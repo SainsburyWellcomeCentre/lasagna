@@ -319,14 +319,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axisRatioLineEdit_2.setText( str(axRatio[1]) )
         self.axisRatioLineEdit_3.setText( str(axRatio[2]) )
 
-        #Make gray image
-        #TODO: This is a bit stupid because it means we're using 3x as much RAM as necessary 
-        #      if image is monochrome. Figure out a nicer solution. 
-        #      see: https://bitbucket.org/tvbz/lasagna/issues/62/look-into-the-possibility-of-a-highly
-        imageStack = np.expand_dims(imageStack,3)
+
+        imageStack = np.expand_dims(imageStack,3) #TODO: AXIS
         self.imageStack=imageStack
 
-        for ii in (1,2):
+        for ii in (1,2): #TODO: AXIS
             self.imageStack = np.append(self.imageStack, imageStack, axis=3) #make gray image
 
         self.overlayEnableActions()
@@ -341,6 +338,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.baseImageFname=fname
 
         self.runHook(self.hooks['loadBaseImageStack_End'])
+
 
     def loadOverlayImageStack(self,fnameToLoad):
         """
@@ -367,7 +365,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         fname = fnameToLoad.split(os.path.sep)[-1]
         self.overlayImageFname=fname
 
-        self.imageStack[...,1] = overlayStack #fill green channel
+        #TODO: AXIS
+        self.imageStack[...,1] = overlayStack #fill green channel 
         self.imageStack[...,2] = 0  #Commenting out this line will produce a green/magenta image
 
         self.overlayEnableActions()
@@ -483,6 +482,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Wipes image stack and clears plot windows
         """
+        #TODO: AXIS
         self.imageStack=np.zeros([1,1,1,3]) #TODO: presumbably there is some less shit way of doing this
         self.initialiseAxes()
         self.imageStack=None
@@ -509,6 +509,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         #show default images
+        #TODO: AXIS
         self.coronal.showImage(self.imageStack)
         self.sagittal.showImage(self.imageStack)
         self.transverse.showImage(self.imageStack)
@@ -548,6 +549,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Remove overalay from an imageStack        
         """
+        #TODO: AXIS
         self.imageStack[...,1] = self.imageStack[...,0]
         self.imageStack[...,2] = self.imageStack[...,0] #May not need to be done if user has edited code to make a magenta/green image
         self.initialiseAxes()
@@ -579,7 +581,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for axis tab
-    # TODO: incorporate these three lots into one
+    # TODO: incorporate these three slots into one
     def axisRatio1Slot(self):
         """
         Set axis ratio on plot 1
@@ -700,6 +702,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
+        #TODO: AXIS - eventually have different histograms for each color channel
         x,y = self.coronal.img.getHistogram()
 
         #Determine max value on the un-logged y values. Do not run this again if the 
@@ -743,12 +746,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots relating to plotting
     def updateAxisLevels(self):
+        #TODO: AXIS
         minX, maxX = self.plottedIntensityRegionObj.getRegion()
         
         self.coronal.minMax=(minX,maxX)
         self.coronal.img.setLevels([minX,maxX])
         
-        self.sagittal.minMax=(minX,maxX)
+        self.sagittnal.minMax=(minX,maxX)
         self.sagittal.img.setLevels([minX,maxX])
         
         self.transverse.minMax=(minX,maxX)

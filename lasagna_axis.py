@@ -26,7 +26,7 @@ class projection2D():
 
 
         print "Creating axis at " + str(thisPlotWidget.objectName())
-        self.img = pg.ImageItem(border='k',levels=self.minMax)
+        self.img = pg.ImageItem(border='k',levels=self.minMax) #TODO: AXIS this can't be added here
         self.img.objectName = 'img_' + str(thisPlotWidget.objectName())
         self.view = thisPlotWidget #This should target the axes to a particular plot widget
         self.view.hideButtons()
