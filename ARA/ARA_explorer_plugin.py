@@ -1,15 +1,17 @@
 
-
-
 """
 Tools for handling the ARA
 eventually this will be a plugin
 """
+
 from lasagna_plugin import lasagna_plugin
 import ARA
+import numpy as np
+import pyqtgraph as pg
 
 class plugin(lasagna_plugin):
     
+
     def __init__(self,lasagna):
         super(plugin,self).__init__(lasagna)
         self.lasagna=lasagna
@@ -29,18 +31,36 @@ class plugin(lasagna_plugin):
 
     def initPlugin(self):
         self.lasagna.imageStack = self.lasagna.loadImageStack(self.pathToARA)
+        
+
+        #Something along these lines should be able to change the color map 
+        pos = np.array([0.0, 0.001, 0.25, 0.35, 0.45, 0.65, 0.9])
+        color = np.array([[0,0,0,255],[255,0,0,255], [0,2,230,255], [7,255,112,255], [255,240,7,255], [7,153,255,255], [255,7,235,255]], dtype=np.ubyte)
+        map = pg.ColorMap(pos, color)
+        lut = map.getLookupTable(0.0, 1.0, 256)
+        
+        self.lasagna.coronal.img.setLookupTable(lut)
+        self.lasagna.sagittal.img.setLookupTable(lut)
+        self.lasagna.transverse.img.setLookupTable(lut)
+
+
         self.lasagna.initialiseAxes()
         self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
 
 
     def closePlugin(self):
+
+        #return color scale to normal
+        self.lasagna.coronal.img.setLookupTable(None)
+        self.lasagna.sagittal.img.setLookupTable(None)
+        self.lasagna.transverse.img.setLookupTable(None)
+
         self.detachHooks()
         self.lasagna.clearAxes()
 
 
     #all methods starting with hook_ are automatically registered as hooks with lasagna 
     #when the plugin is started this happens in the lasagna_plugin constructor 
-
     def hook_updateStatusBar_End(self):
         """
         hooks into the stats bar updat to show the brain area name in the status bar 
@@ -57,7 +77,6 @@ class plugin(lasagna_plugin):
             thisArea='UKNOWN'
 
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
-
 
 
     def hook_loadBaseImageStack_Start(self):
