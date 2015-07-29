@@ -37,7 +37,7 @@
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Concept</h2>
-
+<!--#include virtual="text.txt" -->
 <p>Lasagna is a lightweight Python visualiser for 3D volume data and is still under heavy development. Lasagna was 
 inspired by <a href="http://www.creatis.insa-lyon.fr/rio/vv">VV</a>. Lasagna's key advantage over VV is that the core application
 is very lightweight, with all additional functionality provided by plugins that are easy to write in Python and PyQt. </p>
