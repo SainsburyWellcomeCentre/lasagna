@@ -37,63 +37,51 @@
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Concept</h2>
-{% include_relative ./text.html %}
-<p>Lasagna is a lightweight Python visualiser for 3D volume data and is still under heavy development. Lasagna was 
-inspired by <a href="http://www.creatis.insa-lyon.fr/rio/vv">VV</a>. Lasagna's key advantage over VV is that the core application
-is very lightweight, with all additional functionality provided by plugins that are easy to write in Python and PyQt. </p>
+<p>Lasagna is a lightweight Python visualiser for 3D volume data and is still under heavy development. Lasagna visualises 
+volume data as three linked 2D views which all zoom and pan together. Moving the mouse cursor in one view controls which 
+slice (of the 3-D volume) is displayed in the other two views.
+</p>
 
-<p>Lasagna allows the user to visualise 3D volume data as three linked 2-D views which all 
-zoom and pan together. Moving the mouse cursor in one view controls which slice (of the 3-D volume) is displayed in 
-the other two views. </p>
+<p>
+Lasagna was inspired by <a href="http://www.creatis.insa-lyon.fr/rio/vv">VV</a>. Lasagna's key advantage over VV is that the core application
+is very lightweight and flexible, allowing plugins to provide any additional functionality. Plugins are easy to write in Python and PyQt.</p>
+
 
 <h3>
 <a id="what-data-does-lasagna-handle" class="anchor" href="#what-data-does-lasagna-handle" aria-hidden="true"><span class="octicon octicon-link"></span></a>What data does Lasagna handle?</h3>
 
-<p>Lasagna loads 3D single-channel data sets in the form of multi-page TIFFs or MHD files. Lasagna currently only works on 
-3-D image stacks that can be loaded entirely into RAM. </p>
+<p>Lasagna loads 3D image data sets in the form of multi-page TIFFs or MHD files. Lasagna only works on 
+image stacks that can be loaded entirely into RAM.</p>
 
 <h3>
 <a id="what-applications-is-lasagna-designed-for" class="anchor" href="#what-applications-is-lasagna-designed-for" aria-hidden="true"><span class="octicon octicon-link"></span></a>What applications is Lasagna designed for?</h3>
 
-<p>Since Lasagna has a flexible plugin system, it can potentially be used for any application where visualising 3-D data
-is critical. That said, Lasagna is being specifically developed with the following tasks in mind:</p>
+<p>Lasagna is being specifically developed with the following tasks in mind:</p>
 
 <ul>
-<li>Assessing 3-D registration accuracy of one volume onto another by overlaying two volumes in different colours. </li>
+<li>Assessing 3D registration accuracy by overlaying two volumes in different colours. </li>
 <li>Guiding registration by identifying analogous points in two different volumes. </li>
-<li>Exploration of the Allen Reference Atlas. </li>
-<li>Importing and overlaying of sparse points or traced structures (such as neuronal axons) onto a 3-D volume. </li>
+<li>Exploration of the Allen Reference Atlas brain areas. </li>
+<li>Overlaying of sparse points or traced structures (neuronal trees) onto a 3-D volume. </li>
 </ul>
 
 <h3>
 <a id="current-features" class="anchor" href="#current-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Current features</h3>
 
 <ul>
-<li>Interactive exploration of one 3D volume. </li>
-<li>Overlay of a second volume onto the first. Useful for assessing the degree of alignment between two 3D samples. </li>
-<li>Loading of either TIFF stacks or MHD files, so can work well with <a href="http://elastix.isi.uu.nl/">Elastix</a>. </li>
+<li>Interactive exploration of one 3D volume and overlay of a second volume in a different colour.</li>
+<li>Loading of either TIFF stacks or MHD files to work well with <a href="http://elastix.isi.uu.nl/">Elastix</a>. </li>
 <li>Interactive exploration of the ARA brain areas through a simple plugin.</li>
-<li>A simple plugin system: Python scripts with a particular format located in a particular directory are made accessible via a "Plugins" menu and can modify the behavior of lasagna by calling existing methods or modifying those methods via hooks. </li>
-<li>The zoom can be reset via a button and the scale modified by sliders on top of an image intensity histogram.</li>
+<li>Python scripts with a particular format are made accessible via a <i>Plugins</i> menu and can modify the behavior of Lasagna by calling existing methods or modifying those methods via hooks. </li>
+<li>Histogram, fast zoom reset, user-defined scales for each axis.</li>
 </ul>
 
 
 
 <h2>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
-
-<p>There is currently no installer. Lasagna is still aimed at more advanced users or Python developers. Lasagna runs on Python 2.7 and PyQt4. 
-To run Lasagna, download the repository and make sure you have the following Python modules installed: </p>
-
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Where next?</h2>
 <ul>
-<li>tifffile [for importing TIFF files]</li>
-<li>vtk [for importing MHD files]</li>
-<li>numpy</li>
-<li>pyqtgraph 9.10</li>
-<li>yaml</li>
-<li>PyQt4</li>
-<li>tempfile </li>
-<li>urllib</li>
+<li><a href="./installation.html">Install instructions</li>
 </ul>
         </section>
 
