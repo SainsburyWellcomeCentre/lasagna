@@ -33,14 +33,14 @@ class projection2D():
 
         #Loop through the ingredients list and add them to the ViewBox
         self.items=[] #a list of added plot items TODO: check if we really need this
-        self.addIngredientsToPlotWidget(ingredients)
+        self.addItemsToPlotWidget(ingredients)
 
 
 
-    def addIngredientToPlotWidget(self,ingredient):
+    def addItemToPlotWidget(self,ingredient):
         """
-        Adds an ingredient to the PlotWidget using information in the ingredient properties 
-        to determine how to add it.
+        Adds an ingredient to the PlotWidget as an item (i.e. the ingredient manages the process of 
+        producing an item using information in the ingredient properties.
         """
         #TODO: AXIS find a way to feed in the constructor arguments in a dynamic way
         _thisItem = ( getattr(pg,ingredient.pgObject)(border='k',levels=ingredient.minMax) )
@@ -52,21 +52,21 @@ class projection2D():
         self.items.append(_thisItem)
 
 
-    def removeIngredientFromPlotWidget(self,ingredient):
+    def removeItemFromPlotWidget(self,item):
         """
-        Removes an ingredient from the PlotWidget and also from the list of items.
+        Removes an item from the PlotWidget and also from the list of items.
         This function is used for when want to delete or wipe an item from the list
         because it is no longer needed. Use hideIngredient if you want to temporarily
         make something invisible
 
-        ingredient is either a string defining an objectName or the object itself
+        "item" is either a string defining an objectName or the object itself
         """
 
         items=self.view.items()
         nItemsBefore = len(items) #to determine if an item was removed
-        if isinstance(ingredient,str):
+        if isinstance(item,str):
             for thisItem in items:
-                if hasattr(thisItem,'objectName') and thisItem.objectName==ingredient:
+                if hasattr(thisItem,'objectName') and thisItem.objectName==item:
                         self.view.removeItem(thisItem)
         else: #it should be an image item
             self.view.removeItem(thisItem)
@@ -78,7 +78,7 @@ class projection2D():
         elif nItemsAfter==nItemsBefore:
             return False
         else:
-            print '** removeIngredientFromPlotWidget: %d items before removal and %d after removal.' % (nItemsBefore,nItemsAfter)
+            print '** removeItemFromPlotWidget: %d items before removal and %d after removal.' % (nItemsBefore,nItemsAfter)
             return False
 
 
@@ -86,37 +86,38 @@ class projection2D():
         print "%d items after remove call" % len(self.view.items())
 
 
-    def addIngredientsToPlotWidget(self,ingredients=[]):
+    def addItemsToPlotWidget(self,ingredients=[]):
         """
-        Add all ingredients in list to the PlotWidget
-        """
-        if len(ingredients)==0:
-            return
-        [self.addIngredientToPlotWidget(thisIngredient) for thisIngredient in ingredients]
-
-
-    def removeAllIngredientsFromPlotWidget(self,ingredients):
-        """
-        Remove all ingredients (i.e. delete them) from the PlotWidget
+        Add all ingredients in list to the PlotWidget as items
         """
         if len(ingredients)==0:
             return
-        [self.removeIngredientFromPlotWidget(thisIngredient) for thisIngredient in ingredients]
+        [self.addItemToPlotWidget(thisIngredient) for thisIngredient in ingredients]
 
 
-    def hideIngredient(self,ingredient):
+    def removeAllItemsFromPlotWidget(self,items):
         """
-        Hides an ingredient from the PlotWidget. If you want to delete an ingredient
-        outright then use removeIngredientFromPlotWidget.
+        Remove all items (i.e. delete them) from the PlotWidget
+        items is a list of strings or plot items
         """
-        print "NEED TO WRITE lasagna.axis.hideIngredient()"
+        if len(items)==0:
+            return
+        [self.removeItemFromPlotWidget(thisItem) for thisItem in items]
+
+
+    def hideItem(self,item):
+        """
+        Hides an item from the PlotWidget. If you want to delete an item
+        outright then use removeItemFromPlotWidget.
+        """
+        print "NEED TO WRITE lasagna.axis.hideItem()"
         return
 
 
     def updatePlotItems_2D(self, ingredients, sliceToPlot=None):
         """
         Update all plot items on axis, redrawing so everything associated with a specified 
-        slice (sliceToPlot) is shown.
+        slice (sliceToPlot) is shown. This is done based upon a list of ingredients
         """
 
         # Get base-image in correct orientation.

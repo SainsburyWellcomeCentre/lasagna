@@ -342,9 +342,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                                                               fname=fnameToLoad)
 
         #Add plot items to axes so that they become available for plotting
-        self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.coronal.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.sagittal.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.transverse.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
         
         self.overlayEnableActions()
 
@@ -370,7 +370,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         loadedImageStack = self.loadImageStack(fnameToLoad) 
-
 
         #Do not proceed with adding overlay if it's of a different size
         existingSize = baseStack.data().shape
@@ -400,9 +399,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         
       
         #Add plot items to axes so that they become available for plotting
-        self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.coronal.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.sagittal.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.transverse.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
 
         self.overlayEnableActions()
         self.overlayLoaded=True
@@ -518,9 +517,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         #TODO: AXIS this function should remove ingredients from each axis 
         print "NEED TO WRITE lasagna.clearAxes!!"
-        self.coronal.removeIngredientsFromPlotWidget()
-        self.coronal.removeIngredientsFromPlotWidget()
-        self.coronal.removeIngredientsFromPlotWidget()
+        self.coronal.removeItemsFromPlotWidget()
+        self.coronal.removeItemsFromPlotWidget()
+        self.coronal.removeItemsFromPlotWidget()
 
 
 
@@ -583,14 +582,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Remove overlay from an imageStack        
         """
-
+        #TODO: AXIS with the changes we've been making, this code is now too specific and needs to be 
+        #           elsewhere in some more generalised form
         objectName = 'overlayImage'
         print "removing " + objectName
 
         #Remove item from axes
-        self.coronal.removeIngredientFromPlotWidget(objectName)
-        self.sagittal.removeIngredientFromPlotWidget(objectName)
-        self.transverse.removeIngredientFromPlotWidget(objectName)
+        self.coronal.removeItemFromPlotWidget(objectName)
+        self.sagittal.removeItemFromPlotWidget(objectName)
+        self.transverse.removeItemFromPlotWidget(objectName)
 
         self.ingredients = handleIngredients.removeIngredientByName(objectName,self.ingredients)
 
