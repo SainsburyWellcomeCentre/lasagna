@@ -181,16 +181,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             'updateMainWindowOnMouseMove_End'   : []
                     }
 
-        # Link menu signals to slots
+
+        #Add load actions to the Load ingredients sub-menu
+        self.loadActions = [] #actions must be attached to the lasagna object or they won't function
+        from IO import loadOverlayImageStack
+        self.loadActions.append(loadOverlayImageStack.loadOverlayImageStack(self))
+ 
+        # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showBaseStackLoadDialog)
-        self.actionLoadOverlay.triggered.connect(self.showOverlayLoadDialog)
         self.actionQuit.triggered.connect(self.quitLasagna)
+
 
         # Link toolbar signals to slots
         self.actionResetAxes.triggered.connect(self.resetAxes)
-        self.actionRemoveOverlay.triggered.connect(self.removeOverlay)
+        self.actionRemoveOverlay.triggered.connect(self.removeOverlay) #TODO: ultimately this needs to be dynamically added
 
         #Link tabbed view items to slots
+        #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
         self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
         self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
         self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
@@ -287,23 +294,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
   
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # File menu and methods associated with file loading
-    def loadImageStack(self,thisFname):
-        """
-        Loads an image stack defined by the string thisFname and returns it as an output argument
-        """
-        if not os.path.isfile(thisFname):
-            msg = 'Unable to find ' + thisFname
-            print msg
-            self.statusBar.showMessage(msg)
-            return
-
-        #TODO: The axis swap likely shouldn't be hard-coded here
-        return imageStackLoader.loadStack(thisFname).swapaxes(1,2) 
- 
-
+    # File menu and methods associated with loading the base image stack. 
+  
     def loadBaseImageStack(self,fnameToLoad):
-        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
         """
         Loads the base image image stack. The base image stack is the one which will appear as gray
         if it is the only stack loaded. If an overlay is added on top of this, the base image will
@@ -344,7 +337,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Add plot items to axes so that they become available for plotting
         [axis.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients)) for axis in self.axes2D]
         
-        self.overlayEnableActions()
+        self.overlayEnableActions() #TODO: this will somehow need to be moved out of here and be handled soley by the loadOverlayStack class
 
         #remove any existing range highlighter on the histogram. We do this because different images
         #will likely have different default ranges
@@ -354,54 +347,44 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadBaseImageStack_End'])
 
 
-    def loadOverlayImageStack(self,fnameToLoad):
-        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
+    def showBaseStackLoadDialog(self):
         """
-        Load an image stack and insert it as channel 2 into the pre-existing base stack.
-        This creates a red/green overlay
+        This slot brings up the file load dialog and gets the file name.
+        If the file name is valid, it loads the base stack using the loadBaseImageStack method.
+        We split things up so that the base stack can be loaded from the command line, 
+        or from a plugin without going via the load dialog. 
         """
         self.runHook(self.hooks['showBaseStackLoadDialog_Start'])
 
-        if  baseStack == False:
-            self.actionLoadOverlay.setEnabled(False)
+        fname = self.showFileLoadDialog()
+        if fname == None:
             return
 
-        loadedImageStack = self.loadImageStack(fnameToLoad) 
+        if os.path.isfile(fname): 
+            self.loadBaseImageStack(str(fname)) #convert from QString and load
+            self.initialiseAxes()
+        else:
+            self.statusBar.showMessage("Unable to find " + str(fname))
 
         self.runHook(self.hooks['showBaseStackLoadDialog_End'])
 
-        if not existingSize == overlaySize:
-            msg = '*** Overlay is not the same size as the loaded image ***'
-            print "Base image"
-            print existingSize[0:-1]
-            print "Overlay image"
-            print overlaySize
+
+    # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
+    #Code to handle generic file loading, dialogs, etc
+    def loadImageStack(self,thisFname):
+        """
+        Loads a generic image stack (defined by the string thisFname) and returns it as an output argument
+        """
+        if not os.path.isfile(thisFname):
+            msg = 'Unable to find ' + thisFname
             print msg
             self.statusBar.showMessage(msg)
             return
 
+        #TODO: The axis swap likely shouldn't be hard-coded here
+        return imageStackLoader.loadStack(thisFname).swapaxes(1,2) 
+ 
 
-        #TODO: this is mostly duplicated code from loadBaseImageStack. Look into sorting this out
-        objName='overlayImage'
-        self.ingredients = handleIngredients.addIngredient(self.ingredients, objectName=objName , 
-                                                              kind='imagestack'       , 
-                                                              data=loadedImageStack   , 
-                                                              fname=fnameToLoad)
-
-        #set colormaps for the two stacks
-        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='red'
-        handleIngredients.returnIngredientByName('overlayImage',self.ingredients).lut='green'
-        
-      
-        #Add plot items to axes so that they become available for plotting
-        [axis.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients)) for axis in self.axes2D]
-
-        self.overlayEnableActions()
-        self.overlayLoaded=True
-
-
-    # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
-    #Code to handle file load dialogs
     def showFileLoadDialog(self):
         """
         Bring up the file load dialog. Return the file name. Update the last used path. 
@@ -431,37 +414,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['showFileLoadDialog_End'])
 
         return fname
-
-
-    def showBaseStackLoadDialog(self):
-        """
-        Bring up the file load dialog to load the base image stack
-        """
-        self.runHook(self.hooks['showBaseStackLoadDialog_Start'])
-        fname = self.showFileLoadDialog()
-        if fname == None:
-            return
-
-        if os.path.isfile(fname): 
-            self.loadBaseImageStack(str(fname)) #convert from QString and load
-            self.initialiseAxes()
-        else:
-            self.statusBar.showMessage("Unable to find " + str(fname))
-
-
-    def showOverlayLoadDialog(self):
-        """
-        Bring up the file load dialog to load the overlay image stack
-        """
-        fname = self.showFileLoadDialog()
-        if fname == None:
-            return
-
-        if os.path.isfile(fname): 
-            self.loadOverlayImageStack(str(fname)) #convert QString and load
-            self.initialiseAxes()
-        else:
-            self.statusBar.showMessage("Unable to find " + str(fname))
 
 
     def updateRecentlyOpenedFiles(self):
@@ -567,7 +519,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.infoTextPanel.setText(displayTxt)
 
 
-
+    #TODO: move this method to the loadOverlayImageStack class
     def removeOverlay(self):
         """
         Remove overlay from an imageStack        
@@ -592,6 +544,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.updateDisplayText()
 
 
+    #TODO: move this method to the loadOverlayImageStack class
     def overlayEnableActions(self):
         """
         Actions that need to be performed on the GUI when an overlay can be added
@@ -600,6 +553,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.actionRemoveOverlay.setEnabled(True)
 
 
+    #TODO: move this method to the loadOverlayImageStack class
     def overlayDisableActions(self):
         """
         Actions that need to be performed on the GUI when an overlay can not be added
@@ -705,6 +659,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Update UI elements on the screen (but not the plotted images) as the user moves the mouse across an axis
         """
+        self.runHook(self.hooks['updateMainWindowOnMouseMove_Start']) #Runs each time the views are updated
+
         thisImage = lasHelp.findPyQtGraphObjectNameInPlotWidget(axis.view,'baseImage').image
 
         self.constrainMouseLocationToImage(thisImage)
