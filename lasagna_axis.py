@@ -58,8 +58,32 @@ class projection2D():
         This function is used for when want to delete or wipe an item from the list
         because it is no longer needed. Use hideIngredient if you want to temporarily
         make something invisible
+
+        ingredient is either a string defining an objectName or the object itself
         """
-        pass
+
+        items=self.view.items()
+        nItemsBefore = len(items) #to determine if an item was removed
+        if isinstance(ingredient,str):
+            for thisItem in items:
+                if hasattr(thisItem,'objectName') and thisItem.objectName==ingredient:
+                        self.view.removeItem(thisItem)
+        else: #it should be an image item
+            self.view.removeItem(thisItem)
+
+        #Optionally return True of False depending on whether the removal was successful
+        nItemsAfter = len(self.view.items())
+        if nItemsAfter<nItemsBefore:
+            return True
+        elif nItemsAfter==nItemsBefore:
+            return False
+        else:
+            print '** removeIngredientFromPlotWidget: %d items before removal and %d after removal.' % (nItemsBefore,nItemsAfter)
+            return False
+
+
+
+        print "%d items after remove call" % len(self.view.items())
 
 
     def addIngredientsToPlotWidget(self,ingredients=[]):
@@ -85,7 +109,8 @@ class projection2D():
         Hides an ingredient from the PlotWidget. If you want to delete an ingredient
         outright then use removeIngredientFromPlotWidget.
         """
-        pass
+        print "NEED TO WRITE lasagna.axis.hideIngredient()"
+        return
 
 
     def updatePlotItems_2D(self, ingredients, sliceToPlot=None):

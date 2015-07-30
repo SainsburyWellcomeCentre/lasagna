@@ -335,8 +335,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
         self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
         self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-
-
+        
         self.overlayEnableActions()
 
         #remove any existing range highlighter on the histogram. We do this because different images
@@ -378,13 +377,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
 
-        #TODO: this is all duplicated code from loadBaseImageStack. Look into sorting this out
+        #TODO: this is mostly duplicated code from loadBaseImageStack. Look into sorting this out
         objName='overlayImage'
         self.ingredients = handleIngredients.addIngredient(self.ingredients, objectName=objName , 
                                                               kind='imagestack'       , 
                                                               data=loadedImageStack   , 
                                                               fname=fnameToLoad)
 
+        #set colormaps for the two stacks
+        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='red'
+        handleIngredients.returnIngredientByName('overlayImage',self.ingredients).lut='green'
+        
+      
         #Add plot items to axes so that they become available for plotting
         self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
         self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
@@ -535,7 +539,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.sagittal.updatePlotItems_2D(self.ingredients)
         self.transverse.updatePlotItems_2D(self.ingredients)
 
-        #initialise cross hair
+        #initialize cross hair
         if self.showCrossHairs:
             if self.crossHairVLine==None:
                 self.crossHairVLine = pg.InfiniteLine(angle=90, movable=False)
@@ -567,20 +571,26 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def removeOverlay(self):
         """
-        Remove overalay from an imageStack        
+        Remove overlay from an imageStack        
         """
-        #TODO: AXIS
-        print "NEED TO WRITE lasagna.removeOverlay"
-        self.coronal.removeIngredientFromPlotWidget('overlayImage')
-        self.sagittal.removeIngredientFromPlotWidget('overlayImage')
-        self.transverse.removeIngredientFromPlotWidget('overlayImage')
+
+        objectName = 'overlayImage'
+        print "removing " + objectName
+
+        #Remove item from axes
+        self.coronal.removeIngredientFromPlotWidget(objectName)
+        self.sagittal.removeIngredientFromPlotWidget(objectName)
+        self.transverse.removeIngredientFromPlotWidget(objectName)
+
+        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.ingredients)
+
+        #Set baseImage to gray-scale once more
+        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='gray'
 
         self.initialiseAxes()
         self.overlayLoaded=False
         self.actionRemoveOverlay.setEnabled(False)
 
-        #remove the file name from in the info text 
-        #TODO: AXIS remove overlay from list
         self.updateDisplayText()
 
 
