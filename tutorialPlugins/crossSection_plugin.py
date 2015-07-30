@@ -46,7 +46,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
         pos = QtGui.QCursor.pos()
         PlotWidget = QtGui.qApp.widgetAt(pos).parent()
 
-        ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName='img_graphicsView_',regex=True)
+        #TODO: AXIS we may change the way things are named
+        ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName='baseImage',regex=True)
 
         if ImageItem != None:
             xData = ImageItem.image[:,Y,0]

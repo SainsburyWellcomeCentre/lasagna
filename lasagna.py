@@ -33,8 +33,10 @@ import os.path
 
 
 #lasagna modules
+import ingredients                       # A set of classes for handling loaded data 
+import handleIngredients                 # methods for handling ingredients (searching for them, adding then, etc)
 import imageStackLoader                  # To load TIFF and MHD files
-from lasagna_axis import projection2D      # The class that runs the axes
+from lasagna_axis import projection2D    # The class that runs the axes
 import imageProcessing                   # A potentially temporary module that houses general-purpose image processing code
 import pluginHandler                     # Deals with finding plugins in the path, etc
 import lasagna_mainWindow                 # Derived from designer .ui files built by pyuic
@@ -99,14 +101,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.recentLoadActions = [] 
         self.updateRecentlyOpenedFiles()
         
+        #We will maintain a list of classes of loaded items that can be added to plots
+        self.ingredients = [] 
+
         #set up axes 
         #TODO: could more tightly integrate these objects with the main window so no need to pass many of these args?
         #TODO: stop calling these three views by thei neuroanatomical names. These can be labels, but shouldn't be harcoded as the
         #      names of the object instances
         print ""
-        self.coronal  = projection2D(self.graphicsView_1,  axisRatio=float(self.axisRatioLineEdit_1.text()),  axisToPlot=0)
-        self.sagittal = projection2D(self.graphicsView_2,  axisRatio=float(self.axisRatioLineEdit_2.text()),  axisToPlot=1)
-        self.transverse = projection2D(self.graphicsView_3, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
+        self.coronal  = projection2D(self.graphicsView_1, self.ingredients, axisRatio=float(self.axisRatioLineEdit_1.text()),  axisToPlot=0)
+        self.sagittal = projection2D(self.graphicsView_2, self.ingredients, axisRatio=float(self.axisRatioLineEdit_2.text()),  axisToPlot=1)
+        self.transverse = projection2D(self.graphicsView_3,self.ingredients, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
         print ""
 
 
@@ -147,10 +152,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         #Initialise default values
-        self.imageStack = None
-        self.overlayLoaded = False
-        self.baseImageFname = ''
-        self.overlayImageFname = ''
+        self.overlayLoaded = False #TODO: AXIS this will become moot as eventually arbitrary numbers of overlays can be added
+       
 
         #UI elements updated during mouse moves over an axis
         self.crossHairVLine = None
@@ -300,6 +303,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
  
 
     def loadBaseImageStack(self,fnameToLoad):
+        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
         """
         Loads the base image image stack. The base image stack is the one which will appear as gray
         if it is the only stack loaded. If an overlay is added on top of this, the base image will
@@ -307,11 +311,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         are present will be removed when this function runs. 
         """
 
-        self.baseImageFname='' #wipe this just in case loading fails
+        self.baseImageFname='' #wipe this just in case loading fails TODO: AXIS delete this property
 
         self.runHook(self.hooks['loadBaseImageStack_Start'])
         print "Loading " + fnameToLoad
-        imageStack = self.loadImageStack(fnameToLoad)
+        loadedImageStack = self.loadImageStack(fnameToLoad)
 
         # Set up default values in tabs
         axRatio = imageStackLoader.getVoxelSpacing(fnameToLoad)
@@ -319,56 +323,76 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axisRatioLineEdit_2.setText( str(axRatio[1]) )
         self.axisRatioLineEdit_3.setText( str(axRatio[2]) )
 
-        #Make gray image
-        #TODO: This is a bit stupid because it means we're using 3x as much RAM as necessary 
-        #      if image is monochrome. Figure out a nicer solution. 
-        #      see: https://bitbucket.org/tvbz/lasagna/issues/62/look-into-the-possibility-of-a-highly
-        imageStack = np.expand_dims(imageStack,3)
-        self.imageStack=imageStack
 
-        for ii in (1,2):
-            self.imageStack = np.append(self.imageStack, imageStack, axis=3) #make gray image
+        #Add to the ingredients list
+        objName='baseImage'
+        self.ingredients = handleIngredients.addIngredient(self.ingredients, objectName=objName , 
+                                                              kind='imagestack'       , 
+                                                              data=loadedImageStack   , 
+                                                              fname=fnameToLoad)
 
+        #Add plot items to axes so that they become available for plotting
+        self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        
         self.overlayEnableActions()
 
-        #remove any existing highlighter on the histogram. We do this because different images
+        #remove any existing range highlighter on the histogram. We do this because different images
         #will likely have different default ranges
         if hasattr(self,'plottedIntensityRegionObj'):
             del self.plottedIntensityRegionObj
 
-        #Log the identity of the currently loaded base file
-        fname = fnameToLoad.split(os.path.sep)[-1]
-        self.baseImageFname=fname
-
         self.runHook(self.hooks['loadBaseImageStack_End'])
 
+
     def loadOverlayImageStack(self,fnameToLoad):
+        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
         """
         Load an image stack and insert it as channel 2 into the pre-existing base stack.
         This creates a red/green overlay
         """
-        self.overlayImageFname='' #wipe this just in case loading fails
-        if self.imageStack == None:
+
+        baseStack = handleIngredients.returnIngredientByName('baseImage',self.ingredients) 
+
+        if  baseStack == False:
             self.actionLoadOverlay.setEnabled(False)
             return
 
-        overlayStack = self.loadImageStack(fnameToLoad) 
+        loadedImageStack = self.loadImageStack(fnameToLoad) 
 
-        existingSize = self.imageStack.shape
-        overlaySize = overlayStack.shape
 
-        if not existingSize[0:-1] == overlaySize:
+        #Do not proceed with adding overlay if it's of a different size
+        existingSize = baseStack.data().shape
+        overlaySize = loadedImageStack.shape
+
+        if not existingSize == overlaySize:
             msg = '*** Overlay is not the same size as the loaded image ***'
+            print "Base image"
+            print existingSize[0:-1]
+            print "Overlay image"
+            print overlaySize
             print msg
             self.statusBar.showMessage(msg)
             return
 
-        #Log the identity of the currently loaded overlay file
-        fname = fnameToLoad.split(os.path.sep)[-1]
-        self.overlayImageFname=fname
 
-        self.imageStack[...,1] = overlayStack #fill green channel
-        self.imageStack[...,2] = 0  #Commenting out this line will produce a green/magenta image
+        #TODO: this is mostly duplicated code from loadBaseImageStack. Look into sorting this out
+        objName='overlayImage'
+        self.ingredients = handleIngredients.addIngredient(self.ingredients, objectName=objName , 
+                                                              kind='imagestack'       , 
+                                                              data=loadedImageStack   , 
+                                                              fname=fnameToLoad)
+
+        #set colormaps for the two stacks
+        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='red'
+        handleIngredients.returnIngredientByName('overlayImage',self.ingredients).lut='green'
+        
+      
+        #Add plot items to axes so that they become available for plotting
+        self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
 
         self.overlayEnableActions()
         self.overlayLoaded=True
@@ -414,7 +438,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         if os.path.isfile(fname): 
             self.loadBaseImageStack(str(fname)) #convert from QString and load
-            #TODO: set the voxel sizes if this information was available at load time (e.g. from the MHD file)
             self.initialiseAxes()
         else:
             self.statusBar.showMessage("Unable to find " + str(fname))
@@ -483,17 +506,19 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Wipes image stack and clears plot windows
         """
-        self.imageStack=np.zeros([1,1,1,3]) #TODO: presumbably there is some less shit way of doing this
-        self.initialiseAxes()
-        self.imageStack=None
-        self.overlayDisableActions()
+        #TODO: AXIS this function should remove ingredients from each axis 
+        print "NEED TO WRITE lasagna.clearAxes!!"
+        self.coronal.removeIngredientsFromPlotWidget()
+        self.coronal.removeIngredientsFromPlotWidget()
+        self.coronal.removeIngredientsFromPlotWidget()
+
 
 
     def resetAxes(self):
         """
         Set X and Y limit of each axes to fit the data
         """
-        if self.imageStack == None:
+        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
             return
 
         self.coronal.resetAxes()
@@ -505,15 +530,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Initial display of images in axes and also update other parts of the GUI. 
         """
-        if self.imageStack == None:
+        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
             return
 
         #show default images
-        self.coronal.showImage(self.imageStack)
-        self.sagittal.showImage(self.imageStack)
-        self.transverse.showImage(self.imageStack)
+        print "updating axes with added ingredients"
+        self.coronal.updatePlotItems_2D(self.ingredients)
+        self.sagittal.updatePlotItems_2D(self.ingredients)
+        self.transverse.updatePlotItems_2D(self.ingredients)
 
-        #initialise cross hair
+        #initialize cross hair
         if self.showCrossHairs:
             if self.crossHairVLine==None:
                 self.crossHairVLine = pg.InfiniteLine(angle=90, movable=False)
@@ -532,13 +558,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.updateDisplayText()
 
     def updateDisplayText(self):
-        #Add loaded file names to display box
+        """
+        Loop through all ingredients and print out their type the file name
+        """
         displayTxt=''
-        if len(self.baseImageFname)>0:
-            displayTxt = displayTxt + "<b>Base Image:</b> " + self.baseImageFname
-
-        if len(self.overlayImageFname)>0:
-            displayTxt = displayTxt + "<br>" + "<b>Overlay Image:</b> " + self.overlayImageFname            
+        for thisIngredient in self.ingredients:
+            displayTxt = "%s<b>%s</b>: %s<br>" % (displayTxt, thisIngredient.objectName, thisIngredient.fname())
 
         self.infoTextPanel.setText(displayTxt)
 
@@ -546,16 +571,26 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def removeOverlay(self):
         """
-        Remove overalay from an imageStack        
+        Remove overlay from an imageStack        
         """
-        self.imageStack[...,1] = self.imageStack[...,0]
-        self.imageStack[...,2] = self.imageStack[...,0] #May not need to be done if user has edited code to make a magenta/green image
+
+        objectName = 'overlayImage'
+        print "removing " + objectName
+
+        #Remove item from axes
+        self.coronal.removeIngredientFromPlotWidget(objectName)
+        self.sagittal.removeIngredientFromPlotWidget(objectName)
+        self.transverse.removeIngredientFromPlotWidget(objectName)
+
+        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.ingredients)
+
+        #Set baseImage to gray-scale once more
+        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='gray'
+
         self.initialiseAxes()
         self.overlayLoaded=False
         self.actionRemoveOverlay.setEnabled(False)
 
-        #remove the file name from in the info text 
-        self.overlayImageFname=''
         self.updateDisplayText()
 
 
@@ -576,10 +611,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.overlayLoaded=False #If an overlay can not be added it also can not be present
 
 
-
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for axis tab
-    # TODO: incorporate these three lots into one
+    # TODO: incorporate these three slots into one
     def axisRatio1Slot(self):
         """
         Set axis ratio on plot 1
@@ -632,7 +666,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Ensures that the values of self.mouseX and self.mouseY, which are the X and Y positions
         of the mouse pointer on the current image, do not exceed the dimensions of the image.
         This is used to avoid asking for image slices that do not exist.
-        NOTE: constraints on plotting are also imposed in lasagna_axis.showImage
+        NOTE: constraints on plotting are also imposed in lasagna_axis.updatePlotItems_2D
         """
         #I think the following would be better placed in getMousePositionInCurrentView, but this could work also. 
         if self.mouseX<0:
@@ -670,19 +704,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if isinstance(self.pixelValue,np.ndarray): #so this works with both RGB and monochrome images
             self.pixelValue = int(self.pixelValue[0])
 
-
-
         self.statusBarText = "X=%d, Y=%d, val=%d" % (X,Y,self.pixelValue)
-
         self.runHook(self.hooks['updateStatusBar_End']) #Hook goes here to modify or append message
-
         self.statusBar.showMessage(self.statusBarText)
 
 
-    def updateMainWindowOnMouseMove(self,thisImage):
+    def updateMainWindowOnMouseMove(self,axis):
         """
         Update UI elements on the screen (but not the plotted images) as the user moves the mouse across an axis
         """
+        thisImage = lasHelp.findPyQtGraphObjectNameInPlotWidget(axis.view,'baseImage').image
+
         self.constrainMouseLocationToImage(thisImage)
         self.updateCrossHairs()
         self.updateStatusBar(thisImage)
@@ -700,16 +732,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
-        x,y = self.coronal.img.getHistogram()
 
-        #Determine max value on the un-logged y values. Do not run this again if the 
-        #graph is merely updated. This will only run if a new imageStack was loaded
-        if not hasattr(self,'plottedIntensityRegionObj'):
-            calcuMaxVal = imageProcessing.coreFunctions.defaultHistRange(y,x) #return a reasonble value for the maximum
+        #TODO: AXIS - eventually have different histograms for each color channel
+        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.coronal.view,'baseImage')
+        x,y = img.getHistogram()
 
         if self.logYcheckBox.isChecked():
             y=np.log10(y+0.1)
 
+        #Determine max value on the un-logged y values. Do not run this again if the 
+        #graph is merely updated. This will only run if a new imageStack was loaded
+        if not hasattr(self,'plottedIntensityRegionObj'):
+            baseImage=handleIngredients.returnIngredientByName('baseImage',self.ingredients)
+            calcuMaxVal = baseImage.defaultHistRange() #return a reasonable value for the maximum
+
+      
         self.intensityHistogram.clear()
         ## Using stepMode=True causes the plot to draw two lines for each sample but it needs X to be longer than Y by 1
         self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, brush=(255,0,255,80))
@@ -743,22 +780,35 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots relating to plotting
     def updateAxisLevels(self):
+        #TODO: AXIS - decide what to do with minMax. 
+        #Have the object set it? Doing it here by directly manipulating the item seems wrong
         minX, maxX = self.plottedIntensityRegionObj.getRegion()
-        
-        self.coronal.minMax=(minX,maxX)
-        self.coronal.img.setLevels([minX,maxX])
-        
-        self.sagittal.minMax=(minX,maxX)
-        self.sagittal.img.setLevels([minX,maxX])
-        
-        self.transverse.minMax=(minX,maxX)
-        self.transverse.img.setLevels([minX,maxX])
+
+        #Get all imagestacks
+        allImageStacks = handleIngredients.returnIngredientByType('imagestack',self.ingredients)
+
+        #Loop through all imagestacks and set their levels in each axis
+        for thisImageStack in allImageStacks:
+            objectName=thisImageStack.objectName
+
+            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.coronal.view,objectName)
+            img.setLevels([minX,maxX]) #Sets levels immediately
+
+            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.sagittal.view,objectName)
+            img.setLevels([minX,maxX]) #Sets levels immediately
+
+            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.transverse.view,objectName)
+            img.setLevels([minX,maxX]) #Sets levels immediately
+
+            thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
+
         
 
 
     def mouseMovedCoronal(self,evt):
-        if self.imageStack == None:
+        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
             return
+
 
         pos = evt[0] #Using signal proxy turns original arguments into a tuple
         self.removeCrossHairs()
@@ -771,12 +821,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.coronal.view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.coronal.getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.coronal.img.image)
-            self.coronal.updateDisplayedSlices(self.imageStack,(self.mouseX,self.mouseY))
+            self.updateMainWindowOnMouseMove(self.coronal) #Update UI elements 
+            self.coronal.updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY)) #Update displayed slice
 
 
     def mouseMovedSaggital(self,evt):
-        if self.imageStack == None:
+        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
             return
 
         pos = evt[0]
@@ -788,12 +838,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.sagittal.view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.sagittal.getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.sagittal.img.image)
-            self.sagittal.updateDisplayedSlices(self.imageStack,(self.mouseX,self.mouseY))
+            self.updateMainWindowOnMouseMove(self.sagittal)
+            self.sagittal.updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
 
         
     def mouseMovedTransverse(self,evt):
-        if self.imageStack == None:
+        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
             return
 
         pos = evt[0]  
@@ -805,8 +855,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.transverse.view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.transverse.getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.transverse.img.image)
-            self.transverse.updateDisplayedSlices(self.imageStack,(self.mouseX,self.mouseY))
+            self.updateMainWindowOnMouseMove(self.transverse)
+            self.transverse.updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
 
 
 
@@ -836,6 +886,7 @@ def main(fnames=[None,None]):
     # Link slots to signals
     #connect views to the mouseMoved slot. After connection this runs in the background. 
     #TODO: figure out why returning an argument is crucial even though we never use it
+
     proxy1=pg.SignalProxy(tasty.coronal.view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedCoronal)
     proxy2=pg.SignalProxy(tasty.sagittal.view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
     proxy3=pg.SignalProxy(tasty.transverse.view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)

@@ -18,7 +18,7 @@ def loadTiffStack(fname):
   Bugs: known to fail with tiffs produced by Icy [23/07/15]
   """
   im = imread(fname)
-  print "reading image of size: rows: %d, cols: %d, %d: layers" % (im.shape[1],im.shape[2],im.shape[0])
+  print "reading image of size: rows: %d, cols: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
   return im
 
 
