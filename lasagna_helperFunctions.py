@@ -149,7 +149,7 @@ def defaultPreferences():
             'recentlyLoadedFiles' : [] ,            #A list containing the last "numRecentFiles" file names
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
-            'showCrossHairs' : False                #Whether or not to show the cross hairs 
+            'showCrossHairs' : True                 #Whether or not to show the cross hairs 
             }
 
  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
