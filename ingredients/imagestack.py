@@ -6,9 +6,10 @@ TODO: once this is working, pull out the general purpose stuff and set up an ing
 from __future__ import division
 import numpy as np
 import os
+from PyQt4 import QtGui
 
 class imagestack(object):
-	def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=[0,2E3]):
+	def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=[0,1E3]):
 
 		#Assign input arguments to properties of the class instance. 
 		#The following properties are common to all ingredients
@@ -21,7 +22,7 @@ class imagestack(object):
 		#Set up class-specific properties, which classes other than image stack may not share
 		#or may share but have different values assigned
 		self.pgObject = 'ImageItem' #The PyQtGraph item type which will display the data
-
+		self.compositionMode=QtGui.QPainter.CompositionMode_Plus
 		self.minMax = minMax
 		#TODO: need some way of setting up ImageItem properties such as border and levels
 
@@ -56,7 +57,7 @@ class imagestack(object):
 		onto the object with which it is associated
 		"""
 		data = self.data(axisToPlot)
-		pyqtObject.setImage(data[sliceToPlot], levels=self.minMax)
+		pyqtObject.setImage(data[sliceToPlot], levels=self.minMax, setCompositionMode=self.compositionMode)
 
 
 

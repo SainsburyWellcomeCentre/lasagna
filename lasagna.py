@@ -152,7 +152,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         #Initialise default values
-        self.overlayLoaded = False
+        self.overlayLoaded = False #TODO: AXIS this will become moot as eventually arbitrary numbers of overlays can be added
        
 
         #UI elements updated during mouse moves over an axis
@@ -303,6 +303,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
  
 
     def loadBaseImageStack(self,fnameToLoad):
+        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
         """
         Loads the base image image stack. The base image stack is the one which will appear as gray
         if it is the only stack loaded. If an overlay is added on top of this, the base image will
@@ -347,33 +348,47 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     def loadOverlayImageStack(self,fnameToLoad):
+        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
         """
         Load an image stack and insert it as channel 2 into the pre-existing base stack.
         This creates a red/green overlay
         """
-        self.overlayImageFname='' #wipe this just in case loading fails
-        if self.imageStack == None:
+
+        baseStack = handleIngredients.returnIngredientByName('baseImage',self.ingredients) 
+
+        if  baseStack == False:
             self.actionLoadOverlay.setEnabled(False)
             return
 
-        overlayStack = self.loadImageStack(fnameToLoad) 
+        loadedImageStack = self.loadImageStack(fnameToLoad) 
 
-        existingSize = self.imageStack.shape
-        overlaySize = overlayStack.shape
 
-        if not existingSize[0:-1] == overlaySize:
+        #Do not proceed with adding overlay if it's of a different size
+        existingSize = baseStack.data().shape
+        overlaySize = loadedImageStack.shape
+
+        if not existingSize == overlaySize:
             msg = '*** Overlay is not the same size as the loaded image ***'
+            print "Base image"
+            print existingSize[0:-1]
+            print "Overlay image"
+            print overlaySize
             print msg
             self.statusBar.showMessage(msg)
             return
 
-        #Log the identity of the currently loaded overlay file
-        fname = fnameToLoad.split(os.path.sep)[-1]
-        self.overlayImageFname=fname
 
-        #TODO: AXIS
-        self.imageStack[...,1] = overlayStack #fill green channel 
-        self.imageStack[...,2] = 0  #Commenting out this line will produce a green/magenta image
+        #TODO: this is all duplicated code from loadBaseImageStack. Look into sorting this out
+        objName='overlayImage'
+        self.ingredients = handleIngredients.addIngredient(self.ingredients, objectName=objName , 
+                                                              kind='imagestack'       , 
+                                                              data=loadedImageStack   , 
+                                                              fname=fnameToLoad)
+
+        #Add plot items to axes so that they become available for plotting
+        self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
+        self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
 
         self.overlayEnableActions()
         self.overlayLoaded=True
@@ -565,7 +580,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.actionRemoveOverlay.setEnabled(False)
 
         #remove the file name from in the info text 
-        self.overlayImageFname=''
+        #TODO: AXIS remove overlay from list
         self.updateDisplayText()
 
 
