@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created: Thu Jul 30 15:59:02 2015
+# Created: Thu Jul 30 17:34:08 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -303,6 +303,7 @@ class Ui_lasagna_mainWindow(object):
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap(_fromUtf8(":/actions/icons/overlay.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionLoadOverlay.setIcon(icon4)
+        self.actionLoadOverlay.setShortcut(_fromUtf8(""))
         self.actionLoadOverlay.setObjectName(_fromUtf8("actionLoadOverlay"))
         self.actionRemoveOverlay = QtGui.QAction(lasagna_mainWindow)
         self.actionRemoveOverlay.setEnabled(False)
@@ -314,10 +315,9 @@ class Ui_lasagna_mainWindow(object):
         self.actionNone.setObjectName(_fromUtf8("actionNone"))
         self.actionOpen_2 = QtGui.QAction(lasagna_mainWindow)
         self.actionOpen_2.setObjectName(_fromUtf8("actionOpen_2"))
-        self.menuFile.addAction(self.actionOpen)
+        self.menuLoad_ingredient.addAction(self.actionOpen)
         self.menuFile.addAction(self.menuLoad_ingredient.menuAction())
         self.menuFile.addAction(self.menuOpen_recent.menuAction())
-        self.menuFile.addAction(self.actionLoadOverlay)
         self.menuFile.addAction(self.actionQuit)
         self.menuHelp.addAction(self.actionAbout)
         self.menuBar.addAction(self.menuFile.menuAction())
@@ -334,7 +334,7 @@ class Ui_lasagna_mainWindow(object):
     def retranslateUi(self, lasagna_mainWindow):
         lasagna_mainWindow.setWindowTitle(_translate("lasagna_mainWindow", "MainWindow", None))
         self.menuFile.setTitle(_translate("lasagna_mainWindow", "&File", None))
-        self.menuOpen_recent.setTitle(_translate("lasagna_mainWindow", "Open recent", None))
+        self.menuOpen_recent.setTitle(_translate("lasagna_mainWindow", "&Open recent", None))
         self.menuLoad_ingredient.setTitle(_translate("lasagna_mainWindow", "&Load ingredient", None))
         self.menuHelp.setTitle(_translate("lasagna_mainWindow", "Help", None))
         self.menuPlugins.setTitle(_translate("lasagna_mainWindow", "&Plugins", None))
@@ -354,7 +354,7 @@ class Ui_lasagna_mainWindow(object):
         self.pushButton_FlipView3.setText(_translate("lasagna_mainWindow", "View 3", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.axisSetingsTab), _translate("lasagna_mainWindow", "Axis", None))
         self.toolBar.setWindowTitle(_translate("lasagna_mainWindow", "toolBar", None))
-        self.actionOpen.setText(_translate("lasagna_mainWindow", "&Open", None))
+        self.actionOpen.setText(_translate("lasagna_mainWindow", "&New base stack", None))
         self.actionAbout.setText(_translate("lasagna_mainWindow", "About", None))
         self.actionQuit.setText(_translate("lasagna_mainWindow", "&Quit", None))
         self.action_ARA_Explorer.setText(_translate("lasagna_mainWindow", "&ARA Explorer", None))

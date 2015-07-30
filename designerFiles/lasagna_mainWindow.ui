@@ -79,18 +79,17 @@
     </property>
     <widget class="QMenu" name="menuOpen_recent">
      <property name="title">
-      <string>Open recent</string>
+      <string>&amp;Open recent</string>
      </property>
     </widget>
     <widget class="QMenu" name="menuLoad_ingredient">
      <property name="title">
       <string>&amp;Load ingredient</string>
      </property>
+     <addaction name="actionOpen"/>
     </widget>
-    <addaction name="actionOpen"/>
     <addaction name="menuLoad_ingredient"/>
     <addaction name="menuOpen_recent"/>
-    <addaction name="actionLoadOverlay"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -557,7 +556,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>&amp;Open</string>
+    <string>&amp;New base stack</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -609,6 +608,9 @@
    </property>
    <property name="text">
     <string>&amp;Load overlay</string>
+   </property>
+   <property name="shortcut">
+    <string/>
    </property>
   </action>
   <action name="actionRemoveOverlay">
