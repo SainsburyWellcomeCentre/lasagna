@@ -20,6 +20,8 @@ def addIngredient(ingredientList=[], kind='', objectName='', data=None, fname=''
     ingredients are classes that are defined in the ingredients package
     """
 
+    print "Adding ingredient " + objectName
+
     if len(kind)==0:
         print "ERROR: no ingredient kind specified"
         return
@@ -29,7 +31,8 @@ def addIngredient(ingredientList=[], kind='', objectName='', data=None, fname=''
         print "ERROR: ingredients module has no class '%s'" % kind
         return
 
-    removeIngredient(objectName)
+    #If an ingredient with this object name is already present we delete it
+    ingredientList = removeIngredientByName(objectName,ingredientList)
 
     #Get ingredient of this class from the ingredients package
     ingredientClassObj = getattr(getattr(ingredients,kind),kind)
@@ -43,18 +46,45 @@ def addIngredient(ingredientList=[], kind='', objectName='', data=None, fname=''
     return ingredientList
 
 
-def removeIngredient(ingredientList=[], objectName=''):
+def removeIngredientByName(objectName, ingredientList=[]):
     """
-    Finds ingredient by name and removes it
+    Finds ingredient by name and removes it from the list
     """
-    if len(objectName)==0:
-        return
-    #TODO: is the following correct?
+
+    verbose = False
+    if len(ingredientList)==0:
+        if verbose:
+            print "removeIngredientByType finds no ingredients in list!"
+        return ingredientList
+
+    removedIngredient=False
     for thisIngredient in ingredientList[:]:
-        if thisIngredient.__module__.endswith(objectName):
-            print 'Removing ingredient ' + objectName
-            #TODO: also remove item from ViewBox and maybe also call a destructor
-            print "TODO: also need to remove item from ViewBox"
+        if thisIngredient.objectName == objectName:
+            if verbose:
+                print 'Removing ingredient ' + objectName
+            ingredientList.remove(thisIngredient)
+            removedIngredient=True
+
+    if removedIngredient == False & verbose==True:
+        print "** Failed to remove ingredient %s **" % objectName
+    return ingredientList
+
+
+def removeIngredientByType(ingredientType, ingredientList=[]):
+    """
+    Finds ingredient by type and removes it
+    """
+    verbose = False
+    if len(ingredientList)==0:
+        if verbose:
+            print "removeIngredientByType finds no ingredients in list!"
+        return False
+
+    for thisIngredient in ingredientList[:]:
+        if thisIngredient.__module__.endswith(ingredientType):
+            if verbose:
+                print 'Removing ingredient ' + thisIngredient.objectName
+
             ingredientList.remove(thisIngredient)
 
     return ingredientList
@@ -75,7 +105,7 @@ def returnIngredientByType(ingredientType,ingredientList=[]):
     """
     Return a list of ingredients based upon their type. e.g. imagestack, sparsepoints, etc
     """
-    verbose = 0
+    verbose = False
     if len(ingredientList)==0:
         if verbose:
             print "returnIngredientByType finds no ingredients in list!"
@@ -99,7 +129,7 @@ def returnIngredientByName(objectName,ingredientList=[]):
     Return a specific ingredient based upon its object name.
     Returns False if the ingredient was not found
     """
-    verbose = 0
+    verbose = False
     if len(ingredientList)==0:
         if verbose:
             print "returnIngredientByName finds no ingredients in list!"
