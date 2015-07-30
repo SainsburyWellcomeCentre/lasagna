@@ -57,7 +57,7 @@ class imagestack(object):
 		onto the object with which it is associated
 		"""
 		data = self.data(axisToPlot)
-		pyqtObject.setImage(data[sliceToPlot], levels=self.minMax, setCompositionMode=self.compositionMode)
+		pyqtObject.setImage(data[sliceToPlot], levels=self.minMax, compositionMode=self.compositionMode)
 
 
 
