@@ -26,7 +26,7 @@ class imagestack(object):
         self.compositionMode=QtGui.QPainter.CompositionMode_Plus
 
         self.minMax = minMax
-        self.lut='red' #The look-up table
+        self.lut='gray' #The look-up table
 
         #TODO: need some way of setting up ImageItem properties such as border and levels
 
