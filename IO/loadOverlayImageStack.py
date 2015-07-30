@@ -1,14 +1,17 @@
 """
 load an overlay image stack that will be placed on top of the base stack to
-create a red/green overlay
+create a red/green overlay. If an overlay is added the base stack changes 
+color (e.g. to red). 
 """
 
 import handleIngredients
 from PyQt4 import QtGui
 import os
+from lasagna_plugin import lasagna_plugin
 
-class loadOverlayImageStack(object):
+class loadOverlayImageStack(lasagna_plugin):
     def __init__(self,lasagna):
+        super(loadOverlayImageStack,self).__init__(lasagna)
 
         self.lasagna = lasagna
         self.objectName = 'load_overlay' #Can be uased as an optional way of finding the object later
@@ -16,9 +19,9 @@ class loadOverlayImageStack(object):
 
         #Construct the QActions and other stuff required to integrate the load dialog into the menu
         
-        #Instantiate the action
+        #Instantiate the menu action
         self.loadAction = QtGui.QAction(self.lasagna)
-        self.loadAction.setEnabled(True)    #TODO: make this contingent on whether there is a base stack loaded
+        self.loadAction.setEnabled(False)    #TODO: make this contingent on whether there is a base stack loaded
                                             #TODO: also see lasagna.loadBaseImageStack()
 
         #Add an icon to the action
@@ -35,6 +38,11 @@ class loadOverlayImageStack(object):
         self.loadAction.triggered.connect(self.showLoadDialog)
 
 
+        #TODO: same stuff again but now for the removeOverlay button
+        #self.actionRemoveOverlay.triggered.connect(self.removeOverlay)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #main load method
     def load(self,fnameToLoad):
         """
         The load method does all of the things necessary for loading the overlay
@@ -85,11 +93,17 @@ class loadOverlayImageStack(object):
 
         #TODO: Both of the following lines need to be changed. They call hard-coded stuff in lasagna.py 
         #and doing this is no longer an option
-        self.lasagna.overlayEnableActions()
-        self.lasagna.overlayLoaded=True
+        self.overlayEnableActions()
 
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #Plugin hooks to modify the behavior of the main GUI. Specifically, want to only allow overlays
+    #to be loaded when a base stack is already present.
+    def hook_loadBaseImageStack_End(self):
+        self.overlayEnableActions()
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #Slots follow
     def showLoadDialog(self):
         """
         This slot brings up the load dialog and retrieves the file name.
@@ -103,7 +117,47 @@ class loadOverlayImageStack(object):
             return
 
         if os.path.isfile(fname): 
-            self.load(str(fname)) #convert QString and load
+            self.load(str(fname)) 
             self.lasagna.initialiseAxes()
         else:
             self.lasagna.statusBar.showMessage("Unable to find " + str(fname))
+
+    def removeOverlay(self):
+        """
+        Remove overlay from an imageStack        
+        """
+        #TODO: AXIS with the changes we've been making, this code is now too specific and needs to be 
+        #           elsewhere in some more generalised form
+        objectName = 'overlayImage'
+        print "removing " + objectName
+
+        #Remove item from axes
+        [axis.removeItemFromPlotWidget(objectName) for axis in self.axes2D]
+
+        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.ingredients)
+
+        #Set baseImage to gray-scale once more
+        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='gray'
+
+        self.initialiseAxes()
+        self.actionRemoveOverlay.setEnabled(False)
+
+        self.updateDisplayText()
+
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #The following methods define modifications to the GUI that need to take place when it becomes
+    #possible to overlay an image stack.
+    def overlayEnableActions(self):
+        """
+        Actions that need to be performed on the GUI when an overlay can be added
+        """
+        self.loadAction.setEnabled(True)
+        #self.actionRemoveOverlay.setEnabled(True)
+
+
+    def overlayDisableActions(self):
+        """
+        Actions that need to be performed on the GUI when an overlay can not be added
+        """
+        #self.actionRemoveOverlay.setEnabled(False)

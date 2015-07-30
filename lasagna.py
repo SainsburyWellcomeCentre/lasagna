@@ -146,11 +146,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
 
-
-        #Initialise default values
-        self.overlayLoaded = False #TODO: AXIS this will become moot as eventually arbitrary numbers of overlays can be added
-       
-
         #UI elements updated during mouse moves over an axis
         self.crossHairVLine = None
         self.crossHairHLine = None
@@ -194,7 +189,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # Link toolbar signals to slots
         self.actionResetAxes.triggered.connect(self.resetAxes)
-        self.actionRemoveOverlay.triggered.connect(self.removeOverlay) #TODO: ultimately this needs to be dynamically added
+        
 
         #Link tabbed view items to slots
         #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
@@ -206,7 +201,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         #Plugins menu and initialisation
-        # 1. Get a list of a plugins in the plugins path and add their directories to the Python path
+        # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
         pluginPaths = lasHelp.readPreference('pluginPaths')
 
         plugins, pluginPaths = pluginHandler.findPlugins(pluginPaths)
@@ -299,8 +294,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def loadBaseImageStack(self,fnameToLoad):
         """
         Loads the base image image stack. The base image stack is the one which will appear as gray
-        if it is the only stack loaded. If an overlay is added on top of this, the base image will
-        become red. This function wipes and data that have already been loaded. Any overlays that 
+        if it is the only stack loaded. This function wipes and data that have already been loaded. Any overlays that 
         are present will be removed when this function runs. 
         """
 
@@ -336,8 +330,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #Add plot items to axes so that they become available for plotting
         [axis.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients)) for axis in self.axes2D]
-        
-        self.overlayEnableActions() #TODO: this will somehow need to be moved out of here and be handled soley by the loadOverlayStack class
 
         #remove any existing range highlighter on the histogram. We do this because different images
         #will likely have different default ranges
@@ -361,7 +353,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         if os.path.isfile(fname): 
-            self.loadBaseImageStack(str(fname)) #convert from QString and load
+            self.loadBaseImageStack(str(fname))
             self.initialiseAxes()
         else:
             self.statusBar.showMessage("Unable to find " + str(fname))
@@ -519,48 +511,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.infoTextPanel.setText(displayTxt)
 
 
-    #TODO: move this method to the loadOverlayImageStack class
-    def removeOverlay(self):
-        """
-        Remove overlay from an imageStack        
-        """
-        #TODO: AXIS with the changes we've been making, this code is now too specific and needs to be 
-        #           elsewhere in some more generalised form
-        objectName = 'overlayImage'
-        print "removing " + objectName
-
-        #Remove item from axes
-        [axis.removeItemFromPlotWidget(objectName) for axis in self.axes2D]
-
-        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.ingredients)
-
-        #Set baseImage to gray-scale once more
-        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='gray'
-
-        self.initialiseAxes()
-        self.overlayLoaded=False
-        self.actionRemoveOverlay.setEnabled(False)
-
-        self.updateDisplayText()
-
-
-    #TODO: move this method to the loadOverlayImageStack class
-    def overlayEnableActions(self):
-        """
-        Actions that need to be performed on the GUI when an overlay can be added
-        """
-        self.actionLoadOverlay.setEnabled(True)
-        self.actionRemoveOverlay.setEnabled(True)
-
-
-    #TODO: move this method to the loadOverlayImageStack class
-    def overlayDisableActions(self):
-        """
-        Actions that need to be performed on the GUI when an overlay can not be added
-        """
-        self.actionLoadOverlay.setEnabled(False)
-        self.actionRemoveOverlay.setEnabled(False)
-        self.overlayLoaded=False #If an overlay can not be added it also can not be present
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -821,7 +771,7 @@ def main(fnames=[None,None]):
     
         if not fnames[1]==None:
             print "Loading " + fnames[1]
-            tasty.loadOverlayImageStack(fnames[1])
+            tasty.loadActions[0].load(fnames[1]) #TODO: we need a nice way of finding load actions by name
 
         tasty.initialiseAxes()
 
