@@ -69,7 +69,7 @@ class projection2D():
                 if hasattr(thisItem,'objectName') and thisItem.objectName==item:
                         self.view.removeItem(thisItem)
         else: #it should be an image item
-            self.view.removeItem(thisItem)
+            self.view.removeItem(item)
 
         #Optionally return True of False depending on whether the removal was successful
         nItemsAfter = len(self.view.items())
