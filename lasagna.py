@@ -758,15 +758,25 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #TODO: AXIS - decide what to do with minMax. 
         #Have the object set it? Doing it here by directly manipulating the item seems wrong
         minX, maxX = self.plottedIntensityRegionObj.getRegion()
-        
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.coronal.view,'baseImage')
-        img.setLevels([minX,maxX])
-        
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.sagittal.view,'baseImage')
-        img.setLevels([minX,maxX])
-        
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.transverse.view,'baseImage')
-        img.setLevels([minX,maxX])
+
+        #Get all imagestacks
+        allImageStacks = handleIngredients.returnIngredientByType('imagestack',self.ingredients)
+
+        #Loop through all imagestacks and set their levels in each axis
+        for thisImageStack in allImageStacks:
+            objectName=thisImageStack.objectName
+
+            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.coronal.view,objectName)
+            img.setLevels([minX,maxX]) #Sets levels immediately
+
+            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.sagittal.view,objectName)
+            img.setLevels([minX,maxX]) #Sets levels immediately
+
+            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.transverse.view,objectName)
+            img.setLevels([minX,maxX]) #Sets levels immediately
+
+            thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
+
         
 
 

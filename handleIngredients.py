@@ -49,7 +49,7 @@ def removeIngredient(ingredientList=[], objectName=''):
     """
     if len(objectName)==0:
         return
-
+    #TODO: is the following correct?
     for thisIngredient in ingredientList[:]:
         if thisIngredient.__module__.endswith(objectName):
             print 'Removing ingredient ' + objectName
@@ -69,6 +69,29 @@ def listIngredients(ingredientList=[]):
         ingredientNames.append(thisIngredient.objectName)
 
     return ingredientNames
+
+
+def returnIngredientByType(ingredientType,ingredientList=[]):
+    """
+    Return a list of ingredients based upon their type. e.g. imagestack, sparsepoints, etc
+    """
+    verbose = 0
+    if len(ingredientList)==0:
+        if verbose:
+            print "returnIngredientByType finds no ingredients in list!"
+        return False
+
+    returnedIngredients=[]
+    for thisIngredient in ingredientList:
+        if thisIngredient.__module__.endswith(ingredientType):
+            returnedIngredients.append(thisIngredient)
+
+
+    if verbose and len(returnedIngredients)==0:
+        print "returnIngredientByType finds no ingredients with type " + ingredientType
+        return False
+    else:
+        return returnedIngredients
 
 
 def returnIngredientByName(objectName,ingredientList=[]):
