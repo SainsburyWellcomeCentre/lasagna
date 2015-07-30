@@ -10,7 +10,7 @@ import pyqtgraph as pg
 
 class projection2D():
 
-    def __init__(self, thisPlotWidget, ingredients=[], minMax=(0,1500), axisRatio=1, axisToPlot=0):
+    def __init__(self, thisPlotWidget, axisName='', ingredients=[], minMax=(0,1500), axisRatio=1, axisToPlot=0):
         """
         thisPlotWidget - the PlotWidget to which we will add the axes
         minMax - the minimum and maximum values of the plotted image. 
@@ -20,7 +20,7 @@ class projection2D():
 
         #Create properties
         self.axisToPlot = axisToPlot #the axis in 3D space that this view correponds to
-
+        self.axisName = axisName
         #We can link this projection to two others
         self.linkedXprojection=None
         self.linkedYprojection=None
