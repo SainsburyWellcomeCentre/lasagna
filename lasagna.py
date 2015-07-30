@@ -311,8 +311,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         are present will be removed when this function runs. 
         """
 
-        self.baseImageFname='' #wipe this just in case loading fails TODO: AXIS delete this property
-
         self.runHook(self.hooks['loadBaseImageStack_Start'])
         print "Loading " + fnameToLoad
         loadedImageStack = self.loadImageStack(fnameToLoad)
@@ -323,6 +321,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axisRatioLineEdit_2.setText( str(axRatio[1]) )
         self.axisRatioLineEdit_3.setText( str(axRatio[2]) )
 
+
+        #The paradigm is that other data are plotted over or otherwise added *to* a baseImage.
+        #so we need to remove other crap. 
+        # TODO: AXIS For now we just remove all image stacks in future there will be other classes
+        #       and these are not handled currently. 
+        imageStacks = handleIngredients.returnIngredientByType('imagestack',self.ingredients)
+        if imageStacks != False:
+            for thisStack in imageStacks: #remove imagestacks from plot axes
+                self.coronal.removeItemFromPlotWidget(thisStack.objectName)
+        
+        #remove imagestacks from ingredient list
+        self.ingredients = handleIngredients.removeIngredientByType('imagestack',self.ingredients)
 
         #Add to the ingredients list
         objName='baseImage'
