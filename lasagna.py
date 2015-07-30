@@ -326,7 +326,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if imageStacks != False:
             for thisStack in imageStacks: #remove imagestacks from plot axes
                 [axis.removeItemFromPlotWidget(thisStack.objectName) for axis in self.axes2D]
-        
+
         #remove imagestacks from ingredient list
         self.ingredients = handleIngredients.removeIngredientByType('imagestack',self.ingredients)
 

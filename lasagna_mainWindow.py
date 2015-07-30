@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created: Tue Jul 28 12:54:37 2015
+# Created: Thu Jul 30 15:59:02 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -72,6 +72,8 @@ class Ui_lasagna_mainWindow(object):
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
         self.menuOpen_recent = QtGui.QMenu(self.menuFile)
         self.menuOpen_recent.setObjectName(_fromUtf8("menuOpen_recent"))
+        self.menuLoad_ingredient = QtGui.QMenu(self.menuFile)
+        self.menuLoad_ingredient.setObjectName(_fromUtf8("menuLoad_ingredient"))
         self.menuHelp = QtGui.QMenu(self.menuBar)
         self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
         self.menuPlugins = QtGui.QMenu(self.menuBar)
@@ -310,7 +312,10 @@ class Ui_lasagna_mainWindow(object):
         self.actionRemoveOverlay.setObjectName(_fromUtf8("actionRemoveOverlay"))
         self.actionNone = QtGui.QAction(lasagna_mainWindow)
         self.actionNone.setObjectName(_fromUtf8("actionNone"))
+        self.actionOpen_2 = QtGui.QAction(lasagna_mainWindow)
+        self.actionOpen_2.setObjectName(_fromUtf8("actionOpen_2"))
         self.menuFile.addAction(self.actionOpen)
+        self.menuFile.addAction(self.menuLoad_ingredient.menuAction())
         self.menuFile.addAction(self.menuOpen_recent.menuAction())
         self.menuFile.addAction(self.actionLoadOverlay)
         self.menuFile.addAction(self.actionQuit)
@@ -323,13 +328,14 @@ class Ui_lasagna_mainWindow(object):
         self.toolBar.addSeparator()
 
         self.retranslateUi(lasagna_mainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lasagna_mainWindow)
 
     def retranslateUi(self, lasagna_mainWindow):
         lasagna_mainWindow.setWindowTitle(_translate("lasagna_mainWindow", "MainWindow", None))
         self.menuFile.setTitle(_translate("lasagna_mainWindow", "&File", None))
         self.menuOpen_recent.setTitle(_translate("lasagna_mainWindow", "Open recent", None))
+        self.menuLoad_ingredient.setTitle(_translate("lasagna_mainWindow", "&Load ingredient", None))
         self.menuHelp.setTitle(_translate("lasagna_mainWindow", "Help", None))
         self.menuPlugins.setTitle(_translate("lasagna_mainWindow", "&Plugins", None))
         self.groupBox.setTitle(_translate("lasagna_mainWindow", "Intensity Histogram", None))
@@ -359,6 +365,7 @@ class Ui_lasagna_mainWindow(object):
         self.actionRemoveOverlay.setText(_translate("lasagna_mainWindow", "removeOverlay", None))
         self.actionRemoveOverlay.setToolTip(_translate("lasagna_mainWindow", "removeOverlay", None))
         self.actionNone.setText(_translate("lasagna_mainWindow", "none", None))
+        self.actionOpen_2.setText(_translate("lasagna_mainWindow", "Open", None))
 
 from pyqtgraph import PlotWidget
 import mainWindow_rc

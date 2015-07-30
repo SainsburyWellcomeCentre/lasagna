@@ -78,7 +78,7 @@ class projection2D():
         elif nItemsAfter==nItemsBefore:
             return False
         else:
-            print '** removeItemFromPlotWidget: %d items before removal and %d after removal.' % (nItemsBefore,nItemsAfter)
+            print '** removeItemFromPlotWidget: %d items before removal and %d after removal **' % (nItemsBefore,nItemsAfter)
             return False
 
 
