@@ -164,17 +164,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Hooks are named using the following convention: <lasagnaMethodName_[Start|End]> 
         #So:
         # 1. It's obvious which method will call a given hook list. 
-        # 2. _Start indicates the hook will run at the top of the methdd, potentiall modifying all
-        #    subsecuent behavior of the method.
+        # 2. _Start indicates the hook will run at the top of the method, potentially modifying all
+        #    subsequent behavior of the method.
         # 3. _End indicates that the hook will run at the end of the method, appending its functionality
         #    to whatever the method normally does. 
         self.hooks = {
-            'updateStatusBar_End'       :     [] ,
-            'loadBaseImageStack_Start'  :     [] ,
-            'loadBaseImageStack_End'    :     [] ,
-            'removeCrossHairs_Start'    :     [] , 
-            'showBaseStackLoadDialog_Start' : [] ,
-            'updateMainWindowOnMouseMove_End' : []
+            'updateStatusBar_End'           :   [] ,
+            'loadBaseImageStack_Start'      :   [] ,
+            'loadBaseImageStack_End'        :   [] ,
+            'showBaseStackLoadDialog_Start' :   [] ,
+            'showBaseStackLoadDialog_End'   :   [] ,
+            'removeCrossHairs_Start'        :   [] , 
+            'showFileLoadDialog_Start'      :   [] ,
+            'showFileLoadDialog_End'        :   [] ,
+            'updateMainWindowOnMouseMove_Start' : [] ,
+            'updateMainWindowOnMouseMove_End'   : []
                     }
 
         # Link menu signals to slots
@@ -356,8 +360,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Load an image stack and insert it as channel 2 into the pre-existing base stack.
         This creates a red/green overlay
         """
-
-        baseStack = handleIngredients.returnIngredientByName('baseImage',self.ingredients) 
+        self.runHook(self.hooks['showBaseStackLoadDialog_Start'])
 
         if  baseStack == False:
             self.actionLoadOverlay.setEnabled(False)
@@ -365,9 +368,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         loadedImageStack = self.loadImageStack(fnameToLoad) 
 
-        #Do not proceed with adding overlay if it's of a different size
-        existingSize = baseStack.data().shape
-        overlaySize = loadedImageStack.shape
+        self.runHook(self.hooks['showBaseStackLoadDialog_End'])
 
         if not existingSize == overlaySize:
             msg = '*** Overlay is not the same size as the loaded image ***'
@@ -405,6 +406,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Bring up the file load dialog. Return the file name. Update the last used path. 
         """
+        self.runHook(self.hooks['showFileLoadDialog_Start'])
+
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),  "Images (*.mhd *.mha *.tiff *.tif)" )
         fname = str(fname)
         if len(fname) == 0:
@@ -424,6 +427,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         lasHelp.preferenceWriter('recentlyLoadedFiles',recentlyLoaded)
         self.updateRecentlyOpenedFiles()
+
+        self.runHook(self.hooks['showFileLoadDialog_End'])
 
         return fname
 
