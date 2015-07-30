@@ -1,6 +1,3 @@
-
-
-
 """
 Creates a plugin that is composed of a new window with a pyqtgraph PlotWidget
 On this graph we plot an x-axis cross-section of the image at the level which the 
@@ -50,7 +47,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
         ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName='baseImage',regex=True)
 
         if ImageItem != None:
-            xData = ImageItem.image[:,Y,0]
+            xData = ImageItem.image[:,Y]
 
             self.graphicsView.clear()
             self.graphicsView.plot(xData)
