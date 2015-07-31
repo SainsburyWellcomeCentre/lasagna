@@ -35,8 +35,21 @@
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h2>
-<p>For now, take a look at the two tutorial plugins. These are well commented and show how to modify the main user interface and how to bring up
-a new window that streams information from the main window. More information will be posted once the plugin system crystallises. </p>
+
+<p>
+New plugins are easy to create as they are written completely in Python. A number of tutorial plugins are 
+included to show how a plugin can modify the behavior of Lasagna or stream data from the main application it to a
+plugin window. Note also that other than the methods to load a new base stack, all other file loading 
+methods (such the plot overlay loader) are plugins too. This makes it easy to load data in new ways 
+without needing to modify the core code. Similarly, see the IO modules where data classes such as 
+<tt>imagestack</tt> are defined.
+</p>
+
+
+<p>A more detailed tutorial is coming; for now, take a look at the tutorial plugins. These are well 
+commented and show how to modify the main user interface and how to bring up
+a new window that streams information from the main window. 
+More information will be posted once the plugin system crystallises. </p>
 
 <p align="center">
 <a href="./index.html"><b>Back</b></a>
