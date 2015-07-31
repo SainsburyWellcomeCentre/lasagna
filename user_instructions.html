@@ -39,9 +39,18 @@
 To get a feel for the viewer with some demo, data start Lasagna with the <tt>-D</tt> flag.
 </p>
 
+
+<h2>
+<a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Loading data</h2>
+<p>Lasagna currently accepts only single-channel 3D data that can be loaded completely into RAM. 
+Data may be in the form of TIFF stacks or MHD files. Go to <tt>File > Load ingredient</tt> and select <tt>New base stack</tt>. 
+A "base stack" is the first 3D image stack to be loaded. All other data, such as overlaid image stacks or points, are
+added on top of this base stack. Whenever a new base stack is loaded, any other plotted or loaded data are discarded.
+</p>
+
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Navigating 3D data</h2>
-<p>When the mouse is moved over one 2D view a set of cross-hairs appear. 
+<p>Once a base stack is loaded you may navigate it with the mouse. When the mouse is moved over one 2D view a set of cross-hairs appear. 
 The other two axes show two orthogonal slices taken at the planes of the X and Y cross-hairs. 
 As the cross-hairs are moved across the image, the slices shown in the other two plots update automatically. 
 Zooming is performed with ctrl+mousewheel and panning by clicking and dragging. 
