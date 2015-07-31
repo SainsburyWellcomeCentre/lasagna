@@ -48,9 +48,19 @@ class plugin(lasagna_plugin):
 
 
     def closePlugin(self):
+        """
+        Runs when the user unchecks the plugin in the menu box and also (in this case)
+        when the user loads a new base stack
+        """
 
         #Ensure image color scale returns to normal
         handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients).lut='gray'
+        
+        objectName = 'baseImage'
+        [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
+        self.lasagna.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
+
+
         self.detachHooks()
 
 
