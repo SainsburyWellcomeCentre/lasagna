@@ -19,29 +19,45 @@ class loadOverlayImageStack(lasagna_plugin):
 
         #Construct the QActions and other stuff required to integrate the load dialog into the menu
         
-        #Instantiate the menu action
-        self.loadAction = QtGui.QAction(self.lasagna)
+        # - - - - - - - - - - - - - - - - - - - - 
+        #1. The menu action
+        
+        self.loadAction = QtGui.QAction(self.lasagna) #Instantiate the menu action
 
         #TODO: Test of a base stack exists and if so enable. This isn't too important. It'll
         #probably only be problem if the user loads a base image from the command line
         self.loadAction.setEnabled(False)  
 
         #Add an icon to the action
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/actions/icons/overlay.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.loadAction.setIcon(icon4)
+        iconLoadOverlay = QtGui.QIcon()
+        iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/overlay.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.loadAction.setIcon(iconLoadOverlay)
 
         #Insert the action into the menu
         self.loadAction.setObjectName("loadOverlayImageStack")
         self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
         self.loadAction.setText("Load overlay stack")
 
-        #Link the action to the slot
-        self.loadAction.triggered.connect(self.showLoadDialog)
+        self.loadAction.triggered.connect(self.showLoadDialog) #Link the action to the slot
 
 
-        #TODO: same stuff again but now for the removeOverlay button
-        #self.actionRemoveOverlay.triggered.connect(self.removeOverlay)
+        # - - - - - - - - - - - - - - - - - - - - 
+        #2. The toolbar action
+        self.actionRemoveOverlay = QtGui.QAction(self.lasagna) #Instantiate the menu action
+        self.actionRemoveOverlay.setEnabled(False) 
+
+        #Add an icon to the action
+        iconRemoveOverlay = QtGui.QIcon()
+        iconRemoveOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/removeoverlay.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionRemoveOverlay.setIcon(iconRemoveOverlay)
+
+        #Insert the action into the menu
+        self.actionRemoveOverlay.setObjectName("actionRemoveOverlay")
+        self.lasagna.toolBar.addAction(self.actionRemoveOverlay)  
+        self.actionRemoveOverlay.setToolTip("Remove overlay")
+
+        self.actionRemoveOverlay.triggered.connect(self.removeOverlay) #Link the action to the slot
+
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     #main load method
@@ -126,27 +142,26 @@ class loadOverlayImageStack(lasagna_plugin):
         else:
             self.lasagna.statusBar.showMessage("Unable to find " + str(fname))
 
+
     def removeOverlay(self):
         """
         Remove overlay from an imageStack        
         """
-        #TODO: AXIS with the changes we've been making, this code is now too specific and needs to be 
-        #           elsewhere in some more generalised form
         objectName = 'overlayImage'
         print "removing " + objectName
 
         #Remove item from axes
-        [axis.removeItemFromPlotWidget(objectName) for axis in self.axes2D]
+        [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
 
-        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.ingredients)
+        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
 
         #Set baseImage to gray-scale once more
-        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='gray'
+        handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients).lut='gray'
 
-        self.initialiseAxes()
-        self.actionRemoveOverlay.setEnabled(False)
+        self.lasagna.initialiseAxes()
+        self.actionRemoveOverlay.setEnabled(False) #Disable the button once the overlay has been removed
 
-        self.updateDisplayText()
+        self.lasagna.updateDisplayText()
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -157,7 +172,7 @@ class loadOverlayImageStack(lasagna_plugin):
         Actions that need to be performed on the GUI when an overlay can be added
         """
         self.loadAction.setEnabled(True)
-        #self.actionRemoveOverlay.setEnabled(True)
+        self.actionRemoveOverlay.setEnabled(True)
 
 
     def overlayDisableActions(self):

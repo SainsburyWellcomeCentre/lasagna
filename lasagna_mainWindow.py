@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created: Thu Jul 30 17:34:08 2015
+# Created: Fri Jul 31 11:20:04 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -324,7 +324,6 @@ class Ui_lasagna_mainWindow(object):
         self.menuBar.addAction(self.menuPlugins.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
         self.toolBar.addAction(self.actionResetAxes)
-        self.toolBar.addAction(self.actionRemoveOverlay)
         self.toolBar.addSeparator()
 
         self.retranslateUi(lasagna_mainWindow)

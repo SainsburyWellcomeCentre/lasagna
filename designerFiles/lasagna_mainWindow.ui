@@ -545,7 +545,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionResetAxes"/>
-   <addaction name="actionRemoveOverlay"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
