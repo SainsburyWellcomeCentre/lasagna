@@ -153,7 +153,7 @@ class loadOverlayImageStack(lasagna_plugin):
         #Remove item from axes
         [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
 
-        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
+        self.lasagna.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
 
         #Set baseImage to gray-scale once more
         handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients).lut='gray'
