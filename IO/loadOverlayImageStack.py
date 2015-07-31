@@ -76,6 +76,8 @@ class loadOverlayImageStack(lasagna_plugin):
             print "Overlay image:"
             print overlaySize
 
+            from alert import alert
+            self.lasagna.alert = alert(self.lasagna,alertText="This stack is a different size to the loaded base stack.<br>Aborting load. ")
             return
 
 
