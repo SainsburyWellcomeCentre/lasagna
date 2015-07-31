@@ -8,5 +8,6 @@
   </qresource>
   <qresource prefix="icons">
     <file>icons/lasagna_32.png</file>
+    <file>icons/emblem-important.png</file>
   </qresource>
 </RCC>

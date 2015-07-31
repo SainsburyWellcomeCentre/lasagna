@@ -41,7 +41,7 @@ import imageProcessing                   # A potentially temporary module that h
 import pluginHandler                     # Deals with finding plugins in the path, etc
 import lasagna_mainWindow                 # Derived from designer .ui files built by pyuic
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
-
+from alert import alert                  # Class used to bring up a warning box
 
 
 #Parse command-line input arguments
@@ -94,6 +94,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #self.win = QtGui.QMainWindow()
         self.setupUi(self)
         self.show()
+        self.app=None #The QApplication handle kept here
 
 
         #Misc. window set up 
@@ -470,6 +471,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         [axis.resetAxes() for axis in self.axes2D]
 
 
+
     def initialiseAxes(self):
         """
         Initial display of images in axes and also update other parts of the GUI. 
@@ -763,6 +765,7 @@ def main(fnames=[None,None]):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
+    tasty.app = app
 
     #Load stacks from command line input if any was provided
     if not fnames[0]==None:
