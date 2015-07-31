@@ -43,8 +43,6 @@ class projection2D():
         producing an item using information in the ingredient properties.
         """
         _thisItem = ( getattr(pg,ingredient.pgObject)(**ingredient.pgObjectConstructionArgs) )
-        _thisItem = ( getattr(pg,ingredient.pgObject)(border='k',levels=ingredient.minMax) )
-        #self.img = pg.ImageItem(border='k',levels=self.minMax) #TODO: AXIS this can't be added here
         _thisItem.objectName = ingredient.objectName
 
 
@@ -114,6 +112,17 @@ class projection2D():
             if hasattr(thisItem,'objectName') and isinstance(thisItem.objectName,str):
                 print "object %s: %s" % (n,thisItem.objectName)
             n=n+1
+
+    def getPlotItemByName(self,objName):
+        """
+        returns the first plot item in the list bearing the objectName 'objName'
+        because of the way we generally add objects, there *should* never be 
+        multiple objects with the same name
+        """
+        for thisItem in self.view.items():
+            if hasattr(thisItem,'objectName') and isinstance(thisItem.objectName,str):
+                if thisItem.objectName == objName:
+                    return thisItem
 
 
 
