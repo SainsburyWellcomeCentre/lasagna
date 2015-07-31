@@ -36,21 +36,32 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
     #self.lasagna.updateMainWindowOnMouseMove is run each time the axes are updated. So we can hook into it 
     #to update this window also
     def hook_updateMainWindowOnMouseMove_End(self):
+        """
+        This will run whenever the mouse moves in x or y across one of the axes in the main plot
+        TODO: it would be nice to also run this on mouse wheel
+        """
         X = self.lasagna.mouseX
         Y = self.lasagna.mouseY
 
         #Get the widget that the mouse is currently in 
         pos = QtGui.QCursor.pos()
-        PlotWidget = QtGui.qApp.widgetAt(pos).parent()
+        PlotWidget = QtGui.qApp.widgetAt(pos).parent() #The mouse is in this widget
 
-        #TODO: AXIS we may change the way things are named
+        #Get the base image from this widget
         ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName='baseImage',regex=True)
 
+        #Extract data from base image
         if ImageItem != None:
             xData = ImageItem.image[:,Y]
 
             self.graphicsView.clear()
             self.graphicsView.plot(xData)
+
+        #Link the x axis of the cross-section view with the x axis of the image view
+        #Do not use self.graphicsView.setXLink() as it is bidirectional 
+        xRange = PlotWidget.viewRange()[0]
+        self.graphicsView.setXRange(min=xRange[0], max=xRange[1])
+
 
 
     #The following methods are involved in shutting down the plugin window

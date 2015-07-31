@@ -11,7 +11,7 @@ import pyqtgraph.functions as fn
 from PyQt4 import QtCore, QtGui
 
 class lasagna_viewBox(pg.ViewBox):
-    mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal [seems not be critical]
+    mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal
 
     def __init__(self, linkedAxis={}):
         super(lasagna_viewBox,self).__init__()

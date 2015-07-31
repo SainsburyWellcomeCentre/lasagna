@@ -21,8 +21,10 @@ class loadOverlayImageStack(lasagna_plugin):
         
         #Instantiate the menu action
         self.loadAction = QtGui.QAction(self.lasagna)
-        self.loadAction.setEnabled(False)    #TODO: make this contingent on whether there is a base stack loaded
-                                            #TODO: also see lasagna.loadBaseImageStack()
+
+        #TODO: Test of a base stack exists and if so enable. This isn't too important. It'll
+        #probably only be problem if the user loads a base image from the command line
+        self.loadAction.setEnabled(False)  
 
         #Add an icon to the action
         icon4 = QtGui.QIcon()
