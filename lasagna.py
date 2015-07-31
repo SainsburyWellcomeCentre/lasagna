@@ -181,7 +181,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Add load actions to the Load ingredients sub-menu
         self.loadActions = [] #actions must be attached to the lasagna object or they won't function
         from IO import loadOverlayImageStack
-        self.loadActions.append(loadOverlayImageStack.loadOverlayImageStack(self))
+        self.loadActions.append(loadOverlayImageStack.loadOverlayImageStack(self)) #commenting out this line seamlessly removes the ability to overlay a stack
  
         # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showBaseStackLoadDialog)
