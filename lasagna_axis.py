@@ -105,6 +105,18 @@ class projection2D():
         [self.removeItemFromPlotWidget(thisItem) for thisItem in items]
 
 
+    def listNamedItemsInPlotWidget(self):
+        """
+        Print a list of all named items actually *added* in the PlotWidget
+        """
+        n=1
+        for thisItem in self.view.items():
+            if hasattr(thisItem,'objectName') and isinstance(thisItem.objectName,str):
+                print "object %s: %s" % (n,thisItem.objectName)
+            n=n+1
+
+
+
     def hideItem(self,item):
         """
         Hides an item from the PlotWidget. If you want to delete an item

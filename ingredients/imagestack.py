@@ -15,14 +15,14 @@ class imagestack(object):
         #Assign input arguments to properties of the class instance. 
         #The following properties are common to all ingredients
         self.__data     = data              #The raw data for this ingredient go here.
-        self.fnameAbsPath = fnameAbsPath    #Absolute path to file name
+        self.pgObject = 'ImageItem'         #The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
         self.enable     = enable            #Item is plotted if enable is True. Hidden if enable is False
         self.objectName = objectName        #The name of the object TODO: decide exactly what this will be
 
 
         #Set up class-specific properties, which classes other than image stack may not share
         #or may share but have different values assigned
-        self.pgObject = 'ImageItem' #The PyQtGraph item type which will display the data
+        self.fnameAbsPath = fnameAbsPath    #Absolute path to file name        
         self.compositionMode=QtGui.QPainter.CompositionMode_Plus
 
         self.minMax = minMax
