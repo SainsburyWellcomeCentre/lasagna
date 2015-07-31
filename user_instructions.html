@@ -85,12 +85,26 @@ the Allen Reference Atlas explorer are shut automatically if the user attempts t
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Customisation</h2>
 <p>
-When Lasagna is first loaded is creates a <tt>.lasagna</tt> hidden directory in your home directory. This contains a 
-plain text configuration file called <tt>lasagna_prefs.yml</tt>. The contents of this file are fairly self-explanatory 
-and you may edit it. Parameters from the file can be loaded as needed during run time. So in some cases your 
-changes will take effect right away. 
+Lasagna can be customised using either the preferences file or the plugins system. 
 </p>
 
+<p>
+When Lasagna is first loaded it creates a <tt>.lasagna</tt> hidden directory in your home directory. This contains a 
+plain text configuration file called <tt>lasagna_prefs.yml</tt>. The contents of this file are fairly self-explanatory 
+and you may edit it. Parameters from the file can be loaded as needed during run time. So in some cases your 
+changes will take effect right away. Users wishing to add new preferences should look at the 
+<tt>lasagna_helperFunctions</tt> module and see <tt>lasagna.showFileLoadDialog()</tt> for an example of how
+preferences are read and written. Some basic Python knowledge is needed to do this. 
+</p>
+
+<p>
+For fluent Python speakers, new plugins are easy to create. A number of tutorial plugins are included to 
+show how a plugin can modify the behavior of Lasagna or stream data from the main application it to a
+plugin window. Note also that other than the methods to load a new base stack, all other file loading 
+methods (such the plot overlay loader) are plugins too. This makes it easy to load data in new ways 
+without needing to modify the core code. Similarly, see the IO modules where data classes such as 
+<tt>imagestack</tt> are defined.
+</p>
 
 <p align="center">
 <a href="./index.html"><b>Back</b></a>
