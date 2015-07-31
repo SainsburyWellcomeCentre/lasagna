@@ -45,6 +45,10 @@ class imagestack(object):
         Sets the lookup table (colormap) property self.lut to the string defined by cmap.
         Next time the plot is updated, this colormap is used
         """
+
+        if isinstance(cmap,np.ndarray): #In order to allow the user to set an arbitrary color map array to lut
+            return cmap
+
         validCmaps = ['gray','red','green','blue']
         if len(cmap)==0:
             print "valid color maps are gray, red, and green"

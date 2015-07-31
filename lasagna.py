@@ -173,6 +173,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             'removeCrossHairs_Start'        :   [] , 
             'showFileLoadDialog_Start'      :   [] ,
             'showFileLoadDialog_End'        :   [] ,
+            'loadRecentFileSlot_Start'      :   [] ,
             'updateMainWindowOnMouseMove_Start' : [] ,
             'updateMainWindowOnMouseMove_End'   : []
                     }
@@ -431,6 +432,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         load a file from recently opened list
         """
+        self.runHook(self.hooks['loadRecentFileSlot_Start'])
         fname = str(self.sender().text())
         self.loadBaseImageStack(fname)
         self.initialiseAxes()
@@ -450,17 +452,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def closeEvent(self, event):
         self.quitLasagna()
+
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -           
-
-
-    def clearAxes(self):
-        """
-        Wipes image stack and clears plot windows
-        """
-        #TODO: AXIS this function should remove ingredients from each axis 
-        print "NEED TO WRITE lasagna.clearAxes!!"
-        [axis.removeItemsFromPlotWidget() for axis in self.axes2D]
-
 
     def resetAxes(self):
         """
