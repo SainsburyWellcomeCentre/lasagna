@@ -50,22 +50,25 @@ added on top of this base stack. Whenever a new base stack is loaded, any other 
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Navigating 3D data</h2>
-<p>Once a base stack is loaded you may navigate it with the mouse. When the mouse is moved over one 2D view a set of cross-hairs appear. 
-The other two axes show two orthogonal slices taken at the planes of the X and Y cross-hairs. 
-As the cross-hairs are moved across the image, the slices shown in the other two plots update automatically. 
-Zooming is performed with ctrl+mousewheel and panning by clicking and dragging. 
-If you lose the sample due to zooming out too much, hit the reset (green circular arrow) button in the toolbar</p>
+<p>Once a base stack is loaded you may navigate it with the mouse. When the mouse is moved over one 2D view, 
+a set of cross-hairs appear.  The other two axes show two orthogonal slices taken at the planes of the 
+X and Y cross-hairs. As the cross-hairs are moved across the image, the slices shown in the other two plots 
+update automatically. Zooming is performed with ctrl+mousewheel and panning by clicking and dragging the current view. 
+The other views automatically follow. If you lose the sample due to zooming out too much, hit the reset 
+(green circular arrow) button in the toolbar</p>
 
-<p>You can change the intensity range of the image by moving the sliders on the histogram</p>
+<p>You can change the intensity range of the image by moving the sliders on the histogram. Note that the
+intensity range in the histogram is currently that of the base stack only. This will be fixed and much
+greater control over the plotted data will provided soon.</p>
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overlaying data</h2>
 <p>
-Once a 3D volume is loaded
-it becomes possible to load an overlay volume. The overlaid volume must have the same size as the volume upon which you wish to overlay it. Once 
-an overlay is loaded, the first loaded layer turns red and the new layer is shown in green. Overlapping regions are yellow. The remove the
-overay, use the remove overlay button in the toolbar.</p>
-
+With a base stack loaded, you may overlay a second volume to compare the two. 
+The overlaid volume <i>must have the same size as the base volume</i> upon which you wish to overlay it. Once 
+an overlay is loaded, the first loaded layer turns red and the new layer is shown in green. 
+Overlapping regions are yellow. The remove the overay, use the remove overlay button in the toolbar.
+In this way Lasagna makes it easy to examine the accuracy of 3D image registration. </p>
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using plugins</h2>
