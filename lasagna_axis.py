@@ -42,7 +42,7 @@ class projection2D():
         Adds an ingredient to the PlotWidget as an item (i.e. the ingredient manages the process of 
         producing an item using information in the ingredient properties.
         """
-        #TODO: AXIS find a way to feed in the constructor arguments in a dynamic way
+        _thisItem = ( getattr(pg,ingredient.pgObject)(**ingredient.pgObjectConstructionArgs) )
         _thisItem = ( getattr(pg,ingredient.pgObject)(border='k',levels=ingredient.minMax) )
         #self.img = pg.ImageItem(border='k',levels=self.minMax) #TODO: AXIS this can't be added here
         _thisItem.objectName = ingredient.objectName
