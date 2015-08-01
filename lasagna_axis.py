@@ -159,7 +159,9 @@ class projection2D():
             sliceToPlot=0;
 
         # loop through all plot items searching for imagestack items (these need to be plotted first)
+        #NOTE: the following two loops will be changed soon
         #TODO: CHECK HOW ORDER IS DECIDED
+        #TODO: have just one loop
         #     the plot order may already have been decided at the time the objects were added so having these 
         #     two loops may be of no use
         for thisIngredient in ingredients:
@@ -180,9 +182,10 @@ class projection2D():
 
         # loop through all plot items searching for non-image items (these need to be overlaid onto the image)
         for thisIngredient in ingredients:
-            if not thisIngredient.__module__.endswith('imagestack'):
-                pass
-                #thisIngredient.plotIngredient(pyqtObject=self.img, axisToPlot=self.axisToPlot, sliceToPlot=sliceToPlot)
+            if not thisIngredient.__module__.endswith('imagestack'): #TODO: too specific 
+                thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
+                                              axisToPlot=self.axisToPlot, 
+                                              sliceToPlot=sliceToPlot)
 
 
     def updateDisplayedSlices_2D(self, ingredients, slicesToPlot):

@@ -709,7 +709,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
             self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements 
             self.axes2D[0].updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY)) #Update displayed slice
-
+    
 
     def mouseMovedSaggital(self,evt):
         if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
