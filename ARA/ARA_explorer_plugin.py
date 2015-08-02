@@ -3,7 +3,7 @@
 Tools for handling the ARA
 eventually this will be a plugin
 """
-
+import lasagna_helperFunctions as lasHelp 
 import handleIngredients
 from lasagna_plugin import lasagna_plugin
 import ARA
@@ -23,12 +23,21 @@ class plugin(lasagna_plugin):
         self.pluginLongName="Allen Reference Atlas explorer"
         self.pluginAuthor="Rob Campbell"
 
-        fnames = ARA.fileNames() 
+        #Read file locations from preferences file
+        fnames = lasHelp.loadAllPreferences(prefFName=ARA.getARAPrefFile(),defaultPref=ARA.defaultPrefs())
         self.pathToARA = fnames['ARAdir'] + fnames['stackFname']    
         self.pathToAnnotations = fnames['ARAdir'] + fnames['annotationFname']   
 
-
+        print(self.pathToARA)
         #ensure files are present
+        #TODO: the following is clearly in need of being streamlined
+        if len(self.pathToARA)==0:
+            msg = 'Please fill in preferences file at<br>%s' % ARA.getARAPrefFile()
+            self.lasagna.alert = alert(self.lasagna,alertText=msg)
+            self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+            self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
+            return
+
         if not os.path.exists(self.pathToARA):
             msg='Can not find brain atlas file:<br>%s<br>in path:<br>%s ' % (fnames['stackFname'],fnames['ARAdir'])
             self.lasagna.alert = alert(self.lasagna,alertText=msg)

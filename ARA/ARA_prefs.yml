@@ -1,0 +1,3 @@
+ARAdir: ''  #The absolute path to the directory containing the reference atlas data
+stackFname: '' #The name of the image file in ARAdir that contains the brain atlas volume data
+annotationFname: '' #The name of the CSV file in ARAdir which associates brain area ID numbers to area names
