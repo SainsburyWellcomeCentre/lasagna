@@ -304,6 +304,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadBaseImageStack_Start'])
         print "Loading " + fnameToLoad
         loadedImageStack = self.loadImageStack(fnameToLoad)
+        if loadedImageStack==False:
+            return
 
         # Set up default values in tabs
         axRatio = imageStackLoader.getVoxelSpacing(fnameToLoad)
@@ -374,7 +376,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             msg = 'Unable to find ' + thisFname
             print msg
             self.statusBar.showMessage(msg)
-            return
+            return False
 
         #TODO: The axis swap likely shouldn't be hard-coded here
         return imageStackLoader.loadStack(thisFname).swapaxes(1,2) 
