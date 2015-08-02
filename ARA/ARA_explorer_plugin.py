@@ -9,6 +9,8 @@ from lasagna_plugin import lasagna_plugin
 import ARA
 import numpy as np
 import pyqtgraph as pg
+import os.path
+from alert import alert
 
 class plugin(lasagna_plugin):
     
@@ -25,6 +27,21 @@ class plugin(lasagna_plugin):
         self.pathToARA = fnames['ARAdir'] + fnames['stackFname']    
         self.pathToAnnotations = fnames['ARAdir'] + fnames['annotationFname']   
 
+
+        #ensure files are present
+        if not os.path.exists(self.pathToARA):
+            msg='Can not find brain atlas file:<br>%s<br>in path:<br>%s ' % (fnames['stackFname'],fnames['ARAdir'])
+            self.lasagna.alert = alert(self.lasagna,alertText=msg)
+            self.closePlugin()
+            return
+
+        if not os.path.exists(self.pathToAnnotations):
+            msg='Can not find brain atlas file:<br>%s<br>in path:<br>%s ' % (fnames['annotationFname'],fnames['ARAdir'])
+            self.lasagna.alert = alert(self.lasagna,alertText=msg)
+            self.closePlugin()
+            return
+
+            
         self.annotations = ARA.readAnnotation(self.pathToAnnotations)
 
         self.initPlugin()
@@ -54,12 +71,14 @@ class plugin(lasagna_plugin):
         """
 
         #Ensure image color scale returns to normal
-        handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients).lut='gray'
-        
+        baseIm = handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients)
+        if baseIm != False:
+            baseIm.lut='gray'
+
         objectName = 'baseImage'
         [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
         self.lasagna.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
-
+        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
 
         self.detachHooks()
 
