@@ -304,7 +304,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadBaseImageStack_Start'])
         print "Loading " + fnameToLoad
         loadedImageStack = self.loadImageStack(fnameToLoad)
-        if loadedImageStack==False:
+        if len(loadedImageStack)==0 and loadedImageStack==False:
             return
 
         # Set up default values in tabs
