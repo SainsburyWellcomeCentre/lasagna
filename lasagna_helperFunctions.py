@@ -167,7 +167,7 @@ main lasagna preferences file. However, this can be over-ridden so that indiviua
 their own preferences files and still use these functions. 
 """
 
-def loadAllPreferences(prefFName=None):
+def loadAllPreferences(prefFName=None,defaultPref=getLasagnaPrefFile()):
     """
     Load the preferences YAML file. If the file is missing, we create it using the default
     preferences defined above. Preferences are returned as a dictionary.
@@ -177,8 +177,7 @@ def loadAllPreferences(prefFName=None):
     
     #Generate a default preferences file if no preferences file exists
     if os.path.exists(prefFName) == False:
-        writeAllPreferences(defaultPreferences())
-        print defaultPreferences()
+        writeAllPreferences(defaultPref)
         print "Created default preferences file in " + prefFName
 
     #Load preferences YAML file as a dictionary
@@ -187,7 +186,7 @@ def loadAllPreferences(prefFName=None):
     stream.close()
 
 
-def readPreference(preferenceName,prefFName=None):
+def readPreference(preferenceName,prefFName=None, preferences=getLasagnaPrefFile()):
     """
     Read preferences with key "preferenceName" from YAML file prefFName on disk.
     If the key is abstent, call defaultPreferences and search for the key. If it
@@ -204,7 +203,6 @@ def readPreference(preferenceName,prefFName=None):
         return preferences[preferenceName]
 
     #Check in default preferences and to file and return if so
-    preferences = defaultPreferences()
     if preferences.has_key(preferenceName):
         value = preferences[preferenceName]
         preferenceWriter(preferenceName,value,prefFName)
