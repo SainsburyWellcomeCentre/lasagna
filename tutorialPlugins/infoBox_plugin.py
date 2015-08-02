@@ -61,7 +61,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, infoBox_UI.Ui_infoBox): #must inheri
         """
         This event is execute when the user presses the close window (cross) button in the title bar
         """
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
+        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
         self.deleteLater()
         event.accept()

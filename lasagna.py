@@ -259,7 +259,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def stopPlugin(self,pluginName):
         print "Stopping " + pluginName
-        self.plugins[pluginName].closePlugin() #tidy up the plugin
+        try:
+            self.plugins[pluginName].closePlugin() #tidy up the plugin
+        except:
+            print "failed to properly close plugin " + pluginName
+        
         #delete the plugin instance and replace it in the dictionary with a reference (that what it is?) to the class
         #NOTE: plugins with a window do not run the following code when the window is closed. They should, however, 
         #detach hooks (unless the plugin author forgot to do this)

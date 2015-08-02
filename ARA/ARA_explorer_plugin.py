@@ -32,18 +32,20 @@ class plugin(lasagna_plugin):
         if not os.path.exists(self.pathToARA):
             msg='Can not find brain atlas file:<br>%s<br>in path:<br>%s ' % (fnames['stackFname'],fnames['ARAdir'])
             self.lasagna.alert = alert(self.lasagna,alertText=msg)
-            self.closePlugin()
+            self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+            self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
             return
 
         if not os.path.exists(self.pathToAnnotations):
             msg='Can not find brain atlas file:<br>%s<br>in path:<br>%s ' % (fnames['annotationFname'],fnames['ARAdir'])
             self.lasagna.alert = alert(self.lasagna,alertText=msg)
-            self.closePlugin()
+            self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+            self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
+
             return
 
             
         self.annotations = ARA.readAnnotation(self.pathToAnnotations)
-
         self.initPlugin()
 
 
@@ -78,8 +80,6 @@ class plugin(lasagna_plugin):
         objectName = 'baseImage'
         [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
         self.lasagna.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
-
         self.detachHooks()
 
 
