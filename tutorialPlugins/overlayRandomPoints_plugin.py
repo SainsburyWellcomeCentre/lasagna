@@ -13,7 +13,6 @@ point data onto the plot axes. The plugin does the following:
 
 """
 
-import handleIngredients as handIng
 from lasagna_plugin import lasagna_plugin
 import numpy as np
 import sys
@@ -32,15 +31,14 @@ class plugin(lasagna_plugin):
 
         #add a sparsepoints ingredient
         objName = 'tutePoints'
-        self.lasagna.ingredients = handIng.addIngredient(self.lasagna.ingredients, 
-                                                        objectName=objName , 
-                                                        kind='sparsepoints' ,
-                                                        data=self.generateRandomData())
+        self.lasagna.addIngredient(objectName=objName , 
+                                   kind='sparsepoints' ,
+                                   data=self.generateRandomData())
 
-        #ing = handIng.returnIngredientByName('tutePoints',self.lasagna.ingredients)
+        #ing = self.lasagna.returnIngredientByName('tutePoints')
         
         #Add plot items to axes so that they become available for plotting
-        [axis.addItemToPlotWidget(handIng.returnIngredientByName(objName,self.lasagna.ingredients)) for axis in self.lasagna.axes2D]
+        [axis.addItemToPlotWidget(self.lasagna.returnIngredientByName(objName)) for axis in self.lasagna.axes2D]
         
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
        
@@ -58,7 +56,7 @@ class plugin(lasagna_plugin):
 
 
     def generateRandomData(self):
-        baseImage = handIng.returnIngredientByName('baseImage',self.lasagna.ingredients)
+        baseImage = self.lasagna.returnIngredientByName('baseImage')
         if baseImage == False:
             print "No base image loaded"
             return
@@ -87,7 +85,7 @@ class plugin(lasagna_plugin):
     def closePlugin(self):
         #Remove points from axes then remove the ingredient from the list. 
         [axis.removeItemFromPlotWidget('tutePoints') for axis in self.lasagna.axes2D]
-        self.lasagna.ingredients = handIng.removeIngredientByName('tutePoints',self.lasagna.ingredients)
+        self.lasagna.removeIngredientByName('tutePoints')
 
 
 

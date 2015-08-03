@@ -9,9 +9,6 @@ module). This may turn out to not be a problem in practice, so we leave
 things for now and play it by ear. 
 """
 
-import ingredients
-
-
 def addIngredient(ingredientList=[], kind='', objectName='', data=None, fname=''):
     """
     Adds an ingredient to the list of ingredients.
@@ -42,6 +39,10 @@ def addIngredient(ingredientList=[], kind='', objectName='', data=None, fname=''
                             objectName=objectName
                     )
                 )
+
+    #If it's an image stack, add the image combo box below the histogram
+    if ingredientClassObj.kind == 'imagestack':
+        self.imageComboBox.addItem(ingredientClassObj.objectName)
 
     return ingredientList
 

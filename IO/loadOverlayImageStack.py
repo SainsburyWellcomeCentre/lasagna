@@ -4,7 +4,6 @@ create a red/green overlay. If an overlay is added the base stack changes
 color (e.g. to red). 
 """
 
-import handleIngredients
 from PyQt4 import QtGui
 import os
 from lasagna_plugin import lasagna_plugin
@@ -68,7 +67,7 @@ class loadOverlayImageStack(lasagna_plugin):
         """
 
         #Get the existing base image stack so we can ensure that our overlay is the same size
-        baseStack = handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients) 
+        baseStack = self.lasagna.returnIngredientByName('baseImage') 
 
         if  baseStack == False:
             self.lasgna.actionLoadOverlay.setEnabled(False) #TODO: will need to be changed as we detach this from core application
@@ -99,17 +98,17 @@ class loadOverlayImageStack(lasagna_plugin):
 
         #TODO: this is mostly duplicated code from loadBaseImageStack. Maybe this can be reduced somewhat?
         objName='overlayImage'
-        self.lasagna.ingredients = handleIngredients.addIngredient(self.lasagna.ingredients, objectName=objName , 
-                                                              kind='imagestack'       , 
-                                                              data=loadedImageStack   , 
-                                                              fname=fnameToLoad)
+        self.lasagna.addIngredient(objectName=objName       , 
+                                   kind='imagestack'        , 
+                                   data=loadedImageStack    , 
+                                   fname=fnameToLoad)
 
         #set colormaps for the two stacks
-        handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients).lut='red'
-        handleIngredients.returnIngredientByName('overlayImage',self.lasagna.ingredients).lut='green'
+        self.lasagna.returnIngredientByName('baseImage').lut='red'
+        self.lasagna.returnIngredientByName('overlayImage').lut='green'
         
         #Add plot items to axes so that they become available for plotting
-        [axis.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.lasagna.ingredients)) for axis in self.lasagna.axes2D]
+        [axis.addItemToPlotWidget(self.lasagna.returnIngredientByName(objName)) for axis in self.lasagna.axes2D]
 
         #TODO: Both of the following lines need to be changed. They call hard-coded stuff in lasagna.py 
         #and doing this is no longer an option
@@ -153,10 +152,10 @@ class loadOverlayImageStack(lasagna_plugin):
         #Remove item from axes
         [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
 
-        self.lasagna.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
+        self.lasagna.removeIngredientByName(objectName)
 
         #Set baseImage to gray-scale once more
-        handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients).lut='gray'
+        self.lasagna.returnIngredientByName('baseImage').lut='gray'
 
         self.lasagna.initialiseAxes()
         self.actionRemoveOverlay.setEnabled(False) #Disable the button once the overlay has been removed

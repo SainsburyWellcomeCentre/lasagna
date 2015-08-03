@@ -4,13 +4,12 @@ this file describes a class that handles the axis behavior for the lasagna viewe
 
 from lasagna_viewBox import lasagna_viewBox
 import lasagna_helperFunctions as lasHelp
-import handleIngredients
 import pyqtgraph as pg
 
 
 class projection2D():
 
-    def __init__(self, thisPlotWidget, axisName='', ingredients=[], minMax=(0,1500), axisRatio=1, axisToPlot=0):
+    def __init__(self, thisPlotWidget, lasagna, axisName='', minMax=(0,1500), axisRatio=1, axisToPlot=0):
         """
         thisPlotWidget - the PlotWidget to which we will add the axes
         minMax - the minimum and maximum values of the plotted image. 
@@ -32,8 +31,9 @@ class projection2D():
         self.view.setAspectLocked(True,axisRatio)
 
         #Loop through the ingredients list and add them to the ViewBox
+        self.lasagna = lasagna
         self.items=[] #a list of added plot items TODO: check if we really need this
-        self.addItemsToPlotWidget(ingredients)
+        self.addItemsToPlotWidget(self.lasagna.ingredientList)
 
 
 
@@ -142,7 +142,7 @@ class projection2D():
         """
 
         # Get base-image in correct orientation.
-        baseImage = handleIngredients.returnIngredientByName('baseImage',ingredients)
+        baseImage = self.lasagna.returnIngredientByName('baseImage')
 
         #Use base-image shape to set sliceToPlot correctly so it stays within bounds
         #  get the number of slices in the base image stack along this axes' z (depth) dimension
