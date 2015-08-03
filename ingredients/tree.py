@@ -81,7 +81,7 @@ class Tree(object):
         return self.__nodes
 
     def add_node(self, identifier, parent=None):
-        node = Node(identifier)
+        node = Node(identifier,parent=parent)
         self[identifier] = node
 
         if parent is not None:
@@ -111,7 +111,7 @@ class Tree(object):
         using a yield-based generator
         """
         # Python generator using yield
-        yield identifier #return the root first 
+        yield identifier #return the root of this list
         queue = self[identifier].children
         while queue:
             yield queue[0]
@@ -120,6 +120,51 @@ class Tree(object):
                 queue = expansion + queue[1:]  # depth-first
             elif mode == _WIDTH:
                 queue = queue[1:] + expansion  # width-first
+
+
+    def isleaf(self,identifier):
+        """
+        Is the node indexed by 'identifier' a leaf?
+        returns True or False
+        """
+        n=0
+        for nodeID in self.traverse(identifier):
+            n += 1
+            if n>1:
+                break
+
+        if n==1:
+            return True
+        else:
+            return False
+
+
+    def findleaves(self,fromNode=0):
+        """
+        Returns a list of nodes that are leaves, searching from 
+        the node "fromNode". To find all leaves, fromNode should 
+        be the root node.
+        """
+        nodesThatAreLeaves = []
+        for nodeID in self.traverse(fromNode):
+            if self.isleaf(nodeID):
+                nodesThatAreLeaves.append(nodeID)
+
+        return nodesThatAreLeaves
+
+
+    def findbranches(self,fromNode=0):
+        """
+        Is the node indexed by 'identifier' a branch?
+        A branch is defined as a node with more than two children
+        To find all branches, fromNode should be the root node.
+        """
+        nodesThatAreBranches = []
+        for nodeID in self.traverse(fromNode):
+            if self.nodes[nodeID].isbranch():
+                nodesThatAreBranches.append(nodeID)
+
+        return nodesThatAreBranches
 
 
 
@@ -138,10 +183,11 @@ class Node(object):
     """
     A simple node class
     """
-    def __init__(self, identifier, data=None):
+    def __init__(self, identifier, data=None, parent=None):
         self.__identifier = identifier
         self.__children = []
         self.__data = data #The node's data payload. Can be anything.
+        self.parent = parent
 
     @property
     def data(self):
@@ -161,6 +207,20 @@ class Node(object):
 
     def add_child(self, identifier):
         self.__children.append(identifier)
+
+    
+    def isbranch(self):
+        """
+        Is this node a branch?
+        A branch is defined as a node with more than two children
+        returns True or False
+        """
+
+        if len(self.children) > 1:
+            return True
+        else:
+            return False
+
 
 
 
@@ -226,12 +286,16 @@ if __name__ == '__main__':
     print("\n***** Width-first *****")
     for nodeID in treeOfLife.traverse("Life", mode=_WIDTH):
         print(nodeID)
-
+    
     print("\n***** Width-first of all data in vertebrates *****")
     for nodeID in treeOfLife.traverse("Vertebrates", mode=_WIDTH):
         print "%s - %s" % (nodeID, treeOfLife[nodeID].data)
 
+    print "\nLeaves:"
+    print treeOfLife.findleaves('Life')
 
+    print "\nBranches:"
+    print treeOfLife.findbranches('Life')
 
     # - - - - - - -
     print "\n\n   --------- Tree of Fibonacci numbers --------- \n"
@@ -246,24 +310,3 @@ if __name__ == '__main__':
     treeOfN.add_node(21,13)
 
     treeOfN.display(1)
-
-
-    # - - - - - - -
-    #Import data from CSV file and plot as a 3-D scatter plot using matplotlib
-    #This will ignore the tree structure, but shows how to pull out the data
-    #and plot it. 
-    import matplotlib.pyplot as plt 
-    from mpl_toolkits.mplot3d import Axes3D
-
-    dataTree = importData('exampleTreeDump.csv')
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    for nodeID in dataTree.traverse(1):
-        ax.scatter(dataTree[nodeID].data[0], 
-                    dataTree[nodeID].data[1],
-                    dataTree[nodeID].data[2],
-                    marker='o')
-
-    plt.show()
