@@ -797,10 +797,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not hasattr(self,'plottedIntensityRegionObj'):
             self.plottedIntensityRegionObj = pg.LinearRegionItem()
             self.plottedIntensityRegionObj.setZValue(10)
-            minMax=self.returnIngredientByName(selectedStackName).minMax
-            self.setIntensityRange(minMax)
             self.plottedIntensityRegionObj.sigRegionChanged.connect(self.updateAxisLevels) #link signal slot
 
+        minMax=self.returnIngredientByName(selectedStackName).minMax
+        self.setIntensityRange(minMax)
         # Add to the ViewBox but exclude it from auto-range calculations.
         self.intensityHistogram.addItem(self.plottedIntensityRegionObj, ignoreBounds=True)
 

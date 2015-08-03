@@ -100,7 +100,7 @@ class imagestack(object):
         onto the object with which it is associated
         """
         data = self.data(axisToPlot)
-        print "plotting %s with minmax: %d %d" % (self.objectName,self.minMax[0],self.minMax[1])
+        #print "plotting %s with minmax: %d %d" % (self.objectName,self.minMax[0],self.minMax[1])
         pyqtObject.setImage(
                         data[sliceToPlot], 
                         levels=self.minMax, 
