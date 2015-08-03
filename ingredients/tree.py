@@ -3,7 +3,7 @@ Module to handle tree data.
 Defines a tree and a node class as well as functions for importing data
 """
 
-(_ROOT, _DEPTH, _BREADTH) = range(3) #Used by classes to navigate the tree
+(_ROOT, _DEPTH, _WIDTH) = range(3) #Used by classes to navigate the tree
 
 import os.path
 
@@ -115,7 +115,7 @@ class Tree(object):
             expansion = self[queue[0]].children
             if mode == _DEPTH:
                 queue = expansion + queue[1:]  # depth-first
-            elif mode == _BREADTH:
+            elif mode == _WIDTH:
                 queue = queue[1:] + expansion  # width-first
 
 
@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
     from tree import Tree
 
-    (_ROOT, _DEPTH, _BREADTH) = range(3)
+    (_ROOT, _DEPTH, _WIDTH) = range(3)
 
     print "\n\n   --------- Tree of life --------- \n"
     treeOfLife = Tree()
@@ -204,18 +204,28 @@ if __name__ == '__main__':
     treeOfLife["Mammals"].data = 'they have udders'
 
 
-    treeOfLife.display('Life')
+    print "List of nodes:"
+    print treeOfLife.nodes.keys()
+    print ""
 
-    print("\n***** DEPTH-FIRST ITERATION *****")
+    print "Children of node 'Vertebrates'"
+    print treeOfLife.nodes['Vertebrates'].children
+    print ""
+
+
+    print treeOfLife.display('Life')
+
+
+    print("\n***** Depth-first *****")
     for nodeID in treeOfLife.traverse("Life"):
         print(nodeID)
 
-    print("\n***** DEPTH-FIRST ITERATION *****")
-    for nodeID in treeOfLife.traverse("Life", mode=_DEPTH):
+    print("\n***** Width-first *****")
+    for nodeID in treeOfLife.traverse("Life", mode=_WIDTH):
         print(nodeID)
 
-    print("\n***** BREADTH-FIRST ITERATION OF DATA IN ALL VERTEBRATES *****")
-    for nodeID in treeOfLife.traverse("Vertebrates", mode=_BREADTH):
+    print("\n***** Width-first of all data in vertebrates *****")
+    for nodeID in treeOfLife.traverse("Vertebrates", mode=_WIDTH):
         print "%s - %s" % (nodeID, treeOfLife[nodeID].data)
 
 
