@@ -34,7 +34,6 @@ import os.path
 
 #lasagna modules
 import ingredients                       # A set of classes for handling loaded data 
-import handleIngredients                 # methods for handling ingredients (searching for them, adding then, etc)
 import imageStackLoader                  # To load TIFF and MHD files
 from lasagna_axis import projection2D    # The class that runs the axes
 import imageProcessing                   # A potentially temporary module that houses general-purpose image processing code
@@ -103,7 +102,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.updateRecentlyOpenedFiles()
         
         #We will maintain a list of classes of loaded items that can be added to plots
-        self.ingredients = [] 
+        self.ingredientList = [] 
 
         #set up axes 
         #TODO: could more tightly integrate these objects with the main window so no need to pass many of these args?
@@ -111,9 +110,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #      names of the object instances
         print ""
         self.axes2D = [
-                projection2D(self.graphicsView_1, ingredients=self.ingredients, axisRatio=float(self.axisRatioLineEdit_1.text()), axisToPlot=0),
-                projection2D(self.graphicsView_2, ingredients=self.ingredients, axisRatio=float(self.axisRatioLineEdit_2.text()), axisToPlot=1),
-                projection2D(self.graphicsView_3, ingredients=self.ingredients, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
+                projection2D(self.graphicsView_1, self, axisRatio=float(self.axisRatioLineEdit_1.text()), axisToPlot=0),
+                projection2D(self.graphicsView_2, self, axisRatio=float(self.axisRatioLineEdit_2.text()), axisToPlot=1),
+                projection2D(self.graphicsView_3, self, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
                 ]
         print ""
 
@@ -188,18 +187,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.actionOpen.triggered.connect(self.showBaseStackLoadDialog)
         self.actionQuit.triggered.connect(self.quitLasagna)
 
-
         # Link toolbar signals to slots
         self.actionResetAxes.triggered.connect(self.resetAxes)
-        
 
         #Link tabbed view items to slots
         #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
         self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
         self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
         self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
-        self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
 
+        self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
+        self.imageComboBox.activated[str].connect(self.plotImageStackHistogram) #update histogram on combobox hit
 
 
         #Plugins menu and initialisation
@@ -235,7 +233,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         print ""
-
 
         self.statusBar.showMessage("Initialised")
 
@@ -318,23 +315,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #so we need to remove other crap. 
         # TODO: AXIS For now we just remove all image stacks in future there will be other classes
         #       and these are not handled currently. 
-        imageStacks = handleIngredients.returnIngredientByType('imagestack',self.ingredients)
+        imageStacks = self.returnIngredientByType('imagestack')
         if imageStacks != False:
             for thisStack in imageStacks: #remove imagestacks from plot axes
                 [axis.removeItemFromPlotWidget(thisStack.objectName) for axis in self.axes2D]
 
         #remove imagestacks from ingredient list
-        self.ingredients = handleIngredients.removeIngredientByType('imagestack',self.ingredients)
+        self.removeIngredientByType('imagestack')
 
         #Add to the ingredients list
         objName='baseImage'
-        self.ingredients = handleIngredients.addIngredient(self.ingredients, objectName=objName , 
-                                                              kind='imagestack'       , 
-                                                              data=loadedImageStack   , 
-                                                              fname=fnameToLoad)
+        self.addIngredient(objectName=objName       , 
+                           kind='imagestack'        , 
+                           data=loadedImageStack    , 
+                           fname=fnameToLoad)
 
         #Add plot items to axes so that they become available for plotting
-        [axis.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients)) for axis in self.axes2D]
+        [axis.addItemToPlotWidget(self.returnIngredientByName(objName)) for axis in self.axes2D]
 
         #remove any existing range highlighter on the histogram. We do this because different images
         #will likely have different default ranges
@@ -456,13 +453,156 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def closeEvent(self, event):
         self.quitLasagna()
 
+
+    # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
+    #Code to handle ingredients and modify GUI as they are added or removed
+    """
+    TODO: ingredients can only be handled if they are in the ingredients module
+    ingredients defined in plugin directories, etc, can not be handled by this 
+    module. This potentially makes plugin creation awkward as it couples it too
+    strongly to the core code (new ingredients must be added to the ingredients
+    module). This may turn out to not be a problem in practice, so we leave 
+    things for now and play it by ear. 
+    """
+
+    def addIngredient(self, kind='', objectName='', data=None, fname=''):
+        """
+        Adds an ingredient to the list of ingredients.
+        Scans the list of ingredients to see if an ingredient is already present. 
+        If so, it removes it before adding a new one with the same name. 
+        ingredients are classes that are defined in the ingredients package
+        """
+
+        print "Adding ingredient " + objectName
+
+        if len(kind)==0:
+            print "ERROR: no ingredient kind specified"
+            return
+
+        #Do not attempt to add an ingredient if its class is not defined
+        if not hasattr(ingredients,kind):
+            print "ERROR: ingredients module has no class '%s'" % kind
+            return
+
+        #If an ingredient with this object name is already present we delete it
+        self.removeIngredientByName(objectName)
+
+        #Get ingredient of this class from the ingredients package
+        ingredientClassObj = getattr(getattr(ingredients,kind),kind) #make an ingredient of type "kind"
+        self.ingredientList.append(ingredientClassObj(
+                            fnameAbsPath=fname,
+                            data=data,
+                            objectName=objectName
+                    )
+                )
+
+        #If it's an image stack, add the image combo box below the histogram
+        if self.ingredientList[-1].__module__.endswith('imagestack'):
+            self.imageComboBox.addItem(self.ingredientList[-1].objectName)
+
+
+    def removeIngredientByName(self,objectName):
+        """
+        Finds ingredient by name and removes it from the list
+        """
+
+        verbose = False
+        if len(self.ingredientList)==0:
+            if verbose:
+                print "lasagna.removeIngredientByType finds no ingredients in list!"
+            return
+
+        removedIngredient=False
+        for thisIngredient in self.ingredientList[:]:
+            if thisIngredient.objectName == objectName:
+                if verbose:
+                    print 'Removing ingredient ' + objectName
+                self.ingredientList.remove(thisIngredient)
+                removedIngredient=True
+
+        if removedIngredient == False & verbose==True:
+            print "** Failed to remove ingredient %s **" % objectName
+
+
+    def removeIngredientByType(self,ingredientType):
+        """
+        Finds ingredient by type and removes it
+        """
+        verbose = False
+        if len(self.ingredientList)==0:
+            if verbose:
+                print "removeIngredientByType finds no ingredients in list!"
+            return
+
+        for thisIngredient in self.ingredientList[:]:
+            if thisIngredient.__module__.endswith(ingredientType):
+                if verbose:
+                    print 'Removing ingredient ' + thisIngredient.objectName
+
+                self.ingredientList.remove(thisIngredient)
+
+
+    def listIngredients(self):
+        """
+        Return a list of ingredient objectNames
+        """
+        ingredientNames = [] 
+        for thisIngredient in ingredientList:
+            ingredientNames.append(thisIngredient.objectName)
+
+        return ingredientNames
+
+
+    def returnIngredientByType(self,ingredientType):
+        """
+        Return a list of ingredients based upon their type. e.g. imagestack, sparsepoints, etc
+        """
+        verbose = False
+        if len(self.ingredientList)==0:
+            if verbose:
+                print "returnIngredientByType finds no ingredients in list!"
+            return False
+
+        returnedIngredients=[]
+        for thisIngredient in self.ingredientList:
+            if thisIngredient.__module__.endswith(ingredientType):
+                returnedIngredients.append(thisIngredient)
+
+
+        if verbose and len(returnedIngredients)==0:
+            print "returnIngredientByType finds no ingredients with type " + ingredientType
+            return False
+        else:
+            return returnedIngredients
+
+
+    def returnIngredientByName(self,objectName):
+        """
+        Return a specific ingredient based upon its object name.
+        Returns False if the ingredient was not found
+        """
+        verbose = False
+        if len(self.ingredientList)==0:
+            if verbose:
+                print "returnIngredientByName finds no ingredients in list!"
+            return False
+
+        for thisIngredient in self.ingredientList:
+            if thisIngredient.objectName == objectName:
+                return thisIngredient
+
+        if verbose:
+            print "returnIngredientByName finds no ingredient called " + objectName
+        return False
+
+
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -           
 
     def resetAxes(self):
         """
         Set X and Y limit of each axes to fit the data
         """
-        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
+        if self.returnIngredientByName('baseImage')==False:
             return
         [axis.resetAxes() for axis in self.axes2D]
 
@@ -472,12 +612,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Initial display of images in axes and also update other parts of the GUI. 
         """
-        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
+        if self.returnIngredientByName('baseImage')==False:
             return
 
         #show default images
         print "updating axes with added ingredients"
-        [axis.updatePlotItems_2D(self.ingredients) for axis in self.axes2D]
+        [axis.updatePlotItems_2D(self.ingredientList) for axis in self.axes2D]
 
         #initialize cross hair
         if self.showCrossHairs:
@@ -503,7 +643,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Loop through all ingredients and print out their type the file name
         """
         displayTxt=''
-        for thisIngredient in self.ingredients:
+        for thisIngredient in self.ingredientList:
             displayTxt = "%s<b>%s</b>: %s<br>" % (displayTxt, thisIngredient.objectName, thisIngredient.fname())
 
         self.infoTextPanel.setText(displayTxt)
@@ -622,33 +762,34 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # Image Tab methods
     # These methods are involved with the tabs to the left of the three view axes
 
+
+    #The following are part of the image tab
     def plotImageStackHistogram(self):
         """
         Plot the image stack histogram in a PlotWidget to the left of the three image views.
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
-
-        #TODO: AXIS - eventually have different histograms for each color channel
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,'baseImage')
+        selectedStackName=self.imageComboBox.currentText() #The image stack currently selected with combo box
+        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,selectedStackName)
         x,y = img.getHistogram()
 
-        if self.logYcheckBox.isChecked():
-            y=np.log10(y+0.1)
-
-        #Determine max value on the un-logged y values. Do not run this again if the 
-        #graph is merely updated. This will only run if a new imageStack was loaded
-        if not hasattr(self,'plottedIntensityRegionObj'):
-            baseImage=handleIngredients.returnIngredientByName('baseImage',self.ingredients)
-            calcuMaxVal = baseImage.defaultHistRange() #return a reasonable value for the maximum
 
       
-        self.intensityHistogram.clear()
-        ## Using stepMode=True causes the plot to draw two lines for each sample but it needs X to be longer than Y by 1
-        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, brush=(255,0,255,80))
+        #Plot the histogram
+        if self.logYcheckBox.isChecked():
+            y=np.log10(y+0.1)
+            y[y<0]=0
 
+        self.intensityHistogram.clear()
+        ingredient = self.returnIngredientByName(selectedStackName);#Get colour of the layer
+        cMap = ingredient.setColorMap(ingredient.lut)
+        brushColor = cMap[round(len(cMap)/2),:]
+        penColor = cMap[-1,:]
+
+        ## Using stepMode=True causes the plot to draw two lines for each sample but it needs X to be longer than Y by 1
+        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, pen=penColor, brush=brushColor,yMin=0, xMin=0)
         self.intensityHistogram.showGrid(x=True,y=True,alpha=0.33)
-        self.intensityHistogram.setLimits(yMin=0, xMin=0)
 
         #The object that represents the plotted intensity range is only set up the first time the 
         #plot is made or following a new base image being loaded (any existing plottedIntensityRegionObj
@@ -656,12 +797,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not hasattr(self,'plottedIntensityRegionObj'):
             self.plottedIntensityRegionObj = pg.LinearRegionItem()
             self.plottedIntensityRegionObj.setZValue(10)
-            self.setIntensityRange( (0,calcuMaxVal) )
             self.plottedIntensityRegionObj.sigRegionChanged.connect(self.updateAxisLevels) #link signal slot
+
+        #Get the plotted range and apply to the region object
+        minMax=self.returnIngredientByName(selectedStackName).minMax
+        self.setIntensityRange(minMax)
 
         # Add to the ViewBox but exclude it from auto-range calculations.
         self.intensityHistogram.addItem(self.plottedIntensityRegionObj, ignoreBounds=True)
-
 
     def setIntensityRange(self,intRange=(0,2**12)):
         """
@@ -681,24 +824,25 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         minX, maxX = self.plottedIntensityRegionObj.getRegion()
 
         #Get all imagestacks
-        allImageStacks = handleIngredients.returnIngredientByType('imagestack',self.ingredients)
+        allImageStacks = self.returnIngredientByType('imagestack')
 
         #Loop through all imagestacks and set their levels in each axis
         for thisImageStack in allImageStacks:
             objectName=thisImageStack.objectName
+            if objectName != self.imageComboBox.currentText():
+                continue
 
             for thisAxis in self.axes2D:
                 img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view,objectName)
                 img.setLevels([minX,maxX]) #Sets levels immediately
 
+                thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
 
-            thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
-
-        
+            
 
 
     def mouseMovedCoronal(self,evt):
-        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
+        if self.returnIngredientByName('baseImage')==False:
             return
 
 
@@ -714,11 +858,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
             self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements 
-            self.axes2D[0].updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY)) #Update displayed slice
+            self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
     
 
     def mouseMovedSaggital(self,evt):
-        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
+        if self.returnIngredientByName('baseImage')==False:
             return
 
         pos = evt[0]
@@ -731,11 +875,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
             self.updateMainWindowOnMouseMove(self.axes2D[1])
-            self.axes2D[1].updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
+            self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
 
         
     def mouseMovedTransverse(self,evt):
-        if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
+        if self.returnIngredientByName('baseImage')==False:
             return
 
         pos = evt[0]  
@@ -748,7 +892,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
             self.updateMainWindowOnMouseMove(self.axes2D[2])
-            self.axes2D[2].updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
+            self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
 
 
 

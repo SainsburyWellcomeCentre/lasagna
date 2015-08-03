@@ -172,9 +172,11 @@ def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPrefere
     Load the preferences YAML file. If the file is missing, we create it using the default
     preferences defined above. Preferences are returned as a dictionary.
     """
-    print "loading from %s" % prefFName
+    print "loading from pref file %s" % prefFName
     #Generate a default preferences file if no preferences file exists
     if os.path.exists(prefFName) == False:
+        print "PREF FILE"
+        print prefFName
         writeAllPreferences(defaultPref,prefFName=prefFName)
         print "Created default preferences file in " + prefFName
 
@@ -210,23 +212,21 @@ def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=ge
 
 
 
-def writeAllPreferences(preferences,prefFName=None):
+def writeAllPreferences(preferences,prefFName=getLasagnaPrefFile()):
     """
     Save the dictionary "preferences" as a YAML file in the .lasagna directory located in the 
     user's home directory. 
     """
     assert isinstance(preferences,dict)
 
-    #TODO: check ability to write before doing this
-    if prefFName == None:
-        prefFName = getLasagnaPrefFile()
+    #TODO: check ability to write to the file before proceeding
 
     stream = file(prefFName, 'w')
     yaml.dump(preferences, stream)
     stream.close()
 
 
-def preferenceWriter(preferenceName,newValue,prefFName=None):
+def preferenceWriter(preferenceName,newValue,prefFName=getLasagnaPrefFile()):
     """
     Overwrite a single key "preferenceName" in self.preferences with the value "newValue"
     Saves updates dictionary to the preferences file

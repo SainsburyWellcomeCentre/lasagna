@@ -10,7 +10,7 @@ from PyQt4 import QtGui
 import pyqtgraph as pg
 
 class imagestack(object):
-    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=[0,1E3]):
+    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None):
 
         #Assign input arguments to properties of the class instance. 
         #The following properties are common to all ingredients
@@ -28,12 +28,14 @@ class imagestack(object):
         self.fnameAbsPath = fnameAbsPath    #Absolute path to file name        
         self.compositionMode=QtGui.QPainter.CompositionMode_Plus
 
-        self.minMax = minMax
+
+        #Set reasonable default for plotting the images unless different values were specified
+        if minMax is None:
+            self.minMax = [0, self.defaultHistRange()]
+        else:
+            self.minMax = minMax
+
         self.lut='gray' #The look-up table
-
-        #TODO: need some way of setting up ImageItem properties such as border and levels
-
-
 
 
     def fname(self):
@@ -60,19 +62,20 @@ class imagestack(object):
         cmap = cmap.lower()
         pos = np.array([0.0, 1.0])
 
+        nVal = 255
         if cmap == 'gray' or cmap == 'grey':
-            color = np.array([[ 0 , 0 , 0 ,255], [255,255,255,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal,nVal,nVal]], dtype=np.ubyte)
         elif cmap == 'red':
-            color = np.array([[ 0 , 0 , 0 ,255], [255, 0 ,0 ,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal, 0 ,0 ,nVal]], dtype=np.ubyte)
         elif cmap == 'green':
-            color = np.array([[ 0 , 0 , 0 ,255], [ 0 ,255, 0 ,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 ,nVal, 0 ,nVal]], dtype=np.ubyte)
         elif cmap == 'blue':
-            color = np.array([[ 0 , 0 , 0 ,255], [ 0 , 0 ,255,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 , 0 ,nVal,nVal]], dtype=np.ubyte)
         else:
             print "no pre-defined colormap " + cmap
 
         map = pg.ColorMap(pos, color)
-        lut = map.getLookupTable(0.0, 1.0, 256)
+        lut = map.getLookupTable(0.0, 1.0, nVal+1)
 
         return lut
 

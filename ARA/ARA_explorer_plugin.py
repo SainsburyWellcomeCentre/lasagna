@@ -4,7 +4,6 @@ Tools for handling the ARA
 eventually this will be a plugin
 """
 import lasagna_helperFunctions as lasHelp 
-import handleIngredients
 from lasagna_plugin import lasagna_plugin
 import ARA
 import numpy as np
@@ -25,6 +24,9 @@ class plugin(lasagna_plugin):
 
         #Read file locations from preferences file
         fnames = lasHelp.loadAllPreferences(prefFName=ARA.getARAPrefFile(),defaultPref=ARA.defaultPrefs())
+        if fnames['ARAdir'][-1] !=os.path.sep:
+            fnames['ARAdir'] = fnames['ARAdir'] + os.path.sep
+
         self.pathToARA = fnames['ARAdir'] + fnames['stackFname']    
         self.pathToAnnotations = fnames['ARAdir'] + fnames['annotationFname']   
 
@@ -53,7 +55,7 @@ class plugin(lasagna_plugin):
 
             return
 
-            
+        print self.pathToAnnotations 
         self.annotations = ARA.readAnnotation(self.pathToAnnotations)
         self.initPlugin()
 
@@ -69,7 +71,7 @@ class plugin(lasagna_plugin):
         lut = map.getLookupTable(0.0, 1.0, 256)
 
         #Assign the colormap to the imagestack object
-        handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients).lut=lut
+        self.lasagna.returnIngredientByName('baseImage').lut=lut
 
         self.lasagna.initialiseAxes()
         self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
@@ -82,13 +84,13 @@ class plugin(lasagna_plugin):
         """
 
         #Ensure image color scale returns to normal
-        baseIm = handleIngredients.returnIngredientByName('baseImage',self.lasagna.ingredients)
+        baseIm = self.lasagna.returnIngredientByName('baseImage')
         if baseIm != False:
             baseIm.lut='gray'
 
         objectName = 'baseImage'
         [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
-        self.lasagna.ingredients = handleIngredients.removeIngredientByName(objectName,self.lasagna.ingredients)
+        self.lasagna.removeIngredientByName(objectName)
         self.detachHooks()
 
 

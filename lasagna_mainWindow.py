@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created: Fri Jul 31 11:20:04 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created: Sun Aug  2 19:06:40 2015
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -40,6 +40,14 @@ class Ui_lasagna_mainWindow(object):
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.graphicsView_1 = PlotWidget(self.centralwidget,viewBox=lasagna_viewBox())
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.graphicsView_1.sizePolicy().hasHeightForWidth())
+        self.graphicsView_1.setSizePolicy(sizePolicy)
+        self.graphicsView_1.setObjectName(_fromUtf8("graphicsView_1"))
+        self.gridLayout.addWidget(self.graphicsView_1, 0, 0, 1, 1)
         self.graphicsView_3 = PlotWidget(self.centralwidget,viewBox=lasagna_viewBox())
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
@@ -56,14 +64,6 @@ class Ui_lasagna_mainWindow(object):
         self.graphicsView_2.setSizePolicy(sizePolicy)
         self.graphicsView_2.setObjectName(_fromUtf8("graphicsView_2"))
         self.gridLayout.addWidget(self.graphicsView_2, 0, 1, 1, 1)
-        self.graphicsView_1 = PlotWidget(self.centralwidget,viewBox=lasagna_viewBox())
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView_1.sizePolicy().hasHeightForWidth())
-        self.graphicsView_1.setSizePolicy(sizePolicy)
-        self.graphicsView_1.setObjectName(_fromUtf8("graphicsView_1"))
-        self.gridLayout.addWidget(self.graphicsView_1, 0, 0, 1, 1)
         lasagna_mainWindow.setCentralWidget(self.centralwidget)
         self.menuBar = QtGui.QMenuBar(lasagna_mainWindow)
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 21))
@@ -80,7 +80,7 @@ class Ui_lasagna_mainWindow(object):
         self.menuPlugins.setObjectName(_fromUtf8("menuPlugins"))
         lasagna_mainWindow.setMenuBar(self.menuBar)
         self.mainDockWidget = QtGui.QDockWidget(lasagna_mainWindow)
-        self.mainDockWidget.setMinimumSize(QtCore.QSize(250, 319))
+        self.mainDockWidget.setMinimumSize(QtCore.QSize(278, 365))
         self.mainDockWidget.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.mainDockWidget.setObjectName(_fromUtf8("mainDockWidget"))
         self.dockWidgetContents = QtGui.QWidget()
@@ -97,7 +97,18 @@ class Ui_lasagna_mainWindow(object):
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.verticalLayout_3 = QtGui.QVBoxLayout(self.groupBox)
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
-        self.intensityHistogram = PlotWidget(self.groupBox)
+        self.stackedWidget = QtGui.QStackedWidget(self.groupBox)
+        self.stackedWidget.setFrameShape(QtGui.QFrame.NoFrame)
+        self.stackedWidget.setFrameShadow(QtGui.QFrame.Raised)
+        self.stackedWidget.setObjectName(_fromUtf8("stackedWidget"))
+        self.page = QtGui.QWidget()
+        self.page.setObjectName(_fromUtf8("page"))
+        self.stackedWidget.addWidget(self.page)
+        self.page_2 = QtGui.QWidget()
+        self.page_2.setObjectName(_fromUtf8("page_2"))
+        self.horizontalLayout_4 = QtGui.QHBoxLayout(self.page_2)
+        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
+        self.intensityHistogram = PlotWidget(self.page_2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -105,7 +116,15 @@ class Ui_lasagna_mainWindow(object):
         self.intensityHistogram.setSizePolicy(sizePolicy)
         self.intensityHistogram.setMaximumSize(QtCore.QSize(16777215, 180))
         self.intensityHistogram.setObjectName(_fromUtf8("intensityHistogram"))
-        self.verticalLayout_3.addWidget(self.intensityHistogram)
+        self.horizontalLayout_4.addWidget(self.intensityHistogram)
+        self.stackedWidget.addWidget(self.page_2)
+        self.verticalLayout_3.addWidget(self.stackedWidget)
+        self.horizontalLayout_5 = QtGui.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
+        self.imageComboBox = QtGui.QComboBox(self.groupBox)
+        self.imageComboBox.setMinimumSize(QtCore.QSize(175, 0))
+        self.imageComboBox.setObjectName(_fromUtf8("imageComboBox"))
+        self.horizontalLayout_5.addWidget(self.imageComboBox)
         self.logYcheckBox = QtGui.QCheckBox(self.groupBox)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -114,7 +133,10 @@ class Ui_lasagna_mainWindow(object):
         self.logYcheckBox.setSizePolicy(sizePolicy)
         self.logYcheckBox.setChecked(True)
         self.logYcheckBox.setObjectName(_fromUtf8("logYcheckBox"))
-        self.verticalLayout_3.addWidget(self.logYcheckBox)
+        self.horizontalLayout_5.addWidget(self.logYcheckBox)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_5)
+        spacerItem = QtGui.QSpacerItem(20, 134, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_3.addItem(spacerItem)
         self.verticalLayout_4.addWidget(self.groupBox)
         self.tabWidget.addTab(self.imageSettingsTab, _fromUtf8(""))
         self.axisSetingsTab = QtGui.QWidget()
@@ -328,6 +350,7 @@ class Ui_lasagna_mainWindow(object):
 
         self.retranslateUi(lasagna_mainWindow)
         self.tabWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(lasagna_mainWindow)
 
     def retranslateUi(self, lasagna_mainWindow):
