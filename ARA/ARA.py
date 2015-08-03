@@ -11,11 +11,15 @@ import yaml
 def readAnnotation(fname):
     """
     Read a brain annotation file and return it as an index
-    """
+    """    
     try:  
         assert os.path.isfile(fname)
     except:
         print "Failed to find " + fname
+        return
+
+    if not fname.endswith('.csv'):
+        print "Annotation file must be a CSV file"
         return
 
     areas={}

@@ -24,6 +24,9 @@ class plugin(lasagna_plugin):
 
         #Read file locations from preferences file
         fnames = lasHelp.loadAllPreferences(prefFName=ARA.getARAPrefFile(),defaultPref=ARA.defaultPrefs())
+        if fnames['ARAdir'][-1] !=os.path.sep:
+            fnames['ARAdir'] = fnames['ARAdir'] + os.path.sep
+
         self.pathToARA = fnames['ARAdir'] + fnames['stackFname']    
         self.pathToAnnotations = fnames['ARAdir'] + fnames['annotationFname']   
 
@@ -52,7 +55,7 @@ class plugin(lasagna_plugin):
 
             return
 
-            
+        print self.pathToAnnotations 
         self.annotations = ARA.readAnnotation(self.pathToAnnotations)
         self.initPlugin()
 
