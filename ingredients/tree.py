@@ -210,8 +210,8 @@ if __name__ == '__main__':
     for nodeID in treeOfLife.traverse("Life"):
         print(nodeID)
 
-    print("\n***** BREADTH-FIRST ITERATION *****")
-    for node in treeOfLife.traverse("Life", mode=_BREADTH):
+    print("\n***** DEPTH-FIRST ITERATION *****")
+    for nodeID in treeOfLife.traverse("Life", mode=_DEPTH):
         print(nodeID)
 
     print("\n***** BREADTH-FIRST ITERATION OF DATA IN ALL VERTEBRATES *****")
