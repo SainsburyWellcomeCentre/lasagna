@@ -7,6 +7,7 @@ Defines a tree and a node class as well as functions for importing data
 
 import os.path
 
+
 def importData(fname,displayTree=False):
     """
     Import tree data from a CSV (text) file. The data should be in the following format
@@ -56,6 +57,8 @@ def importData(fname,displayTree=False):
 
         for nodeID in tree.traverse(0):
             print "%s - %s" % (nodeID, tree[nodeID].data)
+
+    return tree
 
 
 
@@ -243,3 +246,24 @@ if __name__ == '__main__':
     treeOfN.add_node(21,13)
 
     treeOfN.display(1)
+
+
+    # - - - - - - -
+    #Import data from CSV file and plot as a 3-D scatter plot using matplotlib
+    #This will ignore the tree structure, but shows how to pull out the data
+    #and plot it. 
+    import matplotlib.pyplot as plt 
+    from mpl_toolkits.mplot3d import Axes3D
+
+    dataTree = importData('exampleTreeDump.csv')
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    for nodeID in dataTree.traverse(1):
+        ax.scatter(dataTree[nodeID].data[0], 
+                    dataTree[nodeID].data[1],
+                    dataTree[nodeID].data[2],
+                    marker='o')
+
+    plt.show()
