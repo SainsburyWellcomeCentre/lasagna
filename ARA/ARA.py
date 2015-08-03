@@ -42,16 +42,8 @@ def defaultPrefs():
     """
     Return default preferences in the YAML file in this directory
     """
-    stream = file('ARA_prefs.yml', 'r')
-    Y = yaml.load(stream)
-    stream.close()
-    return Y
-
-
-#The following should eventually be read from a preferences file
-def fileNames():
     return {
-        'ARAdir' : '/mnt/sonastv/Data/Mrsic-Flogel/ReferenceAtlas/Osten/',
-        'stackFname' : 'ORL_ARA_v2.5.3_bulbFirst.tif',
-        'annotationFname' : 'ARA2_annotation_structure_info.csv'
+        'ARAdir'            : '' , #The absolute path to the directory containing the reference atlas data
+        'stackFname'        : '' , #The name of the image file in ARAdir that contains the brain atlas volume data
+        'annotationFname'   : '' , #The name of the CSV file in ARAdir which associates brain area ID numbers to area names
         }
