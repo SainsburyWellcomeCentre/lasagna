@@ -37,10 +37,6 @@ class imagestack(object):
 
         self.lut='gray' #The look-up table
 
-        #TODO: need some way of setting up ImageItem properties such as border and levels
-
-
-
 
     def fname(self):
         """
