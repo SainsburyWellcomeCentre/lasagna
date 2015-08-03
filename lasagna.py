@@ -197,7 +197,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
 
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
-
+        self.imageComboBox.activated[str].connect(self.plotImageStackHistogram) #update histogram on combobox hit
 
 
         #Plugins menu and initialisation
@@ -770,27 +770,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
-
-        #TODO: AXIS - eventually have different histograms for each color channel
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,'baseImage')
+        selectedStack=self.imageComboBox.currentText() #The image stack currently selected with combo box
+        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,selectedStack)
         x,y = img.getHistogram()
 
-        if self.logYcheckBox.isChecked():
-            y=np.log10(y+0.1)
-
-        #Determine max value on the un-logged y values. Do not run this again if the 
-        #graph is merely updated. This will only run if a new imageStack was loaded
-        if not hasattr(self,'plottedIntensityRegionObj'):
-            baseImage=handleIngredients.returnIngredientByName('baseImage',self.ingredients)
-            calcuMaxVal = baseImage.defaultHistRange() #return a reasonable value for the maximum
 
       
+        #Plot the histogram
+        if self.logYcheckBox.isChecked():
+            y=np.log10(y+0.1)
+            y[y<0]=0
+
         self.intensityHistogram.clear()
         ## Using stepMode=True causes the plot to draw two lines for each sample but it needs X to be longer than Y by 1
-        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, brush=(255,0,255,80))
-
+        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, brush=(255,0,255,80),yMin=0, xMin=0)
         self.intensityHistogram.showGrid(x=True,y=True,alpha=0.33)
-        self.intensityHistogram.setLimits(yMin=0, xMin=0)
 
         #The object that represents the plotted intensity range is only set up the first time the 
         #plot is made or following a new base image being loaded (any existing plottedIntensityRegionObj
@@ -828,15 +822,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Loop through all imagestacks and set their levels in each axis
         for thisImageStack in allImageStacks:
             objectName=thisImageStack.objectName
+            if objectName != self.imageComboBox.currentText():
+                continue
 
             for thisAxis in self.axes2D:
                 img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view,objectName)
                 img.setLevels([minX,maxX]) #Sets levels immediately
 
+                thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
 
-            thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
-
-        
+            
 
 
     def mouseMovedCoronal(self,evt):

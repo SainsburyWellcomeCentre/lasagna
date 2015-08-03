@@ -10,7 +10,7 @@ from PyQt4 import QtGui
 import pyqtgraph as pg
 
 class imagestack(object):
-    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=[0,1E3]):
+    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None):
 
         #Assign input arguments to properties of the class instance. 
         #The following properties are common to all ingredients
@@ -28,7 +28,13 @@ class imagestack(object):
         self.fnameAbsPath = fnameAbsPath    #Absolute path to file name        
         self.compositionMode=QtGui.QPainter.CompositionMode_Plus
 
-        self.minMax = minMax
+
+        #Set reasonable default for plotting the images unless different values were specified
+        if minMax is None:
+            self.minMax = [0, self.defaultHistRange()]
+        else:
+            self.minMax = minMax
+
         self.lut='gray' #The look-up table
 
         #TODO: need some way of setting up ImageItem properties such as border and levels
@@ -98,6 +104,7 @@ class imagestack(object):
         onto the object with which it is associated
         """
         data = self.data(axisToPlot)
+        print "plotting %s with minmax: %d %d" % (self.objectName,self.minMax[0],self.minMax[1])
         pyqtObject.setImage(
                         data[sliceToPlot], 
                         levels=self.minMax, 
