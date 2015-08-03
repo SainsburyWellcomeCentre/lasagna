@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="actions">
+    <file>icons/edit-redo.png</file>
+    <file>icons/removeoverlay.png</file>
+    <file>icons/document-open.png</file>
+    <file>icons/window-close.png</file>
+    <file>icons/overlay.png</file>
+  </qresource>
+  <qresource prefix="icons">
+    <file>icons/lasagna_32.png</file>
+    <file>icons/emblem-important.png</file>
+  </qresource>
+</RCC>

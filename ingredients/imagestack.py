@@ -15,18 +15,21 @@ class imagestack(object):
         #Assign input arguments to properties of the class instance. 
         #The following properties are common to all ingredients
         self.__data     = data              #The raw data for this ingredient go here.
-        self.fnameAbsPath = fnameAbsPath    #Absolute path to file name
+
         self.enable     = enable            #Item is plotted if enable is True. Hidden if enable is False
         self.objectName = objectName        #The name of the object TODO: decide exactly what this will be
 
+        #properties relating to the PyQtGraph object and its creation
+        self.pgObject = 'ImageItem'         #The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
+        self.pgObjectConstructionArgs = dict(border='k', levels=minMax) #The item is created with these arguments
 
         #Set up class-specific properties, which classes other than image stack may not share
         #or may share but have different values assigned
-        self.pgObject = 'ImageItem' #The PyQtGraph item type which will display the data
+        self.fnameAbsPath = fnameAbsPath    #Absolute path to file name        
         self.compositionMode=QtGui.QPainter.CompositionMode_Plus
 
         self.minMax = minMax
-        self.lut='red' #The look-up table
+        self.lut='gray' #The look-up table
 
         #TODO: need some way of setting up ImageItem properties such as border and levels
 
@@ -45,6 +48,10 @@ class imagestack(object):
         Sets the lookup table (colormap) property self.lut to the string defined by cmap.
         Next time the plot is updated, this colormap is used
         """
+
+        if isinstance(cmap,np.ndarray): #In order to allow the user to set an arbitrary color map array to lut
+            return cmap
+
         validCmaps = ['gray','red','green','blue']
         if len(cmap)==0:
             print "valid color maps are gray, red, and green"

@@ -41,7 +41,7 @@ import imageProcessing                   # A potentially temporary module that h
 import pluginHandler                     # Deals with finding plugins in the path, etc
 import lasagna_mainWindow                 # Derived from designer .ui files built by pyuic
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
-
+from alert import alert                  # Class used to bring up a warning box
 
 
 #Parse command-line input arguments
@@ -94,6 +94,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #self.win = QtGui.QMainWindow()
         self.setupUi(self)
         self.show()
+        self.app=None #The QApplication handle kept here
 
 
         #Misc. window set up 
@@ -109,51 +110,42 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #TODO: stop calling these three views by thei neuroanatomical names. These can be labels, but shouldn't be harcoded as the
         #      names of the object instances
         print ""
-        self.coronal  = projection2D(self.graphicsView_1, self.ingredients, axisRatio=float(self.axisRatioLineEdit_1.text()),  axisToPlot=0)
-        self.sagittal = projection2D(self.graphicsView_2, self.ingredients, axisRatio=float(self.axisRatioLineEdit_2.text()),  axisToPlot=1)
-        self.transverse = projection2D(self.graphicsView_3,self.ingredients, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
+        self.axes2D = [
+                projection2D(self.graphicsView_1, ingredients=self.ingredients, axisRatio=float(self.axisRatioLineEdit_1.text()), axisToPlot=0),
+                projection2D(self.graphicsView_2, ingredients=self.ingredients, axisRatio=float(self.axisRatioLineEdit_2.text()), axisToPlot=1),
+                projection2D(self.graphicsView_3, ingredients=self.ingredients, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
+                ]
         print ""
 
 
-        #Establish links between projections for panning and zooming
-        linksC = {
-                    self.sagittal.view.getViewBox(): {'linkX':None, 'linkY':'y', 'linkZoom':True}  ,
-                    self.transverse.view.getViewBox(): {'linkX':'x', 'linkY':None, 'linkZoom':True} 
+        #Establish links between projections for panning and zooming using lasagna_viewBox.linkedAxis
+        self.axes2D[0].view.getViewBox().linkedAxis = {
+                    self.axes2D[1].view.getViewBox(): {'linkX':None, 'linkY':'y', 'linkZoom':True}  ,
+                    self.axes2D[2].view.getViewBox(): {'linkX':'x', 'linkY':None, 'linkZoom':True} 
                  }
-        self.coronal.view.getViewBox().linkedAxis = linksC
 
-
-        linksS = {
-                    self.coronal.view.getViewBox(): {'linkX':None, 'linkY':'y', 'linkZoom':True}  ,
-                    self.transverse.view.getViewBox(): {'linkX':'y', 'linkY':None, 'linkZoom':True} 
+        self.axes2D[1].view.getViewBox().linkedAxis = {
+                    self.axes2D[0].view.getViewBox(): {'linkX':None, 'linkY':'y', 'linkZoom':True}  ,
+                    self.axes2D[2].view.getViewBox(): {'linkX':'y', 'linkY':None, 'linkZoom':True} 
                  }
-        self.sagittal.view.getViewBox().linkedAxis = linksS
 
-
-        linksT = {
-                    self.coronal.view.getViewBox(): {'linkX':'x', 'linkY':None, 'linkZoom':True}  ,
-                    self.sagittal.view.getViewBox(): {'linkX':None, 'linkY':'x', 'linkZoom':True} 
+        self.axes2D[2].view.getViewBox().linkedAxis = {
+                    self.axes2D[0].view.getViewBox(): {'linkX':'x', 'linkY':None, 'linkZoom':True}  ,
+                    self.axes2D[1].view.getViewBox(): {'linkX':None, 'linkY':'x', 'linkZoom':True} 
                  }
-        self.transverse.view.getViewBox().linkedAxis = linksT
-
 
 
         #Establish links between projections for scrolling through slices [implemented by signals in main() after the GUI is instantiated]
-        self.coronal.linkedXprojection = self.transverse
-        self.coronal.linkedYprojection = self.sagittal
+        self.axes2D[0].linkedXprojection = self.axes2D[2]
+        self.axes2D[0].linkedYprojection = self.axes2D[1]
 
-        self.transverse.linkedXprojection = self.coronal
-        self.transverse.linkedYprojection = self.sagittal
+        self.axes2D[2].linkedXprojection = self.axes2D[0]
+        self.axes2D[2].linkedYprojection = self.axes2D[1]
 
-        self.sagittal.linkedXprojection = self.transverse
-        self.sagittal.linkedYprojection = self.coronal
-
-
+        self.axes2D[1].linkedXprojection = self.axes2D[2]
+        self.axes2D[1].linkedYprojection = self.axes2D[0]
 
 
-        #Initialise default values
-        self.overlayLoaded = False #TODO: AXIS this will become moot as eventually arbitrary numbers of overlays can be added
-       
 
         #UI elements updated during mouse moves over an axis
         self.crossHairVLine = None
@@ -168,29 +160,41 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Hooks are named using the following convention: <lasagnaMethodName_[Start|End]> 
         #So:
         # 1. It's obvious which method will call a given hook list. 
-        # 2. _Start indicates the hook will run at the top of the methdd, potentiall modifying all
-        #    subsecuent behavior of the method.
+        # 2. _Start indicates the hook will run at the top of the method, potentially modifying all
+        #    subsequent behavior of the method.
         # 3. _End indicates that the hook will run at the end of the method, appending its functionality
         #    to whatever the method normally does. 
         self.hooks = {
-            'updateStatusBar_End'       :     [] ,
-            'loadBaseImageStack_Start'  :     [] ,
-            'loadBaseImageStack_End'    :     [] ,
-            'removeCrossHairs_Start'    :     [] , 
-            'showBaseStackLoadDialog_Start' : [] ,
-            'updateMainWindowOnMouseMove_End' : []
+            'updateStatusBar_End'           :   [] ,
+            'loadBaseImageStack_Start'      :   [] ,
+            'loadBaseImageStack_End'        :   [] ,
+            'showBaseStackLoadDialog_Start' :   [] ,
+            'showBaseStackLoadDialog_End'   :   [] ,
+            'removeCrossHairs_Start'        :   [] , 
+            'showFileLoadDialog_Start'      :   [] ,
+            'showFileLoadDialog_End'        :   [] ,
+            'loadRecentFileSlot_Start'      :   [] ,
+            'updateMainWindowOnMouseMove_Start' : [] ,
+            'updateMainWindowOnMouseMove_End'   : []
                     }
 
-        # Link menu signals to slots
+
+        #Add load actions to the Load ingredients sub-menu
+        self.loadActions = [] #actions must be attached to the lasagna object or they won't function
+        from IO import loadOverlayImageStack
+        self.loadActions.append(loadOverlayImageStack.loadOverlayImageStack(self)) #commenting out this line seamlessly removes the ability to overlay a stack
+ 
+        # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showBaseStackLoadDialog)
-        self.actionLoadOverlay.triggered.connect(self.showOverlayLoadDialog)
         self.actionQuit.triggered.connect(self.quitLasagna)
+
 
         # Link toolbar signals to slots
         self.actionResetAxes.triggered.connect(self.resetAxes)
-        self.actionRemoveOverlay.triggered.connect(self.removeOverlay)
+        
 
         #Link tabbed view items to slots
+        #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
         self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
         self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
         self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
@@ -199,7 +203,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         #Plugins menu and initialisation
-        # 1. Get a list of a plugins in the plugins path and add their directories to the Python path
+        # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
         pluginPaths = lasHelp.readPreference('pluginPaths')
 
         plugins, pluginPaths = pluginHandler.findPlugins(pluginPaths)
@@ -237,9 +241,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
 
-
-
-
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Plugin-related methods
     def startStopPlugin(self):
@@ -258,7 +259,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def stopPlugin(self,pluginName):
         print "Stopping " + pluginName
-        self.plugins[pluginName].closePlugin() #tidy up the plugin
+        try:
+            self.plugins[pluginName].closePlugin() #tidy up the plugin
+        except:
+            print "failed to properly close plugin " + pluginName
+        
         #delete the plugin instance and replace it in the dictionary with a reference (that what it is?) to the class
         #NOTE: plugins with a window do not run the following code when the window is closed. They should, however, 
         #detach hooks (unless the plugin author forgot to do this)
@@ -287,35 +292,20 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
   
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # File menu and methods associated with file loading
-    def loadImageStack(self,thisFname):
-        """
-        Loads an image stack defined by the string thisFname and returns it as an output argument
-        """
-        if not os.path.isfile(thisFname):
-            msg = 'Unable to find ' + thisFname
-            print msg
-            self.statusBar.showMessage(msg)
-            return
-
-        #TODO: The axis swap likely shouldn't be hard-coded here
-        return imageStackLoader.loadStack(thisFname).swapaxes(1,2) 
- 
-
+    # File menu and methods associated with loading the base image stack. 
+  
     def loadBaseImageStack(self,fnameToLoad):
-        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
         """
         Loads the base image image stack. The base image stack is the one which will appear as gray
-        if it is the only stack loaded. If an overlay is added on top of this, the base image will
-        become red. This function wipes and data that have already been loaded. Any overlays that 
+        if it is the only stack loaded. This function wipes and data that have already been loaded. Any overlays that 
         are present will be removed when this function runs. 
         """
-
-        self.baseImageFname='' #wipe this just in case loading fails TODO: AXIS delete this property
 
         self.runHook(self.hooks['loadBaseImageStack_Start'])
         print "Loading " + fnameToLoad
         loadedImageStack = self.loadImageStack(fnameToLoad)
+        if len(loadedImageStack)==0 and loadedImageStack==False:
+            return
 
         # Set up default values in tabs
         axRatio = imageStackLoader.getVoxelSpacing(fnameToLoad)
@@ -323,6 +313,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axisRatioLineEdit_2.setText( str(axRatio[1]) )
         self.axisRatioLineEdit_3.setText( str(axRatio[2]) )
 
+
+        #The paradigm is that other data are plotted over or otherwise added *to* a baseImage.
+        #so we need to remove other crap. 
+        # TODO: AXIS For now we just remove all image stacks in future there will be other classes
+        #       and these are not handled currently. 
+        imageStacks = handleIngredients.returnIngredientByType('imagestack',self.ingredients)
+        if imageStacks != False:
+            for thisStack in imageStacks: #remove imagestacks from plot axes
+                [axis.removeItemFromPlotWidget(thisStack.objectName) for axis in self.axes2D]
+
+        #remove imagestacks from ingredient list
+        self.ingredients = handleIngredients.removeIngredientByType('imagestack',self.ingredients)
 
         #Add to the ingredients list
         objName='baseImage'
@@ -332,11 +334,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                                                               fname=fnameToLoad)
 
         #Add plot items to axes so that they become available for plotting
-        self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        
-        self.overlayEnableActions()
+        [axis.addItemToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients)) for axis in self.axes2D]
 
         #remove any existing range highlighter on the histogram. We do this because different images
         #will likely have different default ranges
@@ -346,64 +344,50 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadBaseImageStack_End'])
 
 
-    def loadOverlayImageStack(self,fnameToLoad):
-        #TODO: export to standalone module https://github.com/BaselLaserMouse/lasagna/issues/17
+    def showBaseStackLoadDialog(self):
         """
-        Load an image stack and insert it as channel 2 into the pre-existing base stack.
-        This creates a red/green overlay
+        This slot brings up the file load dialog and gets the file name.
+        If the file name is valid, it loads the base stack using the loadBaseImageStack method.
+        We split things up so that the base stack can be loaded from the command line, 
+        or from a plugin without going via the load dialog. 
         """
+        self.runHook(self.hooks['showBaseStackLoadDialog_Start'])
 
-        baseStack = handleIngredients.returnIngredientByName('baseImage',self.ingredients) 
-
-        if  baseStack == False:
-            self.actionLoadOverlay.setEnabled(False)
+        fname = self.showFileLoadDialog()
+        if fname == None:
             return
 
-        loadedImageStack = self.loadImageStack(fnameToLoad) 
+        if os.path.isfile(fname): 
+            self.loadBaseImageStack(str(fname))
+            self.initialiseAxes()
+        else:
+            self.statusBar.showMessage("Unable to find " + str(fname))
 
-
-        #Do not proceed with adding overlay if it's of a different size
-        existingSize = baseStack.data().shape
-        overlaySize = loadedImageStack.shape
-
-        if not existingSize == overlaySize:
-            msg = '*** Overlay is not the same size as the loaded image ***'
-            print "Base image"
-            print existingSize[0:-1]
-            print "Overlay image"
-            print overlaySize
-            print msg
-            self.statusBar.showMessage(msg)
-            return
-
-
-        #TODO: this is mostly duplicated code from loadBaseImageStack. Look into sorting this out
-        objName='overlayImage'
-        self.ingredients = handleIngredients.addIngredient(self.ingredients, objectName=objName , 
-                                                              kind='imagestack'       , 
-                                                              data=loadedImageStack   , 
-                                                              fname=fnameToLoad)
-
-        #set colormaps for the two stacks
-        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='red'
-        handleIngredients.returnIngredientByName('overlayImage',self.ingredients).lut='green'
-        
-      
-        #Add plot items to axes so that they become available for plotting
-        self.coronal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.sagittal.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-        self.transverse.addIngredientToPlotWidget(handleIngredients.returnIngredientByName(objName,self.ingredients))
-
-        self.overlayEnableActions()
-        self.overlayLoaded=True
+        self.runHook(self.hooks['showBaseStackLoadDialog_End'])
 
 
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
-    #Code to handle file load dialogs
+    #Code to handle generic file loading, dialogs, etc
+    def loadImageStack(self,thisFname):
+        """
+        Loads a generic image stack (defined by the string thisFname) and returns it as an output argument
+        """
+        if not os.path.isfile(thisFname):
+            msg = 'Unable to find ' + thisFname
+            print msg
+            self.statusBar.showMessage(msg)
+            return False
+
+        #TODO: The axis swap likely shouldn't be hard-coded here
+        return imageStackLoader.loadStack(thisFname).swapaxes(1,2) 
+ 
+
     def showFileLoadDialog(self):
         """
         Bring up the file load dialog. Return the file name. Update the last used path. 
         """
+        self.runHook(self.hooks['showFileLoadDialog_Start'])
+
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),  "Images (*.mhd *.mha *.tiff *.tif)" )
         fname = str(fname)
         if len(fname) == 0:
@@ -424,38 +408,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         lasHelp.preferenceWriter('recentlyLoadedFiles',recentlyLoaded)
         self.updateRecentlyOpenedFiles()
 
+        self.runHook(self.hooks['showFileLoadDialog_End'])
+
         return fname
-
-
-    def showBaseStackLoadDialog(self):
-        """
-        Bring up the file load dialog to load the base image stack
-        """
-        self.runHook(self.hooks['showBaseStackLoadDialog_Start'])
-        fname = self.showFileLoadDialog()
-        if fname == None:
-            return
-
-        if os.path.isfile(fname): 
-            self.loadBaseImageStack(str(fname)) #convert from QString and load
-            self.initialiseAxes()
-        else:
-            self.statusBar.showMessage("Unable to find " + str(fname))
-
-
-    def showOverlayLoadDialog(self):
-        """
-        Bring up the file load dialog to load the overlay image stack
-        """
-        fname = self.showFileLoadDialog()
-        if fname == None:
-            return
-
-        if os.path.isfile(fname): 
-            self.loadOverlayImageStack(str(fname)) #convert QString and load
-            self.initialiseAxes()
-        else:
-            self.statusBar.showMessage("Unable to find " + str(fname))
 
 
     def updateRecentlyOpenedFiles(self):
@@ -480,6 +435,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         load a file from recently opened list
         """
+        self.runHook(self.hooks['loadRecentFileSlot_Start'])
         fname = str(self.sender().text())
         self.loadBaseImageStack(fname)
         self.initialiseAxes()
@@ -499,20 +455,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def closeEvent(self, event):
         self.quitLasagna()
+
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -           
-
-
-    def clearAxes(self):
-        """
-        Wipes image stack and clears plot windows
-        """
-        #TODO: AXIS this function should remove ingredients from each axis 
-        print "NEED TO WRITE lasagna.clearAxes!!"
-        self.coronal.removeIngredientsFromPlotWidget()
-        self.coronal.removeIngredientsFromPlotWidget()
-        self.coronal.removeIngredientsFromPlotWidget()
-
-
 
     def resetAxes(self):
         """
@@ -520,10 +464,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
             return
+        [axis.resetAxes() for axis in self.axes2D]
 
-        self.coronal.resetAxes()
-        self.sagittal.resetAxes()
-        self.transverse.resetAxes()
 
 
     def initialiseAxes(self):
@@ -535,9 +477,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #show default images
         print "updating axes with added ingredients"
-        self.coronal.updatePlotItems_2D(self.ingredients)
-        self.sagittal.updatePlotItems_2D(self.ingredients)
-        self.transverse.updatePlotItems_2D(self.ingredients)
+        [axis.updatePlotItems_2D(self.ingredients) for axis in self.axes2D]
 
         #initialize cross hair
         if self.showCrossHairs:
@@ -550,9 +490,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.plotImageStackHistogram()
 
-        self.coronal.view.setAspectLocked(True, float(self.axisRatioLineEdit_1.text()))
-        self.sagittal.view.setAspectLocked(True, float(self.axisRatioLineEdit_2.text()))
-        self.transverse.view.setAspectLocked(True, float(self.axisRatioLineEdit_3.text()))
+        #TODO: turn into list by making the axisRatioLineEdits a list
+        self.axes2D[0].view.setAspectLocked(True, float(self.axisRatioLineEdit_1.text()))
+        self.axes2D[1].view.setAspectLocked(True, float(self.axisRatioLineEdit_2.text()))
+        self.axes2D[2].view.setAspectLocked(True, float(self.axisRatioLineEdit_3.text()))
         
         self.resetAxes()
         self.updateDisplayText()
@@ -569,47 +510,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
 
-    def removeOverlay(self):
-        """
-        Remove overlay from an imageStack        
-        """
-
-        objectName = 'overlayImage'
-        print "removing " + objectName
-
-        #Remove item from axes
-        self.coronal.removeIngredientFromPlotWidget(objectName)
-        self.sagittal.removeIngredientFromPlotWidget(objectName)
-        self.transverse.removeIngredientFromPlotWidget(objectName)
-
-        self.ingredients = handleIngredients.removeIngredientByName(objectName,self.ingredients)
-
-        #Set baseImage to gray-scale once more
-        handleIngredients.returnIngredientByName('baseImage',self.ingredients).lut='gray'
-
-        self.initialiseAxes()
-        self.overlayLoaded=False
-        self.actionRemoveOverlay.setEnabled(False)
-
-        self.updateDisplayText()
-
-
-    def overlayEnableActions(self):
-        """
-        Actions that need to be performed on the GUI when an overlay can be added
-        """
-        self.actionLoadOverlay.setEnabled(True)
-        self.actionRemoveOverlay.setEnabled(True)
-
-
-    def overlayDisableActions(self):
-        """
-        Actions that need to be performed on the GUI when an overlay can not be added
-        """
-        self.actionLoadOverlay.setEnabled(False)
-        self.actionRemoveOverlay.setEnabled(False)
-        self.overlayLoaded=False #If an overlay can not be added it also can not be present
-
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for axis tab
@@ -618,21 +518,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Set axis ratio on plot 1
         """
-        self.coronal.view.setAspectLocked( True, float(self.axisRatioLineEdit_1.text()) )
+        self.axes2D[0].view.setAspectLocked( True, float(self.axisRatioLineEdit_1.text()) )
 
 
     def axisRatio2Slot(self):
         """
         Set axis ratio on plot 2
         """
-        self.sagittal.view.setAspectLocked( True, float(self.axisRatioLineEdit_2.text()) )
+        self.axes2D[1].view.setAspectLocked( True, float(self.axisRatioLineEdit_2.text()) )
 
 
     def axisRatio3Slot(self):
         """
         Set axis ratio on plot 3
         """
-        self.transverse.view.setAspectLocked( True, float(self.axisRatioLineEdit_3.text()) )
+        self.axes2D[2].view.setAspectLocked( True, float(self.axisRatioLineEdit_3.text()) )
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -651,14 +551,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not self.showCrossHairs:
             return
 
-        self.coronal.view.removeItem(self.crossHairVLine) 
-        self.coronal.view.removeItem(self.crossHairHLine)
-
-        self.sagittal.view.removeItem(self.crossHairVLine) 
-        self.sagittal.view.removeItem(self.crossHairHLine)
-
-        self.transverse.view.removeItem(self.crossHairVLine) 
-        self.transverse.view.removeItem(self.crossHairHLine)
+        [axis.removeItemFromPlotWidget(self.crossHairVLine) for axis in self.axes2D]
+        [axis.removeItemFromPlotWidget(self.crossHairHLine) for axis in self.axes2D]
 
 
     def constrainMouseLocationToImage(self,thisImage):
@@ -713,6 +607,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Update UI elements on the screen (but not the plotted images) as the user moves the mouse across an axis
         """
+        self.runHook(self.hooks['updateMainWindowOnMouseMove_Start']) #Runs each time the views are updated
+
         thisImage = lasHelp.findPyQtGraphObjectNameInPlotWidget(axis.view,'baseImage').image
 
         self.constrainMouseLocationToImage(thisImage)
@@ -734,7 +630,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
 
         #TODO: AXIS - eventually have different histograms for each color channel
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.coronal.view,'baseImage')
+        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,'baseImage')
         x,y = img.getHistogram()
 
         if self.logYcheckBox.isChecked():
@@ -791,14 +687,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         for thisImageStack in allImageStacks:
             objectName=thisImageStack.objectName
 
-            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.coronal.view,objectName)
-            img.setLevels([minX,maxX]) #Sets levels immediately
+            for thisAxis in self.axes2D:
+                img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view,objectName)
+                img.setLevels([minX,maxX]) #Sets levels immediately
 
-            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.sagittal.view,objectName)
-            img.setLevels([minX,maxX]) #Sets levels immediately
-
-            img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.transverse.view,objectName)
-            img.setLevels([minX,maxX]) #Sets levels immediately
 
             thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
 
@@ -813,17 +705,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         pos = evt[0] #Using signal proxy turns original arguments into a tuple
         self.removeCrossHairs()
 
-        if self.coronal.view.sceneBoundingRect().contains(pos):
+        if self.axes2D[0].view.sceneBoundingRect().contains(pos):
             #TODO: figure out how to integrate this into object, because when we have that, we could
             #      do everything but the axis linking in the object. 
             if self.showCrossHairs:
-                self.coronal.view.addItem(self.crossHairVLine, ignoreBounds=True)
-                self.coronal.view.addItem(self.crossHairHLine, ignoreBounds=True)
+                self.axes2D[0].view.addItem(self.crossHairVLine, ignoreBounds=True)
+                self.axes2D[0].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
-            (self.mouseX,self.mouseY)=self.coronal.getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.coronal) #Update UI elements 
-            self.coronal.updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY)) #Update displayed slice
-
+            (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
+            self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements 
+            self.axes2D[0].updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY)) #Update displayed slice
+    
 
     def mouseMovedSaggital(self,evt):
         if handleIngredients.returnIngredientByName('baseImage',self.ingredients)==False:
@@ -832,14 +724,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         pos = evt[0]
         self.removeCrossHairs()
 
-        if self.sagittal.view.sceneBoundingRect().contains(pos):
+        if self.axes2D[1].view.sceneBoundingRect().contains(pos):
             if self.showCrossHairs:
-                self.sagittal.view.addItem(self.crossHairVLine, ignoreBounds=True)
-                self.sagittal.view.addItem(self.crossHairHLine, ignoreBounds=True)
+                self.axes2D[1].view.addItem(self.crossHairVLine, ignoreBounds=True)
+                self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
-            (self.mouseX,self.mouseY)=self.sagittal.getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.sagittal)
-            self.sagittal.updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
+            (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
+            self.updateMainWindowOnMouseMove(self.axes2D[1])
+            self.axes2D[1].updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
 
         
     def mouseMovedTransverse(self,evt):
@@ -849,14 +741,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         pos = evt[0]  
         self.removeCrossHairs()
 
-        if self.transverse.view.sceneBoundingRect().contains(pos):
+        if self.axes2D[2].view.sceneBoundingRect().contains(pos):
             if self.showCrossHairs:
-                self.transverse.view.addItem(self.crossHairVLine, ignoreBounds=True) 
-                self.transverse.view.addItem(self.crossHairHLine, ignoreBounds=True)
+                self.axes2D[2].view.addItem(self.crossHairVLine, ignoreBounds=True) 
+                self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
-            (self.mouseX,self.mouseY)=self.transverse.getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.transverse)
-            self.transverse.updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
+            (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
+            self.updateMainWindowOnMouseMove(self.axes2D[2])
+            self.axes2D[2].updateDisplayedSlices_2D(self.ingredients,(self.mouseX,self.mouseY))
 
 
 
@@ -869,6 +761,7 @@ def main(fnames=[None,None]):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
+    tasty.app = app
 
     #Load stacks from command line input if any was provided
     if not fnames[0]==None:
@@ -877,7 +770,7 @@ def main(fnames=[None,None]):
     
         if not fnames[1]==None:
             print "Loading " + fnames[1]
-            tasty.loadOverlayImageStack(fnames[1])
+            tasty.loadActions[0].load(fnames[1]) #TODO: we need a nice way of finding load actions by name
 
         tasty.initialiseAxes()
 
@@ -886,10 +779,10 @@ def main(fnames=[None,None]):
     # Link slots to signals
     #connect views to the mouseMoved slot. After connection this runs in the background. 
     #TODO: figure out why returning an argument is crucial even though we never use it
-
-    proxy1=pg.SignalProxy(tasty.coronal.view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedCoronal)
-    proxy2=pg.SignalProxy(tasty.sagittal.view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
-    proxy3=pg.SignalProxy(tasty.transverse.view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)
+    #TODO: set up with just one slot that accepts arguments
+    proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedCoronal)
+    proxy2=pg.SignalProxy(tasty.axes2D[1].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
+    proxy3=pg.SignalProxy(tasty.axes2D[2].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)
 
     sys.exit(app.exec_())
 

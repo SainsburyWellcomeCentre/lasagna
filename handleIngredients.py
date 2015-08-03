@@ -78,7 +78,7 @@ def removeIngredientByType(ingredientType, ingredientList=[]):
     if len(ingredientList)==0:
         if verbose:
             print "removeIngredientByType finds no ingredients in list!"
-        return False
+        return ingredientList
 
     for thisIngredient in ingredientList[:]:
         if thisIngredient.__module__.endswith(ingredientType):

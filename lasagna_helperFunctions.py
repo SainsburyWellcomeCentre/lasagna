@@ -149,7 +149,7 @@ def defaultPreferences():
             'recentlyLoadedFiles' : [] ,            #A list containing the last "numRecentFiles" file names
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
-            'showCrossHairs' : False                #Whether or not to show the cross hairs 
+            'showCrossHairs' : True                 #Whether or not to show the cross hairs 
             }
 
  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,18 +167,15 @@ main lasagna preferences file. However, this can be over-ridden so that indiviua
 their own preferences files and still use these functions. 
 """
 
-def loadAllPreferences(prefFName=None):
+def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPreferences()):
     """
     Load the preferences YAML file. If the file is missing, we create it using the default
     preferences defined above. Preferences are returned as a dictionary.
     """
-    if prefFName == None:
-        prefFName = getLasagnaPrefFile()
-    
+    print "loading from %s" % prefFName
     #Generate a default preferences file if no preferences file exists
     if os.path.exists(prefFName) == False:
-        writeAllPreferences(defaultPreferences())
-        print defaultPreferences()
+        writeAllPreferences(defaultPref,prefFName=prefFName)
         print "Created default preferences file in " + prefFName
 
     #Load preferences YAML file as a dictionary
@@ -187,7 +184,7 @@ def loadAllPreferences(prefFName=None):
     stream.close()
 
 
-def readPreference(preferenceName,prefFName=None):
+def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=getLasagnaPrefFile()):
     """
     Read preferences with key "preferenceName" from YAML file prefFName on disk.
     If the key is abstent, call defaultPreferences and search for the key. If it
@@ -195,7 +192,7 @@ def readPreference(preferenceName,prefFName=None):
     warning and return None. The caller function needs to decide what to do with 
     the None. 
     """
-
+    
     #TODO: need some sort of check as to whether the preference value is valid
     
     #Check on disk
@@ -204,7 +201,6 @@ def readPreference(preferenceName,prefFName=None):
         return preferences[preferenceName]
 
     #Check in default preferences and to file and return if so
-    preferences = defaultPreferences()
     if preferences.has_key(preferenceName):
         value = preferences[preferenceName]
         preferenceWriter(preferenceName,value,prefFName)
