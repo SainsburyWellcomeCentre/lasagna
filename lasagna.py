@@ -338,6 +338,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if hasattr(self,'plottedIntensityRegionObj'):
             del self.plottedIntensityRegionObj
 
+
+
         self.runHook(self.hooks['loadBaseImageStack_End'])
 
 
@@ -501,6 +503,24 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.imageComboBox.addItem(self.ingredientList[-1].objectName)
 
 
+    def removeIngredient(self,ingredientInstance):
+        """
+        Removes the ingredient "ingredientInstance" from self.ingredientList
+        This method is called by the two following methods that remove based on
+        ingredient name or type         
+        """
+        #If this is an image stack, remove it from the combo box
+        if ingredientInstance.__module__.endswith('imagestack'):
+            objName = ingredientInstance.objectName
+            listPositionOfIngredient = self.imageComboBox.findText(objName)
+            if listPositionOfIngredient == -1:
+                print "Can not find ingredient %s in combo box so can not remove it from box." % objName
+            else:
+                self.imageComboBox.removeItem(listPositionOfIngredient)
+
+        self.ingredientList.remove(ingredientInstance)
+
+
     def removeIngredientByName(self,objectName):
         """
         Finds ingredient by name and removes it from the list
@@ -517,12 +537,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             if thisIngredient.objectName == objectName:
                 if verbose:
                     print 'Removing ingredient ' + objectName
-                self.ingredientList.remove(thisIngredient)
+                self.removeIngredient(thisIngredient)
                 removedIngredient=True
 
         if removedIngredient == False & verbose==True:
             print "** Failed to remove ingredient %s **" % objectName
-
 
     def removeIngredientByType(self,ingredientType):
         """
@@ -539,7 +558,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 if verbose:
                     print 'Removing ingredient ' + thisIngredient.objectName
 
-                self.ingredientList.remove(thisIngredient)
+                self.removeIngredient(thisIngredient)
 
 
     def listIngredients(self):
