@@ -770,8 +770,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
-        selectedStack=self.imageComboBox.currentText() #The image stack currently selected with combo box
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,selectedStack)
+        selectedStackName=self.imageComboBox.currentText() #The image stack currently selected with combo box
+        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,selectedStackName)
         x,y = img.getHistogram()
 
 
@@ -782,8 +782,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             y[y<0]=0
 
         self.intensityHistogram.clear()
+        ingredient = self.returnIngredientByName(selectedStackName);#Get colour of the layer
+        cMap = ingredient.setColorMap(ingredient.lut)
+        brushColor = cMap[round(len(cMap)/2),:]
+        penColor = cMap[-1,:]
+
         ## Using stepMode=True causes the plot to draw two lines for each sample but it needs X to be longer than Y by 1
-        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, brush=(255,0,255,80),yMin=0, xMin=0)
+        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, pen=penColor, brush=brushColor,yMin=0, xMin=0)
         self.intensityHistogram.showGrid(x=True,y=True,alpha=0.33)
 
         #The object that represents the plotted intensity range is only set up the first time the 
@@ -792,7 +797,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not hasattr(self,'plottedIntensityRegionObj'):
             self.plottedIntensityRegionObj = pg.LinearRegionItem()
             self.plottedIntensityRegionObj.setZValue(10)
-            minMax=self.returnIngredientByName(selectedStack).minMax
+            minMax=self.returnIngredientByName(selectedStackName).minMax
             self.setIntensityRange(minMax)
             self.plottedIntensityRegionObj.sigRegionChanged.connect(self.updateAxisLevels) #link signal slot
 
