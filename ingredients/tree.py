@@ -122,7 +122,7 @@ class Tree(object):
                 queue = queue[1:] + expansion  # width-first
 
 
-    def isleaf(self,identifier):
+    def isLeaf(self,identifier):
         """
         Is the node indexed by 'identifier' a leaf?
         returns True or False
@@ -139,7 +139,7 @@ class Tree(object):
             return False
 
 
-    def findleaves(self,fromNode=0):
+    def findLeaves(self,fromNode=0):
         """
         Returns a list of nodes that are leaves, searching from 
         the node "fromNode". To find all leaves, fromNode should 
@@ -147,13 +147,13 @@ class Tree(object):
         """
         nodesThatAreLeaves = []
         for nodeID in self.traverse(fromNode):
-            if self.isleaf(nodeID):
+            if self.isLeaf(nodeID):
                 nodesThatAreLeaves.append(nodeID)
 
         return nodesThatAreLeaves
 
 
-    def findbranches(self,fromNode=0):
+    def findBranches(self,fromNode=0):
         """
         Is the node indexed by 'identifier' a branch?
         A branch is defined as a node with more than two children
@@ -167,6 +167,23 @@ class Tree(object):
         return nodesThatAreBranches
 
 
+
+    def pathToRoot(self, fromNode):
+        """
+        Path from node "fromNode" to the tree's root
+        To achieve this we simply need to follow the tree back by looking 
+        each node's parent. Since a node can only have one parent, this is 
+        trivial and quick. No nee to exhaustively search the tree for the 
+        fastest path.
+        """
+        currentNode=fromNode
+        path = [fromNode]
+        while self.nodes[currentNode].parent != None:
+            path.append(self.nodes[currentNode].parent)
+            currentNode = self.nodes[currentNode].parent
+
+
+        return path
 
     def __getitem__(self, key):
         return self.__nodes[key]
@@ -292,10 +309,13 @@ if __name__ == '__main__':
         print "%s - %s" % (nodeID, treeOfLife[nodeID].data)
 
     print "\nLeaves:"
-    print treeOfLife.findleaves('Life')
+    print treeOfLife.findLeaves('Life')
 
     print "\nBranches:"
-    print treeOfLife.findbranches('Life')
+    print treeOfLife.findBranches('Life')
+
+    print "\nPath to root from Fish:"
+    print treeOfLife.pathToRoot('Fish')
 
     # - - - - - - -
     print "\n\n   --------- Tree of Fibonacci numbers --------- \n"
