@@ -1,8 +1,70 @@
+"""
+Module to handle tree data. 
+Defines a tree and a node class as well as functions for importing data
+"""
+
+(_ROOT, _DEPTH, _BREADTH) = range(3) #Used by classes to navigate the tree
+
+import os.path
+
+def importData(fname,displayTree=False):
+    """
+    Import tree data from a CSV (text) file. The data should be in the following format
+    node_ID_number,node_parent_ID_number,xPosition,yPosition,zPosition\n
+
+    The three coordinates are with respect to the image stack with which the 
+    tree structure is associated. 
+
+    The root node has index of 1 and a parent of 0. 
+
+    From MATLAB one can produce tree structures and dump data in the correct format
+    using https://github.com/raacampbell13/matlab-tree and the tree.dumptree method
+
+    if displayTree is True, the tree is displayed after creation
+    """
+
+    #Error check
+    if os.path.exists(fname)==False:
+        print "Can not find file " + fname
+        return
+
+    if fname.lower().endswith('csv')==False:
+        print "Data should be a CSV file"
+        return
+
+    #Read in data
+    fid = open(fname,'r')
+    data = []
+    for line in fid:
+        dataLine = line.rstrip('\n').split(',')
+        data.append(map(int,dataLine))
+
+    fid.close()
 
 
-(_ROOT, _DEPTH, _BREADTH) = range(3)
+    #Build tree
+    tree = Tree()
+    tree.add_node(0)
+    for thisNode in data:
+        tree.add_node(thisNode[0],thisNode[1])
+        tree[thisNode[0]].data = thisNode[2:]
 
 
+    #Optionally dump the tree to screen (unlikely to be useful for large trees)
+    if displayTree:
+        tree.display(0)
+
+        for nodeID in tree.traverse(0):
+            print "%s - %s" % (nodeID, tree[nodeID].data)
+
+
+
+
+
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Tree(object):
     """
     A simple tree class
@@ -67,6 +129,8 @@ class Tree(object):
 
 
 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Node(object):
     """
     A simple node class
@@ -99,6 +163,7 @@ class Node(object):
 
 
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Generate an example if run from the command line
 if __name__ == '__main__':
 
