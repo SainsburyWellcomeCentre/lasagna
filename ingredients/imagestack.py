@@ -62,19 +62,20 @@ class imagestack(object):
         cmap = cmap.lower()
         pos = np.array([0.0, 1.0])
 
+        nVal = 255
         if cmap == 'gray' or cmap == 'grey':
-            color = np.array([[ 0 , 0 , 0 ,255], [255,255,255,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal,nVal,nVal]], dtype=np.ubyte)
         elif cmap == 'red':
-            color = np.array([[ 0 , 0 , 0 ,255], [255, 0 ,0 ,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal, 0 ,0 ,nVal]], dtype=np.ubyte)
         elif cmap == 'green':
-            color = np.array([[ 0 , 0 , 0 ,255], [ 0 ,255, 0 ,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 ,nVal, 0 ,nVal]], dtype=np.ubyte)
         elif cmap == 'blue':
-            color = np.array([[ 0 , 0 , 0 ,255], [ 0 , 0 ,255,255]], dtype=np.ubyte)
+            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 , 0 ,nVal,nVal]], dtype=np.ubyte)
         else:
             print "no pre-defined colormap " + cmap
 
         map = pg.ColorMap(pos, color)
-        lut = map.getLookupTable(0.0, 1.0, 256)
+        lut = map.getLookupTable(0.0, 1.0, nVal+1)
 
         return lut
 
@@ -100,7 +101,6 @@ class imagestack(object):
         onto the object with which it is associated
         """
         data = self.data(axisToPlot)
-        #print "plotting %s with minmax: %d %d" % (self.objectName,self.minMax[0],self.minMax[1])
         pyqtObject.setImage(
                         data[sliceToPlot], 
                         levels=self.minMax, 

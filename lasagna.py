@@ -799,8 +799,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.plottedIntensityRegionObj.setZValue(10)
             self.plottedIntensityRegionObj.sigRegionChanged.connect(self.updateAxisLevels) #link signal slot
 
+        #Get the plotted range and apply to the region object
         minMax=self.returnIngredientByName(selectedStackName).minMax
         self.setIntensityRange(minMax)
+
         # Add to the ViewBox but exclude it from auto-range calculations.
         self.intensityHistogram.addItem(self.plottedIntensityRegionObj, ignoreBounds=True)
 
