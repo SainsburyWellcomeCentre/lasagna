@@ -714,27 +714,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         [axis.removeItemFromPlotWidget(self.crossHairHLine) for axis in self.axes2D]
 
 
-    def constrainMouseLocationToImage(self,thisImage):
-        """
-        Ensures that the values of self.mouseX and self.mouseY, which are the X and Y positions
-        of the mouse pointer on the current image, do not exceed the dimensions of the image.
-        This is used to avoid asking for image slices that do not exist.
-        NOTE: constraints on plotting are also imposed in lasagna_axis.updatePlotItems_2D
-        """
-        #I think the following would be better placed in getMousePositionInCurrentView, but this could work also. 
-        if self.mouseX<0:
-            self.mouseX=0
-
-        if self.mouseY<0:
-            self.mouseY=0
-
-        if self.mouseX>=thisImage.shape[0]:
-            self.mouseX=thisImage.shape[0]-1
-
-        if self.mouseY>=thisImage.shape[1]:
-            self.mouseY=thisImage.shape[1]-1
-
-
     def updateCrossHairs(self):
         """
         Update the drawn cross hairs on the current image 
@@ -745,19 +724,39 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.crossHairHLine.setPos(self.mouseY+0.5)
 
 
-    def updateStatusBar(self,thisImage):
+    def updateStatusBar(self):
         """
         Update the text on the status bar based on the current mouse position 
         """
+
         X = self.mouseX
         Y = self.mouseY
 
-        #get pixel value of red layer
-        self.pixelValue = thisImage[X,Y] 
-        if isinstance(self.pixelValue,np.ndarray): #so this works with both RGB and monochrome images
-            self.pixelValue = int(self.pixelValue[0])
+        #get pixels under image
+        imageItems = self.axes2D[0].getPlotItemByType('ImageItem')
+        pixelValues=[]
+        
+        #Get the pixel intensity of all displayed image layers under the mouse
+        #The following assumes that images have their origin at (0,0)
+        for thisImageItem in imageItems:
+            imShape = thisImageItem.image.shape
 
-        self.statusBarText = "X=%d, Y=%d, val=%d" % (X,Y,self.pixelValue)
+            if X<0 or Y<0:
+                pixelValues.append(0)
+            elif X>=imShape[0] or Y>=imShape[1]:
+                pixelValues.append(0)
+            else:
+                pixelValues.append(thisImageItem.image[X,Y])
+
+        #Build a text string to house these values
+        valueStr = ''
+        while len(pixelValues)>0:
+            valueStr = valueStr + '%d,' % pixelValues.pop()
+
+        valueStr = valueStr[:-1] #Chop off the last character
+
+        self.statusBarText = "X=%d, Y=%d, val=[%s]" % (X,Y,valueStr)
+
         self.runHook(self.hooks['updateStatusBar_End']) #Hook goes here to modify or append message
         self.statusBar.showMessage(self.statusBarText)
 
@@ -768,11 +767,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         self.runHook(self.hooks['updateMainWindowOnMouseMove_Start']) #Runs each time the views are updated
 
-        thisImage = lasHelp.findPyQtGraphObjectNameInPlotWidget(axis.view,'baseImage').image
-
-        self.constrainMouseLocationToImage(thisImage)
         self.updateCrossHairs()
-        self.updateStatusBar(thisImage)
+        self.updateStatusBar()
+
         self.runHook(self.hooks['updateMainWindowOnMouseMove_End']) #Runs each time the views are updated
 
 
@@ -854,7 +851,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             for thisAxis in self.axes2D:
                 img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view,objectName)
                 img.setLevels([minX,maxX]) #Sets levels immediately
-
                 thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
 
             
