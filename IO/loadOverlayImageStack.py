@@ -80,21 +80,6 @@ class loadOverlayImageStack(lasagna_plugin):
         existingSize = baseStack.data().shape
         overlaySize = loadedImageStack.shape
 
-        #Ensure that overlay is the same size as the base image stack
-        if not existingSize == overlaySize:
-            msg = '*** Overlay is not the same size as the loaded image ***'
-            print msg
-            self.lasagna.statusBar.showMessage(msg)
-
-            print "Base image:"
-            print existingSize
-            print "Overlay image:"
-            print overlaySize
-
-            from alert import alert
-            self.lasagna.alert = alert(self.lasagna,alertText="This stack is a different size to the loaded base stack.<br>Aborting load. ")
-            return
-
 
         #TODO: this is mostly duplicated code from loadBaseImageStack. Maybe this can be reduced somewhat?
         objName='overlayImage'

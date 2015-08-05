@@ -45,7 +45,6 @@ class projection2D():
         _thisItem = ( getattr(pg,ingredient.pgObject)(**ingredient.pgObjectConstructionArgs) )
         _thisItem.objectName = ingredient.objectName
 
-
         self.view.addItem(_thisItem)
         self.items.append(_thisItem)
 
@@ -113,6 +112,7 @@ class projection2D():
                 print "object %s: %s" % (n,thisItem.objectName)
             n=n+1
 
+
     def getPlotItemByName(self,objName):
         """
         returns the first plot item in the list bearing the objectName 'objName'
@@ -124,6 +124,19 @@ class projection2D():
                 if thisItem.objectName == objName:
                     return thisItem
 
+
+    def getPlotItemByType(self,itemType):
+        """
+        returns all plot items of the defined type. 
+        itemType should be a string that defines a pyqtgraph item type. 
+        Examples include: ImageItem, ViewBox, PlotItem, AxisItem and LabelItem
+        """
+        itemList = [] 
+        for thisItem in self.view.items():
+            if thisItem.__module__.endswith(itemType):
+                itemList.append(thisItem)
+
+        return itemList
 
 
     def hideItem(self,item):
@@ -141,23 +154,6 @@ class projection2D():
         slice (sliceToPlot) is shown. This is done based upon a list of ingredients
         """
 
-        # Get base-image in correct orientation.
-        baseImage = self.lasagna.returnIngredientByName('baseImage')
-
-        #Use base-image shape to set sliceToPlot correctly so it stays within bounds
-        #  get the number of slices in the base image stack along this axes' z (depth) dimension
-        numSlices = baseImage.data(self.axisToPlot).shape[0]
-
-        #  choose the mid-point if no slice was specified. 
-        if sliceToPlot==None:
-            sliceToPlot=numSlices/2 #The mid-point of the stack
-            
-        #  remain within bounds (don't return a non-existant slice)
-        if sliceToPlot>numSlices:
-            sliceToPlot=numSlices-1;
-        elif sliceToPlot<0:
-            sliceToPlot=0;
-
         # loop through all plot items searching for imagestack items (these need to be plotted first)
         #NOTE: the following two loops will be changed soon
         #TODO: CHECK HOW ORDER IS DECIDED
@@ -171,10 +167,23 @@ class projection2D():
                 #      that this same object needs to be plotted in different axes, each of which has its own
                 #      plot items. So I can't assign a single plot item to the ingredient. Options?
                 #      a list of items and axes in the ingredient? I don't link that.
+        
+                numSlices = thisIngredient.data(self.axisToPlot).shape[0]
+
+                #  remain within bounds (don't return a non-existant slice)
+                if sliceToPlot==None:
+                    sliceToPlotInThisLayer=numSlices/2 #The mid-point of the stack if no slice was specified
+                elif sliceToPlot>=numSlices:
+                    sliceToPlotInThisLayer=numSlices-1;
+                elif sliceToPlot<0:
+                    sliceToPlotInThisLayer=0;
+                else:
+                    sliceToPlotInThisLayer = sliceToPlot
+
                 thisIngredient.plotIngredient(
                                             pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                             axisToPlot=self.axisToPlot, 
-                                            sliceToPlot=sliceToPlot
+                                            sliceToPlot=sliceToPlotInThisLayer
                                             )
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -187,17 +196,15 @@ class projection2D():
                                               axisToPlot=self.axisToPlot, 
                                               sliceToPlot=sliceToPlot)
 
-
     def updateDisplayedSlices_2D(self, ingredients, slicesToPlot):
         """
         Update the image planes shown in each of the axes
         ingredients - lasagna.ingredients
         slicesToPlot - a tuple of length 2 that defines which slices to plot for the Y and X linked axes
         """
-        # TODO: AXIS will need to be updated to cope with a more flexible axis paradigm
         self.updatePlotItems_2D(ingredients)  #TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
-                                     #      Also this doesn't work if we are to change the displayed slice in the current axis by using the mouse wheel.
-        #print "updateDisplayedSlices is plotting slices: x:%d and y:%d" % slicesToPlot
+                                              # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
+
         self.linkedYprojection.updatePlotItems_2D(ingredients,slicesToPlot[0])
         self.linkedXprojection.updatePlotItems_2D(ingredients,slicesToPlot[1])
 
