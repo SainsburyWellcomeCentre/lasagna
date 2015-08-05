@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>icons/elastix_logo.gif</file>
+    <file>icons/edit-delete.png</file>
+  </qresource>
+</RCC>
