@@ -13,7 +13,7 @@ from PyQt4 import QtGui, QtCore
 import sys
 import os
 from which import which #To test if binaries exist in system path
-
+import subprocess
 class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #must inherit lasagna_plugin first
 
     def __init__(self,lasagna,parent=None):
@@ -31,9 +31,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         else:
             print "Using elastix binary at " + which('elastix')
 
-
-
-        self.debug=True #runs certain things quickly to help development
 
         #re-define some default properties that were originally defined in lasagna_plugin
         self.pluginShortName='Elastix' #Appears on the menu
@@ -67,22 +64,29 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.loadSample.released.connect(self.loadSample_slot)
 
         #Tab 2 - Building the registration command
-        self.radioButtonReferenceFixed.toggled.connect(self.updateCMDtext_slot)
-        self.radioButtonSampleFixed.toggled.connect(self.updateCMDtext_slot)
-        self.outputDir.released.connect(self.selectOutputDir_slot)
+        self.radioButtonReferenceFixed.toggled.connect(self.updateWidgets_slot)
+        self.radioButtonSampleFixed.toggled.connect(self.updateWidgets_slot)
+        self.outputDirSelect_button.released.connect(self.selectOutputDir_slot)
         self.removeParameter.released.connect(self.removeParameter_slot)
         self.loadParamFile.released.connect(self.loadParamFile_slot)
         self.moveParamUp_button.released.connect(self.moveParamUp_button_slot)
         self.moveParamDown_button.released.connect(self.moveParamDown_button_slot)
 
+        #Tab 3 - parameter file
+        self.plainTextEditParam.textChanged.connect(self.plainTextEditParam_slot)
+        self.paramSave.released.connect(self.paramSave_slot)
+        self.comboBoxParam.activated.connect(self.comboBoxParamLoadOnSelect_slot)
+
         #Tab 4: running
+        self.runElastix_button.released.connect(self.runElastix_button_slot)
         self.tabRun.setEnabled(False)
 
 
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
-        if self.debug:
+        debug=False #runs certain things quickly to help development
+        if debug:
             self.refAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
             self.samAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
 
@@ -93,23 +97,26 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 self.loadSample.setEnabled(True)
                 self.lasagna.loadActions[0].load(self.samAbsPath)
                 self.lasagna.initialiseAxes()
-                self.outputDirSelectBoxProcessText()
             else:
-                self.refAbsPath='/home/elastix/ref.mhd'
-                self.samAbsPath='/home/elastix/sam.mhd'
+                self.refAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
+                self.samAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
 
 
-            #load param file list
-            paramFiles  =['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
-                          '/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000bspline.txt']
-            for thisParamFName in paramFiles:
-                item = QtGui.QStandardItem()
-                thisParamFName = self.absToRelPath(thisParamFName)
-                item.setText(thisParamFName)
-                self.paramItemModel.appendRow(item)
+            doParamFile=True
+            if doParamFile:
+                #load param file list
+                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
+                              '/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000bspline.txt']
+                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
+                for thisParamFName in paramFiles:
+                    item = QtGui.QStandardItem()
+                    thisParamFName = self.absToRelPath(thisParamFName)
+                    item.setText(thisParamFName)
+                    self.paramItemModel.appendRow(item)
+            self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg1'))
+            self.updateWidgets_slot()
+            self.tabWidget.setCurrentIndex(3)
 
-            self.updateCMDtext_slot()
-            self.tabWidget.setCurrentIndex(0)
         #-------------------------------------------------------------------------------------
 
     #Tab 3 - Editing the parameter files
@@ -127,7 +134,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.referenceStackName.setText(self.lasagna.returnIngredientByName('baseImage').fname())
         self.refAbsPath = self.lasagna.returnIngredientByName('baseImage').fnameAbsPath
         self.loadSample.setEnabled(True)
-        self.updateCMDtext_slot()
+        self.updateWidgets_slot()
         self.sampleStackName_3.setText('')
 
 
@@ -136,17 +143,16 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.lasagna.loadActions[0].showLoadDialog()
         self.sampleStackName_3.setText(self.lasagna.returnIngredientByName('overlayImage').fname())
         self.samAbsPath = self.lasagna.returnIngredientByName('overlayImage').fnameAbsPath
-        self.outputDirSelectBoxProcessText()
-        self.updateCMDtext_slot()
+        self.updateWidgets_slot()
 
 
     def selectOutputDir_slot(self):
         """
         Select the Elastix output directory
         """
-        selectedDir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))  
-        self.outputDirSelectBoxProcessText(outputPath=selectedDir)
-        self.updateCMDtext_slot()
+        selectedDir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.outputDir_label.setText(selectedDir)
+        self.updateWidgets_slot()
 
 
     def loadParamFile_slot(self):
@@ -162,23 +168,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             item.setText(thisParamFName)
             self.paramItemModel.appendRow(item)
 
-        """
-                #eventually we don't use this list
-                PARAM_TEMP=['./paramAffine.txt', './paramBSpline.txt']
-        
-                for thisParam in PARAM_TEMP:
+        self.updateWidgets_slot()
 
-
-                #load a parameter file into the text box so we see what it looks like
-                fname='/mnt/data/TissueCyte/registrationTests/vanillaParams/Par0000affine.txt'
-                fid = open(fname,'r')
-                contents = fid.read()
-                fid.close()
-                self.plainTextEditParam.clear()
-                self.plainTextEditParam.insertPlainText(contents)
-                self.updateCMDtext_slot()
-        """
-        self.updateCMDtext_slot()
 
     def moveParamUp_button_slot(self):
         """
@@ -190,7 +181,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         currentItem = self.paramItemModel.takeRow(currentRow) #Get the contents
         self.paramItemModel.removeRows(currentRow,1) #Delete the cell
         self.paramItemModel.insertRow(currentRow - 1, currentItem)
-        self.updateCMDtext_slot()
+        self.updateWidgets_slot()
 
 
     def moveParamDown_button_slot(self):
@@ -202,11 +193,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             return            
         currentItem = self.paramItemModel.takeRow(currentRow)
         self.paramItemModel.insertRow(currentRow + 1, currentItem)
-        self.updateCMDtext_slot()
+        self.updateWidgets_slot()
 
-    def updateCMDtext_slot(self):
+    def updateWidgets_slot(self):
         """
-        Build the elastix command and show on text boxes on screen 
+        Build the elastix command and show on text boxes on screen.
+        This slot is called by the radio buttons but also by other 
+        slots, such moving parameters up and down.
         """
 
         if self.radioButtonReferenceFixed.isChecked():
@@ -220,63 +213,111 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.elastix_cmd['m'] = self.absToRelPath(self.elastix_cmd['m'])
         self.elastix_cmd['f'] = self.absToRelPath(self.elastix_cmd['f'])
 
+        #Build the parameter string that will be added to the command
         paramStr=''
         for ii in range(self.paramItemModel.rowCount()):
             paramFile = self.paramItemModel.index(ii,0).data().toString()
             paramStr = paramStr + '-p ' + paramFile + ' '
 
+        #Build the command
         str = 'elastix -m %s -f %s %s' % (self.elastix_cmd['m'], 
                                           self.elastix_cmd['f'], 
                                           paramStr)
 
-        if len(self.outputDirSelectBox.toPlainText())>0:
-            str = '%s -out %s' % (str, self.absToRelPath(self.outputDirSelectBox.toPlainText()) )
+        #If the output directory exists, add it to the command
+        if os.path.exists(self.outputDir_label.text()):
+            str = '%s -out %s' % (str, self.outputDir_label.text())
 
-        self.labelCommandText.setText(str)
-        self.labelCommandText_copy.setText(str)
+        #Write the command to the boxes in tabs 2 and 4
+        self.labelCommandText.setText(str) #On Tab 2
+        self.labelCommandText_copy.setText(str) #On Tab 4
+
+        #Refresh the parameter file list combobox on Tab 3
+        self.comboBoxParam.clear()
+        for ii in range(self.paramItemModel.rowCount()):
+            paramFile = self.paramItemModel.index(ii,0).data().toString()
+            paramFile = paramFile.split(os.path.sep)[-1] #Only the file name since we'll be saving to a different location
+            self.comboBoxParam.addItem(paramFile)
+
+        #Load the file from the first index into the text box 
+        #TODO: there is no check for whether the load operation will wipe modifications to the buffer!
+        if self.comboBoxParam.count()>0:
+            self.comboBoxParamLoadOnSelect_slot(0)
+
+        #Enable the run tab if all is ready
+        if self.comboBoxParam.count()>0 and os.path.exists(self.outputDir_label.text()) and os.path.exists(self.elastix_cmd['m']) and os.path.exists(self.elastix_cmd['f']):
+            self.tabRun.setEnabled(True)
+        else:
+            self.tabRun.setEnabled(False)
+
+
+    def comboBoxParamLoadOnSelect_slot(self,indexToLoad):
+        """
+        slot that loads a parameter file from the combobox index indexToLoad
+        into the text box on Tab 3
+        """
+
+        self.paramEditMsg_label.setText('Modifications saved to output directory. Original file not changed.')
+        if os.path.exists(self.outputDir_label.text())==False: #Only load if we can save it somewhere
+            self.paramEditMsg_label.setText('Set valid output directory to see parameter file!')
+            return
+
+        fname=self.paramItemModel.index(indexToLoad,0).data().toString()
+
+        if os.path.exists(fname)==False:
+            print fname + " does not exist"
+            return
+
+        fid = open(fname,'r')
+        contents = fid.read()
+        fid.close()
+        self.plainTextEditParam.clear()
+        self.plainTextEditParam.insertPlainText(contents)
+
+        #Disable the save box, since we only enable it once a change has been made to the buffer
+        if os.path.exists(self.outputDir_label.text()): #Only if we can save it somewhere
+            self.paramSave.setEnabled(False)
+
+
+    def plainTextEditParam_slot(self):
+        """
+        Enable the save box if the text has been changed 
+        """
+        if os.path.exists(self.outputDir_label.text()):
+            self.paramSave.setEnabled(True)
+
+
+    def paramSave_slot(self):
+        """
+        Saves the currently selected file to the output directory
+        """
+        if os.path.exists(self.outputDir_label.text())==False: #Can't save if we don't know where we're saving to
+            return
+
+        currentFname = self.comboBoxParam.itemText(self.comboBoxParam.currentIndex())
+        outputDir = self.outputDir_label.text()
+        currentFname = outputDir + os.path.sep + currentFname 
+        print currentFname
 
 
     def removeParameter_slot(self):
         self.paramItemModel.removeRows(self.paramListView.currentIndex().row(),1)
-        self.updateCMDtext_slot()
+        self.updateWidgets_slot()
 
-
-    #The following are various utility methods that I've not sorted yet
-    def outputDirSelectBoxProcessText(self,outputPath=False):
-        """
-        Fill ouput directory text box
-        """
-
-        if outputPath==False:
-            #Suggest the name of a new empty directory in the same path as the overlay image (the sample image)
-            path=self.lasagna.returnIngredientByName('overlayImage').fnameAbsPath.split(os.path.sep)[:-1]
-            path = str.join(os.path.sep,path)+os.path.sep
-            print path
-            for ii in range(1000):
-                ii += 1
-                thisPath = "%sreg_%03d" % (path,ii)
-                if not os.path.exists(thisPath):
-                    outputPath = thisPath
-                    break
+    
+    def runElastix_button_slot(self):
+        cmd = str(self.labelCommandText.text())
+        print "Running:\n" + cmd
+        subprocess.Popen(cmd, shell=True)
 
         
-        path = outputPath
-
-        self.outputDirSelectBox.clear()
-        self.outputDirSelectBox.insertPlainText(outputPath)
-        if not os.path.exists(path):
-            self.dirMessageLabel.setText('The above directory will be created automatically when Elastix runs')
-
-    #TODO: If it does exist, check if it's empty and report back. 
+    #Utilities
     def absToRelPath(self,path):
         relPath = '.'+path.replace(os.getcwd(),'')
         if relPath=='.':
             relPath = './'
 
         return  relPath
-
-
-
 
 
     #The following methods are involved in shutting down the plugin window
