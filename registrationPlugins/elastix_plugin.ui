@@ -21,9 +21,12 @@
   </property>
   <property name="windowIcon">
    <iconset resource="elastix_plugin.qrc">
-    <normaloff>:/icons/icons/elastix_logo.gif</normaloff>:/icons/icons/elastix_logo.gif</iconset>
+    <normaloff>:/icons/icons/elastix_logo_48.gif</normaloff>:/icons/icons/elastix_logo_48.gif</iconset>
   </property>
   <widget class="QTabWidget" name="tabWidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -36,7 +39,7 @@
     <string extracomment="Remove param"/>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tabLoad">
     <attribute name="title">
@@ -92,13 +95,13 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>40</y>
        <width>768</width>
-       <height>26</height>
+       <height>98</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -152,7 +155,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>11</x>
@@ -209,7 +212,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -243,7 +246,7 @@
         <property name="title">
          <string>Flip</string>
         </property>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>20</x>
@@ -467,6 +470,22 @@
       </item>
      </layout>
     </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>390</y>
+       <width>101</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="elastix_plugin.qrc">:/icons/icons/elastix_logo_96.gif</pixmap>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tabCommand">
     <attribute name="title">
@@ -644,7 +663,7 @@
       <rect>
        <x>20</x>
        <y>170</y>
-       <width>281</width>
+       <width>661</width>
        <height>16</height>
       </rect>
      </property>
@@ -668,7 +687,7 @@
       <rect>
        <x>20</x>
        <y>260</y>
-       <width>281</width>
+       <width>701</width>
        <height>16</height>
       </rect>
      </property>
@@ -684,13 +703,13 @@
       </font>
      </property>
      <property name="text">
-      <string>3. Choose parameter files</string>
+      <string>3. Choose parameter files (these are applied sequentially)</string>
      </property>
     </widget>
     <widget class="QListView" name="paramListView">
      <property name="geometry">
       <rect>
-       <x>205</x>
+       <x>170</x>
        <y>280</y>
        <width>571</width>
        <height>111</height>
@@ -702,7 +721,7 @@
       <rect>
        <x>20</x>
        <y>280</y>
-       <width>180</width>
+       <width>150</width>
        <height>24</height>
       </rect>
      </property>
@@ -714,7 +733,7 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>180</width>
+       <width>150</width>
        <height>0</height>
       </size>
      </property>
@@ -725,7 +744,7 @@
     <widget class="QPushButton" name="removeParameter">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>140</x>
        <y>360</y>
        <width>31</width>
        <height>31</height>
@@ -788,12 +807,48 @@
       <string>Select</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="moveParamUp_button">
+     <property name="geometry">
+      <rect>
+       <x>740</x>
+       <y>280</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normalon>:/icons/icons/arrow-up.png</normalon>
+      </iconset>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="moveParamDown_button">
+     <property name="geometry">
+      <rect>
+       <x>740</x>
+       <y>360</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normalon>:/icons/icons/arrow-down.png</normalon>
+      </iconset>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tabParameters">
     <attribute name="title">
      <string>Parameters</string>
     </attribute>
-    <widget class="QPlainTextEdit" name="plainTextEdit">
+    <widget class="QPlainTextEdit" name="plainTextEditParam">
      <property name="geometry">
       <rect>
        <x>10</x>
