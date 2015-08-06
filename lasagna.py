@@ -49,6 +49,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-D", help="Load demo images", action="store_true")
 parser.add_argument("-red", help="file name for red channel (if only this is specified we get a gray image)")
 parser.add_argument("-green", help="file name for green channel. Only processed if a red channel was provided")
+parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
 
 
@@ -73,6 +74,8 @@ else:
         fnames[0] =args.red
     if args.green != None:
         fnames[1] =args.green
+    
+    pluginToStart = args.P
     
 
 
@@ -916,7 +919,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def main(fnames=[None,None]):
+def main(fnames=[None,None], pluginToStart=None):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
@@ -933,6 +936,11 @@ def main(fnames=[None,None]):
 
         tasty.initialiseAxes()
 
+    if pluginToStart != None:
+        if tasty.plugins.has_key(pluginToStart):
+            tasty.startPlugin(pluginToStart)
+        else:
+            print "No plugin '%s': not starting" % pluginToStart
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Link slots to signals
@@ -947,7 +955,7 @@ def main(fnames=[None,None]):
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(fnames=fnames)
+    main(fnames=fnames, pluginToStart=pluginToStart)
 
 
     """
