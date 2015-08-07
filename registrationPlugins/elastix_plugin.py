@@ -91,7 +91,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
-        debug=True #runs certain things quickly to help development
+        debug=False #runs certain things quickly to help development
         if debug:
          
             doRealLoad=False
@@ -207,11 +207,16 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.updateWidgets_slot()
 
 
-    def removeParameter_slot(self):
+    def removeParameter_slot(self,currentRow=None):
         """
         Remove parameter from parameter list
         """
-        currentRow = self.paramListView.currentIndex().row()
+        if currentRow==None:
+            currentRow = self.paramListView.currentIndex().row()
+        
+        if currentRow<0:
+            print "Can not remove row %d" % currentRow
+
         paramFile = str(self.paramItemModel.index(currentRow,0).data().toString())
 
         #Remove from list view
@@ -219,6 +224,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.updateWidgets_slot()
 
         #remove from dictionary
+        print "removing " + paramFile
         del self.tmpParamFiles[paramFile]
 
 
@@ -319,9 +325,36 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
     
     def runElastix_button_slot(self):  
+        """
+        Performs all of the steps needed to run Elastix:
+        1. Moves (potentially modified) parameter files from the temporary dir to the output dir
+        2. Runs the command. 
+        3. Cleans up references to the parameter files that have now moved
+        """
+
+        #Move files
+        outputDir = self.absToRelPath(self.outputDir_label.text())
+        for ii in range(self.paramItemModel.rowCount()):
+            paramFile = str(self.paramItemModel.index(ii,0).data().toString())
+            tempLocation = self.tmpParamFiles[paramFile]
+            destinationLocation = outputDir + os.path.sep + paramFile
+            print "moving %s to %s" % (tempLocation,destinationLocation)
+            shutil.move(tempLocation,destinationLocation)
+
+
+        #Run command (non-blocking in the background)
         cmd = str(self.labelCommandText.text())
         print "Running:\n" + cmd
         subprocess.Popen(cmd, shell=True)
+
+        #Tidy up GUI references to the now-moved parameter files
+        while self.paramItemModel.rowCount()>0:
+            self.removeParameter_slot(0)
+
+        #Wipe the parameter text and the output directory
+        self.plainTextEditParam.setPlainText("")
+        self.outputDir_label.setText("")
+        self.updateWidgets_slot()
 
 
     #Utilities
