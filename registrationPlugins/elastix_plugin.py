@@ -41,6 +41,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.pluginLongName='registration of images' #Can be used for other purposes (e.g. tool-tip)
         self.pluginAuthor='Rob Campbell'
 
+        #This is the file name we monitor during running
+        self.elastixLogName='elastix.log'
+
 
         #Create widgets defined in the designer file
         self.setupUi(self)
@@ -91,7 +94,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
-        debug=False #runs certain things quickly to help development
+        debug=True #runs certain things quickly to help development
         if debug:
          
             doRealLoad=False
@@ -111,12 +114,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 #load param file list
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
                               '/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000bspline.txt']
-                #paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
+                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
                 self.loadParamFile_slot(paramFiles)
 
             self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg1'))
             self.updateWidgets_slot()
-            self.tabWidget.setCurrentIndex(1)
+            self.tabWidget.setCurrentIndex(3)
 
         #-------------------------------------------------------------------------------------
 
@@ -318,6 +321,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Temporary file is updated on every change 
         """ 
         currentFname = str(self.comboBoxParam.itemText(self.comboBoxParam.currentIndex()))
+        if os.path.exists(currentFname)==False:
+            return
+
         tempFname = self.tmpParamFiles[currentFname]
         fid = open(tempFname,'w')
         fid.write(str(self.plainTextEditParam.toPlainText()))
@@ -345,16 +351,37 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Run command (non-blocking in the background)
         cmd = str(self.labelCommandText.text())
         print "Running:\n" + cmd
+
+        #Pipe everything to /dev/null if that's an option
+        if os.name == 'posix' or os.name == 'mac':
+            cmd = cmd + "  > /dev/null 2>&1"
+    
         subprocess.Popen(cmd, shell=True)
+       
 
         #Tidy up GUI references to the now-moved parameter files
         while self.paramItemModel.rowCount()>0:
             self.removeParameter_slot(0)
 
+        #Start monitoring
+        self.myRunTimer = QtCore.QTimer()
+        self.myRunTimer.timeout.connect(self.isFinished)
+        self.myRunTimer.start(1000)
+
+
         #Wipe the parameter text and the output directory
         self.plainTextEditParam.setPlainText("")
-        self.outputDir_label.setText("")
+        #self.outputDir_label.setText("")
         self.updateWidgets_slot()
+
+
+    def isFinished(self):
+        logName = self.outputDir_label.text() + os.path.sep + self.elastixLogName
+        #lastLine = self.returnLastLineOfFile(logName)
+        if self.lookForStringInFile(logName,'Total time elapsed: '):
+            print "   **   FINISHED!!"
+        else:
+            print "not finished."
 
 
     #Utilities
@@ -376,6 +403,27 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         return  relPath
 
+
+    def returnLastLineOfFile(self,fname):
+        """
+        Returns last line of a file:
+        http://stackoverflow.com/questions/3346430/most-efficient-way-to-get-first-and-last-line-of-file-python
+        """     
+        #TODO: currently not using this function but may do so in future. keep for now.   
+        with open(fname, 'rb') as fh:
+            first = next(fh).decode()
+            fh.seek(-1024, 2)
+            last = fh.readlines()[-1].decode()
+        print last
+
+
+    def lookForStringInFile(self,fname,searchString):
+        with open(fname, 'r') as handle:
+            for line in handle:
+                if line.find(searchString)>-1:
+                    return True
+
+        return False
 
     #The following methods are involved in shutting down the plugin window
     """
