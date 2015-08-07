@@ -277,6 +277,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #Enable the run tab if all is ready
         if self.comboBoxParam.count()>0 and os.path.exists(self.outputDir_label.text()) and os.path.exists(self.elastix_cmd['m']) and os.path.exists(self.elastix_cmd['f']):
+            #Can all param files in the temporary directory be found?
+            for ii in range(self.paramItemModel.rowCount()):
+                paramFile = str(self.paramItemModel.index(ii,0).data().toString())
+                if os.path.exists(self.tmpParamFiles[paramFile])==False:
+                    return #Don't proceed if we can't find the parameter file
+
             self.tabRun.setEnabled(True)
         else:
             self.tabRun.setEnabled(False)
