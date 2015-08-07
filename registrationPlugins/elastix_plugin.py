@@ -12,8 +12,12 @@ import elastix_plugin_UI
 from PyQt4 import QtGui, QtCore
 import sys
 import os
+import tempfile
 from which import which #To test if binaries exist in system path
-import subprocess
+import subprocess #To run the elastix binary
+import shutil
+
+
 class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #must inherit lasagna_plugin first
 
     def __init__(self,lasagna,parent=None):
@@ -50,6 +54,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                         'm' : ''   #moving image
                         }
 
+        #A dictionary for storing location of temporary parameter files
+        self.tmpParamFiles = {}
+
         #Create some properties which we will need
         self.refAbsPath = '' #absolute path to reference image
         self.samAbsPath = '' #absolute path to sample image
@@ -85,11 +92,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
-        debug=False #runs certain things quickly to help development
+        debug=True #runs certain things quickly to help development
         if debug:
-            self.refAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
-            self.samAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
-
+         
             doRealLoad=False
             if doRealLoad:
                 self.lasagna.loadBaseImageStack(self.refAbsPath)
@@ -107,15 +112,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 #load param file list
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
                               '/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000bspline.txt']
-                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
-                for thisParamFName in paramFiles:
-                    item = QtGui.QStandardItem()
-                    thisParamFName = self.absToRelPath(thisParamFName)
-                    item.setText(thisParamFName)
-                    self.paramItemModel.appendRow(item)
+                #paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
+                self.loadParamFile_slot(paramFiles)
+
             self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg1'))
             self.updateWidgets_slot()
-            self.tabWidget.setCurrentIndex(3)
+            self.tabWidget.setCurrentIndex(1)
 
         #-------------------------------------------------------------------------------------
 
@@ -151,22 +153,32 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Select the Elastix output directory
         """
         selectedDir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        #TODO: check if directory is not empty. If it's not empty, prompt to delete contents
         self.outputDir_label.setText(selectedDir)
         self.updateWidgets_slot()
 
 
-    def loadParamFile_slot(self):
+    def loadParamFile_slot(self,selectedParamFiles=False):
         """
-        Bring up a load dialog so the user can select a parameter file
+        optionally (for debugging) selectedParamFiles should be a list
+        1. Bring up a load dialog so the user can select a parameter file
+        2. Add parameter file to the list
+        3. Create an editable copy in a tempoary location
         """
-        selectedParamFiles = QtGui.QFileDialog.getOpenFileNames(self, "Select parameter file", "Text files (*.txt *.TXT *.ini *.INI)")
+        if selectedParamFiles==False:
+            selectedParamFiles = QtGui.QFileDialog.getOpenFileNames(self, "Select parameter file", "Text files (*.txt *.TXT *.ini *.INI)")
 
         #Add to list
-        for thisParamFName in selectedParamFiles:
+        for pathToParamFile in selectedParamFiles:
             item = QtGui.QStandardItem()
-            thisParamFName = self.absToRelPath(str(thisParamFName))
+            #Add to list on Tab 2
+            thisParamFName = str(pathToParamFile).split(os.path.sep)[-1]
             item.setText(thisParamFName)
             self.paramItemModel.appendRow(item)
+
+            #Copy to temporary location
+            self.tmpParamFiles[thisParamFName] = tempfile.gettempdir()+os.path.sep+thisParamFName
+            shutil.copyfile(pathToParamFile,self.tmpParamFiles[thisParamFName])
 
         self.updateWidgets_slot()
 
@@ -195,6 +207,22 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.paramItemModel.insertRow(currentRow + 1, currentItem)
         self.updateWidgets_slot()
 
+
+    def removeParameter_slot(self):
+        """
+        Remove parameter from parameter list
+        """
+        currentRow = self.paramListView.currentIndex().row()
+        paramFile = str(self.paramItemModel.index(currentRow,0).data().toString())
+
+        #Remove from list view
+        self.paramItemModel.removeRows(currentRow,1)
+        self.updateWidgets_slot()
+
+        #remove from dictionary
+        del self.tmpParamFiles[paramFile]
+
+
     def updateWidgets_slot(self):
         """
         Build the elastix command and show on text boxes on screen.
@@ -213,24 +241,28 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.elastix_cmd['m'] = self.absToRelPath(self.elastix_cmd['m'])
         self.elastix_cmd['f'] = self.absToRelPath(self.elastix_cmd['f'])
 
-        #Build the parameter string that will be added to the command
-        paramStr=''
-        for ii in range(self.paramItemModel.rowCount()):
-            paramFile = self.paramItemModel.index(ii,0).data().toString()
-            paramStr = paramStr + '-p ' + paramFile + ' '
 
         #Build the command
-        str = 'elastix -m %s -f %s %s' % (self.elastix_cmd['m'], 
-                                          self.elastix_cmd['f'], 
-                                          paramStr)
+        cmd_str = 'elastix -m %s -f %s ' % (self.elastix_cmd['m'], 
+                                        self.elastix_cmd['f'])
 
-        #If the output directory exists, add it to the command
-        if os.path.exists(self.outputDir_label.text()):
-            str = '%s -out %s' % (str, self.outputDir_label.text())
+    
+        #If the output directory exists, add it to the command along with any parameter files 
+        #TODO: paths become absolute if we didn't call Lasagna from within the registration path. 
+        #      could cd somewhere then run in order to make paths suck less
+        if os.path.exists(self.outputDir_label.text()): 
+            outputDir = self.absToRelPath(self.outputDir_label.text())
+            cmd_str = '%s -out %s ' % (cmd_str, outputDir)
+
+            #Build the parameter string that will be added to the command
+            for ii in range(self.paramItemModel.rowCount()):
+                paramFile = self.paramItemModel.index(ii,0).data().toString()
+                cmd_str = "%s -p %s%s%s " % (cmd_str,outputDir,os.path.sep,paramFile)
+
 
         #Write the command to the boxes in tabs 2 and 4
-        self.labelCommandText.setText(str) #On Tab 2
-        self.labelCommandText_copy.setText(str) #On Tab 4
+        self.labelCommandText.setText(cmd_str) #On Tab 2
+        self.labelCommandText_copy.setText(cmd_str) #On Tab 4
 
         #Refresh the parameter file list combobox on Tab 3
         self.comboBoxParam.clear()
@@ -299,23 +331,37 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         currentFname = outputDir + os.path.sep + currentFname 
         print currentFname
 
-
-    def removeParameter_slot(self):
-        self.paramItemModel.removeRows(self.paramListView.currentIndex().row(),1)
-        self.updateWidgets_slot()
-
     
-    def runElastix_button_slot(self):
+    def runElastix_button_slot(self):  
+        #TODO: copy param files if they are not already in directory. 
+        #TODO: ensure registration command references the param files in the output directory
         cmd = str(self.labelCommandText.text())
         print "Running:\n" + cmd
         subprocess.Popen(cmd, shell=True)
 
-        
+        #TODO: find some way of monitoring if registration is finished. I propose:
+        #1. find the number of instances of (WriteResultImage "true") in all the config files. 
+        #2. monitor the output directory periodically and if the files exist, put them on a 
+        #   list that we can make on the run tab. The difficult thing will be monitoring without blocking
+        #   and still allowing other registrations to be started. 
+
+
     #Utilities
     def absToRelPath(self,path):
-        relPath = '.'+path.replace(os.getcwd(),'')
+        """
+        Returns a relative path if path is within the current directory
+        Otherwise returns the absolute path
+        """
+        path = str(path) #in case it's a QString
+        relPath = path.replace(os.getcwd(),'')
+
+        if relPath == path: #Can not make a relative
+            return path
+
         if relPath=='.':
             relPath = './'
+        else:
+            relPath = '.' + relPath
 
         return  relPath
 
