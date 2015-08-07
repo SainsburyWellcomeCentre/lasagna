@@ -81,7 +81,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #Tab 3 - parameter file
         self.plainTextEditParam.textChanged.connect(self.plainTextEditParam_slot)
-        self.paramSave.released.connect(self.paramSave_slot)
         self.comboBoxParam.activated.connect(self.comboBoxParamLoadOnSelect_slot)
 
         #Tab 4: running
@@ -289,11 +288,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         into the text box on Tab 3
         """
 
-        self.paramEditMsg_label.setText('Modifications saved to output directory. Original file not changed.')
-        if os.path.exists(self.outputDir_label.text())==False: #Only load if we can save it somewhere
-            self.paramEditMsg_label.setText('Set valid output directory to see parameter file!')
-            return
-
         fname=self.paramItemModel.index(indexToLoad,0).data().toString()
 
         if os.path.exists(fname)==False:
@@ -306,44 +300,22 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.plainTextEditParam.clear()
         self.plainTextEditParam.insertPlainText(contents)
 
-        #Disable the save box, since we only enable it once a change has been made to the buffer
-        if os.path.exists(self.outputDir_label.text()): #Only if we can save it somewhere
-            self.paramSave.setEnabled(False)
-
 
     def plainTextEditParam_slot(self):
         """
-        Enable the save box if the text has been changed 
-        """
-        if os.path.exists(self.outputDir_label.text()):
-            self.paramSave.setEnabled(True)
-
-
-    def paramSave_slot(self):
-        """
-        Saves the currently selected file to the output directory
-        """
-        if os.path.exists(self.outputDir_label.text())==False: #Can't save if we don't know where we're saving to
-            return
-
-        currentFname = self.comboBoxParam.itemText(self.comboBoxParam.currentIndex())
-        outputDir = self.outputDir_label.text()
-        currentFname = outputDir + os.path.sep + currentFname 
-        print currentFname
+        Temporary file is updated on every change 
+        """ 
+        currentFname = str(self.comboBoxParam.itemText(self.comboBoxParam.currentIndex()))
+        tempFname = self.tmpParamFiles[currentFname]
+        fid = open(tempFname,'w')
+        fid.write(str(self.plainTextEditParam.toPlainText()))
+        fid.close()
 
     
     def runElastix_button_slot(self):  
-        #TODO: copy param files if they are not already in directory. 
-        #TODO: ensure registration command references the param files in the output directory
         cmd = str(self.labelCommandText.text())
         print "Running:\n" + cmd
         subprocess.Popen(cmd, shell=True)
-
-        #TODO: find some way of monitoring if registration is finished. I propose:
-        #1. find the number of instances of (WriteResultImage "true") in all the config files. 
-        #2. monitor the output directory periodically and if the files exist, put them on a 
-        #   list that we can make on the run tab. The difficult thing will be monitoring without blocking
-        #   and still allowing other registrations to be started. 
 
 
     #Utilities
