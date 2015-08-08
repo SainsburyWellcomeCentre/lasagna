@@ -58,11 +58,22 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                         }
 
         #A dictionary for storing location of temporary parameter files
+        #Temporary parameter files are created as the user edits them and are 
+        #removed when the registration starts
         self.tmpParamFiles = {}
+
+
+        #Start a QTimer to poll for finished analyses
+        self.finishedMonitorTimer = QtCore.QTimer()
+        self.finishedMonitorTimer.timeout.connect(self.analysisFinished_slot)
+        self.finishedMonitorTimer.start(2500) #Number of milliseconds between poll events
+        self.listofDirectoriesWithRunningAnalyses = [] 
+
 
         #Create some properties which we will need
         self.refAbsPath = '' #absolute path to reference image
         self.samAbsPath = '' #absolute path to sample image
+
 
         #Set up the list view on Tab 2
         self.paramItemModel = QtGui.QStandardItemModel(self.paramListView)
@@ -82,14 +93,21 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.moveParamUp_button.released.connect(self.moveParamUp_button_slot)
         self.moveParamDown_button.released.connect(self.moveParamDown_button_slot)
 
+
         #Tab 3 - parameter file
         self.plainTextEditParam.textChanged.connect(self.plainTextEditParam_slot)
         self.comboBoxParam.activated.connect(self.comboBoxParamLoadOnSelect_slot)
 
+
         #Tab 4: running
         self.runElastix_button.released.connect(self.runElastix_button_slot)
-        self.tabRun.setEnabled(False)
+        self.runElastix_button.setEnabled(False)
+        #Set up list view on the running tab
+        self.runningAnalysesItemModel = QtGui.QStandardItemModel(self.runningRegistrations_ListView)
+        self.runningRegistrations_ListView.setModel(self.runningAnalysesItemModel)
 
+
+  
 
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
@@ -292,9 +310,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 if os.path.exists(self.tmpParamFiles[paramFile])==False:
                     return #Don't proceed if we can't find the parameter file
 
-            self.tabRun.setEnabled(True)
+            self.runElastix_button.setEnabled(True)
         else:
-            self.tabRun.setEnabled(False)
+            self.runElastix_button.setEnabled(False)
 
 
     def comboBoxParamLoadOnSelect_slot(self,indexToLoad):
@@ -356,17 +374,20 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if os.name == 'posix' or os.name == 'mac':
             cmd = cmd + "  > /dev/null 2>&1"
     
-        subprocess.Popen(cmd, shell=True)
+        subprocess.Popen(cmd, shell=True) #The command is now run
        
 
         #Tidy up GUI references to the now-moved parameter files
         while self.paramItemModel.rowCount()>0:
             self.removeParameter_slot(0)
 
-        #Start monitoring
-        self.myRunTimer = QtCore.QTimer()
-        self.myRunTimer.timeout.connect(self.isFinished)
-        self.myRunTimer.start(1000)
+        #Add directory to the list of those with running analyses
+        self.listofDirectoriesWithRunningAnalyses.append(self.outputDir_label.text())
+
+        #Add directory to list view of running analyses
+        item = QtGui.QStandardItem()
+        item.setText(self.outputDir_label.text())
+        self.runningAnalysesItemModel.appendRow(item)
 
 
         #Wipe the parameter text and the output directory
@@ -375,14 +396,26 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.updateWidgets_slot()
 
 
-    def isFinished(self):
-        logName = self.outputDir_label.text() + os.path.sep + self.elastixLogName
-        #lastLine = self.returnLastLineOfFile(logName)
-        if self.lookForStringInFile(logName,'Total time elapsed: '):
-            print "   **   FINISHED!!"
-        else:
-            print "not finished."
 
+    def analysisFinished_slot(self):
+        if len(self.listofDirectoriesWithRunningAnalyses) ==0:
+            return
+
+        for thisDir in self.listofDirectoriesWithRunningAnalyses:
+            logName = thisDir + os.path.sep + self.elastixLogName
+
+            if self.lookForStringInFile(logName,'Total time elapsed: '):                
+                print "%s is finished." % thisDir
+                self.listofDirectoriesWithRunningAnalyses.remove(thisDir)
+                
+                #remove from list view
+                for thisRow in range(self.runningAnalysesItemModel.rowCount()):
+                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data().toString())
+                    if dirName == thisDir:
+                        self.runningAnalysesItemModel.removeRows(thisRow,1)            
+                        break
+
+        
 
     #Utilities
     def absToRelPath(self,path):
@@ -418,6 +451,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
 
     def lookForStringInFile(self,fname,searchString):
+        """
+        Search file "fname" for any line containing the string "searchString"
+        return True if such a line exists and False otherwise
+        """
         with open(fname, 'r') as handle:
             for line in handle:
                 if line.find(searchString)>-1:
