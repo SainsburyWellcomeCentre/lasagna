@@ -468,6 +468,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
     """
     def closePlugin(self):
         #self.detachHooks()
+        self.finishedMonitorTimer.stop()
         self.close()
 
 
