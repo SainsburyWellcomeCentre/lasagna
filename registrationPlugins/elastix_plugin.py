@@ -389,12 +389,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         while self.paramItemModel.rowCount()>0:
             self.removeParameter_slot(0)
 
-        #Add directory to the list of those with running analyses
-        self.listofDirectoriesWithRunningAnalyses.append(self.outputDir_label.text())
+        #Add directory (with absolute path) to the list of those with running analyses
+        outputDirFullPath = str(self.outputDir_label.text())
+        outputDirFullPath = os.path.abspath(outputDir)
+        self.listofDirectoriesWithRunningAnalyses.append(outputDirFullPath)
 
         #Add directory to list view of running analyses
         item = QtGui.QStandardItem()
-        item.setText(self.outputDir_label.text())
+        item.setText(outputDirFullPath)
         item.setEditable(False)
         self.runningAnalysesItemModel.appendRow(item)
 
@@ -431,7 +433,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 #Look for result images
                 for file in os.listdir(thisDir):
                     if file.startswith('result') and file.endswith('.mhd'):
-                        #TODO: change these to absolute paths
                         resultFname = str(thisDir + os.path.sep + file)
 
                         #Don't add if it already exists
