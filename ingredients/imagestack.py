@@ -94,6 +94,12 @@ class imagestack(object):
         """
         return self.__data.swapaxes(0,axisToPlot)
 
+    def raw_data(self):
+        """
+        return raw data
+        """
+        return self.__data
+
 
     def plotIngredient(self,pyqtObject,axisToPlot=0,sliceToPlot=0):
         """
@@ -132,5 +138,18 @@ class imagestack(object):
         vals = vals>thresh
 
         return x[vals.tolist().index(True)]
+
+
+    def changeData(self,imageData,imageAbsPath,recalculateDefaultHistRange=False):
+        """
+        Replace the current image stack with imageData. 
+        Must also supply imageAbsPath.
+        """
+        self.__data = imageData
+        self.fnameAbsPath = imageAbsPath 
+
+        if recalculateDefaultHistRange:
+            self.defaultHistRange()
+
 
 

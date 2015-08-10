@@ -4,6 +4,9 @@ Brings up an alert message to warn the user when something significant has happe
 We can't rely on the user watching the console for messages. 
 """
 
+#TODO: maybe neater to just replace with a QMessageBox
+#e.g.  QMessageBox.information(None,"Hello!","Something went wrong )
+
 import alert_UI
 from PyQt4 import QtGui, QtCore
 
