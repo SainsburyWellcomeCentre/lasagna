@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Lasagna - extensible 3D slicing </title>
+
+	<style>
+	ol > li{
+		margin-bottom: 1.5em;
+
+	}
+	</style>
+
+
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Lasagna</h1>
+        <h2>3-D imaging visualisation through slicing</h2>
+        <a href="https://github.com/BaselLaserMouse/lasagna" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="lasagna---python-volume-visualiser-for-3-d-data" class="anchor" href="#lasagna---python-volume-visualiser-for-3-d-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Elastix Plugin - Image Registration</h1>
+
+<h2>
+<a id="what-applications-is-lasagna-designed-for" class="anchor" href="#what-applications-is-lasagna-designed-for" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h2>
+<p>
+<a href="http://elastix.isi.uu.nl/">Elastix</a> is a powerful and <a href="http://elastix.bigr.nl/wiki/index.php/References">widely used</a> framework for image registration. The Lasagna Elastix plugin provides a simple graphical front-end for the Elastix tools. For the plugin to run you must
+first <a href="http://elastix.isi.uu.nl/download_links.php">download Elastix</a> and then add it to your system path (Windows users see <a href="http://geekswithblogs.net/renso/archive/2009/10/21/how-to-set-the-windows-path-in-windows-7.aspx">here</a>). To get Elastix to do what you want, you will have to understand how configure the registration settings. A good starting point is the <a href="http://elastix.isi.uu.nl/doxygen/index.html">Elastix PDF manual</a>. This is necessary reading for beginners. 
+</p>
+
+<h2>
+<a id="what-applications-is-lasagna-designed-for" class="anchor" href="#what-applications-is-lasagna-designed-for" aria-hidden="true"><span class="octicon octicon-link"></span></a>What does the Elastix Plugin do?</h2>
+<p>
+The Elastix install is comprised of two binaries: <tt>elastix</tt>, which calculates transformation coefficients based on a pair of images and
+optionally produces the transformed (result) images, and <tt>transformix</tt>, which applies pre-existing transformation coefficients (calculated by <tt>elastix</tt>) to any desired image or a collection of sparse points. The calculation of the registration coefficients is highly configurable via a settings file that is passed as an input argument to the <tt>elastix</tt> binary. However, the Elastix tools provide no options for visualisation of the images either before or after registration. This is a problem because determining how well the registration worked is often not trivial and requires 
+careful visual examination of the registration results. The goal of Lasagna's Elastix Plugin is to simplify this process by providing a visual workflow that goes from the original images to the registered results. 
+</p>
+
+<h2>
+<a id="what-applications-is-lasagna-designed-for" class="anchor" href="#what-applications-is-lasagna-designed-for" aria-hidden="true"><span class="octicon octicon-link"></span></a>Walkthrough of the registration process</h2>
+<p>
+The following walkthrough shows how the Elastix Plugin is used to interactively register one image stack to another. 
+</p>
+
+<ol>
+<li>We start Lasagna and open the Elastix Plugin from the Plugins menu. The plugin will fail to start if the elastix binary is not found
+in the system path. 
+<br />
+<img src="./images/elastix/plugin_loaded_empty.png" alt="elastix plugin just loaded" />
+</li>
+
+<li>We then load the <b>fixed</b> image stack followed by the <b>moving</b> image stack. Elastix will attempt to register the 
+<b>moving</b> image to the <b>fixed</b> image. The result image produced by Elastix will therefore be a version of the <b>moving</b>
+image that has been deformed so that it more closely matches the <b>fixed</b> image. The fixed image is shown in red and the moving
+image in green. It is not necessary to manually provide "control points" to guide the registration, but the image stacks should be in a very
+similar orientation prior to registration. Note that images should be in 
+<a href="http://www.itk.org/Wiki/ITK/MetaIO/Documentation">MHD format</a>.
+Elastix does not work with image formats such as TIFF, as these do not contain information regarding the scale, size, and orientation 
+of the image (see the Elastix manual for details). Elastix will also work with other formats, such as <a href="http://brainder.org/2012/09/23/the-nifti-file-format/">NIFTI</a>,
+but Lasagna currently supports only MHD.
+<br />
+<img src="./images/elastix/loadedImages.png" alt="images loaded" />
+</li>
+
+<li>
+Moving on to the Command tab, we select an <b>output directory</b>. The results of each registration 
+should be stored in a different <b>output directory</b>. A good way of trying out different registration 
+parameters is to conduct each registration in a different sub-directory within the directory that contains 
+the <b>moving</b> image. In this example, the <b>moving</b> image is in:
+<br /> 
+<tt>/mnt/data/TissueCyte/registrationTests/regPipelinePrototype</tt>
+<br /> and we're placing this registration in:
+<br />
+<tt>/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg1</tt> 
+<br />
+Note we can not proceed until you have defined a registration <b>output directory</b>.
+<img src="./images/elastix/outputDir.png" alt="output directory"/>
+</li>
+
+<li>
+<p>
+With the <b>output directory</b> defined, we next need to choose the parameters for the 
+registration. To obtain good results with Elastix it is critical to correctly set up the parameter file.
+Example parameter files can be found in the <a href="http://elastix.bigr.nl/wiki/index.php/Parameter_file_database">Elastix Wiki</a> 
+and information on correctly setting up a parameter file can be found in the Elastix manual.
+</p>
+<p>
+In our case, examination of the <b>fixed</b> and <b>moving</b> images (above) reveals that that the <b>moving</b> image (green)
+needs to be translated, possibly have its aspect ratio changed (scaled differently along different axes), 
+and locally deformed in order to match idiosyncrasies in the <b>fixed</b> image. The first two transformations are <a href="https://en.wikipedia.org/wiki/Affine_transformation">affine</a> (which also includes other operations such rotation and shear), whereas the third transformation will 
+involve local non-linear deformations. When presented with this scenario, standard image registration practice is to conduct a two-step alignment. First
+the affine parameters are calculated, to get the image stacks in rough alignment, and then the non-linear (warping) transformation is calculated.
+</p>
+<p>
+To conduct a two-step registration with the Elastix Plugin select select "Load param file" on the Command tab and either shift-click to select 
+multiple parameter files or go repeatedly to "Load param file" in order to load as many parameter files are needed. Loaded parameter files appear in
+the list box to the right of the load button and will be applied in the order in which they are listed. In this example the affine parameter file will
+be applied before the B-spline (non-linear) file. The system command that will be executed to initiate the registration is shown in the box at the 
+bottom of the tab. Parameter files can be removed by selecting and hitting the cross button or have their order changed by selecting and hitting the 
+up and down buttons. 
+</p>
+<img src="./images/elastix/param_select.png" alt="output directory"/>
+<p>
+
+<li>
+<p>
+ We are now ready to tweak the parameter files (if desired) in the Parameters tab. Currently this is done simply by editing 
+the raw file. The parameter file to be edited can be chosen by the drop-down box at the bottom of the tab. The original parameter
+file is <i>not</i> modified. Instead, a copy is created and this copy will be stored in the registration <b>output directory</b>.
+</p>
+<p>
+In this case we noticed that the "WriteResultImage" setting is set to "false" for the first (affine) step. It is set to "true" for the B-spline
+parameter file. If we leave it this way, we will get single result image that shows the consequence of applying sequentially the affine and then the B-spline steps. To illustrate the progression in registration accuracy we choose to set "WriteResultImage" to "true" for the affine step as well. This is done simply by editing the text on the screen. 
+</p>
+<img src="./images/elastix/param_edit.png" alt="output directory"/>
+</li>
+
+
+<li>
+<p>
+To run the registration with these settings, we go to the Run tab and click "Run." The registration begins and the path to the
+<b>output directory</b> is added to the list of running registrations below the run button. In this case the registration takes
+roughly 7 minutes. It is possible to start a new registration whilst the first one is still running: simply go back to the command tab
+and select a new <b>output directory</b> and new parameter files, then press "Run". The second registration will be appended to the 
+list of running registrations. Once a registration finishes it is automatically removed from the list of running registrations. For this 
+to happen, the registration must terminate successfully. If the registration crashes it will not be removed from the list.
+</p>
+<img src="./images/elastix/running.png" alt="run the registration"/>
+</li>
+
+<li>
+<p>
+If the registration completes with results files written to the registration directory, these will appear on a list in the Results 
+tab. In our case we have two images: <tt>result.0.mhd</tt> shows the consequence of applying the affine step only; 
+<tt>result.1.mhd</tt> shows the consequence of applying the affine step and the non-linear warping step. To see the results simply
+click the "show highlighted result" radio-button then select an image from the list. The non-linear warping produces substantially better
+results to the affine step alone:
+</p>
+<img src="./images/elastix/results_affine.png" alt="affine result"/>
+<img src="./images/elastix/results_warping.png" alt="warping result"/>
+</li>
+
+
+<h2>
+<a id="what-applications-is-lasagna-designed-for" class="anchor" href="#what-applications-is-lasagna-designed-for" aria-hidden="true"><span class="octicon octicon-link"></span></a>Where next?</h2>
+<p>
+The Elastix Plugin and image registration in Lasagna is still under development. Planned features include:
+</p>
+<ul>
+<li>Transformation of sparse points.</li>
+<li>Calculating inverse transforms.</li>
+<li>Overlay of deformation fields.</li>
+<li>The option of a GUI (<a href="http://elastix.bigr.nl/wiki/images/9/9c/ElastixParameterFileGUI.png">something like this</a>) 
+for setting at least the more common parameters.
+</ul>
+
+<p align="center">
+<a href="./index.html"><b>Back to homepage</b></a>
+</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/BaselLaserMouse/lasagna/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/BaselLaserMouse/lasagna/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner">Lasagna<a href="https://github.com/BaselLaserMouse/lasagna"></a> is maintained by <a href="https://github.com/BaselLaserMouse">BaselLaserMouse</a>.</p>
+          
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
