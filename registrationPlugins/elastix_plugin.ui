@@ -84,9 +84,9 @@
      <property name="text">
       <string>Instructions 
 
-1. Load a reference stack. This should be the coordinate frame you want to go to. e.g. an average brain
-2. Load a sample stack. This should be the stack that you want to explore in the standardised coordinates
-3. Ensure the sample and reference stack are in the same orientation. If not, flip the sample and save it.</string>
+1. Load a the image you wish to treat as the &quot;fixed&quot; (reference) image. 
+2. Load the image you wish to treat as the &quot;moving&quot; image. This will be registered to (1)
+3. Ensure the sample and reference stack are in the same orientation. If not, flip the sample and save it. [not implemented yet]</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -106,7 +106,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QPushButton" name="loadSample">
+       <widget class="QPushButton" name="loadMoving">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -123,7 +123,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Load Sample Stack</string>
+         <string>Load Moving Stack</string>
         </property>
        </widget>
       </item>
@@ -166,7 +166,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="loadReference">
+       <widget class="QPushButton" name="loadFixed">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -180,7 +180,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Load Reference Stack</string>
+         <string>Load Fixed Stack</string>
         </property>
        </widget>
       </item>
@@ -553,6 +553,9 @@
      </widget>
     </widget>
     <widget class="QLabel" name="label_SelectFixedImage">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -573,89 +576,7 @@
       </font>
      </property>
      <property name="text">
-      <string>1. Select fixed image</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="radioButtonSampleFixed">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>261</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>160</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="text">
-      <string>sample image is fixed image</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="radioButtonReferenceFixed">
-     <property name="geometry">
-      <rect>
-       <x>470</x>
-       <y>50</y>
-       <width>261</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>260</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>reference image is fixed image</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_5">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>80</y>
-       <width>341</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Select this if you have point data in the source space that you want to represent in the reference space.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_6">
-     <property name="geometry">
-      <rect>
-       <x>470</x>
-       <y>80</y>
-       <width>311</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Select this if you want the ource image to resemble the reference image.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+      <string>1. Swap moving and fixed</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_selectOutputDir">
@@ -989,7 +910,7 @@
     <attribute name="title">
      <string>Results</string>
     </attribute>
-    <widget class="QListView" name="runningRegistrations_ListView_2">
+    <widget class="QListView" name="registrationResults_ListView">
      <property name="geometry">
       <rect>
        <x>10</x>

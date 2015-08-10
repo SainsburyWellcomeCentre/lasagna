@@ -71,8 +71,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
 
         #Create some properties which we will need
-        self.refAbsPath = '' #absolute path to reference image
-        self.samAbsPath = '' #absolute path to sample image
+        self.fixedStackPath = '' #absolute path to reference image
+        self.movingStackPath = '' #absolute path to sample image
 
 
         #Set up the list view on Tab 2
@@ -81,8 +81,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
   
         #Link signals to slots
         #Tab 1 - Loading data
-        self.loadReference.released.connect(self.loadReference_slot)
-        self.loadSample.released.connect(self.loadSample_slot)
+        self.loadFixed.released.connect(self.loadFixed_slot)
+        self.loadMoving.released.connect(self.loadMoving_slot)
 
         #Tab 2 - Building the registration command
         self.radioButtonReferenceFixed.toggled.connect(self.updateWidgets_slot)
@@ -112,21 +112,20 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
-        debug=True #runs certain things quickly to help development
+        debug=False #runs certain things quickly to help development
         if debug:
          
+            self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
+            self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
+
             doRealLoad=False
             if doRealLoad:
-                self.lasagna.loadBaseImageStack(self.refAbsPath)
+                self.lasagna.loadBaseImageStack(self.fixedStackPath)
                 self.lasagna.initialiseAxes()
-                self.loadSample.setEnabled(True)
-                self.lasagna.loadActions[0].load(self.samAbsPath)
+                self.loadMoving.setEnabled(True)
+                self.lasagna.loadActions[0].load(self.movingStackPath) #TODO: this list index hack will need fixing
                 self.lasagna.initialiseAxes()
-            else:
-                self.refAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
-                self.samAbsPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
-
-
+                self.loadMoving_slot(supressDialog=True)
             doParamFile=True
             if doParamFile:
                 #load param file list
@@ -141,6 +140,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #-------------------------------------------------------------------------------------
 
+
     #Tab 3 - Editing the parameter files
     #Parameter files are optionally edited and always saved to the registration directory.
     #The registration directory is created as needed.
@@ -150,24 +150,30 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
     #At this point we just need to press Run! 
 
     #The following are slots
-    def loadReference_slot(self):
+    def loadFixed_slot(self):
         #TODO: allow only MHD files to be read
         self.lasagna.showBaseStackLoadDialog() 
         self.referenceStackName.setText(self.lasagna.returnIngredientByName('baseImage').fname())
-        self.refAbsPath = self.lasagna.returnIngredientByName('baseImage').fnameAbsPath
-        self.loadSample.setEnabled(True)
+        self.fixedStackPath = self.lasagna.returnIngredientByName('baseImage').fnameAbsPath
+        self.loadMoving.setEnabled(True)
         self.updateWidgets_slot()
         self.sampleStackName_3.setText('')
+        self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath['f'])
 
 
-    def loadSample_slot(self):
+    def loadMoving_slot(self,supressDialog=False):
         #TODO: allow only MHD files to be read
-        self.lasagna.loadActions[0].showLoadDialog()
-        self.sampleStackName_3.setText(self.lasagna.returnIngredientByName('overlayImage').fname())
-        self.samAbsPath = self.lasagna.returnIngredientByName('overlayImage').fnameAbsPath
+        if supressDialog==False:
+            self.lasagna.loadActions[0].showLoadDialog()
+            self.sampleStackName_3.setText(self.lasagna.returnIngredientByName('overlayImage').fname())
+            self.movingStackPath = self.lasagna.returnIngredientByName('overlayImage').fnameAbsPath
         self.updateWidgets_slot()
+        overlay=self.lasagna.returnIngredientByName('overlayImage')
+        self.originalOverlayImage = overlay.raw_data()
+        self.originalOverlayFname = overlay.fnameAbsPath
+        self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
 
-
+        
     def selectOutputDir_slot(self):
         """
         Select the Elastix output directory
@@ -256,16 +262,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         slots, such moving parameters up and down.
         """
 
-        if self.radioButtonReferenceFixed.isChecked():
-            self.elastix_cmd['f'] = self.refAbsPath
-            self.elastix_cmd['m'] = self.samAbsPath
-        else:
-            self.elastix_cmd['m'] = self.refAbsPath
-            self.elastix_cmd['f'] = self.samAbsPath
+        self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
+        self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
 
-        #Make paths relative if possible
-        self.elastix_cmd['m'] = self.absToRelPath(self.elastix_cmd['m'])
-        self.elastix_cmd['f'] = self.absToRelPath(self.elastix_cmd['f'])
+
 
 
         #Build the command
