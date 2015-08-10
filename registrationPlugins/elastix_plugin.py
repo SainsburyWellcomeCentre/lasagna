@@ -148,15 +148,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #-------------------------------------------------------------------------------------
 
 
-    #Tab 3 - Editing the parameter files
-    #Parameter files are optionally edited and always saved to the registration directory.
-    #The registration directory is created as needed.
-    #Once all files are copied, the final tab is enabled.
 
-    #Tab 4 - Running the registration 
-    #At this point we just need to press Run! 
-
-    #The following are slots
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Tab 1 - Loading -  slots
     def loadFixed_slot(self):
         #TODO: allow only MHD files to be read
         self.lasagna.showBaseStackLoadDialog() 
@@ -181,6 +175,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
 
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Tab 2 - Command build - slots
     def selectOutputDir_slot(self):
         """
         Select the Elastix output directory
@@ -323,6 +319,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             self.runElastix_button.setEnabled(False)
 
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Tab 3 - Param edit - slots
     def comboBoxParamLoadOnSelect_slot(self,indexToLoad):
         """
         slot that loads a parameter file from the combobox index indexToLoad
@@ -356,6 +354,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         fid.close()
 
     
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Tab 4 - Run - slots    
     def runElastix_button_slot(self):  
         """
         Performs all of the steps needed to run Elastix:
@@ -451,6 +451,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             
 
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Tab 5 - Results - slots
     def resultImageClicked_Slot(self,index):
         """
         Show the result image into the main view.
@@ -498,6 +500,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.lasagna.initialiseAxes()
 
 
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #Utilities
     def absToRelPath(self,path):
         """
