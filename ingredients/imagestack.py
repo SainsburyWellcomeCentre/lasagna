@@ -160,6 +160,7 @@ class imagestack(object):
             print "imagestack.flipDataAlongAxis - axisToFlip must be an integer"
             return
 
+
         if axisToFlip==0:
             self.__data = self.__data[::-1,:,:]
         elif axisToFlip==1:

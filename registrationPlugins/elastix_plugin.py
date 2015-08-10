@@ -81,6 +81,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.originalOverlayImage = None #The original overlay image is stored here
         self.originalOverlayFname = None 
 
+        #Flip axis 
+        self.flipAxis1.released.connect(lambda: self.flipAxis_Slot(0))
+        self.flipAxis2.released.connect(lambda: self.flipAxis_Slot(1))
+        self.flipAxis3.released.connect(lambda: self.flipAxis_Slot(2))
+
+        self.saveModifiedMovingStack.released.connect(self.saveModifiedMovingStack_slot)
+
         #Tab 2 - Building the registration command 
         self.outputDirSelect_button.released.connect(self.selectOutputDir_slot)
         self.removeParameter.released.connect(self.removeParameter_slot)
@@ -130,6 +137,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 self.lasagna.loadBaseImageStack(self.fixedStackPath)
                 self.lasagna.initialiseAxes()
                 self.loadMoving.setEnabled(True)
+                self.flipAxis1.setEnabled(True)
+                self.flipAxis2.setEnabled(True)
+                self.flipAxis3.setEnabled(True)                
                 self.lasagna.loadActions[0].load(self.movingStackPath) #TODO: this list index hack will need fixing
                 self.lasagna.initialiseAxes()
                 self.loadMoving_slot(supressDialog=True)
@@ -143,7 +153,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg1'))
             self.updateWidgets_slot()
-            self.tabWidget.setCurrentIndex(3)
+            self.tabWidget.setCurrentIndex(0)
 
         #-------------------------------------------------------------------------------------
 
@@ -156,7 +166,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.lasagna.showBaseStackLoadDialog() 
         self.referenceStackName.setText(self.lasagna.returnIngredientByName('baseImage').fname())
         self.fixedStackPath = self.lasagna.returnIngredientByName('baseImage').fnameAbsPath
-        self.loadMoving.setEnabled(True)
+
+        #Enable UI buttons
+        self.loadMoving.setEnabled(True)        
+        #Enable when the saving is working
+        #self.flipAxis1.setEnabled(True)
+        #self.flipAxis2.setEnabled(True)
+        #self.flipAxis3.setEnabled(True)
+
         self.updateWidgets_slot()
         self.sampleStackName_3.setText('')
         self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath['f'])
@@ -173,6 +190,43 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.originalOverlayImage = overlay.raw_data()
         self.originalOverlayFname = overlay.fnameAbsPath
         self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
+        self.saveModifiedMovingStack.setEnabled(False)
+
+
+    def flipAxis_Slot(self,axisToFlip):
+        """
+        Flips the overlay stack along the defined axis
+        """
+        print "Flipping axis %d of moving stack" % (axisToFlip+1)
+
+        if self.lasagna.returnIngredientByName('overlayImage')==False:
+            "Print failed to flip overlay image"
+            return
+
+        self.lasagna.returnIngredientByName('overlayImage').flipDataAlongAxis(axisToFlip)
+        self.lasagna.initialiseAxes()
+        self.saveModifiedMovingStack.setEnabled(True)
+
+
+    def saveModifiedMovingStack_slot(self):
+        """
+        Save modified stack.
+        Following code only works if the image dimensions have not changed.
+        So ok for flipping.
+        """
+
+        rawName=self.originalOverlayFname.replace('mhd','raw')
+        if os.path.exists(rawName) == False:
+            print "Failed to find %s in path" % rawName
+
+
+        handle = open(rawName, "wb")
+        imStack = self.lasagna.returnIngredientByName('overlayImage').data()
+        handle.write( bytearray(imStack.ravel()) ) #This writes garbled files right now
+        handle.close()
+
+        self.saveModifiedMovingStack.setEnabled(False)
+
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
