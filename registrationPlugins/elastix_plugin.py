@@ -180,7 +180,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.originalOverlayFname = overlay.fnameAbsPath
         self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
 
-        
+
     def selectOutputDir_slot(self):
         """
         Select the Elastix output directory
