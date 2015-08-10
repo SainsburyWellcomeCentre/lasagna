@@ -63,12 +63,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.tmpParamFiles = {}
 
 
-        #Start a QTimer to poll for finished analyses
-        self.finishedMonitorTimer = QtCore.QTimer()
-        self.finishedMonitorTimer.timeout.connect(self.analysisFinished_slot)
-        self.finishedMonitorTimer.start(2500) #Number of milliseconds between poll events
-        self.listofDirectoriesWithRunningAnalyses = [] 
-
+ 
 
         #Create some properties which we will need
         self.fixedStackPath = '' #absolute path to reference image
@@ -83,10 +78,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Tab 1 - Loading data
         self.loadFixed.released.connect(self.loadFixed_slot)
         self.loadMoving.released.connect(self.loadMoving_slot)
+        self.originalOverlayImage = None #The original overlay image is stored here
+        self.originalOverlayFname = None 
 
-        #Tab 2 - Building the registration command
-        self.radioButtonReferenceFixed.toggled.connect(self.updateWidgets_slot)
-        self.radioButtonSampleFixed.toggled.connect(self.updateWidgets_slot)
+        #Tab 2 - Building the registration command 
         self.outputDirSelect_button.released.connect(self.selectOutputDir_slot)
         self.removeParameter.released.connect(self.removeParameter_slot)
         self.loadParamFile.released.connect(self.loadParamFile_slot)
@@ -102,12 +97,24 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Tab 4: running
         self.runElastix_button.released.connect(self.runElastix_button_slot)
         self.runElastix_button.setEnabled(False)
+        #Start a QTimer to poll for finished analyses
+        self.finishedMonitorTimer = QtCore.QTimer()
+        self.finishedMonitorTimer.timeout.connect(self.analysisFinished_slot)
+        self.finishedMonitorTimer.start(2500) #Number of milliseconds between poll events
+        self.listofDirectoriesWithRunningAnalyses = [] 
         #Set up list view on the running tab
         self.runningAnalysesItemModel = QtGui.QStandardItemModel(self.runningRegistrations_ListView)
         self.runningRegistrations_ListView.setModel(self.runningAnalysesItemModel)
 
 
-  
+        #Tab 5: results
+        self.resultsItemModel = QtGui.QStandardItemModel(self.registrationResults_ListView)
+        self.registrationResults_ListView.setModel(self.resultsItemModel)
+        self.registrationResults_ListView.clicked.connect(self.resultImageClicked_Slot)
+        self.resultImages_Dict={} #the keys are result image file names and the values are the result images
+        self.showHighlightedResult_radioButton.toggled.connect(self.overlayRadioButtons_Slot)
+        self.showOriginalOverlay_radioButton.toggled.connect(self.overlayRadioButtons_Slot)
+
 
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
@@ -118,7 +125,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
             self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
 
-            doRealLoad=False
+            doRealLoad=True
             if doRealLoad:
                 self.lasagna.loadBaseImageStack(self.fixedStackPath)
                 self.lasagna.initialiseAxes()
@@ -200,6 +207,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             #Add to list on Tab 2
             thisParamFName = str(pathToParamFile).split(os.path.sep)[-1]
             item.setText(thisParamFName)
+            item.setEditable(False)
             self.paramItemModel.appendRow(item)
 
             #Copy to temporary location
@@ -387,6 +395,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Add directory to list view of running analyses
         item = QtGui.QStandardItem()
         item.setText(self.outputDir_label.text())
+        item.setEditable(False)
         self.runningAnalysesItemModel.appendRow(item)
 
 
@@ -398,6 +407,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
 
     def analysisFinished_slot(self):
+        """
+        This slot is called by the self.finishedMonitorTimer QTimer.
+        It updates the list of directories that contain running analyses.
+        """
         if len(self.listofDirectoriesWithRunningAnalyses) ==0:
             return
 
@@ -415,7 +428,69 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                         self.runningAnalysesItemModel.removeRows(thisRow,1)            
                         break
 
-        
+                #Look for result images
+                for file in os.listdir(thisDir):
+                    if file.startswith('result') and file.endswith('.mhd'):
+                        #TODO: check if item exists before adding it
+                        #TODO: change these to absolute paths
+                        resultFname = str(thisDir + os.path.sep + file)
+                        item = QtGui.QStandardItem()
+                        item.setText(resultFname)
+                        item.setEditable(False)
+                        self.resultsItemModel.appendRow(item)
+                        print "Loading " + resultFname
+                        self.resultImages_Dict[resultFname] = self.lasagna.loadImageStack(resultFname)
+                        print "Image loading complete"
+
+            
+
+
+    def resultImageClicked_Slot(self,index):
+        """
+        Show the result image into the main view.
+        """
+        if isinstance(index,QtCore.QModelIndex)==False: #Nothing is selected
+                return
+        else:
+            self.overlayRadioButtons_Slot(index)
+
+
+    def overlayRadioButtons_Slot(self,Index=False):
+        """
+        Overlay selected image or original image. Index is optionally
+        supplied when this slot is called from resultImageClicked_Slot
+        Index is a QModelIndex
+        """
+
+        overlay=self.lasagna.returnIngredientByName('overlayImage')
+        selectedIndex = self.registrationResults_ListView.selectedIndexes()
+        if len(selectedIndex)==0:
+            return
+        else:
+            selectedIndex = selectedIndex[0] #in case there are multiple selections, select the first one
+
+        imageFname = str(selectedIndex.data().toString())
+
+
+        #Show the image if the highlighted overlay radio button is enabled
+        if self.showHighlightedResult_radioButton.isChecked()==True:
+            if overlay.fnameAbsPath == imageFname:
+                print "Skipping. Unchanged."
+                return
+
+            overlay.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
+            print "switched to overlay " + imageFname
+
+        elif self.showOriginalOverlay_radioButton.isChecked()==True:
+            if overlay.fnameAbsPath ==  self.originalOverlayFname:
+                print "Skipping. Unchanged."
+                return
+
+            overlay.changeData(imageData=self.originalOverlayImage, imageAbsPath=self.originalOverlayFname)
+            print "switched to original overlay"
+
+        self.lasagna.initialiseAxes()
+
 
     #Utilities
     def absToRelPath(self,path):
