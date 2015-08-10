@@ -431,13 +431,18 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 #Look for result images
                 for file in os.listdir(thisDir):
                     if file.startswith('result') and file.endswith('.mhd'):
-                        #TODO: check if item exists before adding it
                         #TODO: change these to absolute paths
                         resultFname = str(thisDir + os.path.sep + file)
-                        item = QtGui.QStandardItem()
-                        item.setText(resultFname)
-                        item.setEditable(False)
-                        self.resultsItemModel.appendRow(item)
+
+                        #Don't add if it already exists
+                        if len(self.resultsItemModel.findItems(resultFname))==0:
+                            item = QtGui.QStandardItem()    
+                            item.setText(resultFname)
+                            item.setEditable(False)
+                            self.resultsItemModel.appendRow(item)
+                        else:
+                            print "Result item '%s' already exists. Over-writing." % resultFname
+        
                         print "Loading " + resultFname
                         self.resultImages_Dict[resultFname] = self.lasagna.loadImageStack(resultFname)
                         print "Image loading complete"
