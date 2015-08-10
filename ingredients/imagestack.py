@@ -152,4 +152,21 @@ class imagestack(object):
             self.defaultHistRange()
 
 
+    def flipDataAlongAxis(self,axisToFlip):
+        """
+        Flip the data along axisToFlip. 
+        """
+        if isinstance(axisToFlip,int)==False:
+            print "imagestack.flipDataAlongAxis - axisToFlip must be an integer"
+            return
 
+        if axisToFlip==0:
+            self.__data = self.__data[::-1,:,:]
+        elif axisToFlip==1:
+            self.__data = self.__data[:,::-1,:]
+        elif axisToFlip==2:
+            self.__data = self.__data[:,:,::-1]            
+        else:
+            print "Can not flip axis %d" % axisToFlip
+
+            

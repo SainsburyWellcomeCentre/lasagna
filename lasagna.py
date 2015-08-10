@@ -199,6 +199,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
         self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
 
+        #Flip axis 
+        self.pushButton_FlipView1.released.connect(lambda: self.flipAxis_Slot(0))
+        self.pushButton_FlipView2.released.connect(lambda: self.flipAxis_Slot(1))
+        self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
+
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageComboBox.activated[str].connect(self.plotImageStackHistogram) #update histogram on combobox hit
 
@@ -695,6 +700,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Set axis ratio on plot 3
         """
         self.axes2D[2].view.setAspectLocked( True, float(self.axisRatioLineEdit_3.text()) )
+
+
+    def flipAxis_Slot(self,axisToFlip):
+        """
+        Loops through all displayed image stacks and flips the axes
+        """
+        imageStacks = self.returnIngredientByType('imagestack')
+        if imageStacks==False:
+            return
+
+        for thisStack in imageStacks:
+            thisStack.flipDataAlongAxis(axisToFlip)
+
+        self.initialiseAxes()
+
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
