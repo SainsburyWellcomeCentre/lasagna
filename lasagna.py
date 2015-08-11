@@ -218,8 +218,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.pushButton_FlipView2.released.connect(lambda: self.flipAxis_Slot(1))
         self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
 
+
+        #Image tab stuff
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
-        self.imageComboBox.activated[str].connect(self.plotImageStackHistogram) #update histogram on combobox hit
+        self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
+        labels = QtCore.QStringList(("Name",""))
+        self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
+        self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
+
 
 
         #Plugins menu and initialisation
@@ -530,9 +536,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     )
                 )
 
-        #If it's an image stack, add the image combo box below the histogram
+        #If it's an image stack, add to the image layers ListView
         if self.ingredientList[-1].__module__.endswith('imagestack'):
-            self.imageComboBox.addItem(self.ingredientList[-1].objectName)
+            name = QtGui.QStandardItem(self.ingredientList[-1].objectName)
+            name.setEditable(False)
+            thing = QtGui.QStandardItem()
+
+            thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
+            thing.setCheckState(QtCore.Qt.Checked)
+            self.imageStackLayers_Model.appendRow((name,thing))
+
 
 
     def removeIngredient(self,ingredientInstance):
@@ -540,6 +553,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Removes the ingredient "ingredientInstance" from self.ingredientList
         This method is called by the two following methods that remove based on
         ingredient name or type         
+        """
+        return
+        #TODO: layers
         """
         #If this is an image stack, remove it from the combo box
         if ingredientInstance.__module__.endswith('imagestack'):
@@ -551,7 +567,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.imageComboBox.removeItem(listPositionOfIngredient)
 
         self.ingredientList.remove(ingredientInstance)
-
+        """
 
     def removeIngredientByName(self,objectName):
         """
@@ -833,7 +849,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
-        selectedStackName=self.imageComboBox.currentText() #The image stack currently selected with combo box
+        return
+        #selectedStackName=self.imageComboBox.currentText() #The image stack currently selected with combo box
         img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,selectedStackName)
         x,y = img.getHistogram()
 
@@ -892,8 +909,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Loop through all imagestacks and set their levels in each axis
         for thisImageStack in allImageStacks:
             objectName=thisImageStack.objectName
-            if objectName != self.imageComboBox.currentText():
-                continue
+            #if objectName != self.imageComboBox.currentText(): #TODO: LAYERS
+            #    continue
 
             for thisAxis in self.axes2D:
                 img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view,objectName)
