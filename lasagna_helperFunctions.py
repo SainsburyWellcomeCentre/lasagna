@@ -201,12 +201,19 @@ def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=ge
     preferences = loadAllPreferences(prefFName)
     if preferences.has_key(preferenceName):
         return preferences[preferenceName]
+    else:
+        print "Did not find preference %s on disk. Looking in defaultPreferencesa" % preferenceName
 
     #Check in default preferences and to file and return if so
+    preferences = defaultPreferences()
     if preferences.has_key(preferenceName):
         value = preferences[preferenceName]
         preferenceWriter(preferenceName,value,prefFName)
         return value
+    else:
+        print "Did not find preference %s in default preferences" % preferenceName
+
+
 
 
 
