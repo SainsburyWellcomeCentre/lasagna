@@ -226,9 +226,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         pluginPaths = lasHelp.readPreference('pluginPaths')
 
         plugins, pluginPaths = pluginHandler.findPlugins(pluginPaths)
-        print "Adding plugin paths to Python path"
-        print pluginPaths
-        [sys.path.append(p) for p in pluginPaths] #append
+        print "Adding plugin paths to Python path:"
+        self.pluginSubMenus = {}    
+        for p in pluginPaths: #print plugin paths to screen, add to path, add as sub-dir names in Plugins menu
+            print p
+            sys.path.append(p)
+            dirName = p.split(os.path.sep)[-1]
+            self.pluginSubMenus[dirName] = QtGui.QMenu(self.menuPlugins)
+            self.pluginSubMenus[dirName].setObjectName(dirName)
+            self.pluginSubMenus[dirName].setTitle(dirName)
+            self.menuPlugins.addAction(self.pluginSubMenus[dirName].menuAction())
+            
+
 
         # 2. Add each plugin to a dictionary where the keys are plugin name and values are instances of the plugin. 
         print ""
@@ -238,6 +247,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             #Get the module name and class
             pluginClass, pluginName = pluginHandler.getPluginInstanceFromFileName(thisPlugin,None) 
+
+            #Get the name of the directory in which the plugin resides so we can add it to the right sub-menu
+            dirName = os.path.dirname(pluginClass.__file__).split(os.path.sep)[-1]
 
             #create instance of the plugin object and add to the self.plugins dictionary
             print "Creating reference to class " + pluginName +  ".plugin"
@@ -249,15 +261,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.pluginActions[pluginName].setObjectName(pluginName)
             self.pluginActions[pluginName].setCheckable(True) #so we have a checkbox next to the menu entry
 
-            self.menuPlugins.addAction(self.pluginActions[pluginName]) #add action to the plugins menu
+            self.pluginSubMenus[dirName].addAction(self.pluginActions[pluginName]) #add action to the correct plugins sub-menu
             self.pluginActions[pluginName].triggered.connect(self.startStopPlugin) #Connect this action's signal to the slot
 
 
         print ""
 
+
         self.statusBar.showMessage("Initialised")
-
-
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Plugin-related methods
@@ -273,7 +284,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def startPlugin(self,pluginName):
         print "Starting " + pluginName
         self.plugins[pluginName] = self.plugins[pluginName](self) #Create an instance of the plugin object 
-
 
     def stopPlugin(self,pluginName):
         print "Stopping " + pluginName
