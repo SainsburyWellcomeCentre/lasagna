@@ -147,6 +147,7 @@ def defaultPreferences():
             'lastLoadDir' : getHomeDir() ,          #The directory from which we last loaded data
             'numRecentFiles' : 5 ,                  #The number of recently loaded file names to store
             'recentlyLoadedFiles' : [] ,            #A list containing the last "numRecentFiles" file names
+            'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
             'showCrossHairs' : True                 #Whether or not to show the cross hairs 
@@ -201,12 +202,19 @@ def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=ge
     preferences = loadAllPreferences(prefFName)
     if preferences.has_key(preferenceName):
         return preferences[preferenceName]
+    else:
+        print "Did not find preference %s on disk. Looking in defaultPreferencesa" % preferenceName
 
     #Check in default preferences and to file and return if so
+    preferences = defaultPreferences()
     if preferences.has_key(preferenceName):
         value = preferences[preferenceName]
         preferenceWriter(preferenceName,value,prefFName)
         return value
+    else:
+        print "Did not find preference %s in default preferences" % preferenceName
+
+
 
 
 

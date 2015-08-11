@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created: Sun Aug  2 19:06:40 2015
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Mon Aug 10 15:06:09 2015
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -80,7 +80,7 @@ class Ui_lasagna_mainWindow(object):
         self.menuPlugins.setObjectName(_fromUtf8("menuPlugins"))
         lasagna_mainWindow.setMenuBar(self.menuBar)
         self.mainDockWidget = QtGui.QDockWidget(lasagna_mainWindow)
-        self.mainDockWidget.setMinimumSize(QtCore.QSize(278, 365))
+        self.mainDockWidget.setMinimumSize(QtCore.QSize(280, 365))
         self.mainDockWidget.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.mainDockWidget.setObjectName(_fromUtf8("mainDockWidget"))
         self.dockWidgetContents = QtGui.QWidget()
@@ -123,6 +123,8 @@ class Ui_lasagna_mainWindow(object):
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
         self.imageComboBox = QtGui.QComboBox(self.groupBox)
         self.imageComboBox.setMinimumSize(QtCore.QSize(175, 0))
+        self.imageComboBox.setMaxVisibleItems(3)
+        self.imageComboBox.setMaxCount(9)
         self.imageComboBox.setObjectName(_fromUtf8("imageComboBox"))
         self.horizontalLayout_5.addWidget(self.imageComboBox)
         self.logYcheckBox = QtGui.QCheckBox(self.groupBox)
@@ -227,12 +229,12 @@ class Ui_lasagna_mainWindow(object):
         self.axisRatioLineEdit_3.setObjectName(_fromUtf8("axisRatioLineEdit_3"))
         self.horizontalLayout_3.addWidget(self.axisRatioLineEdit_3)
         self.groupBoxFlip = QtGui.QGroupBox(self.axisSetingsTab)
-        self.groupBoxFlip.setEnabled(False)
-        self.groupBoxFlip.setGeometry(QtCore.QRect(150, 10, 61, 121))
+        self.groupBoxFlip.setEnabled(True)
+        self.groupBoxFlip.setGeometry(QtCore.QRect(150, 10, 81, 121))
         self.groupBoxFlip.setToolTip(_fromUtf8(""))
         self.groupBoxFlip.setObjectName(_fromUtf8("groupBoxFlip"))
         self.layoutWidget3 = QtGui.QWidget(self.groupBoxFlip)
-        self.layoutWidget3.setGeometry(QtCore.QRect(10, 20, 43, 83))
+        self.layoutWidget3.setGeometry(QtCore.QRect(20, 20, 43, 83))
         self.layoutWidget3.setObjectName(_fromUtf8("layoutWidget3"))
         self.verticalLayout = QtGui.QVBoxLayout(self.layoutWidget3)
         self.verticalLayout.setMargin(0)
@@ -260,6 +262,7 @@ class Ui_lasagna_mainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(7)
         self.pushButton_FlipView2.setFont(font)
+        self.pushButton_FlipView2.setCheckable(True)
         self.pushButton_FlipView2.setObjectName(_fromUtf8("pushButton_FlipView2"))
         self.verticalLayout.addWidget(self.pushButton_FlipView2)
         self.pushButton_FlipView3 = QtGui.QPushButton(self.layoutWidget3)
@@ -370,7 +373,7 @@ class Ui_lasagna_mainWindow(object):
         self.axisRatioLineEdit_2.setText(_translate("lasagna_mainWindow", "2", None))
         self.axisRatioLabel_3.setText(_translate("lasagna_mainWindow", "View 3", None))
         self.axisRatioLineEdit_3.setText(_translate("lasagna_mainWindow", "0.5", None))
-        self.groupBoxFlip.setTitle(_translate("lasagna_mainWindow", "Flip", None))
+        self.groupBoxFlip.setTitle(_translate("lasagna_mainWindow", "Flip Stacks", None))
         self.pushButton_FlipView1.setText(_translate("lasagna_mainWindow", "View 1", None))
         self.pushButton_FlipView2.setText(_translate("lasagna_mainWindow", "View 2", None))
         self.pushButton_FlipView3.setText(_translate("lasagna_mainWindow", "View 3", None))

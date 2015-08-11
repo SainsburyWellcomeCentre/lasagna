@@ -166,7 +166,7 @@ class projection2D():
                 #TODO: AXIS need some way of linking the ingredient to the plot item but keeping in mind 
                 #      that this same object needs to be plotted in different axes, each of which has its own
                 #      plot items. So I can't assign a single plot item to the ingredient. Options?
-                #      a list of items and axes in the ingredient? I don't link that.
+                #      a list of items and axes in the ingredient? I don't like that.
         
                 numSlices = thisIngredient.data(self.axisToPlot).shape[0]
 
@@ -194,7 +194,7 @@ class projection2D():
             if not thisIngredient.__module__.endswith('imagestack'): #TODO: too specific 
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                               axisToPlot=self.axisToPlot, 
-                                              sliceToPlot=sliceToPlot)
+                                              sliceToPlot=sliceToPlotInThisLayer)
 
     def updateDisplayedSlices_2D(self, ingredients, slicesToPlot):
         """

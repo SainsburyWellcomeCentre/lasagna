@@ -65,8 +65,6 @@ class plugin(lasagna_plugin):
         n = 10E3 #number of random points to make
         numAxes = 3
 
-        print "generated"
-
         r = np.random.rand(n*numAxes).reshape((n,numAxes)) #the random array
 
         #multiply values in each dimension of the array by the array size of the base image

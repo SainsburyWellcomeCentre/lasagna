@@ -52,7 +52,6 @@ class sparsepoints(object):
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
-        
         z = self.__data[:,axisToPlot]
         data = self.data(axisToPlot)
         data = data[z==sliceToPlot,:]

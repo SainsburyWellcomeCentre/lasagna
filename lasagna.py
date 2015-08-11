@@ -181,11 +181,24 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     }
 
 
-        #Add load actions to the Load ingredients sub-menu
-        self.loadActions = [] #actions must be attached to the lasagna object or they won't function
-        from IO import loadOverlayImageStack
-        self.loadActions.append(loadOverlayImageStack.loadOverlayImageStack(self)) #commenting out this line seamlessly removes the ability to overlay a stack
- 
+        #Handle IO plugins. For instance these are the loaders that handle different data types
+        #and different loading actions. 
+        print "Adding IO module paths to Python path"
+        IO_Paths = lasHelp.readPreference('IO_modulePaths') #directories containing IO modules
+        print IO_Paths
+        IO_plugins, IO_pluginPaths = pluginHandler.findPlugins(IO_Paths)
+        [sys.path.append(p) for p in IO_Paths] #append to system path
+
+        #Add *load actions* to the Load ingredients sub-menu and add loader modules here 
+        #TODO: currently we only have code to handle load actions as no save actions are available
+        self.loadActions = {} #actions must be attached to the lasagna object or they won't function
+        for thisIOmodule in IO_plugins:
+            print "Adding %s to load menu" % thisIOmodule
+            IOclass,IOname=pluginHandler.getPluginInstanceFromFileName(thisIOmodule,attributeToImport='loaderClass')
+            thisInstance = IOclass(self)
+            self.loadActions[thisInstance.objectName] = thisInstance
+
+
         # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showBaseStackLoadDialog)
         self.actionQuit.triggered.connect(self.quitLasagna)
@@ -199,6 +212,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
         self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
 
+        #Flip axis 
+        self.pushButton_FlipView1.released.connect(lambda: self.flipAxis_Slot(0))
+        self.pushButton_FlipView2.released.connect(lambda: self.flipAxis_Slot(1))
+        self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
+
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageComboBox.activated[str].connect(self.plotImageStackHistogram) #update histogram on combobox hit
 
@@ -208,9 +226,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         pluginPaths = lasHelp.readPreference('pluginPaths')
 
         plugins, pluginPaths = pluginHandler.findPlugins(pluginPaths)
-        print "Adding plugin paths to Python path"
-        print pluginPaths
-        [sys.path.append(p) for p in pluginPaths] #append
+        print "Adding plugin paths to Python path:"
+        self.pluginSubMenus = {}    
+        for p in pluginPaths: #print plugin paths to screen, add to path, add as sub-dir names in Plugins menu
+            print p
+            sys.path.append(p)
+            dirName = p.split(os.path.sep)[-1]
+            self.pluginSubMenus[dirName] = QtGui.QMenu(self.menuPlugins)
+            self.pluginSubMenus[dirName].setObjectName(dirName)
+            self.pluginSubMenus[dirName].setTitle(dirName)
+            self.menuPlugins.addAction(self.pluginSubMenus[dirName].menuAction())
+            
+
 
         # 2. Add each plugin to a dictionary where the keys are plugin name and values are instances of the plugin. 
         print ""
@@ -220,6 +247,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             #Get the module name and class
             pluginClass, pluginName = pluginHandler.getPluginInstanceFromFileName(thisPlugin,None) 
+
+            #Get the name of the directory in which the plugin resides so we can add it to the right sub-menu
+            dirName = os.path.dirname(pluginClass.__file__).split(os.path.sep)[-1]
 
             #create instance of the plugin object and add to the self.plugins dictionary
             print "Creating reference to class " + pluginName +  ".plugin"
@@ -231,15 +261,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.pluginActions[pluginName].setObjectName(pluginName)
             self.pluginActions[pluginName].setCheckable(True) #so we have a checkbox next to the menu entry
 
-            self.menuPlugins.addAction(self.pluginActions[pluginName]) #add action to the plugins menu
+            self.pluginSubMenus[dirName].addAction(self.pluginActions[pluginName]) #add action to the correct plugins sub-menu
             self.pluginActions[pluginName].triggered.connect(self.startStopPlugin) #Connect this action's signal to the slot
 
 
         print ""
 
+
         self.statusBar.showMessage("Initialised")
-
-
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Plugin-related methods
@@ -255,7 +284,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def startPlugin(self,pluginName):
         print "Starting " + pluginName
         self.plugins[pluginName] = self.plugins[pluginName](self) #Create an instance of the plugin object 
-
 
     def stopPlugin(self,pluginName):
         print "Stopping " + pluginName
@@ -697,6 +725,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axes2D[2].view.setAspectLocked( True, float(self.axisRatioLineEdit_3.text()) )
 
 
+    def flipAxis_Slot(self,axisToFlip):
+        """
+        Loops through all displayed image stacks and flips the axes
+        """
+        imageStacks = self.returnIngredientByType('imagestack')
+        if imageStacks==False:
+            return
+
+        for thisStack in imageStacks:
+            thisStack.flipDataAlongAxis(axisToFlip)
+
+        self.initialiseAxes()
+
+
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Methods that are run during navigation
     def removeCrossHairs(self):
@@ -932,7 +975,7 @@ def main(fnames=[None,None], pluginToStart=None):
     
         if not fnames[1]==None:
             print "Loading " + fnames[1]
-            tasty.loadActions[0].load(fnames[1]) #TODO: we need a nice way of finding load actions by name
+            tasty.loadActions['load_overlay'].load(fnames[1]) #TODO: we need a nice way of finding load actions by name
 
         tasty.initialiseAxes()
 

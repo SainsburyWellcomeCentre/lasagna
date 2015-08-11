@@ -110,7 +110,7 @@
   <widget class="QDockWidget" name="mainDockWidget">
    <property name="minimumSize">
     <size>
-     <width>278</width>
+     <width>280</width>
      <height>365</height>
     </size>
    </property>
@@ -434,13 +434,13 @@
         </widget>
         <widget class="QGroupBox" name="groupBoxFlip">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="geometry">
           <rect>
            <x>150</x>
            <y>10</y>
-           <width>61</width>
+           <width>81</width>
            <height>121</height>
           </rect>
          </property>
@@ -448,12 +448,12 @@
           <string/>
          </property>
          <property name="title">
-          <string>Flip</string>
+          <string>Flip Stacks</string>
          </property>
          <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
-            <x>10</x>
+            <x>20</x>
             <y>20</y>
             <width>43</width>
             <height>83</height>
@@ -508,6 +508,9 @@
              </property>
              <property name="text">
               <string>View 2</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
