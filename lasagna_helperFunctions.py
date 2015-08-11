@@ -147,6 +147,7 @@ def defaultPreferences():
             'lastLoadDir' : getHomeDir() ,          #The directory from which we last loaded data
             'numRecentFiles' : 5 ,                  #The number of recently loaded file names to store
             'recentlyLoadedFiles' : [] ,            #A list containing the last "numRecentFiles" file names
+            'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
             'showCrossHairs' : True                 #Whether or not to show the cross hairs 

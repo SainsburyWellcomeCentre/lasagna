@@ -7,7 +7,6 @@ Rob Campbell
 
 
 from lasagna_plugin import lasagna_plugin
-from IO import loadOverlayImageStack
 import elastix_plugin_UI
 from PyQt4 import QtGui, QtCore
 import sys

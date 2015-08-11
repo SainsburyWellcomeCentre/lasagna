@@ -181,11 +181,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     }
 
 
-        #Add load actions to the Load ingredients sub-menu
+        #Handle IO plugins. For instance these are the loaders that handle different data types
+        #and different loading actions. 
+        print "Adding IO module paths to Python path"
+        IO_Paths = lasHelp.readPreference('IO_modulePaths') #directories containing IO modules
+        print IO_Paths
+        IO_plugins, IO_pluginPaths = pluginHandler.findPlugins(IO_Paths)
+        [sys.path.append(p) for p in IO_Paths] #append to system path
+
+        #Add *load actions* to the Load ingredients sub-menu and add loader modules here 
+        #TODO: currently we only have code to handle load actions as no save actions are available
         self.loadActions = [] #actions must be attached to the lasagna object or they won't function
-        from IO import loadOverlayImageStack
-        self.loadActions.append(loadOverlayImageStack.loadOverlayImageStack(self)) #commenting out this line seamlessly removes the ability to overlay a stack
- 
+        for thisIOmodule in IO_plugins:
+            print "Adding %s to load menu" % thisIOmodule
+            IOclass,IOname=pluginHandler.getPluginInstanceFromFileName(thisIOmodule,attributeToImport='loaderClass')
+            self.loadActions.append(IOclass(self))
+
+
         # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showBaseStackLoadDialog)
         self.actionQuit.triggered.connect(self.quitLasagna)

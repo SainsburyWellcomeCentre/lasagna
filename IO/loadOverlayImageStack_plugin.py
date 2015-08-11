@@ -8,9 +8,9 @@ from PyQt4 import QtGui
 import os
 from lasagna_plugin import lasagna_plugin
 
-class loadOverlayImageStack(lasagna_plugin):
+class loaderClass(lasagna_plugin):
     def __init__(self,lasagna):
-        super(loadOverlayImageStack,self).__init__(lasagna)
+        super(loaderClass,self).__init__(lasagna)
 
         self.lasagna = lasagna
         self.objectName = 'load_overlay' #Can be uased as an optional way of finding the object later
