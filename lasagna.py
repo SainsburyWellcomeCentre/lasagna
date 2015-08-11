@@ -191,11 +191,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #Add *load actions* to the Load ingredients sub-menu and add loader modules here 
         #TODO: currently we only have code to handle load actions as no save actions are available
-        self.loadActions = [] #actions must be attached to the lasagna object or they won't function
+        self.loadActions = {} #actions must be attached to the lasagna object or they won't function
         for thisIOmodule in IO_plugins:
             print "Adding %s to load menu" % thisIOmodule
             IOclass,IOname=pluginHandler.getPluginInstanceFromFileName(thisIOmodule,attributeToImport='loaderClass')
-            self.loadActions.append(IOclass(self))
+            thisInstance = IOclass(self)
+            self.loadActions[thisInstance.objectName] = thisInstance
 
 
         # Link other menu signals to slots
@@ -964,7 +965,7 @@ def main(fnames=[None,None], pluginToStart=None):
     
         if not fnames[1]==None:
             print "Loading " + fnames[1]
-            tasty.loadActions[0].load(fnames[1]) #TODO: we need a nice way of finding load actions by name
+            tasty.loadActions['load_overlay'].load(fnames[1]) #TODO: we need a nice way of finding load actions by name
 
         tasty.initialiseAxes()
 

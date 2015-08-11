@@ -139,7 +139,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 self.flipAxis1.setEnabled(True)
                 self.flipAxis2.setEnabled(True)
                 self.flipAxis3.setEnabled(True)                
-                self.lasagna.loadActions[0].load(self.movingStackPath) #TODO: this list index hack will need fixing
+                self.lasagna.loadActions['load_overlay'].load(self.movingStackPath) #TODO: this list index hack will need fixing
                 self.lasagna.initialiseAxes()
                 self.loadMoving_slot(supressDialog=True)
             doParamFile=True
@@ -181,7 +181,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
     def loadMoving_slot(self,supressDialog=False):
         #TODO: allow only MHD files to be read
         if supressDialog==False:
-            self.lasagna.loadActions[0].showLoadDialog()
+            self.lasagna.loadActions['load_overlay'].showLoadDialog()
             self.sampleStackName_3.setText(self.lasagna.returnIngredientByName('overlayImage').fname())
             self.movingStackPath = self.lasagna.returnIngredientByName('overlayImage').fnameAbsPath
         self.updateWidgets_slot()
