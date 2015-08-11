@@ -55,6 +55,7 @@ args = parser.parse_args()
 
 
 fnames=[None,None]
+pluginToStart = args.P
 if args.D==True:
     import tempfile
     import urllib
@@ -75,7 +76,7 @@ else:
     if args.green != None:
         fnames[1] =args.green
     
-    pluginToStart = args.P
+    
     
 
 
