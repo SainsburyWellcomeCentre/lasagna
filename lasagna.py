@@ -225,7 +225,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         labels = QtCore.QStringList(("Name",""))
         self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
-
+        self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenu)
 
 
         #Plugins menu and initialisation
@@ -504,6 +505,27 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     module). This may turn out to not be a problem in practice, so we leave 
     things for now and play it by ear. 
     """
+    #------------------------------------------------------------------------
+    # PROTOTYPE CODE
+    def layersMenu(self,position): 
+        menu = QtGui.QMenu()
+
+        action = QtGui.QAction("Change color",self)
+        action.triggered.connect(self.actionOfStuff)
+        menu.addAction(action)
+
+        action = QtGui.QAction("Delete",self)
+        action.triggered.connect(self.actionOfStuff2)
+        menu.addAction(action)
+        menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
+
+    def actionOfStuff(self):
+        print self.imageStackLayers_TreeView.selectedIndexes() #Can use this to delete the layer
+        print "stuff happened"
+
+    def actionOfStuff2(self):
+        print "oranges are not green"
+    #------------------------------------------------------------------------
 
     def addIngredient(self, kind='', objectName='', data=None, fname=''):
         """
