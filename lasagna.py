@@ -511,20 +511,30 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def layersMenu(self,position): 
         menu = QtGui.QMenu()
 
-        action = QtGui.QAction("Change color",self)
-        action.triggered.connect(self.actionOfStuff)
-        menu.addAction(action)
+        changeColorMenu = QtGui.QMenu("Change color",self)
+
+        #action.triggered.connect(self.changeImageStackColorMap_Slot)
+
+        for thisColor in lasHelp.readPreference('colorOrder'):
+            action = QtGui.QAction(thisColor,self)
+            #action.triggered.connect(lambda: self.changeImageStackColorMap_Slot(thisColor))
+            action.triggered.connect(self.changeImageStackColorMap_Slot)
+            changeColorMenu.addAction(action)
+
+        menu.addAction(changeColorMenu.menuAction())
 
         action = QtGui.QAction("Delete",self)
-        action.triggered.connect(self.deleteLayer)
+        action.triggered.connect(self.deleteLayer_Slot)
         menu.addAction(action)
         menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
 
-    def actionOfStuff(self):
+    def changeImageStackColorMap_Slot(self):
+        color = str(self.sender().text())
+        objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+        self.returnIngredientByName(objName).lut=color
+        self.initialiseAxes()
 
-        print "stuff happened"
-
-    def deleteLayer(self):
+    def deleteLayer_Slot(self):
         objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
         [axis.removeItemFromPlotWidget(objName) for axis in self.axes2D]
         self.removeIngredientByName(objName)
