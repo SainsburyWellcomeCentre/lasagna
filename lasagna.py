@@ -370,12 +370,25 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Add plot items to axes so that they become available for plotting
         [axis.addItemToPlotWidget(self.returnIngredientByName(objName)) for axis in self.axes2D]
 
+        #If only one stack is present, we will display it as gray (see imagestack class)
+        #if more than one stack has been added, we will colour successive stacks according
+        #to the colorOrder preference in the parameter file
+        stacks = self.stacksInTreeList()
+        colorOrder = lasHelp.readPreference('colorOrder')
+        print colorOrder
+        if len(stacks)==2:
+            self.returnIngredientByName(stacks[0]).lut=colorOrder[0]
+            self.returnIngredientByName(stacks[1]).lut=colorOrder[1]
+        elif len(stacks)>2:
+            self.returnIngredientByName(stacks[len(stacks)-1]).lut=colorOrder[len(stacks)-1]
+
         #remove any existing range highlighter on the histogram. We do this because different images
         #will likely have different default ranges
         if hasattr(self,'plottedIntensityRegionObj'):
             del self.plottedIntensityRegionObj
 
         self.runHook(self.hooks['loadImageStack_End'])
+
 
     def clearAllImageStacks(self):
         # TOOD: keep this for a little in case it's handy
@@ -386,6 +399,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #remove imagestacks from ingredient list
         self.removeIngredientByType('imagestack')
+
 
     def showBaseStackLoadDialog(self):
         """
@@ -531,9 +545,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             stackName = self.imageStackLayers_Model.index(ii,0).data().toString()
             stacks.append(stackName)
 
-
         if len(stacks)>0:
-            return stackName
+            return stacks
         else:
             return False
 

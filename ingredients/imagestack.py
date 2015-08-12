@@ -78,7 +78,8 @@ class imagestack(object):
         elif cmap == 'yellow':
             color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal, 0 ,nVal]], dtype=np.ubyte)
         else:
-            print "no pre-defined colormap " + cmap
+            print "no pre-defined colormap %s. reverting to gray " % cmap
+            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal,nVal,nVal]], dtype=np.ubyte)
 
         map = pg.ColorMap(pos, color)
         lut = map.getLookupTable(0.0, 1.0, nVal+1)
