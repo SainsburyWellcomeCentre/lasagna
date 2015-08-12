@@ -41,33 +41,26 @@ class plugin(lasagna_plugin):
         [axis.addItemToPlotWidget(self.lasagna.returnIngredientByName(objName)) for axis in self.lasagna.axes2D]
         
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
-       
-
-    """
-    #self.lasagna.updateMainWindowOnMouseMove is run each time the axes are updated. 
-    #So we can hook into it to plot points TODO: is this the best hook?
-    def hook_updateMainWindowOnMouseMove_End(self):
-        ingredient = handIng.returnIngredientByName('tutePoints',self.lasagna.ingredients)
-        ingredient.__data = self.generateRandomData()
-        
-        print ingredient.__data[1:10,:]
-        print ingredient.data()[1:10,:] #THIS DOESN'T CHANGE. WHY??
-    """
 
 
     def generateRandomData(self):
-        baseImage = self.lasagna.returnIngredientByName('baseImage')
-        if baseImage == False:
-            print "No base image loaded"
+        """
+        Generate random data spanning the extent of the first image stack
+        """
+        stackName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString()
+        firstLayer = self.lasagna.returnIngredientByName(stackName)
+        if firstLayer == False:
+            print "No image layers loaded"
             return
-        imShape = baseImage.data().shape
+
+        imShape = firstLayer.data().shape
 
         n = 10E3 #number of random points to make
         numAxes = 3
 
         r = np.random.rand(n*numAxes).reshape((n,numAxes)) #the random array
 
-        #multiply values in each dimension of the array by the array size of the base image
+        #multiply values in each dimension of the array by the array size of the first layer image
         for ii in range(numAxes):
             r[:,ii] = np.floor(r[:,ii]*imShape[ii])
 
