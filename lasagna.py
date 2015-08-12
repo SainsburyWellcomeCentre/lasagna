@@ -560,9 +560,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return False
 
     def selectedStackName(self):
-
+        """
+        Return the name of the selected image stack. If no stack selected, returns the first stack in the list
+        """
         if len(self.imageStackLayers_TreeView.selectedIndexes())==0 and  self.imageStackLayers_Model.rowCount()>0:
-            print "lasagna.plotImageStackHistogram : Nothing selected, choosing first layer"
             return self.returnIngredientByType('imagestack')[0].objectName  #TODO: won't play fair with checkboxes
         else:
             return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
