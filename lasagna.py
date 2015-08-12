@@ -507,16 +507,19 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         menu.addAction(action)
 
         action = QtGui.QAction("Delete",self)
-        action.triggered.connect(self.actionOfStuff2)
+        action.triggered.connect(self.deleteLayer)
         menu.addAction(action)
         menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
 
     def actionOfStuff(self):
-        print self.imageStackLayers_TreeView.selectedIndexes() #Can use this to delete the layer
+
         print "stuff happened"
 
-    def actionOfStuff2(self):
-        print "oranges are not green"
+    def deleteLayer(self):
+        objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+        [axis.removeItemFromPlotWidget(objName) for axis in self.axes2D]
+        self.removeIngredientByName(objName)
+        print "removed " + objName
 
     def stacksInTreeList(self):
         """
