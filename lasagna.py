@@ -600,14 +600,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #If this is an image stack, remove it from the layers list
         if ingredientInstance.__module__.endswith('imagestack'):
             objName = ingredientInstance.objectName
-            listPositionOfIngredient = self.imageStackLayers_Model.findItems(objName)
-            print listPositionOfIngredient
-            if listPositionOfIngredient == -1:
+
+            items = self.imageStackLayers_Model.findItems(objName)
+            if items == -1:
                 print "Can not find ingredient %s in combo box so can not remove it from box." % objName
             else:
-                self.imageStackLayers_Model.removeRows(listPositionOfIngredient)
+                self.imageStackLayers_Model.removeRow(items[0].row())
 
-        self.ingredientList.remove(ingredientInstance) 
+            self.ingredientList.remove(ingredientInstance) 
+            #make stack gray if there is only one left
+            if len(self.ingredientList)==1:
+                self.ingredientList[0].lut='gray'
+                self.initialiseAxes()
 
 
     def removeIngredientByName(self,objectName):
