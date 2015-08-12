@@ -30,6 +30,8 @@ class plugin(lasagna_plugin):
         self.pathToARA = fnames['ARAdir'] + fnames['stackFname']    
         self.pathToAnnotations = fnames['ARAdir'] + fnames['annotationFname']   
 
+        self.ARAlayerName=''
+
         print(self.pathToARA)
         #ensure files are present
         #TODO: the following is clearly in need of being streamlined
@@ -61,6 +63,7 @@ class plugin(lasagna_plugin):
 
 
     def initPlugin(self):
+        self.lasagna.clearAllImageStacks()
         self.lasagna.loadImageStack(self.pathToARA)
         
 
@@ -71,7 +74,9 @@ class plugin(lasagna_plugin):
         lut = map.getLookupTable(0.0, 1.0, 256)
 
         #Assign the colormap to the imagestack object
-        self.lasagna.returnIngredientByName('baseImage').lut=lut
+        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString()
+        firstLayer = self.lasagna.returnIngredientByName(self.ARAlayerName)
+        firstLayer.lut=lut
 
         self.lasagna.initialiseAxes()
         self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
@@ -84,13 +89,12 @@ class plugin(lasagna_plugin):
         """
 
         #Ensure image color scale returns to normal
-        baseIm = self.lasagna.returnIngredientByName('baseImage')
-        if baseIm != False:
-            baseIm.lut='gray'
+        stack = self.lasagna.returnIngredientByName(self.ARAlayerName)
+        if stack != False:
+            stack.lut='gray'
 
-        objectName = 'baseImage'
-        [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
-        self.lasagna.removeIngredientByName(objectName)
+        [axis.removeItemFromPlotWidget(self.ARAlayerName) for axis in self.lasagna.axes2D]
+        self.lasagna.removeIngredientByName(self.ARAlayerName)
         self.detachHooks()
 
 
@@ -117,6 +121,7 @@ class plugin(lasagna_plugin):
         Hooks into base image file dialog method to shut down the ARA Explorer if the
         user attempts to load a base stack
         """
+        self.lasagna.clearAllImageStacks()
 
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
@@ -129,6 +134,7 @@ class plugin(lasagna_plugin):
         Hooks into the recent file loading method to shut down the ARA Explorer if the
         user attempts to load a base stack
         """
+        self.lasagna.clearAllImageStacks()
 
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
