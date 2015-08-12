@@ -71,6 +71,12 @@ class imagestack(object):
             color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 ,nVal, 0 ,nVal]], dtype=np.ubyte)
         elif cmap == 'blue':
             color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 , 0 ,nVal,nVal]], dtype=np.ubyte)
+        elif cmap == 'magenta':
+            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal, 0 ,nVal,nVal]], dtype=np.ubyte)
+        elif cmap == 'cyan':
+            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 ,nVal,nVal,nVal]], dtype=np.ubyte)
+        elif cmap == 'yellow':
+            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal, 0 ,nVal]], dtype=np.ubyte)
         else:
             print "no pre-defined colormap " + cmap
 
