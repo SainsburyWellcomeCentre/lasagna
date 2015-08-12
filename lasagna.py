@@ -166,8 +166,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             'updateStatusBar_End'           :   [] ,
             'loadImageStack_Start'          :   [] ,
             'loadImageStack_End'            :   [] ,
-            'showBaseStackLoadDialog_Start' :   [] ,
-            'showBaseStackLoadDialog_End'   :   [] ,
+            'showStackLoadDialog_Start'     :   [] ,
+            'showStackLoadDialog_End'       :   [] ,
             'removeCrossHairs_Start'        :   [] , 
             'showFileLoadDialog_Start'      :   [] ,
             'showFileLoadDialog_End'        :   [] ,
@@ -196,7 +196,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         # Link other menu signals to slots
-        self.actionOpen.triggered.connect(self.showBaseStackLoadDialog)
+        self.actionOpen.triggered.connect(self.showStackLoadDialog)
         self.actionQuit.triggered.connect(self.quitLasagna)
 
         # Link toolbar signals to slots
@@ -397,14 +397,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeIngredientByType('imagestack')
 
 
-    def showBaseStackLoadDialog(self):
+    def showStackLoadDialog(self):
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
         We split things up so that the base stack can be loaded from the command line, 
         or from a plugin without going via the load dialog. 
         """
-        self.runHook(self.hooks['showBaseStackLoadDialog_Start'])
+        self.runHook(self.hooks['showStackLoadDialog_Start'])
 
         fname = self.showFileLoadDialog()
         if fname == None:
@@ -416,7 +416,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         else:
             self.statusBar.showMessage("Unable to find " + str(fname))
 
-        self.runHook(self.hooks['showBaseStackLoadDialog_End'])
+        self.runHook(self.hooks['showStackLoadDialog_End'])
 
 
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
