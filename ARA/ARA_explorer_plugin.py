@@ -61,7 +61,7 @@ class plugin(lasagna_plugin):
 
 
     def initPlugin(self):
-        self.lasagna.loadBaseImageStack(self.pathToARA)
+        self.lasagna.loadImageStack(self.pathToARA)
         
 
         #Make up a disjointed colormap

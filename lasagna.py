@@ -169,8 +169,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #    to whatever the method normally does. 
         self.hooks = {
             'updateStatusBar_End'           :   [] ,
-            'loadBaseImageStack_Start'      :   [] ,
-            'loadBaseImageStack_End'        :   [] ,
+            'loadImageStack_Start'          :   [] ,
+            'loadImageStack_End'            :   [] ,
             'showBaseStackLoadDialog_Start' :   [] ,
             'showBaseStackLoadDialog_End'   :   [] ,
             'removeCrossHairs_Start'        :   [] , 
@@ -330,40 +330,38 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # File menu and methods associated with loading the base image stack. 
   
-    def loadBaseImageStack(self,fnameToLoad):
+    def loadImageStack(self,fnameToLoad):
         """
         Loads the base image image stack. The base image stack is the one which will appear as gray
         if it is the only stack loaded. This function wipes and data that have already been loaded. Any overlays that 
         are present will be removed when this function runs. 
         """
 
-        self.runHook(self.hooks['loadBaseImageStack_Start'])
-        print "Loading " + fnameToLoad
-        loadedImageStack = self.loadImageStack(fnameToLoad)
+        self.runHook(self.hooks['loadImageStack_Start'])
+
+        if not os.path.isfile(fnameToLoad):
+            msg = 'Unable to find ' + fnameToLoad
+            print msg
+            self.statusBar.showMessage(msg)
+            return False
+
+        print "Loading image stack " + fnameToLoad
+ 
+        #TODO: The axis swap likely shouldn't be hard-coded here
+        loadedImageStack = imageStackLoader.loadStack(fnameToLoad).swapaxes(1,2) 
+ 
         if len(loadedImageStack)==0 and loadedImageStack==False:
             return
 
         # Set up default values in tabs
+        # It's ok to load images of different sizes but their voxel sizes need to be the same
         axRatio = imageStackLoader.getVoxelSpacing(fnameToLoad)
         self.axisRatioLineEdit_1.setText( str(axRatio[0]) )
         self.axisRatioLineEdit_2.setText( str(axRatio[1]) )
         self.axisRatioLineEdit_3.setText( str(axRatio[2]) )
 
-
-        #The paradigm is that other data are plotted over or otherwise added *to* a baseImage.
-        #so we need to remove other crap. 
-        # TODO: AXIS For now we just remove all image stacks in future there will be other classes
-        #       and these are not handled currently. 
-        imageStacks = self.returnIngredientByType('imagestack')
-        if imageStacks != False:
-            for thisStack in imageStacks: #remove imagestacks from plot axes
-                [axis.removeItemFromPlotWidget(thisStack.objectName) for axis in self.axes2D]
-
-        #remove imagestacks from ingredient list
-        self.removeIngredientByType('imagestack')
-
         #Add to the ingredients list
-        objName='baseImage'
+        objName=fnameToLoad.split(os.path.sep)[-1]
         self.addIngredient(objectName=objName       , 
                            kind='imagestack'        , 
                            data=loadedImageStack    , 
@@ -377,15 +375,22 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if hasattr(self,'plottedIntensityRegionObj'):
             del self.plottedIntensityRegionObj
 
+        self.runHook(self.hooks['loadImageStack_End'])
 
+    def clearAllImageStacks(self):
+        # TOOD: keep this for a little in case it's handy
+        imageStacks = self.returnIngredientByType('imagestack')
+        if imageStacks != False:
+            for thisStack in imageStacks: #remove imagestacks from plot axes
+                [axis.removeItemFromPlotWidget(thisStack.objectName) for axis in self.axes2D]
 
-        self.runHook(self.hooks['loadBaseImageStack_End'])
-
+        #remove imagestacks from ingredient list
+        self.removeIngredientByType('imagestack')
 
     def showBaseStackLoadDialog(self):
         """
         This slot brings up the file load dialog and gets the file name.
-        If the file name is valid, it loads the base stack using the loadBaseImageStack method.
+        If the file name is valid, it loads the base stack using the loadImageStack method.
         We split things up so that the base stack can be loaded from the command line, 
         or from a plugin without going via the load dialog. 
         """
@@ -396,7 +401,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         if os.path.isfile(fname): 
-            self.loadBaseImageStack(str(fname))
+            self.loadImageStack(str(fname))
             self.initialiseAxes()
         else:
             self.statusBar.showMessage("Unable to find " + str(fname))
@@ -406,19 +411,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
     #Code to handle generic file loading, dialogs, etc
-    def loadImageStack(self,thisFname):
-        """
-        Loads a generic image stack (defined by the string thisFname) and returns it as an output argument
-        """
-        if not os.path.isfile(thisFname):
-            msg = 'Unable to find ' + thisFname
-            print msg
-            self.statusBar.showMessage(msg)
-            return False
-
-        #TODO: The axis swap likely shouldn't be hard-coded here
-        return imageStackLoader.loadStack(thisFname).swapaxes(1,2) 
- 
 
     def showFileLoadDialog(self):
         """
@@ -475,7 +467,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         self.runHook(self.hooks['loadRecentFileSlot_Start'])
         fname = str(self.sender().text())
-        self.loadBaseImageStack(fname)
+        self.loadImageStack(fname)
         self.initialiseAxes()
 
 
@@ -525,6 +517,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def actionOfStuff2(self):
         print "oranges are not green"
+
+    def stacksInTreeList(self):
+        """
+        Goes through the list of image stack layers in the QTreeView list 
+        and pull out the names.
+        """
+        stacks=[]
+        for ii in range(self.imageStackLayers_Model.rowCount()):
+            stackName = self.imageStackLayers_Model.index(ii,0).data().toString()
+            stacks.append(stackName)
+
+
+        if len(stacks)>0:
+            return stackName
+        else:
+            return False
+
     #------------------------------------------------------------------------
 
     def addIngredient(self, kind='', objectName='', data=None, fname=''):
@@ -691,7 +700,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Set X and Y limit of each axes to fit the data
         """
-        if self.returnIngredientByName('baseImage')==False:
+        if self.stacksInTreeList()==False:
             return
         [axis.resetAxes() for axis in self.axes2D]
 
@@ -701,7 +710,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Initial display of images in axes and also update other parts of the GUI. 
         """
-        if self.returnIngredientByName('baseImage')==False:
+        if self.stacksInTreeList()==False:
             return
 
         #show default images
@@ -943,7 +952,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     def mouseMovedCoronal(self,evt):
-        if self.returnIngredientByName('baseImage')==False:
+        if self.stacksInTreeList()==False:
             return
 
 
@@ -963,7 +972,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     
 
     def mouseMovedSaggital(self,evt):
-        if self.returnIngredientByName('baseImage')==False:
+        if self.stacksInTreeList()==False:
             return
 
         pos = evt[0]
@@ -980,7 +989,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         
     def mouseMovedTransverse(self,evt):
-        if self.returnIngredientByName('baseImage')==False:
+        if self.stacksInTreeList()==False:
             return
 
         pos = evt[0]  
@@ -1011,7 +1020,7 @@ def main(fnames=[None,None], pluginToStart=None):
     #Load stacks from command line input if any was provided
     if not fnames[0]==None:
         print "Loading " + fnames[0]
-        tasty.loadBaseImageStack(fnames[0])
+        tasty.loadImageStack(fnames[0])
     
         if not fnames[1]==None:
             print "Loading " + fnames[1]

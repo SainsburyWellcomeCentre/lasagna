@@ -133,7 +133,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             doRealLoad=True
             if doRealLoad:
-                self.lasagna.loadBaseImageStack(self.fixedStackPath)
+                self.lasagna.loadImageStack(self.fixedStackPath)
                 self.lasagna.initialiseAxes()
                 self.loadMoving.setEnabled(True)
                 self.flipAxis1.setEnabled(True)
