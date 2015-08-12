@@ -222,6 +222,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
         self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.plotImageStackHistogram) 
 
 
         #Plugins menu and initialisation
@@ -370,7 +371,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #to the colorOrder preference in the parameter file
         stacks = self.stacksInTreeList()
         colorOrder = lasHelp.readPreference('colorOrder')
-        print colorOrder
+
         if len(stacks)==2:
             self.returnIngredientByName(stacks[0]).lut=colorOrder[0]
             self.returnIngredientByName(stacks[1]).lut=colorOrder[1]
@@ -528,17 +529,20 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         menu.addAction(action)
         menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
 
+
     def changeImageStackColorMap_Slot(self):
         color = str(self.sender().text())
         objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
         self.returnIngredientByName(objName).lut=color
         self.initialiseAxes()
 
+
     def deleteLayer_Slot(self):
         objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
         [axis.removeItemFromPlotWidget(objName) for axis in self.axes2D]
         self.removeIngredientByName(objName)
         print "removed " + objName
+
 
     def stacksInTreeList(self):
         """
@@ -554,6 +558,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return stacks
         else:
             return False
+
+    def selectedStackName(self):
+
+        if len(self.imageStackLayers_TreeView.selectedIndexes())==0 and  self.imageStackLayers_Model.rowCount()>0:
+            print "lasagna.plotImageStackHistogram : Nothing selected, choosing first layer"
+            return self.returnIngredientByType('imagestack')[0].objectName  #TODO: won't play fair with checkboxes
+        else:
+            return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
 
     #------------------------------------------------------------------------
 
@@ -592,11 +604,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if self.ingredientList[-1].__module__.endswith('imagestack'):
             name = QtGui.QStandardItem(self.ingredientList[-1].objectName)
             name.setEditable(False)
-            thing = QtGui.QStandardItem()
 
+            thing = QtGui.QStandardItem()
             thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
             thing.setCheckState(QtCore.Qt.Checked)
+
             self.imageStackLayers_Model.appendRow((name,thing))
+
+            #TODO: Set the selection to this ingredient if it is the first one to be added
+            #if self.imageStackLayers_Model.rowCount()==1:
+            #    print dir(name)
 
 
 
@@ -904,12 +921,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
-        return
-        #selectedStackName=self.imageComboBox.currentText() #The image stack currently selected with combo box
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,selectedStackName)
+
+        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,self.selectedStackName())
         x,y = img.getHistogram()
-
-
       
         #Plot the histogram
         if self.logYcheckBox.isChecked():
@@ -917,7 +931,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             y[y<0]=0
 
         self.intensityHistogram.clear()
-        ingredient = self.returnIngredientByName(selectedStackName);#Get colour of the layer
+        ingredient = self.returnIngredientByName(self.selectedStackName());#Get colour of the layer
         cMap = ingredient.setColorMap(ingredient.lut)
         brushColor = cMap[round(len(cMap)/2),:]
         penColor = cMap[-1,:]
@@ -935,11 +949,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.plottedIntensityRegionObj.sigRegionChanged.connect(self.updateAxisLevels) #link signal slot
 
         #Get the plotted range and apply to the region object
-        minMax=self.returnIngredientByName(selectedStackName).minMax
+        minMax=self.returnIngredientByName(self.selectedStackName()).minMax
         self.setIntensityRange(minMax)
 
         # Add to the ViewBox but exclude it from auto-range calculations.
         self.intensityHistogram.addItem(self.plottedIntensityRegionObj, ignoreBounds=True)
+
 
     def setIntensityRange(self,intRange=(0,2**12)):
         """
@@ -954,8 +969,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots relating to plotting
     def updateAxisLevels(self):
-        #TODO: AXIS - decide what to do with minMax. 
-        #Have the object set it? Doing it here by directly manipulating the item seems wrong
+        #TODO: Decide what to do with minMax. Setting it here by directly manipulating the item seems wrong
         minX, maxX = self.plottedIntensityRegionObj.getRegion()
 
         #Get all imagestacks
@@ -964,8 +978,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Loop through all imagestacks and set their levels in each axis
         for thisImageStack in allImageStacks:
             objectName=thisImageStack.objectName
-            #if objectName != self.imageComboBox.currentText(): #TODO: LAYERS
-            #    continue
+
+            if objectName != self.selectedStackName(): #TODO: LAYERS
+                continue
 
             for thisAxis in self.axes2D:
                 img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view,objectName)
@@ -1046,8 +1061,6 @@ def main(fnames, pluginToStart=None):
         for thisFname in fnames:
             print "Loading " + thisFname
             tasty.loadImageStack(thisFname)
-    
-
 
     tasty.initialiseAxes()
 
@@ -1060,7 +1073,6 @@ def main(fnames, pluginToStart=None):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Link slots to signals
     #connect views to the mouseMoved slot. After connection this runs in the background. 
-    #TODO: figure out why returning an argument is crucial even though we never use it
     #TODO: set up with just one slot that accepts arguments
     proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedCoronal)
     proxy2=pg.SignalProxy(tasty.axes2D[1].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
