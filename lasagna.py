@@ -179,11 +179,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #Handle IO plugins. For instance these are the loaders that handle different data types
         #and different loading actions. 
-        print "Adding IO module paths to Python path"
         IO_Paths = lasHelp.readPreference('IO_modulePaths') #directories containing IO modules
-        print IO_Paths
+        print "Adding IO module paths to Python path"
         IO_plugins, IO_pluginPaths = pluginHandler.findPlugins(IO_Paths)
-        [sys.path.append(p) for p in IO_Paths] #append to system path
+        for p in IO_Paths:
+            sys.path.append(p) #append to system path
+            print p
 
         #Add *load actions* to the Load ingredients sub-menu and add loader modules here 
         #TODO: currently we only have code to handle load actions as no save actions are available
@@ -194,6 +195,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             thisInstance = IOclass(self)
             self.loadActions[thisInstance.objectName] = thisInstance
 
+        print ""
 
         # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showStackLoadDialog)

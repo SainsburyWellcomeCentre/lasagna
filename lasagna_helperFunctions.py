@@ -174,7 +174,7 @@ def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPrefere
     Load the preferences YAML file. If the file is missing, we create it using the default
     preferences defined above. Preferences are returned as a dictionary.
     """
-    print "loading from pref file %s" % prefFName
+    #print "loading from pref file %s" % prefFName
     #Generate a default preferences file if no preferences file exists
     if os.path.exists(prefFName) == False:
         print "PREF FILE"

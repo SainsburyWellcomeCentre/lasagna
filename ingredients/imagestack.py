@@ -10,7 +10,7 @@ from PyQt4 import QtGui
 import pyqtgraph as pg
 
 class imagestack(object):
-    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None):
+    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None, lut='gray'):
 
         #Assign input arguments to properties of the class instance. 
         #The following properties are common to all ingredients
@@ -35,7 +35,7 @@ class imagestack(object):
         else:
             self.minMax = minMax
 
-        self.lut='gray' #The look-up table
+        self.lut=lut #The look-up table
 
 
     def fname(self):
