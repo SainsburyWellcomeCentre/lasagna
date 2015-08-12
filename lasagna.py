@@ -47,8 +47,7 @@ from alert import alert                  # Class used to bring up a warning box
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-D", help="Load demo images", action="store_true")
-parser.add_argument("-red", help="file name for red channel (if only this is specified we get a gray image)")
-parser.add_argument("-green", help="file name for green channel. Only processed if a red channel was provided")
+parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
 parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
 
@@ -70,13 +69,9 @@ if args.D==True:
             print 'Downloading %s to %s' % (url,fname)
             urllib.urlretrieve(url,fname)
     
-else:
-    if args.red != None:
-        fnames[0] =args.red
-    if args.green != None:
-        fnames[1] =args.green
-    
-    
+elif args.im != None:
+    fnames = args.im
+  
     
 
 
@@ -581,9 +576,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                             data=data,
                             objectName=objectName
                     )
-                )
+                ) #TODO: is it possible to attach the ingredient to the TreeView?
 
-        #If it's an image stack, add to the image layers ListView
+        #If it's an image stack, add to the image layers list
         if self.ingredientList[-1].__module__.endswith('imagestack'):
             name = QtGui.QStandardItem(self.ingredientList[-1].objectName)
             name.setEditable(False)
@@ -601,20 +596,19 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This method is called by the two following methods that remove based on
         ingredient name or type         
         """
-        return
-        #TODO: layers
-        """
-        #If this is an image stack, remove it from the combo box
+
+        #If this is an image stack, remove it from the layers list
         if ingredientInstance.__module__.endswith('imagestack'):
             objName = ingredientInstance.objectName
-            listPositionOfIngredient = self.imageComboBox.findText(objName)
+            listPositionOfIngredient = self.imageStackLayers_Model.findItems(objName)
+            print listPositionOfIngredient
             if listPositionOfIngredient == -1:
                 print "Can not find ingredient %s in combo box so can not remove it from box." % objName
             else:
-                self.imageComboBox.removeItem(listPositionOfIngredient)
+                self.imageStackLayers_Model.removeRows(listPositionOfIngredient)
 
-        self.ingredientList.remove(ingredientInstance)
-        """
+        self.ingredientList.remove(ingredientInstance) 
+
 
     def removeIngredientByName(self,objectName):
         """
@@ -1027,7 +1021,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def main(fnames=[None,None], pluginToStart=None):
+def main(fnames, pluginToStart=None):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
@@ -1035,14 +1029,13 @@ def main(fnames=[None,None], pluginToStart=None):
 
     #Load stacks from command line input if any was provided
     if not fnames[0]==None:
-        print "Loading " + fnames[0]
-        tasty.loadImageStack(fnames[0])
+        for thisFname in fnames:
+            print "Loading " + thisFname
+            tasty.loadImageStack(thisFname)
     
-        if not fnames[1]==None:
-            print "Loading " + fnames[1]
-            tasty.loadActions['load_overlay'].load(fnames[1]) #TODO: we need a nice way of finding load actions by name
 
-        tasty.initialiseAxes()
+
+    tasty.initialiseAxes()
 
     if pluginToStart != None:
         if tasty.plugins.has_key(pluginToStart):
