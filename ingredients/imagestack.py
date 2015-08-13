@@ -11,8 +11,8 @@ import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 
 class imagestack(lasagna_ingredient):
-    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None, lut='gray'):
-        super(imagestack,self).__init__(data, fnameAbsPath, enable, objectName,
+    def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None, lut='gray'):
+        super(imagestack,self).__init__(parent, data, fnameAbsPath, enable, objectName,
                                         pgObject='ImageItem',
                                         pgObjectConstructionArgs = dict(border='k', levels=minMax)
                                         )

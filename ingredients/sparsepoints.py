@@ -10,8 +10,8 @@ import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 
 class sparsepoints(lasagna_ingredient):
-    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName=''):
-        super(sparsepoints,self).__init__(data, fnameAbsPath, enable, objectName,
+    def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
+        super(sparsepoints,self).__init__(parent, data, fnameAbsPath, enable, objectName,
                                         pgObject='PlotDataItem'
                                         )
 

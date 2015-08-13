@@ -50,6 +50,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
         #Get the base image from this widget
         selectedStackName = self.lasagna.selectedStackName()
         ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName=selectedStackName,regex=True)
+        if ImageItem==False:
+            return
 
         #Extract data from base image
         if ImageItem != None:

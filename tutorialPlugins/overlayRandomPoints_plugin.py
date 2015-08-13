@@ -30,16 +30,13 @@ class plugin(lasagna_plugin):
         self.lasagna = lasagna
 
         #add a sparsepoints ingredient
-        objName = 'tutePoints'
-        self.lasagna.addIngredient(objectName=objName , 
+        self.objName = 'tutePoints'
+        self.lasagna.addIngredient(objectName=self.objName , 
                                    kind='sparsepoints' ,
                                    data=self.generateRandomData())
 
-        #ing = self.lasagna.returnIngredientByName('tutePoints')
-        
-        #Add plot items to axes so that they become available for plotting
-        [axis.addItemToPlotWidget(self.lasagna.returnIngredientByName(objName)) for axis in self.lasagna.axes2D]
-        
+        self.lasagna.returnIngredientByName(self.objName).show() #Add item to all three 2D plots
+
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
 
@@ -75,8 +72,7 @@ class plugin(lasagna_plugin):
 
     def closePlugin(self):
         #Remove points from axes then remove the ingredient from the list. 
-        [axis.removeItemFromPlotWidget('tutePoints') for axis in self.lasagna.axes2D]
-        self.lasagna.removeIngredientByName('tutePoints')
+        self.lasagna.removeIngredientByName(self.objName)
 
 
 

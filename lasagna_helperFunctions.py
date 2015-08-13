@@ -39,11 +39,11 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
 
     if not hasattr(pltItem,'items'):
         print "findPyQtGraphObjectNameInPlotWidget finds no attribute 'items'"
-        return
+        return False
 
     if len(pltItem.items)==0:
         print "findPyQtGraphObjectNameInPlotWidget finds no items in list"
-        return
+        return False
 
 
     if regex == True:
@@ -57,7 +57,7 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
 
 
     print "Failed to find " + itemName + " in PlotWidget"
-    return None
+    return False
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

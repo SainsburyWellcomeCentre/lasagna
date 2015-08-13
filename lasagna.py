@@ -391,8 +391,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                            data=loadedImageStack    , 
                            fname=fnameToLoad)
 
-        #Add plot items to axes so that they become available for plotting
-        [axis.addItemToPlotWidget(self.returnIngredientByName(objName)) for axis in self.axes2D]
+        self.returnIngredientByName(objName).show() #Add item to all three 2D plots
+
 
         #If only one stack is present, we will display it as gray (see imagestack class)
         #if more than one stack has been added, we will colour successive stacks according
@@ -422,7 +422,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 [axis.removeItemFromPlotWidget(thisStack.objectName) for axis in self.axes2D]
 
         #remove imagestacks from ingredient list
-        self.removeIngredientByType('imagestack')
+        self.removeIngredientByType('imagestack') #TODO. integrate above into the remove ingredient function
 
 
     def showStackLoadDialog(self):
@@ -567,7 +567,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def deleteLayer_Slot(self):
         objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
-        [axis.removeItemFromPlotWidget(objName) for axis in self.axes2D]
         self.removeIngredientByName(objName)
         print "removed " + objName
 
@@ -591,6 +590,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Return the name of the selected image stack. If no stack selected, returns the first stack in the list
         """
+        #TODO: this method must return nothing if the is nothing to plot. at the moment it's possible for it not to do when items are being deleted
+        #when last stack is deleted this causes a minor error in plotImageStackHistorgram
         if len(self.imageStackLayers_TreeView.selectedIndexes())==0 and  self.imageStackLayers_Model.rowCount()>0:
             return self.returnIngredientByType('imagestack')[0].objectName  #TODO: won't play fair with checkboxes
         else:
@@ -623,6 +624,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Get ingredient of this class from the ingredients package
         ingredientClassObj = getattr(getattr(ingredients,kind),kind) #make an ingredient of type "kind"
         self.ingredientList.append(ingredientClassObj(
+                            parent=self,
                             fnameAbsPath=fname,
                             data=data,
                             objectName=objectName
@@ -655,23 +657,27 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This method is called by the two following methods that remove based on
         ingredient name or type         
         """
+        ingredientInstance.removePlotItem() #remove from axes
 
         #If this is an image stack, remove it from the layers list
         if isinstance(self.ingredientList[-1],ingredients.imagestack.imagestack):
             objName = ingredientInstance.objectName
 
+            #TODO: update for image stack and non-image stack items
             items = self.imageStackLayers_Model.findItems(objName)
             if items == -1:
-                print "Can not find ingredient %s in combo box so can not remove it from box." % objName
+                print "Can not find ingredient %s in list so can not remove it." % objName
             else:
-                self.imageStackLayers_Model.removeRow(items[0].row())
+                self.imageStackLayers_Model.removeRow(items[0].row()) #TODO: this will only work for image stacks
 
-            self.ingredientList.remove(ingredientInstance) 
+
             #make stack gray if there is only one left
             if len(self.ingredientList)==1:
                 self.ingredientList[0].lut='gray'
                 self.initialiseAxes()
 
+        self.ingredientList.remove(ingredientInstance) 
+        
 
     def removeIngredientByName(self,objectName):
         """
@@ -940,8 +946,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
         """
-
         img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,self.selectedStackName())
+        if img==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
+            self.intensityHistogram.clear()
+            return
+
         x,y = img.getHistogram()
       
         #Plot the histogram
@@ -993,6 +1002,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #Get all imagestacks
         allImageStacks = self.returnIngredientByType('imagestack')
+        if allImageStacks == False:
+            return
 
         #Loop through all imagestacks and set their levels in each axis
         for thisImageStack in allImageStacks:

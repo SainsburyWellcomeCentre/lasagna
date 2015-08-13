@@ -58,13 +58,16 @@ class projection2D():
 
         "item" is either a string defining an objectName or the object itself
         """
-
         items=self.view.items()
         nItemsBefore = len(items) #to determine if an item was removed
         if isinstance(item,str):
+            removed=False
             for thisItem in items:
                 if hasattr(thisItem,'objectName') and thisItem.objectName==item:
                         self.view.removeItem(thisItem)
+                        removed=True
+            if removed==False:
+                print "lasagna_axis.removeItemFromPlotWidget failed to remove item defined by string " + item
         else: #it should be an image item
             self.view.removeItem(item)
 
