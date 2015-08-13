@@ -24,7 +24,7 @@ __maintainer__ = "Rob Campbell"
 
 
 
-from pyqtgraph.Qt import QtCore, QtGui
+from PyQt4 import QtCore, QtGui
 import pyqtgraph as pg
 import numpy as np
 import sys
@@ -200,6 +200,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showStackLoadDialog)
         self.actionQuit.triggered.connect(self.quitLasagna)
+        self.actionAbout.triggered.connect(self.about_slot)
 
         # Link toolbar signals to slots
         self.actionResetAxes.triggered.connect(self.resetAxes)
@@ -275,6 +276,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         self.statusBar.showMessage("Initialised")
+
+
+    def about_slot(self):
+        """
+        A simple about box
+        """
+        msg = "Lasagna - Rob Campbell<br>Basel - 2015"
+        reply = QtGui.QMessageBox.question(self, 'Message', 
+                     msg)
+
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Plugin-related methods
