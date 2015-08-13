@@ -125,7 +125,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="imageSettingsTab">
         <attribute name="title">
@@ -201,7 +201,7 @@
         <attribute name="title">
          <string>Points</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <widget class="QTreeView" name="points_TreeView">
            <property name="sizePolicy">
@@ -225,221 +225,335 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
-            <widget class="QLabel" name="labelMarker">
+            <widget class="QGroupBox" name="groupBoxAxisRatio_2">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="maximumSize">
+             <property name="minimumSize">
               <size>
-               <width>42</width>
-               <height>24</height>
+               <width>131</width>
+               <height>131</height>
               </size>
              </property>
-             <property name="text">
-              <string>Marker</string>
+             <property name="maximumSize">
+              <size>
+               <width>131</width>
+               <height>16777215</height>
+              </size>
              </property>
+             <property name="title">
+              <string>z-spread</string>
+             </property>
+             <widget class="QWidget" name="layoutWidget">
+              <property name="geometry">
+               <rect>
+                <x>11</x>
+                <y>30</y>
+                <width>106</width>
+                <height>25</height>
+               </rect>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <widget class="QLabel" name="axisRatioLabel_4">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>45</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>45</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>View 1</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="view1Z_spinBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>99</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="layoutWidget">
+              <property name="geometry">
+               <rect>
+                <x>11</x>
+                <y>60</y>
+                <width>106</width>
+                <height>25</height>
+               </rect>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QLabel" name="axisRatioLabel_5">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>45</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>45</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>View 2</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="view2Z_spinBox">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="layoutWidget">
+              <property name="geometry">
+               <rect>
+                <x>11</x>
+                <y>90</y>
+                <width>106</width>
+                <height>25</height>
+               </rect>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="axisRatioLabel_6">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>45</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>45</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>View 3</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="view3Z_spinBox">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="marker_comboBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+            <widget class="QFrame" name="frame">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
              </property>
-             <property name="maximumSize">
-              <size>
-               <width>85</width>
-               <height>24</height>
-              </size>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
              </property>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QLabel" name="labelMarker">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Marker</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="marker_comboBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>85</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QLabel" name="labelMarker_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Size</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="markerSize_spinBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>99</number>
+                  </property>
+                  <property name="value">
+                   <number>10</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QLabel" name="labelMarker_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Alpha</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="markeAlpha_spinBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimum">
+                   <number>0</number>
+                  </property>
+                  <property name="maximum">
+                   <number>255</number>
+                  </property>
+                  <property name="value">
+                   <number>255</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="markerColor_pushButton">
+                <property name="text">
+                 <string>Color</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox">
+                <property name="text">
+                 <string>Line</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBoxAxisRatio_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>131</width>
-             <height>131</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>131</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>z-spread</string>
-           </property>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>11</x>
-              <y>30</y>
-              <width>106</width>
-              <height>25</height>
-             </rect>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QLabel" name="axisRatioLabel_4">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>16</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>45</width>
-                 <height>16</height>
-                </size>
-               </property>
-               <property name="layoutDirection">
-                <enum>Qt::LeftToRight</enum>
-               </property>
-               <property name="text">
-                <string>View 1</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="view1Z_spinBox">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>99</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>11</x>
-              <y>60</y>
-              <width>106</width>
-              <height>25</height>
-             </rect>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <item>
-              <widget class="QLabel" name="axisRatioLabel_5">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>16</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>45</width>
-                 <height>16</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>View 2</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="view2Z_spinBox">
-               <property name="minimum">
-                <number>1</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>11</x>
-              <y>90</y>
-              <width>106</width>
-              <height>25</height>
-             </rect>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <widget class="QLabel" name="axisRatioLabel_6">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>45</width>
-                 <height>16</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>45</width>
-                 <height>16</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>View 3</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="view3Z_spinBox">
-               <property name="minimum">
-                <number>1</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer">
@@ -449,12 +563,19 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>200</height>
+             <height>208</height>
             </size>
            </property>
           </spacer>
          </item>
         </layout>
+        <zorder>points_TreeView</zorder>
+        <zorder>groupBoxAxisRatio_2</zorder>
+        <zorder>verticalSpacer</zorder>
+        <zorder>layoutWidget_2</zorder>
+        <zorder>marker_comboBox</zorder>
+        <zorder>markerSize_spinBox</zorder>
+        <zorder>frame</zorder>
        </widget>
        <widget class="QWidget" name="axisSetingsTab">
         <attribute name="title">
