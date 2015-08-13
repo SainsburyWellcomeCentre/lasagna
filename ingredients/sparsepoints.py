@@ -10,12 +10,22 @@ import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
+
+
 class sparsepoints(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
         super(sparsepoints,self).__init__(parent, data, fnameAbsPath, enable, objectName,
                                         pgObject='PlotDataItem'
                                         )
 
+
+        #Choose symbols from preferences file. TODO: in future could increment through so successive items have different symbols and colors
+        self.symbol = lasHelp.readPreference('symbolOrder')[0]
+        self.pen = None
+        self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
+        self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
+        self.color = lasHelp.readPreference('colorOrder')[0]
+        self.symbolBrush = tuple(self.colorName2value(self.color, alpha=self.alpha))
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
         name = QtGui.QStandardItem(objectName)
@@ -29,18 +39,13 @@ class sparsepoints(lasagna_ingredient):
         #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
         self.modelItems=name
         self.model = self.parent.points_Model
+
         self.addToList()
         #TODO: Set the selection to this ingredient if it is the first one to be added
         #if self.imageStackLayers_Model.rowCount()==1:
         #    print dir(name)
 
-        #Choose symbols from preferences file. TODO: in future could increment through so successive items have different symbols and colors
-        self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.pen = None
-        self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
-        self.symbolBrush = tuple(self.colorName2value(lasHelp.readPreference('colorOrder')[0],
-                                                alpha=lasHelp.readPreference('defaultSymbolOpacity')))
-
+       
     def data(self,axisToPlot=0):
         """
         Sparse point data are an n by 3 array where each row defines the location
@@ -74,4 +79,13 @@ class sparsepoints(lasagna_ingredient):
                             symbolSize=self.symbolSize, 
                             symbolBrush=self.symbolBrush
                             )
-        
+
+
+    def addToList(self):
+        """
+        Add to list and then set UI elements
+        """
+        super(sparsepoints,self).addToList()
+        self.parent.markerSize_spinBox.setValue(self.symbolSize)
+        self.parent.markerAlpha_spinBox.setValue(self.alpha)
+        #TODO: set markerSymbol_comboBox

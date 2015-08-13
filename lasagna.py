@@ -237,9 +237,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         #self.points_TreeView.customContextMenuRequested.connect(self.layersMenu)
-        #TODO: add to settings file
-        points = ['d','t','s']
-        [self.marker_comboBox.addItem(pointType) for pointType in points]
+        [self.marker_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')]
 
 
         #Plugins menu and initialisation

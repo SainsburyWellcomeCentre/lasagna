@@ -125,7 +125,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="imageSettingsTab">
         <attribute name="title">
@@ -435,7 +435,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="marker_comboBox">
+                 <widget class="QComboBox" name="markerSymbol_comboBox">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -488,7 +488,7 @@
                    <number>99</number>
                   </property>
                   <property name="value">
-                   <number>10</number>
+                   <number>1</number>
                   </property>
                  </widget>
                 </item>
@@ -516,7 +516,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="markeAlpha_spinBox">
+                 <widget class="QSpinBox" name="markerAlpha_spinBox">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -573,7 +573,7 @@
         <zorder>groupBoxAxisRatio_2</zorder>
         <zorder>verticalSpacer</zorder>
         <zorder>layoutWidget_2</zorder>
-        <zorder>marker_comboBox</zorder>
+        <zorder>markerSymbol_comboBox</zorder>
         <zorder>markerSize_spinBox</zorder>
         <zorder>frame</zorder>
        </widget>
