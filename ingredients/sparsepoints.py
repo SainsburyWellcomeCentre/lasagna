@@ -9,7 +9,7 @@ import os
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from PyQt4 import QtGui, QtCore
-
+import lasagna_helperFunctions as lasHelp
 class sparsepoints(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
         super(sparsepoints,self).__init__(parent, data, fnameAbsPath, enable, objectName,
@@ -30,11 +30,16 @@ class sparsepoints(lasagna_ingredient):
         self.modelItems=name
         self.model = self.parent.points_Model
         self.addToList()
-
-
         #TODO: Set the selection to this ingredient if it is the first one to be added
         #if self.imageStackLayers_Model.rowCount()==1:
         #    print dir(name)
+
+        #Choose symbols from preferences file. TODO: in future could increment through so successive items have different symbols and colors
+        self.symbol = lasHelp.readPreference('symbolOrder')[0]
+        self.pen = None
+        self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
+        self.symbolBrush = tuple(self.colorName2value(lasHelp.readPreference('colorOrder')[0],
+                                                alpha=lasHelp.readPreference('defaultSymbolOpacity')))
 
     def data(self,axisToPlot=0):
         """
@@ -63,5 +68,10 @@ class sparsepoints(lasagna_ingredient):
         data = data[z==sliceToPlot,:]
 
 
-        pyqtObject.setData(x=data[:,0], y=data[:,1], symbol='t', pen=None, symbolSize=10, symbolBrush=(100, 100, 255, 150))
+        pyqtObject.setData(x=data[:,0], y=data[:,1], 
+                            symbol=self.symbol, 
+                            pen=self.pen, 
+                            symbolSize=self.symbolSize, 
+                            symbolBrush=self.symbolBrush
+                            )
         
