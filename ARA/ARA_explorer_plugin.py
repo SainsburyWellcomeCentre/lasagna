@@ -63,7 +63,7 @@ class plugin(lasagna_plugin):
 
 
     def initPlugin(self):
-        self.lasagna.clearAllImageStacks()
+        self.lasagna.removeIngredientByType('imagestack')
         self.lasagna.loadImageStack(self.pathToARA)
         
 
@@ -87,14 +87,8 @@ class plugin(lasagna_plugin):
         Runs when the user unchecks the plugin in the menu box and also (in this case)
         when the user loads a new base stack
         """
-
-        #Ensure image color scale returns to normal
-        stack = self.lasagna.returnIngredientByName(self.ARAlayerName)
-        if stack != False:
-            stack.lut='gray'
-
-        [axis.removeItemFromPlotWidget(self.ARAlayerName) for axis in self.lasagna.axes2D]
         self.lasagna.removeIngredientByName(self.ARAlayerName)
+        self.lasagna.intensityHistogram.clear()
         self.detachHooks()
 
 
@@ -121,7 +115,7 @@ class plugin(lasagna_plugin):
         Hooks into base image file dialog method to shut down the ARA Explorer if the
         user attempts to load a base stack
         """
-        self.lasagna.clearAllImageStacks()
+        self.lasagna.removeIngredientByType('imagestack')
 
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
@@ -134,7 +128,7 @@ class plugin(lasagna_plugin):
         Hooks into the recent file loading method to shut down the ARA Explorer if the
         user attempts to load a base stack
         """
-        self.lasagna.clearAllImageStacks()
+        self.lasagna.removeIngredientByType('imagestack')
 
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name

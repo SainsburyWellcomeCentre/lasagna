@@ -157,7 +157,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #-------------------------------------------------------------------------------------
 
         #Clear all image stacks 
-        self.lasagna.clearAllImageStacks()
+        self.lasagna.removeIngredientByType('imagestack')
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

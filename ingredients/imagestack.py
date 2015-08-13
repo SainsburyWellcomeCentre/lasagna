@@ -6,7 +6,7 @@ TODO: once this is working, pull out the general purpose stuff and set up an ing
 from __future__ import division
 import numpy as np
 import os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 
@@ -28,6 +28,24 @@ class imagestack(lasagna_ingredient):
 
         self.lut=lut #The look-up table
 
+        #Add to the imageStackLayers_model which is associated with the imagestack QTreeView
+        name = QtGui.QStandardItem(objectName)
+        name.setEditable(False)
+
+        #Add checkbox
+        thing = QtGui.QStandardItem()
+        thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
+        thing.setCheckState(QtCore.Qt.Checked)
+
+        #Append to list
+        #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
+        self.modelItems=name
+        self.model = self.parent.imageStackLayers_Model
+        self.addToList()
+
+        #TODO: Set the selection to this ingredient if it is the first one to be added
+        #if self.imageStackLayers_Model.rowCount()==1:
+        #    print dir(name)
 
 
 
@@ -83,8 +101,6 @@ class imagestack(lasagna_ingredient):
         return self._data.swapaxes(0,axisToPlot)
 
 
-
-
     def plotIngredient(self,pyqtObject,axisToPlot=0,sliceToPlot=0):
         """
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
@@ -97,7 +113,6 @@ class imagestack(lasagna_ingredient):
                         compositionMode=self.compositionMode,
                         lut=self.setColorMap(self.lut)
                         )
-
 
 
     def defaultHistRange(self,logY=False):
@@ -154,4 +169,9 @@ class imagestack(lasagna_ingredient):
         else:
             print "Can not flip axis %d" % axisToFlip
 
-            
+
+    def removeFromList(self):
+        super(imagestack,self).removeFromList()
+        if len(self.parent.ingredientList)==1:
+                self.parent.ingredientList[0].lut='gray'
+                self.parent.initialiseAxes()

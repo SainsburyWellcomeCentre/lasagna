@@ -20,7 +20,7 @@ class lasagna_ingredient(object):
         self.pgObjectConstructionArgs = pgObjectConstructionArgs #The pyqtgrao item is created with these arguments
 
 
-        
+
 
     def fname(self):
         """
@@ -48,3 +48,16 @@ class lasagna_ingredient(object):
     	Remove ingredient from plots by removing the plot item from all 2D axes so that it becomes unavailable for plotting
     	"""
         [axis.removeItemFromPlotWidget(self.objectName) for axis in self.parent.axes2D]
+
+
+    def addToList(self):
+    	"""
+    	Add this ingredients list items to the QStandardModel (model) associated with its QTreeView
+    	"""
+    	self.model.appendRow(self.modelItems)
+
+
+    def removeFromList(self):
+    	items = self.model.findItems(self.objectName)
+    	self.model.removeRow(items[0].row())
+

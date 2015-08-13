@@ -8,6 +8,7 @@ import numpy as np
 import os
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
+from PyQt4 import QtGui, QtCore
 
 class sparsepoints(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
@@ -15,6 +16,25 @@ class sparsepoints(lasagna_ingredient):
                                         pgObject='PlotDataItem'
                                         )
 
+
+        #Add to the imageStackLayers_model which is associated with the points QTreeView
+        name = QtGui.QStandardItem(objectName)
+        name.setEditable(False)
+
+        #Add checkbox
+        thing = QtGui.QStandardItem()
+        thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
+        thing.setCheckState(QtCore.Qt.Checked)
+
+        #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
+        self.modelItems=name
+        self.model = self.parent.points_Model
+        self.addToList()
+
+
+        #TODO: Set the selection to this ingredient if it is the first one to be added
+        #if self.imageStackLayers_Model.rowCount()==1:
+        #    print dir(name)
 
     def data(self,axisToPlot=0):
         """

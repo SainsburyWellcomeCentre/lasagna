@@ -414,17 +414,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
-    def clearAllImageStacks(self):
-        # TOOD: keep this for a little in case it's handy
-        imageStacks = self.returnIngredientByType('imagestack')
-        if imageStacks != False:
-            for thisStack in imageStacks: #remove imagestacks from plot axes
-                [axis.removeItemFromPlotWidget(thisStack.objectName) for axis in self.axes2D]
-
-        #remove imagestacks from ingredient list
-        self.removeIngredientByType('imagestack') #TODO. integrate above into the remove ingredient function
-
-
     def showStackLoadDialog(self):
         """
         This slot brings up the file load dialog and gets the file name.
@@ -593,7 +582,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #TODO: this method must return nothing if the is nothing to plot. at the moment it's possible for it not to do when items are being deleted
         #when last stack is deleted this causes a minor error in plotImageStackHistorgram
         if len(self.imageStackLayers_TreeView.selectedIndexes())==0 and  self.imageStackLayers_Model.rowCount()>0:
-            return self.returnIngredientByType('imagestack')[0].objectName  #TODO: won't play fair with checkboxes
+            if self.returnIngredientByType('imagestack') != False:
+                return self.returnIngredientByType('imagestack')[0].objectName  #TODO: won't play fair with checkboxes
+            else:
+                print "No more image stacks"
+                return False
         else:
             return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
 
@@ -629,26 +622,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                             data=data,
                             objectName=objectName
                     )
-                ) #TODO: is it possible to attach the ingredient to the TreeView?
-
-        #If it's an image stack, add to the image layers list
-        if isinstance(self.ingredientList[-1],ingredients.imagestack.imagestack):
-            #Define the name column
-            name = QtGui.QStandardItem(self.ingredientList[-1].objectName)
-            name.setEditable(False)
-
-            #Add checkbox
-            thing = QtGui.QStandardItem()
-            thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
-            thing.setCheckState(QtCore.Qt.Checked)
-
-            #self.imageStackLayers_Model.appendRow((name,thing)) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
-            self.imageStackLayers_Model.appendRow(name)
-
-            #TODO: Set the selection to this ingredient if it is the first one to be added
-            #if self.imageStackLayers_Model.rowCount()==1:
-            #    print dir(name)
-
+                )
 
 
     def removeIngredient(self,ingredientInstance):
@@ -658,26 +632,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient name or type         
         """
         ingredientInstance.removePlotItem() #remove from axes
-
-        #If this is an image stack, remove it from the layers list
-        if isinstance(self.ingredientList[-1],ingredients.imagestack.imagestack):
-            objName = ingredientInstance.objectName
-
-            #TODO: update for image stack and non-image stack items
-            items = self.imageStackLayers_Model.findItems(objName)
-            if items == -1:
-                print "Can not find ingredient %s in list so can not remove it." % objName
-            else:
-                self.imageStackLayers_Model.removeRow(items[0].row()) #TODO: this will only work for image stacks
-
-
-            #make stack gray if there is only one left
-            if len(self.ingredientList)==1:
-                self.ingredientList[0].lut='gray'
-                self.initialiseAxes()
-
         self.ingredientList.remove(ingredientInstance) 
-        
+        ingredientInstance.removeFromList() #remove ingredient from the list with which it is associated        
 
     def removeIngredientByName(self,objectName):
         """
@@ -948,6 +904,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,self.selectedStackName())
         if img==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
+            print "truing to clear"
             self.intensityHistogram.clear()
             return
 
