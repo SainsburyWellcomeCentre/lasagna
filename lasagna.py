@@ -220,12 +220,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Image tab stuff
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
-        labels = QtCore.QStringList(("Name",""))
+        labels = QtCore.QStringList("Name") 
         self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
         self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenu)
-        self.imageStackLayers_TreeView.setColumnWidth(0,200)
+        #self.imageStackLayers_TreeView.setColumnWidth(0,200)
+
         QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.plotImageStackHistogram) 
 
 
@@ -618,14 +619,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #If it's an image stack, add to the image layers list
         if self.ingredientList[-1].__module__.endswith('imagestack'):
+            #Define the name column
             name = QtGui.QStandardItem(self.ingredientList[-1].objectName)
             name.setEditable(False)
 
+            #Add checkbox
             thing = QtGui.QStandardItem()
             thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
             thing.setCheckState(QtCore.Qt.Checked)
 
-            self.imageStackLayers_Model.appendRow((name,thing))
+            #self.imageStackLayers_Model.appendRow((name,thing)) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
+            self.imageStackLayers_Model.appendRow(name)
 
             #TODO: Set the selection to this ingredient if it is the first one to be added
             #if self.imageStackLayers_Model.rowCount()==1:
