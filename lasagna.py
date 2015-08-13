@@ -230,6 +230,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.plotImageStackHistogram) 
 
 
+        #Points tab stuff
+        self.points_Model = QtGui.QStandardItemModel(self.points_TreeView)
+        labels = QtCore.QStringList("Name") 
+        self.points_Model.setHorizontalHeaderLabels(labels)
+        self.points_TreeView.setModel(self.points_Model)
+        self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        #self.points_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        points = ['d','t','s']
+        [self.marker_comboBox.addItem(pointType) for pointType in points]
+
+
         #Plugins menu and initialisation
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
         pluginPaths = lasHelp.readPreference('pluginPaths')
