@@ -5,7 +5,7 @@ this file describes a class that handles the axis behavior for the lasagna viewe
 from lasagna_viewBox import lasagna_viewBox
 import lasagna_helperFunctions as lasHelp
 import pyqtgraph as pg
-
+import ingredients
 
 class projection2D():
 
@@ -148,7 +148,7 @@ class projection2D():
         return
 
 
-    def updatePlotItems_2D(self, ingredients, sliceToPlot=None):
+    def updatePlotItems_2D(self, ingredientsList, sliceToPlot=None):
         """
         Update all plot items on axis, redrawing so everything associated with a specified 
         slice (sliceToPlot) is shown. This is done based upon a list of ingredients
@@ -160,8 +160,8 @@ class projection2D():
         #TODO: have just one loop
         #     the plot order may already have been decided at the time the objects were added so having these 
         #     two loops may be of no use
-        for thisIngredient in ingredients:
-            if thisIngredient.__module__.endswith('imagestack'):
+        for thisIngredient in ingredientsList:
+            if isinstance(thisIngredient, ingredients.imagestack.imagestack):
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                 #TODO: AXIS need some way of linking the ingredient to the plot item but keeping in mind 
                 #      that this same object needs to be plotted in different axes, each of which has its own
@@ -190,8 +190,8 @@ class projection2D():
         # the image is now displayed
 
         # loop through all plot items searching for non-image items (these need to be overlaid onto the image)
-        for thisIngredient in ingredients:
-            if not thisIngredient.__module__.endswith('imagestack'): #TODO: too specific 
+        for thisIngredient in ingredientsList:
+            if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: #TODO: too specific 
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                               axisToPlot=self.axisToPlot, 
                                               sliceToPlot=sliceToPlotInThisLayer)

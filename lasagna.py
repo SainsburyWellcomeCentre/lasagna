@@ -237,6 +237,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         #self.points_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        #TODO: add to settings file
         points = ['d','t','s']
         [self.marker_comboBox.addItem(pointType) for pointType in points]
 
@@ -629,7 +630,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 ) #TODO: is it possible to attach the ingredient to the TreeView?
 
         #If it's an image stack, add to the image layers list
-        if self.ingredientList[-1].__module__.endswith('imagestack'):
+        if isinstance(self.ingredientList[-1],ingredients.imagestack.imagestack):
             #Define the name column
             name = QtGui.QStandardItem(self.ingredientList[-1].objectName)
             name.setEditable(False)
@@ -656,7 +657,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
 
         #If this is an image stack, remove it from the layers list
-        if ingredientInstance.__module__.endswith('imagestack'):
+        if isinstance(self.ingredientList[-1],ingredients.imagestack.imagestack):
             objName = ingredientInstance.objectName
 
             items = self.imageStackLayers_Model.findItems(objName)
@@ -705,7 +706,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         for thisIngredient in self.ingredientList[:]:
-            if thisIngredient.__module__.endswith(ingredientType):
+            if thisIngredient.__module__.endswith(ingredientType): #TODO: fix this so we look for it by instance not name
                 if verbose:
                     print 'Removing ingredient ' + thisIngredient.objectName
 
@@ -735,7 +736,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         returnedIngredients=[]
         for thisIngredient in self.ingredientList:
-            if thisIngredient.__module__.endswith(ingredientType):
+            if thisIngredient.__module__.endswith(ingredientType):  #TODO: fix this so we look for it by instance not name
                 returnedIngredients.append(thisIngredient)
 
 
