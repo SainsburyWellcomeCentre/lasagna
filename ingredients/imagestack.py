@@ -63,28 +63,12 @@ class imagestack(lasagna_ingredient):
             print "valid color maps are gray, red, and green"
             return
 
-        cmap = cmap.lower()
+
         pos = np.array([0.0, 1.0])
 
         nVal = 255
-        if cmap == 'gray' or cmap == 'grey':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal,nVal,nVal]], dtype=np.ubyte)
-        elif cmap == 'red':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal, 0 ,0 ,nVal]], dtype=np.ubyte)
-        elif cmap == 'green':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 ,nVal, 0 ,nVal]], dtype=np.ubyte)
-        elif cmap == 'blue':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 , 0 ,nVal,nVal]], dtype=np.ubyte)
-        elif cmap == 'magenta':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal, 0 ,nVal,nVal]], dtype=np.ubyte)
-        elif cmap == 'cyan':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 ,nVal,nVal,nVal]], dtype=np.ubyte)
-        elif cmap == 'yellow':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal, 0 ,nVal]], dtype=np.ubyte)
-        else:
-            print "no pre-defined colormap %s. reverting to gray " % cmap
-            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal,nVal,nVal]], dtype=np.ubyte)
-
+        finalColor = self.colorName2value(cmap,nVal=nVal,alpha=nVal)
+        color = np.array([[ 0 , 0 , 0 ,nVal], finalColor], dtype=np.ubyte)
         map = pg.ColorMap(pos, color)
         lut = map.getLookupTable(0.0, 1.0, nVal+1)
 
