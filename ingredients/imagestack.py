@@ -8,26 +8,17 @@ import numpy as np
 import os
 from PyQt4 import QtGui
 import pyqtgraph as pg
+from  lasagna_ingredient import lasagna_ingredient 
 
-class imagestack(object):
+class imagestack(lasagna_ingredient):
     def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None, lut='gray'):
+        super(imagestack,self).__init__(data, fnameAbsPath, enable, objectName,
+                                        pgObject='ImageItem',
+                                        pgObjectConstructionArgs = dict(border='k', levels=minMax)
+                                        )
 
-        #Assign input arguments to properties of the class instance. 
-        #The following properties are common to all ingredients
-        self.__data     = data              #The raw data for this ingredient go here.
 
-        self.enable     = enable            #Item is plotted if enable is True. Hidden if enable is False
-        self.objectName = objectName        #The name of the object TODO: decide exactly what this will be
-
-        #properties relating to the PyQtGraph object and its creation
-        self.pgObject = 'ImageItem'         #The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
-        self.pgObjectConstructionArgs = dict(border='k', levels=minMax) #The item is created with these arguments
-
-        #Set up class-specific properties, which classes other than image stack may not share
-        #or may share but have different values assigned
-        self.fnameAbsPath = fnameAbsPath    #Absolute path to file name        
         self.compositionMode=QtGui.QPainter.CompositionMode_Plus
-
 
         #Set reasonable default for plotting the images unless different values were specified
         if minMax is None:
@@ -38,11 +29,6 @@ class imagestack(object):
         self.lut=lut #The look-up table
 
 
-    def fname(self):
-        """
-        Strip the absolute path and return only the file name as as a string
-        """
-        return self.fnameAbsPath.split(os.path.sep)[-1]
 
 
     def setColorMap(self,cmap=''):
@@ -88,24 +74,15 @@ class imagestack(object):
 
 
 
-
-    # TODO: farm out preceeding stuff to a general-purpose ingredient class 
-    # Methods that follow are specific to the imagestack class. Methods that preceed this
-    # are general-purpose and can be part of an "ingredient" class
     def data(self,axisToPlot=0):
         """
-        Returns data formated in the correct way for plotting in the axes that 
-        requested it.
+        Returns data formated in the correct way for plotting in the single axes that requested it.
         axisToPlot defines the data dimension along which we are plotting the data.
         specifically, axisToPlot is the dimension that is treated as the z-axis
         """
-        return self.__data.swapaxes(0,axisToPlot)
+        return self._data.swapaxes(0,axisToPlot)
 
-    def raw_data(self):
-        """
-        return raw data
-        """
-        return self.__data
+
 
 
     def plotIngredient(self,pyqtObject,axisToPlot=0,sliceToPlot=0):
