@@ -225,6 +225,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
         self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        self.imageStackLayers_TreeView.setColumnWidth(0,200)
         QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.plotImageStackHistogram) 
 
 
@@ -278,13 +279,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.statusBar.showMessage("Initialised")
 
 
+
+    # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - 
     def about_slot(self):
         """
         A simple about box
         """
         msg = "Lasagna - Rob Campbell<br>Basel - 2015"
-        reply = QtGui.QMessageBox.question(self, 'Message', 
-                     msg)
+        reply = QtGui.QMessageBox.question(self, 'Message', msg)
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
