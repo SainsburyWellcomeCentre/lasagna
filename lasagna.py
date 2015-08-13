@@ -795,19 +795,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axes2D[2].view.setAspectLocked(True, float(self.axisRatioLineEdit_3.text()))
         
         self.resetAxes()
-        self.updateDisplayText()
-
-    def updateDisplayText(self):
-        """
-        Loop through all ingredients and print out their type the file name
-        """
-        displayTxt=''
-        for thisIngredient in self.ingredientList:
-            displayTxt = "%s<b>%s</b>: %s<br>" % (displayTxt, thisIngredient.objectName, thisIngredient.fname())
-
-        self.infoTextPanel.setText(displayTxt)
-
-
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
