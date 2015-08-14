@@ -415,7 +415,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
-    def showStackLoadDialog(self):
+    def showStackLoadDialog(self,fileFilter="Images (*.mhd *.mha *.tiff *.tif)"):
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
@@ -424,7 +424,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
-        fname = self.showFileLoadDialog()
+        fname = self.showFileLoadDialog(fileFilter)
         if fname == None:
             return
 
@@ -440,13 +440,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
     #Code to handle generic file loading, dialogs, etc
 
-    def showFileLoadDialog(self):
+    def showFileLoadDialog(self, fileFilter="All files (*)" ):
         """
         Bring up the file load dialog. Return the file name. Update the last used path. 
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
 
-        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),  "Images (*.mhd *.mha *.tiff *.tif)" )
+        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
         fname = str(fname)
         if len(fname) == 0:
             return None
