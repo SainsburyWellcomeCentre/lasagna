@@ -128,7 +128,7 @@ class imagestack(lasagna_ingredient):
         Replace the current image stack with imageData. 
         Must also supply imageAbsPath.
         """
-        self.__data = imageData
+        self._data = imageData
         self.fnameAbsPath = imageAbsPath 
 
         if recalculateDefaultHistRange:
@@ -145,11 +145,11 @@ class imagestack(lasagna_ingredient):
 
 
         if axisToFlip==0:
-            self.__data = self.__data[::-1,:,:]
+            self._data = self._data[::-1,:,:]
         elif axisToFlip==1:
-            self.__data = self.__data[:,::-1,:]
+            self._data = self._data[:,::-1,:]
         elif axisToFlip==2:
-            self.__data = self.__data[:,:,::-1]            
+            self._data = self._data[:,:,::-1]            
         else:
             print "Can not flip axis %d" % axisToFlip
 
