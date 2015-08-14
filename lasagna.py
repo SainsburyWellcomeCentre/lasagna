@@ -389,7 +389,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                            data=loadedImageStack    , 
                            fname=fnameToLoad)
 
-        self.returnIngredientByName(objName).show() #Add item to all three 2D plots
+        self.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots
 
 
         #If only one stack is present, we will display it as gray (see imagestack class)

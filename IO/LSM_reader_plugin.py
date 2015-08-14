@@ -61,7 +61,7 @@ class loaderClass(lasagna_plugin):
                            fname=fname
                            )
                 self.lasagna.returnIngredientByName(objName).lut=colorOrder[ii]
-                self.lasagna.returnIngredientByName(objName).show() #Add item to all three 2D plots
+                self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots
 
             self.lasagna.initialiseAxes()
 

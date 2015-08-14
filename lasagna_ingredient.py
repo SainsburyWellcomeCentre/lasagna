@@ -36,7 +36,7 @@ class lasagna_ingredient(object):
         return self._data
 
 
-    def show(self):
+    def addToPlots(self):
     	"""
     	Show ingredient on plots by adding the plot item to all 2D axes so that it becomes available for plotting
     	"""
