@@ -82,7 +82,7 @@ class plugin(lasagna_plugin):
         firstLayer.histPenCustomColor = [180,180,180,255]
         firstLayer.histBrushCustomColor = [150,150,150,150]
 
-        self.lasagna.initialiseAxes()
+        self.lasagna.initialiseAxes(resetAxes=True)
         self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
 
 

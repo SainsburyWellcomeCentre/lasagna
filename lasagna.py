@@ -741,7 +741,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
 
-    def initialiseAxes(self):
+    def initialiseAxes(self,resetAxes=False):
         """
         Initial display of images in axes and also update other parts of the GUI. 
         """
@@ -768,7 +768,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axes2D[1].view.setAspectLocked(True, float(self.axisRatioLineEdit_2.text()))
         self.axes2D[2].view.setAspectLocked(True, float(self.axisRatioLineEdit_3.text()))
         
-        self.resetAxes()
+        if resetAxes:
+            self.resetAxes()
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
