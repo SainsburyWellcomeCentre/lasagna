@@ -40,10 +40,8 @@ class loaderClass(lasagna_plugin):
         We split things up to make it easier to load the base stack pragmatically,
         such as from a plugin, without going via the load dialog. 
         """
-
-        #TODO: get it to filter by LSM
         
-        fname = self.lasagna.showFileLoadDialog()
+        fname = self.lasagna.showFileLoadDialog(fileFilter="LSM (*.lsm)")
         if fname == None:
             return
 
