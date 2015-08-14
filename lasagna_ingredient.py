@@ -53,8 +53,10 @@ class lasagna_ingredient(object):
     def addToList(self):
     	"""
     	Add this ingredients list items to the QStandardModel (model) associated with its QTreeView
+    	then highlight it when it's added.
     	"""
     	self.model.appendRow(self.modelItems)
+    	self.model.parent().setCurrentIndex(self.modelItems.index()) #Parent is, for example, a QTreeView
 
 
     def removeFromList(self):

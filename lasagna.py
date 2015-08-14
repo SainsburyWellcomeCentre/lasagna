@@ -575,16 +575,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Return the name of the selected image stack. If no stack selected, returns the first stack in the list
         """
-        #TODO: this method must return nothing if the is nothing to plot. at the moment it's possible for it not to do when items are being deleted
-        #when last stack is deleted this causes a minor error in plotImageStackHistorgram
-        if len(self.imageStackLayers_TreeView.selectedIndexes())==0 and  self.imageStackLayers_Model.rowCount()>0:
-            if self.returnIngredientByType('imagestack') != False:
-                return self.returnIngredientByType('imagestack')[0].objectName  #TODO: won't play fair with checkboxes
-            else:
-                print "No more image stacks"
-                return False
-        else:
-            return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+        if self.imageStackLayers_Model.rowCount()==0:
+            print "lasagna.selectedStackName finds no image stacks in list"
+            return False
+
+        #Highlight the first row if nothing is selected (which shouldn't ever happen)        
+        if len(self.imageStackLayers_TreeView.selectedIndexes())==0:
+            firstItem  = self.imageStackLayers_Model.index(0,0)
+            self.imageStackLayers_TreeView.setCurrentIndex(firstItem)
+            print "lasagna.selectedStackName forced highlighting of first image stack"
+
+
+        return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
 
     #------------------------------------------------------------------------
 
@@ -619,6 +621,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                             objectName=objectName
                     )
                 )
+
+
 
 
     def removeIngredient(self,ingredientInstance):

@@ -500,7 +500,7 @@ class Ui_lasagna_mainWindow(object):
         self.toolBar.addSeparator()
 
         self.retranslateUi(lasagna_mainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lasagna_mainWindow)
 
     def retranslateUi(self, lasagna_mainWindow):
