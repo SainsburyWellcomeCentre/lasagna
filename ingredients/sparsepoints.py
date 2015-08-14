@@ -25,7 +25,7 @@ class sparsepoints(lasagna_ingredient):
         self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
         self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
         self.color = lasHelp.readPreference('colorOrder')[0]
-        self.symbolBrush = tuple(self.colorName2value(self.color, alpha=self.alpha))
+        
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
         name = QtGui.QStandardItem(objectName)
@@ -39,6 +39,8 @@ class sparsepoints(lasagna_ingredient):
         #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
         self.modelItems=name
         self.model = self.parent.points_Model
+
+
 
         self.addToList()
         #TODO: Set the selection to this ingredient if it is the first one to be added
@@ -72,12 +74,16 @@ class sparsepoints(lasagna_ingredient):
         data = self.data(axisToPlot)
         data = data[z==sliceToPlot,:]
 
+        if self.pen == True:            
+            pen = self.symbolBrush()
+        else:
+            pen = self.pen
 
         pyqtObject.setData(x=data[:,0], y=data[:,1], 
                             symbol=self.symbol, 
-                            pen=self.pen, 
+                            pen=pen, 
                             symbolSize=self.symbolSize, 
-                            symbolBrush=self.symbolBrush
+                            symbolBrush=self.symbolBrush()
                             )
 
 
@@ -88,4 +94,51 @@ class sparsepoints(lasagna_ingredient):
         super(sparsepoints,self).addToList()
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
-        #TODO: set markerSymbol_comboBox
+        if self.pen == None:
+            self.parent.addLines_checkBox.setCheckState(False)
+        else:
+            self.parent.addLines_checkBox.setCheckState(True)
+            
+
+
+    def symbolBrush(self):
+        if isinstance(self.color,str):
+            return tuple(self.colorName2value(self.color, alpha=self.alpha))
+        elif isinstance(self.color,list):
+            return tuple(self.color + [self.alpha])
+        else:
+            print "sparsepoints.color can not cope with type " + type(self.color)
+
+
+    #---------------------------------------------------------------
+    #Getters and setters
+
+    def get_symbolSize(self):
+        return self._symbolSize
+    def set_symbolSize(self,symbolSize):
+        self._symbolSize = symbolSize
+    symbolSize = property(get_symbolSize,set_symbolSize)
+
+
+    def get_symbol(self):
+        return self._symbol
+    def set_symbol(self,symbol):
+        self._symbol = symbol
+    symbol = property(get_symbol,set_symbol)
+
+
+    def get_color(self):
+        return self._color
+    def set_color(self,color):
+        self._color = color
+    color = property(get_color,set_color)
+
+
+    def get_alpha(self):
+        return self._alpha
+    def set_alpha(self,alpha):
+        self._alpha = alpha        
+    alpha = property(get_alpha,set_alpha)
+
+
+   

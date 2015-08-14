@@ -228,6 +228,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
             <widget class="QGroupBox" name="groupBoxAxisRatio_2">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -544,7 +547,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="addLines_checkBox">
                 <property name="text">
                  <string>Line</string>
                 </property>

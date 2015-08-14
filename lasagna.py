@@ -235,8 +235,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         #self.points_TreeView.customContextMenuRequested.connect(self.layersMenu)
-        [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')]
-
+        [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')] #populate with markers
+        self.markerSymbol_comboBox.activated.connect(self.markerSymbol_comboBox_slot)
+        self.markerSize_spinBox.valueChanged.connect(self.markerSize_spinBox_slot)
+        self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)
+        self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)        
+        self.markerColor_pushButton.released.connect(self.markerColor_pushButton_slot)
+        self.addLines_checkBox.stateChanged.connect(self.addLines_checkBox_slot)
 
         #Plugins menu and initialisation
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
@@ -749,7 +754,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         #show default images
-        print "updating axes with added ingredients"
         [axis.updatePlotItems_2D(self.ingredientList) for axis in self.axes2D]
 
         #initialize cross hair
@@ -770,6 +774,60 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         
         if resetAxes:
             self.resetAxes()
+
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Slots for points tab
+    def markerSymbol_comboBox_slot(self,index):
+        symbol = str(self.markerSymbol_comboBox.currentText())
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        ingredient.symbol = symbol
+        self.initialiseAxes()
+
+    def markerSize_spinBox_slot(self,spinBoxValue):
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        ingredient.symbolSize = spinBoxValue
+        self.initialiseAxes()
+
+    def markerAlpha_spinBox_slot(self,spinBoxValue):
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        ingredient.alpha = spinBoxValue
+        self.initialiseAxes()
+
+    def markerColor_pushButton_slot(self):
+        col = QtGui.QColorDialog.getColor()
+        rgb = [col.toRgb().red(), col.toRgb().green(), col.toRgb().blue()]
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        ingredient.color =rgb
+        self.initialiseAxes()
+
+    def addLines_checkBox_slot(self,state):
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if state==0:
+            ingredient.pen = None
+        else:
+            ingredient.pen = True
+
+        self.initialiseAxes()
+
+
+    def selectedPointsName(self):
+        """
+        Return the name of the selected points ingredient. If none are selected, returns the first in the list
+        """
+        if self.points_Model.rowCount()==0:
+            print "lasagna.selectedPointsName finds no image stacks in list"
+            return False
+
+        #Highlight the first row if nothing is selected (which shouldn't ever happen)        
+        if len(self.points_TreeView.selectedIndexes())==0:
+            firstItem  = self.points_Model.index(0,0)
+            self.points_TreeView.setCurrentIndex(firstItem)
+            print "lasagna.selectedStackName forced highlighting of first image stack"
+
+
+        return str( self.points_TreeView.selectedIndexes()[0].data().toString() )
+
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
