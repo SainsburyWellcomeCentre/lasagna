@@ -6,28 +6,19 @@ TODO: once this is working, pull out the general purpose stuff and set up an ing
 from __future__ import division
 import numpy as np
 import os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
+from  lasagna_ingredient import lasagna_ingredient 
 
-class imagestack(object):
-    def __init__(self, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None):
+class imagestack(lasagna_ingredient):
+    def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None, lut='gray'):
+        super(imagestack,self).__init__(parent, data, fnameAbsPath, enable, objectName,
+                                        pgObject='ImageItem',
+                                        pgObjectConstructionArgs = dict(border='k', levels=minMax)
+                                        )
 
-        #Assign input arguments to properties of the class instance. 
-        #The following properties are common to all ingredients
-        self.__data     = data              #The raw data for this ingredient go here.
 
-        self.enable     = enable            #Item is plotted if enable is True. Hidden if enable is False
-        self.objectName = objectName        #The name of the object TODO: decide exactly what this will be
-
-        #properties relating to the PyQtGraph object and its creation
-        self.pgObject = 'ImageItem'         #The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
-        self.pgObjectConstructionArgs = dict(border='k', levels=minMax) #The item is created with these arguments
-
-        #Set up class-specific properties, which classes other than image stack may not share
-        #or may share but have different values assigned
-        self.fnameAbsPath = fnameAbsPath    #Absolute path to file name        
         self.compositionMode=QtGui.QPainter.CompositionMode_Plus
-
 
         #Set reasonable default for plotting the images unless different values were specified
         if minMax is None:
@@ -35,14 +26,32 @@ class imagestack(object):
         else:
             self.minMax = minMax
 
-        self.lut='gray' #The look-up table
+        self.lut=lut #The look-up table
 
+        #Add to the imageStackLayers_model which is associated with the imagestack QTreeView
+        name = QtGui.QStandardItem(objectName)
+        name.setEditable(False)
 
-    def fname(self):
-        """
-        Strip the absolute path and return only the file name as as a string
-        """
-        return self.fnameAbsPath.split(os.path.sep)[-1]
+        #Add checkbox
+        thing = QtGui.QStandardItem()
+        thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
+        thing.setCheckState(QtCore.Qt.Checked)
+
+        #Append to list
+        #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
+        self.modelItems=name
+        self.model = self.parent.imageStackLayers_Model
+        self.addToList()
+
+        #Allow for the option of custom colours in the luminance histogram
+        #These should either be False or an RGBalph vector. e.g. [255,0,0,180]
+        self.histPenCustomColor = False
+        self.histBrushCustomColor = False
+
+        #TODO: Set the selection to this ingredient if it is the first one to be added
+        #if self.imageStackLayers_Model.rowCount()==1:
+        #    print dir(name)
+
 
 
     def setColorMap(self,cmap=''):
@@ -59,46 +68,47 @@ class imagestack(object):
             print "valid color maps are gray, red, and green"
             return
 
-        cmap = cmap.lower()
+
         pos = np.array([0.0, 1.0])
 
         nVal = 255
-        if cmap == 'gray' or cmap == 'grey':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal,nVal,nVal,nVal]], dtype=np.ubyte)
-        elif cmap == 'red':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [nVal, 0 ,0 ,nVal]], dtype=np.ubyte)
-        elif cmap == 'green':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 ,nVal, 0 ,nVal]], dtype=np.ubyte)
-        elif cmap == 'blue':
-            color = np.array([[ 0 , 0 , 0 ,nVal], [ 0 , 0 ,nVal,nVal]], dtype=np.ubyte)
-        else:
-            print "no pre-defined colormap " + cmap
-
+        finalColor = self.colorName2value(cmap,nVal=nVal,alpha=nVal)
+        color = np.array([[ 0 , 0 , 0 ,nVal], finalColor], dtype=np.ubyte)
         map = pg.ColorMap(pos, color)
         lut = map.getLookupTable(0.0, 1.0, nVal+1)
 
         return lut
 
 
+    def histBrushColor(self):
+        """
+        The brush color of the histogram
+        """
+        if self.histBrushCustomColor != False:
+            return self.histBrushCustomColor
+
+        cMap = self.setColorMap(self.lut)
+        return cMap[round(len(cMap)/2),:]
 
 
-    # TODO: farm out preceeding stuff to a general-purpose ingredient class 
-    # Methods that follow are specific to the imagestack class. Methods that preceed this
-    # are general-purpose and can be part of an "ingredient" class
+    def histPenColor(self):
+        """
+        The pen color of the histogram
+        """
+        if self.histPenCustomColor != False:
+            return self.histPenCustomColor
+            
+        cMap = self.setColorMap(self.lut)
+        return cMap[-1,:]
+
+
     def data(self,axisToPlot=0):
         """
-        Returns data formated in the correct way for plotting in the axes that 
-        requested it.
+        Returns data formated in the correct way for plotting in the single axes that requested it.
         axisToPlot defines the data dimension along which we are plotting the data.
         specifically, axisToPlot is the dimension that is treated as the z-axis
         """
-        return self.__data.swapaxes(0,axisToPlot)
-
-    def raw_data(self):
-        """
-        return raw data
-        """
-        return self.__data
+        return self._data.swapaxes(0,axisToPlot)
 
 
     def plotIngredient(self,pyqtObject,axisToPlot=0,sliceToPlot=0):
@@ -113,7 +123,6 @@ class imagestack(object):
                         compositionMode=self.compositionMode,
                         lut=self.setColorMap(self.lut)
                         )
-
 
 
     def defaultHistRange(self,logY=False):
@@ -145,7 +154,7 @@ class imagestack(object):
         Replace the current image stack with imageData. 
         Must also supply imageAbsPath.
         """
-        self.__data = imageData
+        self._data = imageData
         self.fnameAbsPath = imageAbsPath 
 
         if recalculateDefaultHistRange:
@@ -162,12 +171,17 @@ class imagestack(object):
 
 
         if axisToFlip==0:
-            self.__data = self.__data[::-1,:,:]
+            self._data = self._data[::-1,:,:]
         elif axisToFlip==1:
-            self.__data = self.__data[:,::-1,:]
+            self._data = self._data[:,::-1,:]
         elif axisToFlip==2:
-            self.__data = self.__data[:,:,::-1]            
+            self._data = self._data[:,:,::-1]            
         else:
             print "Can not flip axis %d" % axisToFlip
 
-            
+
+    def removeFromList(self):
+        super(imagestack,self).removeFromList()
+        if len(self.parent.ingredientList)==1:
+                self.parent.ingredientList[0].lut='gray'
+                self.parent.initialiseAxes()

@@ -39,11 +39,11 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
 
     if not hasattr(pltItem,'items'):
         print "findPyQtGraphObjectNameInPlotWidget finds no attribute 'items'"
-        return
+        return False
 
     if len(pltItem.items)==0:
         print "findPyQtGraphObjectNameInPlotWidget finds no items in list"
-        return
+        return False
 
 
     if regex == True:
@@ -57,7 +57,7 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
 
 
     print "Failed to find " + itemName + " in PlotWidget"
-    return None
+    return False
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -150,7 +150,13 @@ def defaultPreferences():
             'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
-            'showCrossHairs' : True                 #Whether or not to show the cross hairs 
+            'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
+            'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
+            'symbolOrder' : ['o','s','t','d','+'],
+            'defaultSymbolOpacity' : 180,
+            'defaultSymbolSize' : 10,
+            'hideZoomResetButtonOnImageAxes' : True ,
+            'hideAxes' : True
             }
 
  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -173,7 +179,7 @@ def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPrefere
     Load the preferences YAML file. If the file is missing, we create it using the default
     preferences defined above. Preferences are returned as a dictionary.
     """
-    print "loading from pref file %s" % prefFName
+    #print "loading from pref file %s" % prefFName
     #Generate a default preferences file if no preferences file exists
     if os.path.exists(prefFName) == False:
         print "PREF FILE"

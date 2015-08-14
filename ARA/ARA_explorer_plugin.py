@@ -30,6 +30,8 @@ class plugin(lasagna_plugin):
         self.pathToARA = fnames['ARAdir'] + fnames['stackFname']    
         self.pathToAnnotations = fnames['ARAdir'] + fnames['annotationFname']   
 
+        self.ARAlayerName=''
+
         print(self.pathToARA)
         #ensure files are present
         #TODO: the following is clearly in need of being streamlined
@@ -61,7 +63,8 @@ class plugin(lasagna_plugin):
 
 
     def initPlugin(self):
-        self.lasagna.loadBaseImageStack(self.pathToARA)
+        self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
+        self.lasagna.loadImageStack(self.pathToARA)
         
 
         #Make up a disjointed colormap
@@ -71,9 +74,15 @@ class plugin(lasagna_plugin):
         lut = map.getLookupTable(0.0, 1.0, 256)
 
         #Assign the colormap to the imagestack object
-        self.lasagna.returnIngredientByName('baseImage').lut=lut
+        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString() #TODO: a bit horrible
+        firstLayer = self.lasagna.returnIngredientByName(self.ARAlayerName)
+        firstLayer.lut=lut
+        #Specify what colors the histogram should be so it doesn't end up megenta and 
+        #vomit-yellow, or who knows what, due to the weird color map we use here.
+        firstLayer.histPenCustomColor = [180,180,180,255]
+        firstLayer.histBrushCustomColor = [150,150,150,150]
 
-        self.lasagna.initialiseAxes()
+        self.lasagna.initialiseAxes(resetAxes=True)
         self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
 
 
@@ -82,15 +91,8 @@ class plugin(lasagna_plugin):
         Runs when the user unchecks the plugin in the menu box and also (in this case)
         when the user loads a new base stack
         """
-
-        #Ensure image color scale returns to normal
-        baseIm = self.lasagna.returnIngredientByName('baseImage')
-        if baseIm != False:
-            baseIm.lut='gray'
-
-        objectName = 'baseImage'
-        [axis.removeItemFromPlotWidget(objectName) for axis in self.lasagna.axes2D]
-        self.lasagna.removeIngredientByName(objectName)
+        self.lasagna.removeIngredientByName(self.ARAlayerName)
+        self.lasagna.intensityHistogram.clear()
         self.detachHooks()
 
 
@@ -117,6 +119,7 @@ class plugin(lasagna_plugin):
         Hooks into base image file dialog method to shut down the ARA Explorer if the
         user attempts to load a base stack
         """
+        self.lasagna.removeIngredientByType('imagestack')
 
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
@@ -129,6 +132,7 @@ class plugin(lasagna_plugin):
         Hooks into the recent file loading method to shut down the ARA Explorer if the
         user attempts to load a base stack
         """
+        self.lasagna.removeIngredientByType('imagestack')
 
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name

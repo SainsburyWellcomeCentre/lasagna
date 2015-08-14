@@ -133,7 +133,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             doRealLoad=True
             if doRealLoad:
-                self.lasagna.loadBaseImageStack(self.fixedStackPath)
+                self.lasagna.loadImageStack(self.fixedStackPath)
                 self.lasagna.initialiseAxes()
                 self.loadMoving.setEnabled(True)
                 self.flipAxis1.setEnabled(True)
@@ -156,15 +156,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #-------------------------------------------------------------------------------------
 
+        #Clear all image stacks 
+        self.lasagna.removeIngredientByType('imagestack')
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Tab 1 - Loading -  slots
     def loadFixed_slot(self):
         #TODO: allow only MHD files to be read
-        self.lasagna.showBaseStackLoadDialog() 
-        self.referenceStackName.setText(self.lasagna.returnIngredientByName('baseImage').fname())
-        self.fixedStackPath = self.lasagna.returnIngredientByName('baseImage').fnameAbsPath
+        self.lasagna.showStackLoadDialog("MHD Images (*.mhd *mha )") 
+
+        fixedName=self.lasagna.stacksInTreeList()[0]
+        self.referenceStackName.setText(fixedName)
+        self.fixedStackPath = self.lasagna.returnIngredientByName(fixedName).fnameAbsPath
 
         #Enable UI buttons
         self.loadMoving.setEnabled(True)        
@@ -175,17 +179,20 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         self.updateWidgets_slot()
         self.sampleStackName_3.setText('')
-        self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath['f'])
+        self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
 
 
     def loadMoving_slot(self,supressDialog=False):
         #TODO: allow only MHD files to be read
         if supressDialog==False:
-            self.lasagna.loadActions['load_overlay'].showLoadDialog()
-            self.sampleStackName_3.setText(self.lasagna.returnIngredientByName('overlayImage').fname())
-            self.movingStackPath = self.lasagna.returnIngredientByName('overlayImage').fnameAbsPath
+            self.lasagna.showStackLoadDialog() 
+            movingName=self.lasagna.stacksInTreeList()[1]
+            self.sampleStackName_3.setText(movingName)
+            self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath
+
         self.updateWidgets_slot()
-        overlay=self.lasagna.returnIngredientByName('overlayImage')
+        movingName=self.lasagna.stacksInTreeList()[1]
+        overlay=self.lasagna.returnIngredientByName(movingName)
         self.originalOverlayImage = overlay.raw_data()
         self.originalOverlayFname = overlay.fnameAbsPath
         self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)

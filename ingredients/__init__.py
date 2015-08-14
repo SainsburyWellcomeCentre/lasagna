@@ -1,2 +1,1 @@
-import imagestack
-import sparsepoints
+import imagestack, sparsepoints

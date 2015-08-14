@@ -48,10 +48,15 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
         PlotWidget = QtGui.qApp.widgetAt(pos).parent() #The mouse is in this widget
 
         #Get the base image from this widget
-        ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName='baseImage',regex=True)
+        selectedStackName = self.lasagna.selectedStackName()
+        ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName=selectedStackName,regex=True)
+        if ImageItem==False:
+            return
 
         #Extract data from base image
         if ImageItem != None:
+            if ImageItem.image.shape[1]<=Y:
+                return
             xData = ImageItem.image[:,Y]
 
             self.graphicsView.clear()
