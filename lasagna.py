@@ -1051,7 +1051,8 @@ def main(fnames, pluginToStart=None):
 
     if pluginToStart != None:
         if tasty.plugins.has_key(pluginToStart):
-            tasty.startPlugin(pluginToStart)
+            tasty.startPlugin(pluginToStart) 
+            tasty.pluginActions[pluginToStart].setChecked(True)
         else:
             print "No plugin '%s': not starting" % pluginToStart
 
