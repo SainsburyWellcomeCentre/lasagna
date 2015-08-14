@@ -27,7 +27,14 @@ class projection2D():
 
         print "Creating axis at " + str(thisPlotWidget.objectName())
         self.view = thisPlotWidget #This should target the axes to a particular plot widget
-        self.view.hideButtons()
+
+        if lasHelp.readPreference('hideZoomResetButtonOnImageAxes')==True:
+            self.view.hideButtons()
+
+        if lasHelp.readPreference('hideAxes')==True:
+            self.view.hideAxis('left')
+            self.view.hideAxis('bottom')               
+
         self.view.setAspectLocked(True,axisRatio)
 
         #Loop through the ingredients list and add them to the ViewBox

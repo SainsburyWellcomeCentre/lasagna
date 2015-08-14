@@ -105,8 +105,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #set up axes 
         #TODO: could more tightly integrate these objects with the main window so no need to pass many of these args?
-        #TODO: stop calling these three views by thei neuroanatomical names. These can be labels, but shouldn't be harcoded as the
-        #      names of the object instances
         print ""
         self.axes2D = [
                 projection2D(self.graphicsView_1, self, axisRatio=float(self.axisRatioLineEdit_1.text()), axisToPlot=0),
