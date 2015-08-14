@@ -43,6 +43,11 @@ class imagestack(lasagna_ingredient):
         self.model = self.parent.imageStackLayers_Model
         self.addToList()
 
+        #Allow for the option of custom colours in the luminance histogram
+        #These should either be False or an RGBalph vector. e.g. [255,0,0,180]
+        self.histPenCustomColor = False
+        self.histBrushCustomColor = False
+
         #TODO: Set the selection to this ingredient if it is the first one to be added
         #if self.imageStackLayers_Model.rowCount()==1:
         #    print dir(name)
@@ -74,6 +79,27 @@ class imagestack(lasagna_ingredient):
 
         return lut
 
+
+    def histBrushColor(self):
+        """
+        The brush color of the histogram
+        """
+        if self.histBrushCustomColor != False:
+            return self.histBrushCustomColor
+
+        cMap = self.setColorMap(self.lut)
+        return cMap[round(len(cMap)/2),:]
+
+
+    def histPenColor(self):
+        """
+        The pen color of the histogram
+        """
+        if self.histPenCustomColor != False:
+            return self.histPenCustomColor
+            
+        cMap = self.setColorMap(self.lut)
+        return cMap[-1,:]
 
 
     def data(self,axisToPlot=0):

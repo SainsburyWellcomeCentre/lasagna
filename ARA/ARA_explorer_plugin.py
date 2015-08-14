@@ -63,7 +63,7 @@ class plugin(lasagna_plugin):
 
 
     def initPlugin(self):
-        self.lasagna.removeIngredientByType('imagestack')
+        self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
         self.lasagna.loadImageStack(self.pathToARA)
         
 
@@ -74,9 +74,13 @@ class plugin(lasagna_plugin):
         lut = map.getLookupTable(0.0, 1.0, 256)
 
         #Assign the colormap to the imagestack object
-        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString()
+        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString() #TODO: a bit horrible
         firstLayer = self.lasagna.returnIngredientByName(self.ARAlayerName)
         firstLayer.lut=lut
+        #Specify what colors the histogram should be so it doesn't end up megenta and 
+        #vomit-yellow, or who knows what, due to the weird color map we use here.
+        firstLayer.histPenCustomColor = [180,180,180,255]
+        firstLayer.histBrushCustomColor = [150,150,150,150]
 
         self.lasagna.initialiseAxes()
         self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))

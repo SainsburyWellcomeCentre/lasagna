@@ -913,9 +913,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.intensityHistogram.clear()
         ingredient = self.returnIngredientByName(self.selectedStackName());#Get colour of the layer
-        cMap = ingredient.setColorMap(ingredient.lut)
-        brushColor = cMap[round(len(cMap)/2),:]
-        penColor = cMap[-1,:]
+
+        brushColor =  ingredient.histBrushColor()
+        penColor = ingredient.histPenColor()
 
         ## Using stepMode=True causes the plot to draw two lines for each sample but it needs X to be longer than Y by 1
         self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, pen=penColor, brush=brushColor,yMin=0, xMin=0)
