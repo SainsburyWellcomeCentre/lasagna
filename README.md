@@ -18,4 +18,5 @@ Lasagna runs on Python 2.7, PyQt4, and uses PyQtGraph for the plotting. You'll n
 * pyqtgraph 9.10
 * yaml
 * PyQt4
+* SIP
 
