@@ -12,6 +12,7 @@ import os
 import struct 
 import numpy as np
 import imp #to look for the presence of a module. Python 3 will require importlib
+import lasagna_helperFunctions as lasHelp 
 
 def loadTiffStack(fname):
   """
@@ -243,30 +244,39 @@ def getVoxelSpacing(fname):
   ratios automatically. TODO: Currently this will only work for MHD files, but we may be able 
   to swing something for TIFFs (e.g. by creating Icy-like metadata files)
   """
-  from lasagna_helperFunctions import readPreference
-  import vtk
 
   if fname.lower().endswith('.mhd'):
-    imr = vtk.vtkMetaImageReader()
-    imr.SetFileName(fname)
-    imr.Update()
-  
-    im = imr.GetOutput()
-    spacing = im.GetSpacing()
 
-    if len(spacing)==0: 
-      return readPreference('defaultAxisRatios') #defaults
+    try:
+      imp.find_module('vtk')
+      import vtk
+    except ImportError:
+      print "Failed to find VTK. Using default axis length values"
+      #TODO: read values from built-in info reader
+      return lasHelp.readPreference('defaultAxisRatios') #defaults
+
+
+    if fallBackMode==False:      
+      imr = vtk.vtkMetaImageReader()
+      imr.SetFileName(fname)
+      imr.Update()
+  
+      im = imr.GetOutput()
+      spacing = im.GetSpacing()
+
+      if len(spacing)==0: 
+        return lasHelp.readPreference('defaultAxisRatios') #defaults
     
-    #Determine the ratios from the spacing 
-    ratios = [1,1,1]
+      #Determine the ratios from the spacing 
+      ratios = [1,1,1]
     
-    ratios[0] = spacing[0]/spacing[1]
-    ratios[1] = spacing[2]/spacing[0]
-    ratios[2] = spacing[1]/spacing[2]
-    return ratios
+      ratios[0] = spacing[0]/spacing[1]
+      ratios[1] = spacing[2]/spacing[0]
+      ratios[2] = spacing[1]/spacing[2]
+      return ratios
 
   else:
-    return readPreference('defaultAxisRatios') #defaults
+    return lasHelp.readPreference('defaultAxisRatios') #defaults
 
 
 def loadStack(fname):
