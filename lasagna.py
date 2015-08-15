@@ -42,6 +42,14 @@ import lasagna_mainWindow                 # Derived from designer .ui files buil
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
 from alert import alert                  # Class used to bring up a warning box
 
+#The following imports are made here in order to ensure Lasagna builds as a standlone
+#application on the Mac with py2app
+import csv
+import lasagna_plugin #Needed here to build a standalone version 
+import tifffile #used currently for the LSM reading
+import ARA #TODO: find out what calls this and try to weed it out. 
+
+
 
 #Parse command-line input arguments
 import argparse
