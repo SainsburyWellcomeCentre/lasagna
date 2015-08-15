@@ -512,6 +512,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     self.stopPlugin(thisPlugin)
 
         QtGui.qApp.quit()
+        sys.exit(0) #without this we get a big horrible error report on the Mac
 
     def closeEvent(self, event):
         self.quitLasagna()
