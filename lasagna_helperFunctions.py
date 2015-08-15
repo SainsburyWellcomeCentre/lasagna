@@ -148,7 +148,9 @@ def defaultPreferences():
             'numRecentFiles' : 5 ,                  #The number of recently loaded file names to store
             'recentlyLoadedFiles' : [] ,            #A list containing the last "numRecentFiles" file names
             'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
-            'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', absPathToLasagna()+'ARA'], #must be asbolute paths
+            'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', 
+                             absPathToLasagna()+'registrationPlugins', 
+                             absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
             'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
             'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
