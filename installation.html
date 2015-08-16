@@ -82,13 +82,49 @@
 <h3><a id="what-applications-is-lasagna-designed-for" 
   class="anchor" href="#what-applications-is-lasagna-designed-for" 
   aria-hidden="true"><span class="octicon octicon-link"></span></a>Windows [source install]</h3>
+  <p>The packaged Python distributions <a href="https://www.enthought.com/products/canopy/">Canopy</a> and 
+  <a href="https://www.enthought.com/products/canopy/">Anaconda</a> do not carry PyQtGraph. Instaad, 
+  the following procedure, whilst long, has been verified to work.
+
 <ul>
-  <li>Download the archive or pull the Master branch from Github into a directory of you choice.</li>
-  <li>Install <a href="https://www.python.org/downloads/">Python 2.7</a> and the required Python modules. 
-      In the past I've had good luck with modules from <a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">here</a>.
+  <li><a href="https://www.python.org/downloads/windows/">Download</a> and install that latest Python 2.7.x release. 
+      Currently this is 2.7.10. Install the 64 bit version (which says x86-64) if you have a 64 bit OS.
+      During install, select the bottom option in the list to add Python to your path. </li>
+  <li><a href="https://www.riverbankcomputing.com/software/pyqt/download">Download</a> and install PyQt4.
+   Install the correct version for your Python. e.g. if you installed the 64 bit Python install the 64 Bit PyQt. 
+   At the time of writing this is PyQt4-4.11.4-gpl-Py2.7-Qt4.8.7-x64.exe The PyQt4 install will also install Windows. </li>  
+  <li><a href="http://www.pyqtgraph.org/">Download</a> and install PyQtGraph. Again, choose the "amd64" if you have a 64 bit windows install</li> 
+  <li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=44266">Download</a> and install 
+  Microsoft Visual C++ Compiler for Python 2.7. You will need this to build tifffile.</li>
+  <li>It's now time to install the remaining modules. You will do this using <a href="https://docs.python.org/2.7/installing/">pip</a>. 
+  Open a windows command prompt and type:
+  <br />
+  <tt>pip install tifffile pyyaml </tt>
+  <br />
+  This automatically downloads and installs those modules. You may also try installing numpy this way. If that fails, use the approach
+  that follows.
   </li>
-  <li>Double-click on lasagna.py. You may make a shortcut to a location that suits you. Report back if there are problems 
-(the Windows instructions haven't been tested).
+  <li>From the  <a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">unofficial</a> Python modules page, download the following (in each
+  case select the "cp27" file and make sure it's the correct 32 bit or 64 bit):
+
+    <ul>
+    <li><a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/#pylibtiff">PyLibTiff</a></li>
+    <li><a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk">VTK</a> (Choose the 5.10x + qt486)</li>
+    <li><a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy">numpy</a> (if it failed to install earlier). Choose the lastest mkl-cp27 version</li>
+    </ul>
+
+  </li>
+  <li>You now need to install these files. Open the command terminal. Change directories to your Downloads folder. run:
+  <br />
+  <tt>pip install FILENAME</tt>
+  <br />
+  Where FILENAME is the name of one of the python module files you downloaded. Install all the files this way. If you get errors, you probably
+  downloaded the wrong version. 
+  </li>
+  <li>At this point all the dependencies should be installed. Download the Lasagna archive or pull the Master branch from Github into a directory of you choice.</li>
+  <li>Double-click on lasagna.py or run from the command line using: 
+  <br /> <tt>python lasagna.py</tt>
+  <br /> (after you have changed to the Lasagna directory. You may make a shortcut to a location that suits you. 
 </li>
 </ul>
 
