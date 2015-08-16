@@ -69,8 +69,7 @@ def getHomeDir():
     """
 
     if os.name != "posix":
-        from win32com.shell import shellcon, shell
-        homedir = "{}\\".format(shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0))
+        homedir = os.path.expanduser("~")+"\\"
     else:
         homedir = "{}/".format(os.path.expanduser("~"))
 
