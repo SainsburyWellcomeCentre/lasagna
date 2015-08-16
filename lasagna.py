@@ -46,7 +46,7 @@ from alert import alert                  # Class used to bring up a warning box
 #application on the Mac with py2app
 import csv
 import lasagna_plugin #Needed here to build a standalone version 
-import tifffile #used currently for the LSM reading
+#import tifffile #used currently for the LSM reading
 import ARA #TODO: find out what calls this and try to weed it out. 
 
 
