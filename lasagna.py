@@ -230,7 +230,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
         self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenuStacks)
         #self.imageStackLayers_TreeView.setColumnWidth(0,200)
 
         QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.plotImageStackHistogram) 
@@ -242,7 +242,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.points_Model.setHorizontalHeaderLabels(labels)
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        #self.points_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        self.points_TreeView.customContextMenuRequested.connect(self.layersMenuPoints)
         [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')] #populate with markers
         self.markerSymbol_comboBox.activated.connect(self.markerSymbol_comboBox_slot)
         self.markerSize_spinBox.valueChanged.connect(self.markerSize_spinBox_slot)
@@ -538,7 +538,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     """
     #------------------------------------------------------------------------
     # PROTOTYPE CODE
-    def layersMenu(self,position): 
+    def layersMenuStacks(self,position): 
         menu = QtGui.QMenu()
 
         changeColorMenu = QtGui.QMenu("Change color",self)
@@ -554,7 +554,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         menu.addAction(changeColorMenu.menuAction())
 
         action = QtGui.QAction("Delete",self)
-        action.triggered.connect(self.deleteLayer_Slot)
+        action.triggered.connect(self.deleteLayerStack_Slot)
         menu.addAction(action)
         menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
 
@@ -566,7 +566,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.initialiseAxes()
 
 
-    def deleteLayer_Slot(self):
+    def deleteLayerStack_Slot(self):
         objName = self.selectedStackName()
         self.removeIngredientByName(objName)
         print "removed " + objName
@@ -850,6 +850,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         return str( self.points_TreeView.selectedIndexes()[0].data().toString() )
+
+
+    #The remaining methods for this tab are involved in building a context menu on right-click
+    def layersMenuPoints(self,position): 
+        menu = QtGui.QMenu()
+
+        action = QtGui.QAction("Delete",self)
+        action.triggered.connect(self.deleteLayerPoints_Slot)
+        menu.addAction(action)
+        menu.exec_(self.points_TreeView.viewport().mapToGlobal(position))
+
+
+    def deleteLayerPoints_Slot(self):
+        objName =  self.selectedPointsName()
+        self.removeIngredientByName(objName)
+        print "removed " + objName
+
 
 
 
