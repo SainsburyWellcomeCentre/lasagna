@@ -768,7 +768,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if self.stacksInTreeList()==False:
             return
 
-        #show default images
+        #show default images (snap to middle layer of each axis)
         [axis.updatePlotItems_2D(self.ingredientList) for axis in self.axes2D]
 
         #initialize cross hair

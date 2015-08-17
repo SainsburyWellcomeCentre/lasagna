@@ -42,10 +42,10 @@ class projection2D():
         self.addItemsToPlotWidget(self.lasagna.ingredientList)
 
         #The currently plotted slice
-        #self.currentSlice=False 
+        self.currentSlice=False 
 
         #Link wheel-alone custom signal to a slot that will increment the current layer on mouse-wheel alone
-        #self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
+        self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
 
 
     def addItemToPlotWidget(self,ingredient):
@@ -200,7 +200,7 @@ class projection2D():
                                             axisToPlot=self.axisToPlot, 
                                             sliceToPlot=sliceToPlotInThisLayer
                                             )
-                #self.currentSlice = sliceToPlotInThisLayer
+                self.currentSlice = sliceToPlotInThisLayer
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
         # the image is now displayed
@@ -218,7 +218,7 @@ class projection2D():
         ingredients - lasagna.ingredients
         slicesToPlot - a tuple of length 2 that defines which slices to plot for the Y and X linked axes
         """
-        self.updatePlotItems_2D(ingredients)  #TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
+        #self.updatePlotItems_2D(ingredients)  #TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
                                               # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
 
         self.linkedYprojection.updatePlotItems_2D(ingredients,slicesToPlot[0])
