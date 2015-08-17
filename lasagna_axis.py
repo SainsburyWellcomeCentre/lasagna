@@ -2,7 +2,6 @@
 this file describes a class that handles the axis behavior for the lasagna viewer
 """
 
-from lasagna_viewBox import lasagna_viewBox
 import lasagna_helperFunctions as lasHelp
 import pyqtgraph as pg
 import ingredients
@@ -42,6 +41,11 @@ class projection2D():
         self.items=[] #a list of added plot items TODO: check if we really need this
         self.addItemsToPlotWidget(self.lasagna.ingredientList)
 
+        #The currently plotted slice
+        #self.currentSlice=False 
+
+        #Link wheel-alone custom signal to a slot that will increment the current layer on mouse-wheel alone
+        #self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
 
 
     def addItemToPlotWidget(self,ingredient):
@@ -190,11 +194,13 @@ class projection2D():
                 else:
                     sliceToPlotInThisLayer = sliceToPlot
 
+
                 thisIngredient.plotIngredient(
                                             pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                             axisToPlot=self.axisToPlot, 
                                             sliceToPlot=sliceToPlotInThisLayer
                                             )
+                #self.currentSlice = sliceToPlotInThisLayer
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
         # the image is now displayed
@@ -233,3 +239,14 @@ class projection2D():
         Set the X and Y limits of the axis to nicely frame the data 
         """
         self.view.autoRange()
+
+
+    #------------------------------------------------------
+    #slots
+    def wheel_alone_slot(self):
+        """
+        Capture mouse-wheel alone and report direction of mouse wheel alone
+        """
+        sliceToPlot = self.currentSlice + self.view.getViewBox().progressBy
+        self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=sliceToPlot)
+

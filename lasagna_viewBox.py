@@ -12,6 +12,7 @@ from PyQt4 import QtCore, QtGui
 
 class lasagna_viewBox(pg.ViewBox):
     mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal
+    progressLayer = QtCore.pyqtSignal() #This fires when the user mouse-wheels without keyboard modifiers
 
     def __init__(self, linkedAxis={}):
         super(lasagna_viewBox,self).__init__()
@@ -24,6 +25,9 @@ class lasagna_viewBox(pg.ViewBox):
             linkZoom  - link self's zoom with the key's zoom (True or False)
         """
         self.linkedAxis = linkedAxis #A list of ViewBox axes to link to 
+
+        #Define a custom signal to indicate when the user has created an event that will increment the displayed layer
+        self.progressBy = 0
 
 
     def wheelEvent(self, ev, axis=None):
@@ -148,5 +152,14 @@ class lasagna_viewBox(pg.ViewBox):
             
             return
     
-        # Here is where we can put code to switch layer because this only
-        # runs if wheel is rotated alone 
+
+        # Emit a signal when the wheel is rotated alone and return a positive or negative value in self.progressBy
+        # that we can use to incremement the image layer in the current axes
+        if ev.delta()>0:
+            self.progressBy=1
+        elif ev.delta()<0:
+            self.progressBy=-1
+        else:
+            self.progressBy=0
+
+        self.progressLayer.emit()

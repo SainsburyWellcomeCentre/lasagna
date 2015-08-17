@@ -69,8 +69,7 @@ def getHomeDir():
     """
 
     if os.name != "posix":
-        from win32com.shell import shellcon, shell
-        homedir = "{}\\".format(shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0))
+        homedir = os.path.expanduser("~")+"\\"
     else:
         homedir = "{}/".format(os.path.expanduser("~"))
 
@@ -81,7 +80,7 @@ def stripTrailingFileFromPath(thisPath):
     """
     Given a path (e.g. '/home/user/myImage.tiff') strip the file name and return the rest of the path
     """
-    thisPath = thisPath.split(os.path.sep)
+    thisPath = os.path.split(thisPath)
     thisPath = string.join(thisPath[:-1],os.path.sep)
     if thisPath[-1] != os.path.sep:
         thisPath = thisPath + os.path.sep
@@ -144,19 +143,21 @@ def defaultPreferences():
     """
     
     return {
-            'lastLoadDir' : getHomeDir() ,          #The directory from which we last loaded data
-            'numRecentFiles' : 5 ,                  #The number of recently loaded file names to store
-            'recentlyLoadedFiles' : [] ,            #A list containing the last "numRecentFiles" file names
+            'lastLoadDir' : getHomeDir(),           #The directory from which we last loaded data
+            'numRecentFiles' : 5,                   #The number of recently loaded file names to store
+            'recentlyLoadedFiles' : [],             #A list containing the last "numRecentFiles" file names
             'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
-            'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', absPathToLasagna()+'ARA'], #must be asbolute paths
+            'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', 
+                             absPathToLasagna()+'registrationPlugins', 
+                             absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
             'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
             'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
             'symbolOrder' : ['o','s','t','d','+'],
             'defaultSymbolOpacity' : 180,
             'defaultSymbolSize' : 10,
-            'hideZoomResetButtonOnImageAxes' : True ,
-            'hideAxes' : True
+            'hideZoomResetButtonOnImageAxes' : True,
+            'hideAxes' : True,
             }
 
  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

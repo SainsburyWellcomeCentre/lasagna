@@ -48,9 +48,6 @@ class imagestack(lasagna_ingredient):
         self.histPenCustomColor = False
         self.histBrushCustomColor = False
 
-        #TODO: Set the selection to this ingredient if it is the first one to be added
-        #if self.imageStackLayers_Model.rowCount()==1:
-        #    print dir(name)
 
 
 

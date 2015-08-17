@@ -15,10 +15,10 @@ import lasagna_helperFunctions as lasHelp
 class sparsepoints(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
         super(sparsepoints,self).__init__(parent, data, fnameAbsPath, enable, objectName,
-                                        pgObject='PlotDataItem'
+                                        pgObject='ScatterPlotItem'
                                         )
 
-
+        
         #Choose symbols from preferences file. TODO: in future could increment through so successive items have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
         self.pen = None
@@ -43,9 +43,7 @@ class sparsepoints(lasagna_ingredient):
 
 
         self.addToList()
-        #TODO: Set the selection to this ingredient if it is the first one to be added
-        #if self.imageStackLayers_Model.rowCount()==1:
-        #    print dir(name)
+
 
        
     def data(self,axisToPlot=0):
@@ -70,21 +68,50 @@ class sparsepoints(lasagna_ingredient):
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
-        z = self._data[:,axisToPlot]
-        data = self.data(axisToPlot)
-        data = data[z==sliceToPlot,:]
+        z = np.round(self._data[:,axisToPlot])
 
+        data = self.data(axisToPlot)
+
+        #Find points within this z-plane +/- a certain region
+        zRange = self.parent.viewZ_spinBoxes[axisToPlot].value()-1
+        fromLayer = sliceToPlot-zRange
+        toLayer = sliceToPlot+zRange
+        data = data[(z>=fromLayer) * (z<=toLayer),:]
+        z = z[(z>=fromLayer) * (z<=toLayer)]
         if self.pen == True:            
             pen = self.symbolBrush()
         else:
             pen = self.pen
 
-        pyqtObject.setData(x=data[:,0], y=data[:,1], 
-                            symbol=self.symbol, 
-                            pen=pen, 
-                            symbolSize=self.symbolSize, 
-                            symbolBrush=self.symbolBrush()
-                            )
+
+        #Add points, making points further from the current
+        #layer less prominent 
+        #TODO: make how this settable by the user via YAML or UI elements
+        dataToAdd = []
+        for ii in range(len(data)):
+
+            #Get size for out-of layer points
+            size = (self.symbolSize - abs(z[ii]-sliceToPlot)*2)
+            if size<1:
+                size=1
+            #Get opacity for out-of layer points
+            alpha = (self.alpha - abs(z[ii]-sliceToPlot)*20)
+            if alpha<10:
+                alpha=10
+
+
+            dataToAdd.append(
+                    {
+                     'pos': (data[ii,0],data[ii,1]),
+                     'symbol': self.symbol,
+                     'brush': self.symbolBrush(alpha=alpha),
+                     'pen': pen,
+                     'size': size
+                     }
+                    )
+
+        pyqtObject.setData(dataToAdd)
+     
 
 
     def addToList(self):
@@ -101,11 +128,17 @@ class sparsepoints(lasagna_ingredient):
             
 
 
-    def symbolBrush(self):
+    def symbolBrush(self,alpha=False):
+        """
+        Returns an RGB + opacity tuple 
+        """
+        if alpha==False:
+            alpha=self.alpha
+
         if isinstance(self.color,str):
-            return tuple(self.colorName2value(self.color, alpha=self.alpha))
+            return tuple(self.colorName2value(self.color, alpha=alpha))
         elif isinstance(self.color,list):
-            return tuple(self.color + [self.alpha])
+            return tuple(self.color + [alpha])
         else:
             print "sparsepoints.color can not cope with type " + type(self.color)
 

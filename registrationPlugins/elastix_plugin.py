@@ -163,8 +163,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Tab 1 - Loading -  slots
     def loadFixed_slot(self):
-        #TODO: allow only MHD files to be read
-        self.lasagna.showStackLoadDialog("MHD Images (*.mhd *mha )") 
+        self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
 
         fixedName=self.lasagna.stacksInTreeList()[0]
         self.referenceStackName.setText(fixedName)
@@ -185,7 +184,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
     def loadMoving_slot(self,supressDialog=False):
         #TODO: allow only MHD files to be read
         if supressDialog==False:
-            self.lasagna.showStackLoadDialog() 
+            self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
             movingName=self.lasagna.stacksInTreeList()[1]
             self.sampleStackName_3.setText(movingName)
             self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath

@@ -35,12 +35,20 @@ import os.path
 #lasagna modules
 import ingredients                       # A set of classes for handling loaded data 
 import imageStackLoader                  # To load TIFF and MHD files
-from lasagna_axis import projection2D    # The class that runs the axes
+import lasagna_axis                      # The class that runs the axes
 import imageProcessing                   # A potentially temporary module that houses general-purpose image processing code
 import pluginHandler                     # Deals with finding plugins in the path, etc
 import lasagna_mainWindow                 # Derived from designer .ui files built by pyuic
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
 from alert import alert                  # Class used to bring up a warning box
+
+#The following imports are made here in order to ensure Lasagna builds as a standlone
+#application on the Mac with py2app
+import csv
+import lasagna_plugin #Needed here to build a standalone version 
+#import tifffile #used currently for the LSM reading
+import ARA #TODO: find out what calls this and try to weed it out. 
+
 
 
 #Parse command-line input arguments
@@ -103,15 +111,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #We will maintain a list of classes of loaded items that can be added to plots
         self.ingredientList = [] 
 
+
         #set up axes 
-        #TODO: could more tightly integrate these objects with the main window so no need to pass many of these args?
+        #Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them
+        self.axisRatioLineEdits = [self.axisRatioLineEdit_1,self.axisRatioLineEdit_2,self.axisRatioLineEdit_3]
+
+        self.graphicsViews = [self.graphicsView_1, self.graphicsView_2, self.graphicsView_3] #These are the graphics_views from the UI file
+        self.axes2D=[]
         print ""
-        self.axes2D = [
-                projection2D(self.graphicsView_1, self, axisRatio=float(self.axisRatioLineEdit_1.text()), axisToPlot=0),
-                projection2D(self.graphicsView_2, self, axisRatio=float(self.axisRatioLineEdit_2.text()), axisToPlot=1),
-                projection2D(self.graphicsView_3, self, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
-                ]
+        for ii in range(len(self.graphicsViews)):
+            self.axes2D.append(lasagna_axis.projection2D(self.graphicsViews[ii], self, axisRatio=float(self.axisRatioLineEdits[ii].text()), axisToPlot=ii))
         print ""
+
 
 
         #Establish links between projections for panning and zooming using lasagna_viewBox.linkedAxis
@@ -140,7 +151,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.axes2D[1].linkedXprojection = self.axes2D[2]
         self.axes2D[1].linkedYprojection = self.axes2D[0]
-
 
 
         #UI elements updated during mouse moves over an axis
@@ -222,7 +232,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
         self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenuStacks)
         #self.imageStackLayers_TreeView.setColumnWidth(0,200)
 
         QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.plotImageStackHistogram) 
@@ -234,7 +244,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.points_Model.setHorizontalHeaderLabels(labels)
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        #self.points_TreeView.customContextMenuRequested.connect(self.layersMenu)
+        self.points_TreeView.customContextMenuRequested.connect(self.layersMenuPoints)
         [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')] #populate with markers
         self.markerSymbol_comboBox.activated.connect(self.markerSymbol_comboBox_slot)
         self.markerSize_spinBox.valueChanged.connect(self.markerSize_spinBox_slot)
@@ -242,6 +252,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)        
         self.markerColor_pushButton.released.connect(self.markerColor_pushButton_slot)
         self.addLines_checkBox.stateChanged.connect(self.addLines_checkBox_slot)
+        #add the z-points spinboxes to a list to make them indexable
+        self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
 
         #Plugins menu and initialisation
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
@@ -381,9 +393,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Set up default values in tabs
         # It's ok to load images of different sizes but their voxel sizes need to be the same
         axRatio = imageStackLoader.getVoxelSpacing(fnameToLoad)
-        self.axisRatioLineEdit_1.setText( str(axRatio[0]) )
-        self.axisRatioLineEdit_2.setText( str(axRatio[1]) )
-        self.axisRatioLineEdit_3.setText( str(axRatio[2]) )
+        for ii in range(len(axRatio)):
+            self.axisRatioLineEdits[ii].setText(str(axRatio[ii]))
+
 
         #Add to the ingredients list
         objName=fnameToLoad.split(os.path.sep)[-1]
@@ -415,7 +427,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
-    def showStackLoadDialog(self,triggered,fileFilter="Images (*.mhd *.mha *.tiff *.tif)"):
+    def showStackLoadDialog(self,triggered=None,fileFilter="Images (*.mhd *.mha *.tiff *.tif)"):
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
@@ -512,6 +524,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     self.stopPlugin(thisPlugin)
 
         QtGui.qApp.quit()
+        sys.exit(0) #without this we get a big horrible error report on the Mac
 
     def closeEvent(self, event):
         self.quitLasagna()
@@ -529,7 +542,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     """
     #------------------------------------------------------------------------
     # PROTOTYPE CODE
-    def layersMenu(self,position): 
+    def layersMenuStacks(self,position): 
         menu = QtGui.QMenu()
 
         changeColorMenu = QtGui.QMenu("Change color",self)
@@ -545,20 +558,20 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         menu.addAction(changeColorMenu.menuAction())
 
         action = QtGui.QAction("Delete",self)
-        action.triggered.connect(self.deleteLayer_Slot)
+        action.triggered.connect(self.deleteLayerStack_Slot)
         menu.addAction(action)
         menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
 
 
     def changeImageStackColorMap_Slot(self):
         color = str(self.sender().text())
-        objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+        objName = self.selectedStackName()
         self.returnIngredientByName(objName).lut=color
         self.initialiseAxes()
 
 
-    def deleteLayer_Slot(self):
-        objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+    def deleteLayerStack_Slot(self):
+        objName = self.selectedStackName()
         self.removeIngredientByName(objName)
         print "removed " + objName
 
@@ -770,9 +783,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.plotImageStackHistogram()
 
         #TODO: turn into list by making the axisRatioLineEdits a list
-        self.axes2D[0].view.setAspectLocked(True, float(self.axisRatioLineEdit_1.text()))
-        self.axes2D[1].view.setAspectLocked(True, float(self.axisRatioLineEdit_2.text()))
-        self.axes2D[2].view.setAspectLocked(True, float(self.axisRatioLineEdit_3.text()))
+        for ii in range(len(self.axisRatioLineEdits)):
+            self.axes2D[ii].view.setAspectLocked(True, float(self.axisRatioLineEdits[ii].text()))
         
         if resetAxes:
             self.resetAxes()
@@ -783,28 +795,40 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def markerSymbol_comboBox_slot(self,index):
         symbol = str(self.markerSymbol_comboBox.currentText())
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
         ingredient.symbol = symbol
         self.initialiseAxes()
 
     def markerSize_spinBox_slot(self,spinBoxValue):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
         ingredient.symbolSize = spinBoxValue
         self.initialiseAxes()
 
     def markerAlpha_spinBox_slot(self,spinBoxValue):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
         ingredient.alpha = spinBoxValue
         self.initialiseAxes()
 
     def markerColor_pushButton_slot(self):
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
+
         col = QtGui.QColorDialog.getColor()
         rgb = [col.toRgb().red(), col.toRgb().green(), col.toRgb().blue()]
-        ingredient = self.returnIngredientByName(self.selectedPointsName())
         ingredient.color =rgb
         self.initialiseAxes()
 
     def addLines_checkBox_slot(self,state):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
+
         if state==0:
             ingredient.pen = None
         else:
@@ -829,6 +853,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         return str( self.points_TreeView.selectedIndexes()[0].data().toString() )
+
+
+    #The remaining methods for this tab are involved in building a context menu on right-click
+    def layersMenuPoints(self,position): 
+        menu = QtGui.QMenu()
+
+        action = QtGui.QAction("Delete",self)
+        action.triggered.connect(self.deleteLayerPoints_Slot)
+        menu.addAction(action)
+        menu.exec_(self.points_TreeView.viewport().mapToGlobal(position))
+
+
+    def deleteLayerPoints_Slot(self):
+        objName =  self.selectedPointsName()
+        self.removeIngredientByName(objName)
+        print "removed " + objName
+
 
 
 
@@ -965,7 +1006,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,self.selectedStackName())
         if img==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
-            print "truing to clear"
             self.intensityHistogram.clear()
             return
 
@@ -1090,9 +1130,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
             self.updateMainWindowOnMouseMove(self.axes2D[2])
             self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
-
-
-
 
 
 

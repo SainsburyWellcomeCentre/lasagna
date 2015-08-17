@@ -12,11 +12,12 @@ the [website](http://raacampbell13.github.io/lasagna).
 
 ## Installation ##
 Lasagna runs on Python 2.7, PyQt4, and uses PyQtGraph for the plotting. You'll need the following modules:
-* tifffile [for importing TIFF files]
-* vtk [for importing MHD files]
+* tifffile [for importing LSM files]
+* vtk [optional, for faster import of MHD files]
+* PyLibTiff
 * numpy
 * pyqtgraph 9.10
 * yaml
 * PyQt4
-* tempfile 
-* urllib
+* SIP
+
