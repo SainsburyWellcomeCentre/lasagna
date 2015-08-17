@@ -77,21 +77,38 @@ class sparsepoints(lasagna_ingredient):
         fromLayer = sliceToPlot-zRange
         toLayer = sliceToPlot+zRange
         data = data[(z>=fromLayer) * (z<=toLayer),:]
-
+        z = z[(z>=fromLayer) * (z<=toLayer)]
         if self.pen == True:            
             pen = self.symbolBrush()
         else:
             pen = self.pen
 
 
-        
+        #Add points, making points further from the current
+        #layer less prominent 
+        #TODO: make how this settable by the user via YAML or UI elements
         dataToAdd = []
         for ii in range(len(data)):
+
+            #Get size for out-of layer points
+            size = (self.symbolSize - abs(z[ii]-sliceToPlot)*2)
+            if size<1:
+                size=1
+            #Get opacity for out-of layer points
+            alpha = (self.alpha - abs(z[ii]-sliceToPlot)*20)
+            if alpha<10:
+                alpha=10
+
+
             dataToAdd.append(
-                    {'pos': (data[ii,0],data[ii,1]),
+                    {
+                     'pos': (data[ii,0],data[ii,1]),
                      'symbol': self.symbol,
-                     'brush': self.symbolBrush(),
-                     'pen': pen}
+                     'brush': self.symbolBrush(alpha=alpha),
+                     'pen': pen,
+                     'size': size,
+                     #'size': self.symbolSize - abs(z[ii]-sliceToPlot)
+                     }
                     )
 
         pyqtObject.setData(dataToAdd)
@@ -112,11 +129,17 @@ class sparsepoints(lasagna_ingredient):
             
 
 
-    def symbolBrush(self):
+    def symbolBrush(self,alpha=False):
+        """
+        Returns an RGB + opacity tuple 
+        """
+        if alpha==False:
+            alpha=self.alpha
+
         if isinstance(self.color,str):
-            return tuple(self.colorName2value(self.color, alpha=self.alpha))
+            return tuple(self.colorName2value(self.color, alpha=alpha))
         elif isinstance(self.color,list):
-            return tuple(self.color + [self.alpha])
+            return tuple(self.color + [alpha])
         else:
             print "sparsepoints.color can not cope with type " + type(self.color)
 
