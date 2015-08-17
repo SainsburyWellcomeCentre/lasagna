@@ -70,10 +70,15 @@ class sparsepoints(lasagna_ingredient):
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
-        z = self._data[:,axisToPlot]
+        z = np.round(self._data[:,axisToPlot])
 
         data = self.data(axisToPlot)
-        data = data[np.round(z)==sliceToPlot,:]
+
+        #Find points within this z-plane +/- a certain region
+        zRange = self.parent.viewZ_spinBoxes[axisToPlot].value()-1
+        fromLayer = sliceToPlot-zRange
+        toLayer = sliceToPlot+zRange
+        data = data[(z>=fromLayer) * (z<=toLayer),:]
 
         if self.pen == True:            
             pen = self.symbolBrush()
