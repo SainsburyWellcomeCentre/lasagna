@@ -238,7 +238,7 @@ def mhd_read_header_file(fname):
 
 
 
-def getVoxelSpacing(fname):
+def getVoxelSpacing(fname,fallBackMode=False):
   """
   Attempts to get the voxel spacing in all three dimensions. This allows us to set the axis
   ratios automatically. TODO: Currently this will only work for MHD files, but we may be able 
