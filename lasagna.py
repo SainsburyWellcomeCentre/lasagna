@@ -35,7 +35,7 @@ import os.path
 #lasagna modules
 import ingredients                       # A set of classes for handling loaded data 
 import imageStackLoader                  # To load TIFF and MHD files
-from lasagna_axis import projection2D    # The class that runs the axes
+import lasagna_axis                      # The class that runs the axes
 import imageProcessing                   # A potentially temporary module that houses general-purpose image processing code
 import pluginHandler                     # Deals with finding plugins in the path, etc
 import lasagna_mainWindow                 # Derived from designer .ui files built by pyuic
@@ -119,7 +119,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.axes2D=[]
         print ""
         for ii in range(len(self.graphicsViews)):
-            self.axes2D.append(projection2D(self.graphicsViews[ii], self, axisRatio=float(self.axisRatioLineEdits[ii].text()), axisToPlot=ii))
+            self.axes2D.append(lasagna_axis.projection2D(self.graphicsViews[ii], self, axisRatio=float(self.axisRatioLineEdits[ii].text()), axisToPlot=ii))
         print ""
 
 
