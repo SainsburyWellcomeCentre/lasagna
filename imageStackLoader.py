@@ -14,27 +14,25 @@ import numpy as np
 import imp #to look for the presence of a module. Python 3 will require importlib
 import lasagna_helperFunctions as lasHelp 
 
-def loadTiffStack(fname):
+def loadTiffStack(fname,useLibTiff=False):
   """
   Read a TIFF stack.
+  We're using tifflib by default as, right now, only this works when the application is compile on Windows. [17/08/15]
   Bugs: known to fail with tiffs produced by Icy [23/07/15]
 
   """
-  #I think TIFF3D uses libtiff whereas TIFFfile is pure python. Provide both options
   purePython = True
-  if purePython:
-    from libtiff import TIFF3D
-    tiff3d = TIFF3D.open(fname)
-    print "Loading:\n" + tiff3d.info() + "\n"
-    im = tiff3d.read_image()
-    tiff3d.close()
-  else:
+  if useLibTiff:
     from libtiff import TIFFfile
     import numpy as np
     tiff = TIFFfile(fname)
     samples, sample_names = tiff.get_samples() #we should have just one
-    print "Loading:\n" + tiff.get_info() + "\n"
+    print "Loading:\n" + tiff.get_info() + " with libtiff\n"
     im = np.asarray(samples[0])
+  else:
+    print "Loading:\n" + fname + " with tifffile\n"
+    from tifffile import imread 
+    im = imread(fname)
 
   print "read image of size: rows: %d, cols: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
   return im
