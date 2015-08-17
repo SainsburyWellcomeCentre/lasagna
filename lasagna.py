@@ -112,13 +112,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.ingredientList = [] 
 
         #set up axes 
-        #TODO: could more tightly integrate these objects with the main window so no need to pass many of these args?
+        #Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them
+        self.axisRatioLineEdits = [self.axisRatioLineEdit_1,self.axisRatioLineEdit_2,self.axisRatioLineEdit_3]
+
+        self.graphicsViews = [self.graphicsView_1, self.graphicsView_2, self.graphicsView_3]
+        self.axes2D=[]
         print ""
-        self.axes2D = [
-                projection2D(self.graphicsView_1, self, axisRatio=float(self.axisRatioLineEdit_1.text()), axisToPlot=0),
-                projection2D(self.graphicsView_2, self, axisRatio=float(self.axisRatioLineEdit_2.text()), axisToPlot=1),
-                projection2D(self.graphicsView_3, self, axisRatio=float(self.axisRatioLineEdit_3.text()), axisToPlot=2)
-                ]
+        for ii in range(len(self.graphicsViews)):
+            self.axes2D.append(projection2D(self.graphicsViews[ii], self, axisRatio=float(self.axisRatioLineEdits[ii].text()), axisToPlot=ii))
         print ""
 
 
@@ -391,9 +392,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Set up default values in tabs
         # It's ok to load images of different sizes but their voxel sizes need to be the same
         axRatio = imageStackLoader.getVoxelSpacing(fnameToLoad)
-        self.axisRatioLineEdit_1.setText( str(axRatio[0]) )
-        self.axisRatioLineEdit_2.setText( str(axRatio[1]) )
-        self.axisRatioLineEdit_3.setText( str(axRatio[2]) )
+        for ii in range(len(axRatio)):
+            self.axisRatioLineEdits[ii].setText(str(axRatio[ii]))
+
 
         #Add to the ingredients list
         objName=fnameToLoad.split(os.path.sep)[-1]
@@ -781,9 +782,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.plotImageStackHistogram()
 
         #TODO: turn into list by making the axisRatioLineEdits a list
-        self.axes2D[0].view.setAspectLocked(True, float(self.axisRatioLineEdit_1.text()))
-        self.axes2D[1].view.setAspectLocked(True, float(self.axisRatioLineEdit_2.text()))
-        self.axes2D[2].view.setAspectLocked(True, float(self.axisRatioLineEdit_3.text()))
+        for ii in range(len(self.axisRatioLineEdits)):
+            self.axes2D[ii].view.setAspectLocked(True, float(self.axisRatioLineEdits[ii].text()))
         
         if resetAxes:
             self.resetAxes()
