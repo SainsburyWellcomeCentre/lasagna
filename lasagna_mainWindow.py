@@ -141,7 +141,7 @@ class Ui_lasagna_mainWindow(object):
         self.horizontalLayout_10 = QtGui.QHBoxLayout()
         self.horizontalLayout_10.setObjectName(_fromUtf8("horizontalLayout_10"))
         self.groupBoxAxisRatio_2 = QtGui.QGroupBox(self.pointsSettingsTab)
-        self.groupBoxAxisRatio_2.setEnabled(False)
+        self.groupBoxAxisRatio_2.setEnabled(True)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
