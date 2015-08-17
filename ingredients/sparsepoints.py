@@ -15,10 +15,10 @@ import lasagna_helperFunctions as lasHelp
 class sparsepoints(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
         super(sparsepoints,self).__init__(parent, data, fnameAbsPath, enable, objectName,
-                                        pgObject='PlotDataItem'
+                                        pgObject='ScatterPlotItem'
                                         )
 
-
+        
         #Choose symbols from preferences file. TODO: in future could increment through so successive items have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
         self.pen = None
@@ -83,12 +83,19 @@ class sparsepoints(lasagna_ingredient):
         else:
             pen = self.pen
 
-        pyqtObject.setData(x=data[:,0], y=data[:,1], 
-                            symbol=self.symbol, 
-                            pen=pen, 
-                            symbolSize=self.symbolSize, 
-                            symbolBrush=self.symbolBrush()
-                            )
+
+        
+        dataToAdd = []
+        for ii in range(len(data)):
+            dataToAdd.append(
+                    {'pos': (data[ii,0],data[ii,1]),
+                     'symbol': self.symbol,
+                     'brush': self.symbolBrush(),
+                     'pen': pen}
+                    )
+
+        pyqtObject.setData(dataToAdd)
+     
 
 
     def addToList(self):
