@@ -792,28 +792,40 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def markerSymbol_comboBox_slot(self,index):
         symbol = str(self.markerSymbol_comboBox.currentText())
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
         ingredient.symbol = symbol
         self.initialiseAxes()
 
     def markerSize_spinBox_slot(self,spinBoxValue):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
         ingredient.symbolSize = spinBoxValue
         self.initialiseAxes()
 
     def markerAlpha_spinBox_slot(self,spinBoxValue):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
         ingredient.alpha = spinBoxValue
         self.initialiseAxes()
 
     def markerColor_pushButton_slot(self):
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
+
         col = QtGui.QColorDialog.getColor()
         rgb = [col.toRgb().red(), col.toRgb().green(), col.toRgb().blue()]
-        ingredient = self.returnIngredientByName(self.selectedPointsName())
         ingredient.color =rgb
         self.initialiseAxes()
 
     def addLines_checkBox_slot(self,state):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
+
         if state==0:
             ingredient.pen = None
         else:
