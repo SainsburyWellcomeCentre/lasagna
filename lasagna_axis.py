@@ -26,7 +26,7 @@ class projection2D():
 
         print "Creating axis at " + str(thisPlotWidget.objectName())
         self.view = thisPlotWidget #This should target the axes to a particular plot widget
-        
+
         if lasHelp.readPreference('hideZoomResetButtonOnImageAxes')==True:
             self.view.hideButtons()
 
@@ -41,6 +41,11 @@ class projection2D():
         self.items=[] #a list of added plot items TODO: check if we really need this
         self.addItemsToPlotWidget(self.lasagna.ingredientList)
 
+        #The currently plotted slice
+        self.currentSlice=False 
+
+        #Link wheel-alone custom signal to a slot that will increment the current layer on mouse-wheel alone
+        self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
 
 
     def addItemToPlotWidget(self,ingredient):
@@ -189,11 +194,13 @@ class projection2D():
                 else:
                     sliceToPlotInThisLayer = sliceToPlot
 
+
                 thisIngredient.plotIngredient(
                                             pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                             axisToPlot=self.axisToPlot, 
                                             sliceToPlot=sliceToPlotInThisLayer
                                             )
+                self.currentSlice = sliceToPlotInThisLayer
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
         # the image is now displayed
@@ -232,3 +239,14 @@ class projection2D():
         Set the X and Y limits of the axis to nicely frame the data 
         """
         self.view.autoRange()
+
+
+    #------------------------------------------------------
+    #slots
+    def wheel_alone_slot(self):
+        """
+        Capture mouse-wheel alone and report direction of mouse wheel alone
+        """
+        sliceToPlot = self.currentSlice + self.view.getViewBox().progressBy
+        self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=sliceToPlot)
+

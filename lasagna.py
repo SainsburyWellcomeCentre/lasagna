@@ -111,16 +111,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #We will maintain a list of classes of loaded items that can be added to plots
         self.ingredientList = [] 
 
+
         #set up axes 
         #Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them
         self.axisRatioLineEdits = [self.axisRatioLineEdit_1,self.axisRatioLineEdit_2,self.axisRatioLineEdit_3]
 
-        self.graphicsViews = [self.graphicsView_1, self.graphicsView_2, self.graphicsView_3]
+        self.graphicsViews = [self.graphicsView_1, self.graphicsView_2, self.graphicsView_3] #These are the graphics_views from the UI file
         self.axes2D=[]
         print ""
         for ii in range(len(self.graphicsViews)):
             self.axes2D.append(lasagna_axis.projection2D(self.graphicsViews[ii], self, axisRatio=float(self.axisRatioLineEdits[ii].text()), axisToPlot=ii))
         print ""
+
 
 
         #Establish links between projections for panning and zooming using lasagna_viewBox.linkedAxis
@@ -149,7 +151,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.axes2D[1].linkedXprojection = self.axes2D[2]
         self.axes2D[1].linkedYprojection = self.axes2D[0]
-
 
 
         #UI elements updated during mouse moves over an axis
@@ -1129,9 +1130,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
             self.updateMainWindowOnMouseMove(self.axes2D[2])
             self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
-
-
-
 
 
 

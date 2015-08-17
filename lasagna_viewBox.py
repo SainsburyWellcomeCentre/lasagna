@@ -28,7 +28,6 @@ class lasagna_viewBox(pg.ViewBox):
 
         #Define a custom signal to indicate when the user has created an event that will increment the displayed layer
         self.progressBy = 0
-        self.axis_id = None #Integer defining the id of the axis in the GUI
 
 
     def wheelEvent(self, ev, axis=None):
