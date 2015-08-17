@@ -2,7 +2,6 @@
 this file describes a class that handles the axis behavior for the lasagna viewer
 """
 
-from lasagna_viewBox import lasagna_viewBox
 import lasagna_helperFunctions as lasHelp
 import pyqtgraph as pg
 import ingredients
@@ -27,7 +26,7 @@ class projection2D():
 
         print "Creating axis at " + str(thisPlotWidget.objectName())
         self.view = thisPlotWidget #This should target the axes to a particular plot widget
-
+        
         if lasHelp.readPreference('hideZoomResetButtonOnImageAxes')==True:
             self.view.hideButtons()
 
