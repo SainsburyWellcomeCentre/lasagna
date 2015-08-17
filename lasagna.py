@@ -561,13 +561,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def changeImageStackColorMap_Slot(self):
         color = str(self.sender().text())
-        objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+        objName = self.selectedStackName()
         self.returnIngredientByName(objName).lut=color
         self.initialiseAxes()
 
 
     def deleteLayer_Slot(self):
-        objName = str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+        objName = self.selectedStackName()
         self.removeIngredientByName(objName)
         print "removed " + objName
 
