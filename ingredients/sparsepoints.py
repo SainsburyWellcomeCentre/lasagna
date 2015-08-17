@@ -106,8 +106,7 @@ class sparsepoints(lasagna_ingredient):
                      'symbol': self.symbol,
                      'brush': self.symbolBrush(alpha=alpha),
                      'pen': pen,
-                     'size': size,
-                     #'size': self.symbolSize - abs(z[ii]-sliceToPlot)
+                     'size': size
                      }
                     )
 

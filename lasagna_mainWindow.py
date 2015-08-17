@@ -298,6 +298,7 @@ class Ui_lasagna_mainWindow(object):
         self.markerColor_pushButton.setObjectName(_fromUtf8("markerColor_pushButton"))
         self.verticalLayout_4.addWidget(self.markerColor_pushButton)
         self.addLines_checkBox = QtGui.QCheckBox(self.frame)
+        self.addLines_checkBox.setEnabled(False)
         self.addLines_checkBox.setObjectName(_fromUtf8("addLines_checkBox"))
         self.verticalLayout_4.addWidget(self.addLines_checkBox)
         self.horizontalLayout_10.addWidget(self.frame)

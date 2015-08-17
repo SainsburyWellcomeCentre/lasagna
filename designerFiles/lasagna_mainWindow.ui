@@ -548,6 +548,9 @@
               </item>
               <item>
                <widget class="QCheckBox" name="addLines_checkBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Line</string>
                 </property>
