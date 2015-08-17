@@ -43,9 +43,7 @@ class sparsepoints(lasagna_ingredient):
 
 
         self.addToList()
-        #TODO: Set the selection to this ingredient if it is the first one to be added
-        #if self.imageStackLayers_Model.rowCount()==1:
-        #    print dir(name)
+
 
        
     def data(self,axisToPlot=0):
