@@ -71,8 +71,9 @@ class sparsepoints(lasagna_ingredient):
         onto the object with which it is associated
         """
         z = self._data[:,axisToPlot]
+
         data = self.data(axisToPlot)
-        data = data[z==sliceToPlot,:]
+        data = data[np.round(z)==sliceToPlot,:]
 
         if self.pen == True:            
             pen = self.symbolBrush()
