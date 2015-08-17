@@ -143,9 +143,9 @@ def defaultPreferences():
     """
     
     return {
-            'lastLoadDir' : getHomeDir() ,          #The directory from which we last loaded data
-            'numRecentFiles' : 5 ,                  #The number of recently loaded file names to store
-            'recentlyLoadedFiles' : [] ,            #A list containing the last "numRecentFiles" file names
+            'lastLoadDir' : getHomeDir(),           #The directory from which we last loaded data
+            'numRecentFiles' : 5,                   #The number of recently loaded file names to store
+            'recentlyLoadedFiles' : [],             #A list containing the last "numRecentFiles" file names
             'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', 
                              absPathToLasagna()+'registrationPlugins', 
@@ -156,8 +156,8 @@ def defaultPreferences():
             'symbolOrder' : ['o','s','t','d','+'],
             'defaultSymbolOpacity' : 180,
             'defaultSymbolSize' : 10,
-            'hideZoomResetButtonOnImageAxes' : True ,
-            'hideAxes' : True
+            'hideZoomResetButtonOnImageAxes' : True,
+            'hideAxes' : True,
             }
 
  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
