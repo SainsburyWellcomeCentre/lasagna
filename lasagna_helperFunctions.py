@@ -80,7 +80,7 @@ def stripTrailingFileFromPath(thisPath):
     """
     Given a path (e.g. '/home/user/myImage.tiff') strip the file name and return the rest of the path
     """
-    thisPath = thisPath.split(os.path.sep)
+    thisPath = os.path.split(thisPath)
     thisPath = string.join(thisPath[:-1],os.path.sep)
     if thisPath[-1] != os.path.sep:
         thisPath = thisPath + os.path.sep
