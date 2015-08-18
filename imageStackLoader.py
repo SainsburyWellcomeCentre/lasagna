@@ -5,7 +5,6 @@ Read MHD stacks (using the vtk library) or TIFF stacks
 https://github.com/raacampbell13/lasagna
 """
 
-
 from __future__ import division
 import re
 import os
@@ -14,6 +13,69 @@ import numpy as np
 import imp #to look for the presence of a module. Python 3 will require importlib
 import lasagna_helperFunctions as lasHelp 
 
+
+#-------------------------------------------------------------------------------------------
+#   *General methods*
+# The methods in this section are the ones that are called by by Lasagna or are called by other
+# functions in this module. They determine the correct loader methods, etc, for the file format 
+# so that Lasagna doesn't have to know about this. 
+
+def loadStack(fname):
+  """
+  loadStack determines the data type from the file extension determines what data are to be 
+  loaded and chooses the approproate function to return the data.
+  """
+  if fname.lower().endswith('.tif') or fname.lower().endswith('.tiff'):
+    return loadTiffStack(fname)
+  elif fname.lower().endswith('.mhd'):
+    return mhdRead(fname)
+  elif fname.lower().endswith('.nrrd') or fname.lower().endswith('.nrd'):
+    return nrrdRead(fname)
+  else:
+    print "\n\n*" + fname + " NOT LOADED. DATA TYPE NOT KNOWN\n\n"
+
+
+def imageFilter():
+  """
+  Returns a string defining the filter for the Qt Loader dialog. 
+  As image formats are added (or removed) from this module, this 
+  string should be manually modified accordingly.
+  """
+  return "Images (*.mhd *.tiff *.tif .nrrd .nrd)"
+
+
+def getVoxelSpacing(fname,fallBackMode=False):
+  """
+  Attempts to get the voxel spacing in all three dimensions. This allows us to set the axis
+  ratios automatically. TODO: Currently this will only work for MHD files, but we may be able 
+  to swing something for TIFFs (e.g. by creating Icy-like metadata files)
+  """
+
+  if fname.lower().endswith('.mhd'):
+    return mhd_getRatios(fname)
+  if fname.lower().endswith('.nrrd') or fname.lower().endswith('.nrd'):  
+    return nrrd_getRatios(fname)
+  else:
+    return lasHelp.readPreference('defaultAxisRatios') #defaults
+
+
+def spacingToRatio(spacing):
+  """
+  Takes a vector of axis spacings and converts it to ratios
+  so Lasagna can plot the images correctly
+  Expects spacing to have a length of 3
+  """
+  assert len(spacing) == 3
+
+  ratios = [0,0,0]
+  ratios[0] = spacing[0]/spacing[1]
+  ratios[1] = spacing[2]/spacing[0]
+  ratios[2] = spacing[1]/spacing[2]
+  return ratios
+
+
+#-------------------------------------------------------------------------------------------
+#   *TIFF handling methods*
 def loadTiffStack(fname,useLibTiff=False):
   """
   Read a TIFF stack.
@@ -38,6 +100,9 @@ def loadTiffStack(fname,useLibTiff=False):
   return im
 
 
+
+#-------------------------------------------------------------------------------------------
+#   *MHD handling methods*
 def mhdRead(fname,fallBackMode = False):
   """
   Read an MHD file using either VTK (if available) or the slower-built in reader
@@ -53,8 +118,6 @@ def mhdRead(fname,fallBackMode = False):
     except ImportError:
       print "Failed to find VTK. Falling back to built in (but slower) MHD reader"
       fallBackMode = True
-
-
 
   if fallBackMode:
     return mhd_read_fallback(fname)
@@ -232,60 +295,67 @@ def mhd_read_header_file(fname):
   return info
 
 
-
-
-
-
-def getVoxelSpacing(fname,fallBackMode=False):
+def mhd_getRatios(fname):
   """
-  Attempts to get the voxel spacing in all three dimensions. This allows us to set the axis
-  ratios automatically. TODO: Currently this will only work for MHD files, but we may be able 
-  to swing something for TIFFs (e.g. by creating Icy-like metadata files)
+  Get relative axis ratios from MHD file defined by fname
   """
-
-  if fname.lower().endswith('.mhd'):
-
-    try:
-      imp.find_module('vtk')
-      import vtk
-    except ImportError:
-      print "Failed to find VTK. Using default axis length values"
-      #TODO: read values from built-in info reader
-      return lasHelp.readPreference('defaultAxisRatios') #defaults
-
-
-    if fallBackMode==False:      
-      imr = vtk.vtkMetaImageReader()
-      imr.SetFileName(fname)
-      imr.Update()
-  
-      im = imr.GetOutput()
-      spacing = im.GetSpacing()
-
-      if len(spacing)==0: 
-        return lasHelp.readPreference('defaultAxisRatios') #defaults
-    
-      #Determine the ratios from the spacing 
-      ratios = [1,1,1]
-    
-      ratios[0] = spacing[0]/spacing[1]
-      ratios[1] = spacing[2]/spacing[0]
-      ratios[2] = spacing[1]/spacing[2]
-      return ratios
-
-  else:
+  try:
+    imp.find_module('vtk')
+    import vtk
+  except ImportError:
+    print "Failed to find VTK. Using default axis length values"
+    #TODO: read values from built-in info reader
     return lasHelp.readPreference('defaultAxisRatios') #defaults
 
 
-def loadStack(fname):
-  """
-  loadStack determines the data type from the file extension determines what data are to be 
-  loaded and chooses the approproate function to return the data.
-  """
-  if fname.lower().endswith('.tif') or fname.lower().endswith('.tiff'):
-    return loadTiffStack(fname)
-  elif fname.lower().endswith('.mhd'):
-    return mhdRead(fname)
-  else:
-    print fname + " not loaded. data type unknown"
+  if fallBackMode==False:      
+    imr = vtk.vtkMetaImageReader()
+    imr.SetFileName(fname)
+    imr.Update()
+ 
+    im = imr.GetOutput()
+    spacing = im.GetSpacing()
 
+    if len(spacing)==0: 
+      return lasHelp.readPreference('defaultAxisRatios') #defaults
+  
+    return spacingToRatio(spacing)  
+
+
+
+#-------------------------------------------------------------------------------------------
+#   *NRRD handling methods*
+def nrrdRead(fname):
+  """
+  Read NRRD file
+  """
+  import nrrd 
+  (data,header) = nrrd.read(fname)
+  return data
+
+
+def nrrdHeaderRead(fname):
+  """
+  Read NRRD header
+  """
+
+  import nrrd
+  fid = open(fname,'rb')
+  header = nrrd.read_header(fid)
+  fid.close()
+
+  return header
+
+
+def nrrd_getRatios(fname):
+  """
+  Get the aspect ratios from the NRRD file
+  """
+  header = nrrdHeaderRead(fname)
+  axSizes = header['space directions']
+
+  spacing =[]
+  for ii in range(len(axSizes)):
+    spacing.append(axSizes[ii][ii])
+
+  return spacingToRatio(spacing)
