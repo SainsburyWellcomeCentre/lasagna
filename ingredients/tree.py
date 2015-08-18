@@ -89,7 +89,7 @@ class Tree(object):
 
         return node
 
-
+    #TODO: replace with  __repr__(self): ?
     def display(self, identifier, depth=_ROOT):
         """
         Very (very) simple tree display

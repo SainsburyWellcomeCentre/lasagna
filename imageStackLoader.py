@@ -41,7 +41,7 @@ def imageFilter():
   As image formats are added (or removed) from this module, this 
   string should be manually modified accordingly.
   """
-  return "Images (*.mhd *.tiff *.tif .nrrd .nrd)"
+  return "Images (*.mhd *.tiff *.tif *.nrrd *.nrd)"
 
 
 def getVoxelSpacing(fname,fallBackMode=False):
