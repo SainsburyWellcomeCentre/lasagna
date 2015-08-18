@@ -29,10 +29,6 @@ def importData(fname,displayTree=False):
         print "Can not find file " + fname
         return
 
-    if fname.lower().endswith('csv')==False:
-        print "Data should be a CSV file"
-        return
-
     #Read in data
     fid = open(fname,'r')
     data = []
