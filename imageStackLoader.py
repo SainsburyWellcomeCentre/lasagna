@@ -308,18 +308,17 @@ def mhd_getRatios(fname):
     return lasHelp.readPreference('defaultAxisRatios') #defaults
 
 
-  if fallBackMode==False:      
-    imr = vtk.vtkMetaImageReader()
-    imr.SetFileName(fname)
-    imr.Update()
+  imr = vtk.vtkMetaImageReader()
+  imr.SetFileName(fname)
+  imr.Update()
  
-    im = imr.GetOutput()
-    spacing = im.GetSpacing()
+  im = imr.GetOutput()
+  spacing = im.GetSpacing()
 
-    if len(spacing)==0: 
-      return lasHelp.readPreference('defaultAxisRatios') #defaults
+  if len(spacing)==0: 
+    return lasHelp.readPreference('defaultAxisRatios') #defaults
   
-    return spacingToRatio(spacing)  
+  return spacingToRatio(spacing)  
 
 
 
