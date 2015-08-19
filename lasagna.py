@@ -370,9 +370,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
   
     def loadImageStack(self,fnameToLoad):
         """
-        Loads the base image image stack. The base image stack is the one which will appear as gray
-        if it is the only stack loaded. This function wipes and data that have already been loaded. Any overlays that 
-        are present will be removed when this function runs. 
+        Loads an image image stack. 
         """
 
         self.runHook(self.hooks['loadImageStack_Start'])
