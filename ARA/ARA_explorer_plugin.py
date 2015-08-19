@@ -22,6 +22,9 @@ import ara_explorer_UI
 #For handling the labels files
 import ara_json, tree
 
+#For contour drawing
+#from skimage import measure
+
 class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #must inherit lasagna_plugin first
     def __init__(self,lasagna):
         super(plugin,self).__init__(lasagna)
@@ -93,22 +96,23 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
            return
 
 
-        self.data = dict(loaded='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
+        
+        #Make an sparsepoints ingredient (TODO: turn into a still to be made line ingredient)
+        #self.lasagna.addIngredient(objectName='ARA_CONTOUR', kind='sparsepoints', data=[])
+        
 
-        self.initPlugin()
-
-
-
-    def initPlugin(self):
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
 
         #If the user has asked for this, load the first ARA entry automatically
+        self.data = dict(loaded='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
         if self.prefs['loadFirstAtlasOnStartup']:
             print "Auto-Loading " + self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
             self.loadARA(self.paths.keys()[0])
             self.load_pushButton.setEnabled(False) #disable because the current selection has now been loaded
 
 
+
+        
 
     def closePlugin(self):
         """
@@ -156,6 +160,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
+        if value>0 & self.highlightArea_checkBox.isChecked():
+            #contours = measure.find_contours(thisItem.image, value)
+            pass
+            
 
  
     #--------------------------------------
