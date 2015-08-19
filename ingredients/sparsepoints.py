@@ -51,6 +51,9 @@ class sparsepoints(lasagna_ingredient):
         Sparse point data are an n by 3 array where each row defines the location
         of a single point in x, y, and z
         """
+        if len(self_data)==0:
+            return False
+
         data = np.delete(self._data,axisToPlot,1)
         if axisToPlot==2:
             data = np.fliplr(data)
@@ -68,6 +71,9 @@ class sparsepoints(lasagna_ingredient):
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
+        if len(self._data)==0:
+            return
+
         z = np.round(self._data[:,axisToPlot])
 
         data = self.data(axisToPlot)
