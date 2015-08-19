@@ -6,41 +6,84 @@ Defines a tree and a node class as well as functions for importing data
 (_ROOT, _DEPTH, _WIDTH) = range(3) #Used by classes to navigate the tree
 
 import os.path
+import dataTypeFromString
 
-
-def importData(fname,displayTree=False):
+def importData(fname, displayTree=False, colSep=',', headerLine=False):
     """
-    Import tree data from a CSV (text) file. The data should be in the following format
-    node_ID_number,node_parent_ID_number,xPosition,yPosition,zPosition\n
+    Import tree data from a CSV (text) file or list. 
 
-    The three coordinates are with respect to the image stack with which the 
-    tree structure is associated. 
+    The data should be in the following format:
+    node_ID_number,node_parent_ID_number,data_item1,data_item2,...,data_itemN\n
 
-    The root node has index of 1 and a parent of 0. 
+    The separator can, optionally, be a character other than ","
+
+    The root node must have a parent id of 0 and normally should also have an index of 1
 
     From MATLAB one can produce tree structures and dump data in the correct format
     using https://github.com/raacampbell13/matlab-tree and the tree.dumptree method
 
-    if displayTree is True, the tree is displayed after creation
+    Inputs:
+    fname - if a string, importData assumes it is a file name and tries to load the tree from file.
+            if it is a list, importData assumes that each line is a CSV data line and tries to 
+            convert to a tree.        
+    displayTree - if True the tree is printed to standard output after creation
+    colSep - the data separator, a comma by default.
+    headerLine - if True, the first line is stripped off and considered to be the column headings.
+                headerLine can also be a CSV string or a list that defines the column headings. Must have the
+                same number of columns as the rest of the file
+
     """
 
     #Error check
-    if os.path.exists(fname)==False:
-        print "Can not find file " + fname
-        return
+    if isinstance(fname,str):
+        if os.path.exists(fname)==False:
+            print "Can not find file " + fname
+            return
 
-    if fname.lower().endswith('csv')==False:
-        print "Data should be a CSV file"
-        return
+        #Read in data
+        fid = open(fname,'r')
+        contents = fid.read().split('\n')
+        fid.close()
 
-    #Read in data
-    fid = open(fname,'r')
+    elif isinstance(fname,list):
+        contents=fname #assume that fname is data rather than a file name
+
+
+    #Get header data if present
+    if headerLine==True:
+        header = contents.pop(0)
+        header = header.rstrip('\n').split(colSep)
+    elif isinstance(headerLine,str):
+        header = headerLine.rstrip('\n').split(colSep)
+    elif isinstance(headerLine,list):
+        header = headerLine
+    else:
+        header = False
+
+
     data = []
-    for line in fid:
-        dataLine = line.rstrip('\n').split(',')
-        data.append(map(int,dataLine))
+    for line in contents:
+        if len(line)==0:
+            continue
 
-    fid.close()
+        dataLine = line.split(colSep)
+        theseData = map(int,dataLine[0:2]) #add index and parent to the first two columns
+
+        #Add data to the third column. Either as a list or as a dictionary (if header names were provided)
+        if header != False: #add as dictionary
+            assert len(header)==len(dataLine)
+            dataCol = dict()
+
+            for ii in range(len(header)-2):
+                ii+=2
+                dataCol[header[ii]]=dataTypeFromString.convertString(dataLine[ii])
+
+        else:
+            dataCol = dataLine[2:] #add as list
+
+
+        theseData.append(dataCol) 
+        data.append(theseData)
 
 
     #Build tree
@@ -48,7 +91,7 @@ def importData(fname,displayTree=False):
     tree.add_node(0)
     for thisNode in data:
         tree.add_node(thisNode[0],thisNode[1])
-        tree[thisNode[0]].data = thisNode[2:]
+        tree[thisNode[0]].data = thisNode[2]
 
 
     #Optionally dump the tree to screen (unlikely to be useful for large trees)
@@ -89,7 +132,7 @@ class Tree(object):
 
         return node
 
-
+    #TODO: replace with  __repr__(self): ?
     def display(self, identifier, depth=_ROOT):
         """
         Very (very) simple tree display

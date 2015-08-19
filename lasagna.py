@@ -44,10 +44,10 @@ from alert import alert                  # Class used to bring up a warning box
 
 #The following imports are made here in order to ensure Lasagna builds as a standlone
 #application on the Mac with py2app
-import csv
+import json, ara_json, tree #for handling ARA labels files
 import lasagna_plugin #Needed here to build a standalone version 
-#import tifffile #used currently for the LSM reading
-import ARA #TODO: find out what calls this and try to weed it out. 
+import tifffile #used to load tiff and LSM files
+import nrrd
 
 
 
@@ -159,7 +159,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.showCrossHairs = lasHelp.readPreference('showCrossHairs')
         self.mouseX = None
         self.mouseY = None
-        self.pixelValue = None
+        self.inAxis = 0
         self.statusBarText = None
 
         #Lists of functions that are used as hooks for plugins to modify the behavior of built-in methods.
@@ -369,9 +369,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
   
     def loadImageStack(self,fnameToLoad):
         """
-        Loads the base image image stack. The base image stack is the one which will appear as gray
-        if it is the only stack loaded. This function wipes and data that have already been loaded. Any overlays that 
-        are present will be removed when this function runs. 
+        Loads an image image stack. 
         """
 
         self.runHook(self.hooks['loadImageStack_Start'])
@@ -427,7 +425,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
-    def showStackLoadDialog(self,triggered=None,fileFilter="Images (*.mhd *.mha *.tiff *.tif)"):
+    def showStackLoadDialog(self,triggered=None,fileFilter=None):
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
@@ -436,6 +434,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         
         triggered - just catches the input from the signal so we can set fileFilter
         """
+
+        #If no filter was provided, as for imageStackLoader what it's capable of loading and filter by this
+        if fileFilter==None:
+            fileFliter = imageStackLoader.imageFilter()
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
         fname = self.showFileLoadDialog(fileFilter=fileFilter)
@@ -768,7 +770,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if self.stacksInTreeList()==False:
             return
 
-        #show default images
+        #show default images (snap to middle layer of each axis)
         [axis.updatePlotItems_2D(self.ingredientList) for axis in self.axes2D]
 
         #initialize cross hair
@@ -951,9 +953,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Y = self.mouseY
 
         #get pixels under image
-        imageItems = self.axes2D[0].getPlotItemByType('ImageItem')
+        imageItems = self.axes2D[self.inAxis].getPlotItemByType('ImageItem')
         pixelValues=[]
-        
+
         #Get the pixel intensity of all displayed image layers under the mouse
         #The following assumes that images have their origin at (0,0)
         for thisImageItem in imageItems:
@@ -976,6 +978,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.statusBarText = "X=%d, Y=%d, val=[%s]" % (X,Y,valueStr)
 
         self.runHook(self.hooks['updateStatusBar_End']) #Hook goes here to modify or append message
+
         self.statusBar.showMessage(self.statusBarText)
 
 
@@ -1087,6 +1090,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeCrossHairs()
 
         if self.axes2D[0].view.sceneBoundingRect().contains(pos):
+            self.inAxis=0
             #TODO: figure out how to integrate this into object, because when we have that, we could
             #      do everything but the axis linking in the object. 
             if self.showCrossHairs:
@@ -1106,6 +1110,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeCrossHairs()
 
         if self.axes2D[1].view.sceneBoundingRect().contains(pos):
+            self.inAxis=1
             if self.showCrossHairs:
                 self.axes2D[1].view.addItem(self.crossHairVLine, ignoreBounds=True)
                 self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
@@ -1123,6 +1128,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeCrossHairs()
 
         if self.axes2D[2].view.sceneBoundingRect().contains(pos):
+            self.inAxis=2
             if self.showCrossHairs:
                 self.axes2D[2].view.addItem(self.crossHairVLine, ignoreBounds=True) 
                 self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)

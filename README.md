@@ -1,5 +1,8 @@
 # Lasagna - Python Volume Visualiser for 3-D data. #
 
+
+![cover image](http://raacampbell13.github.io/lasagna/images/mainWindow.jpg "Main Window")
+
 ## Concept ##
 Lasagna is a lightweight platform for visualising for 3D volume data. Lasagna features
 a flexible plugin system, allowing it to be easily extended using Python and PyQt. 

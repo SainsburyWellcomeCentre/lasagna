@@ -161,5 +161,10 @@ class lasagna_viewBox(pg.ViewBox):
             self.progressBy=-1
         else:
             self.progressBy=0
+        self.progressBy = self.progressBy * abs(ev.delta())/120 #this may be mouse-specific!
+
+        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
+            # Allow faster scrolling if it was a shift+wheel
+            self.progressBy = self.progressBy*5
 
         self.progressLayer.emit()

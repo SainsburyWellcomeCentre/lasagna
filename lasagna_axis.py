@@ -42,7 +42,7 @@ class projection2D():
         self.addItemsToPlotWidget(self.lasagna.ingredientList)
 
         #The currently plotted slice
-        #self.currentSlice=False 
+        self.currentSlice=False 
 
         #Link wheel-alone custom signal to a slot that will increment the current layer on mouse-wheel alone
         #self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
@@ -200,7 +200,7 @@ class projection2D():
                                             axisToPlot=self.axisToPlot, 
                                             sliceToPlot=sliceToPlotInThisLayer
                                             )
-                #self.currentSlice = sliceToPlotInThisLayer
+                self.currentSlice = sliceToPlotInThisLayer
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
         # the image is now displayed
