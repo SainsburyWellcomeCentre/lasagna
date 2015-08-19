@@ -1,6 +1,6 @@
 import json
 import os
-
+import sys
 """
 Dumps ARA JSON as a flattened file that we can feed into our tree reader
 """
@@ -28,24 +28,10 @@ def importData(fname,verbose=False):
 
 
 
-
-
-class Node(object):
-    def __init__(self, id=0, atlas_id=0, acronym=None, name=None, color_hex_triplet=None, graph_order=0, parent_structure_id=None, level=0):
-        self.id = id
-        self.atlas_id = atlas_id
-        self.acronym = acronym
-        self.name = name
-        self.color_hex_triplet = color_hex_triplet
-        self.graph_order = graph_order
-        self.parent_structure_id = parent_structure_id
-        self.level = level
-        self.children  = []
-
-    
-
-
 def tree_flatten(obj,flattened=''):
+    if obj[u'parent_structure_id']==None:
+        obj[u'parent_structure_id']=0
+
     flattened = flattened+"{id}|{parent_id}|{atlas_id}|{acronym}|{name}|{color}\n".format( 
             id=obj[u'id'],
             parent_id=obj[u'parent_structure_id'],
@@ -64,5 +50,8 @@ def tree_flatten(obj,flattened=''):
 
 #----------------------------------------------------------------------------
 if __name__ == '__main__':
-    flattened = importData('brain_area_names.json') #True to dump to standard output 
+    if len(sys.argv)>1:
+        fname = sys.argv[1]
+
+    flattened = importData(fname)
     print flattened
