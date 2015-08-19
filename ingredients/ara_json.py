@@ -53,5 +53,19 @@ if __name__ == '__main__':
     if len(sys.argv)>1:
         fname = sys.argv[1]
 
+
     flattened = importData(fname)
-    print flattened
+
+    returnTree=True
+
+    #Optionally run flattened structure through tree
+    if returnTree:
+        import tree
+        colNames = 'id|parent|atlas_id|acronym|name|color' #this
+        colNames = ['id','parent','atlas_id','acronym','name','color'] #or this
+        tree.importData(flattened.split('\n'),colSep='|',displayTree=True,headerLine=colNames)
+
+    else:
+        print flattened
+
+
