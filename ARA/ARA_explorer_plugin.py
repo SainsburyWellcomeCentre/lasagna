@@ -101,6 +101,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         #If the user has asked for this, load the first ARA entry automatically
         if self.prefs['loadFirstAtlasOnStartup']:
+            print "Auto-Loading " + self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
             self.loadARA(self.paths[self.paths.keys()[0]])
 
 
@@ -143,13 +144,27 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-        thisArea='UKNOWN' #The default return value should the following if statements fail
-        print self.lasagna.pixelValue #This should contain numbers but does not
-        if len(self.lasagna.pixelValue)>0:
-            if self.lasagna.pixelValue[0] in self.data['labels'].nodes:
-                thisArea=self.data['labels'][self.lasagna.pixelValue].data['name']
+       
+        stackName = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        thisAxis = self.lasagna.axes2D[self.lasagna.inAxis]
+        thisItem = thisAxis.getPlotItemByName(stackName)
+        imShape = thisItem.image.shape
 
-            
+        X = self.lasagna.mouseX
+        Y = self.lasagna.mouseY
+        
+        if X<0 or Y<0:
+            thisArea='outside image area'
+        elif X>=imShape[0] or Y>=imShape[1]:
+            thisArea='outside image area'
+        else:
+            value = thisItem.image[X,Y]
+            if value==0:
+                thisArea='outside brain'
+            elif value in self.data['labels'].nodes :
+                thisArea=self.data['labels'][value].data['name']
+            else:
+                thisArea='UNKNOWN'
 
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
