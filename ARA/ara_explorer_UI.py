@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ara_explorer.ui'
 #
-# Created: Wed Aug 19 11:50:06 2015
+# Created: Wed Aug 19 16:25:45 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,9 +26,17 @@ except AttributeError:
 class Ui_ara_explorer(object):
     def setupUi(self, ara_explorer):
         ara_explorer.setObjectName(_fromUtf8("ara_explorer"))
-        ara_explorer.resize(499, 254)
+        ara_explorer.resize(443, 574)
+        ara_explorer.setMinimumSize(QtCore.QSize(443, 500))
+        self.verticalLayout = QtGui.QVBoxLayout(ara_explorer)
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.load_frame = QtGui.QFrame(ara_explorer)
-        self.load_frame.setGeometry(QtCore.QRect(10, 10, 421, 61))
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.load_frame.sizePolicy().hasHeightForWidth())
+        self.load_frame.setSizePolicy(sizePolicy)
+        self.load_frame.setMinimumSize(QtCore.QSize(0, 61))
         self.load_frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.load_frame.setFrameShadow(QtGui.QFrame.Raised)
         self.load_frame.setObjectName(_fromUtf8("load_frame"))
@@ -38,8 +46,14 @@ class Ui_ara_explorer(object):
         self.load_pushButton = QtGui.QPushButton(self.load_frame)
         self.load_pushButton.setGeometry(QtCore.QRect(300, 20, 95, 24))
         self.load_pushButton.setObjectName(_fromUtf8("load_pushButton"))
+        self.verticalLayout.addWidget(self.load_frame)
         self.frame = QtGui.QFrame(ara_explorer)
-        self.frame.setGeometry(QtCore.QRect(10, 80, 421, 80))
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
+        self.frame.setMinimumSize(QtCore.QSize(0, 80))
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
         self.frame.setObjectName(_fromUtf8("frame"))
@@ -51,6 +65,10 @@ class Ui_ara_explorer(object):
         self.highlightArea_checkBox.setGeometry(QtCore.QRect(10, 30, 241, 21))
         self.highlightArea_checkBox.setChecked(True)
         self.highlightArea_checkBox.setObjectName(_fromUtf8("highlightArea_checkBox"))
+        self.verticalLayout.addWidget(self.frame)
+        self.treeView = QtGui.QTreeView(ara_explorer)
+        self.treeView.setObjectName(_fromUtf8("treeView"))
+        self.verticalLayout.addWidget(self.treeView)
 
         self.retranslateUi(ara_explorer)
         QtCore.QMetaObject.connectSlotsByName(ara_explorer)

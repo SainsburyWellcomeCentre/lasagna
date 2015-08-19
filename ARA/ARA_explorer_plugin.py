@@ -143,11 +143,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
+        thisArea='UKNOWN' #The default return value should the following if statements fail
+        print self.lasagna.pixelValue #This should contain numbers but does not
+        if len(self.lasagna.pixelValue)>0:
+            if self.lasagna.pixelValue[0] in self.data['labels'].nodes:
+                thisArea=self.data['labels'][self.lasagna.pixelValue].data['name']
 
-        if self.lasagna.pixelValue in self.data['labels'].nodes:
-            thisArea=self.data['labels'][self.lasagna.pixelValue].data['name']
-        else:
-            thisArea='UKNOWN'
+            
 
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
