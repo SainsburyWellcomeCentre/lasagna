@@ -145,6 +145,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         as the user mouses over the images
         """
        
+        if not self.statusBarName_checkBox.isChecked():
+            return
+            
         stackName = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
         thisAxis = self.lasagna.axes2D[self.lasagna.inAxis]
         thisItem = thisAxis.getPlotItemByName(stackName)
