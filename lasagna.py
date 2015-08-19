@@ -44,10 +44,9 @@ from alert import alert                  # Class used to bring up a warning box
 
 #The following imports are made here in order to ensure Lasagna builds as a standlone
 #application on the Mac with py2app
-import csv
+import json, ara_json, tree #for handling ARA labels files
 import lasagna_plugin #Needed here to build a standalone version 
 import tifffile #used to load tiff and LSM files
-import ARA #TODO: find out what calls this and try to weed it out. 
 import nrrd
 
 

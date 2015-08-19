@@ -24,7 +24,11 @@ def importData(fname,verbose=False):
     with open(fname) as f:
         obj = json.load(f)        
 
-    return tree_flatten(obj[u'msg'][0])
+
+    flattenedTree = tree_flatten(obj[u'msg'][0])
+    colNames = 'id|parent|atlas_id|acronym|name|color'
+    return (flattenedTree,colNames)
+
 
 
 
@@ -54,15 +58,13 @@ if __name__ == '__main__':
         fname = sys.argv[1]
 
 
-    flattened = importData(fname)
+    (flattened,colNames) = importData(fname)
 
     returnTree=True
 
     #Optionally run flattened structure through tree
     if returnTree:
         import tree
-        colNames = 'id|parent|atlas_id|acronym|name|color' #this
-        colNames = ['id','parent','atlas_id','acronym','name','color'] #or this
         tree.importData(flattened.split('\n'),colSep='|',displayTree=True,headerLine=colNames)
 
     else:

@@ -42,7 +42,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
 
         #Read in data
         fid = open(fname,'r')
-        contents = fid.read()
+        contents = fid.read().split('\n')
         fid.close()
 
     elif isinstance(fname,list):
@@ -52,6 +52,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
     #Get header data if present
     if headerLine==True:
         header = contents.pop(0)
+        header = header.rstrip('\n').split(colSep)
     elif isinstance(headerLine,str):
         header = headerLine.rstrip('\n').split(colSep)
     elif isinstance(headerLine,list):
@@ -59,17 +60,18 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
     else:
         header = False
 
+
     data = []
     for line in contents:
         if len(line)==0:
             continue
 
-        dataLine = line.rstrip('\n').split(colSep)
+        dataLine = line.split(colSep)
         theseData = map(int,dataLine[0:2]) #add index and parent to the first two columns
 
         #Add data to the third column. Either as a list or as a dictionary (if header names were provided)
         if header != False: #add as dictionary
-            assert len(dataLine)==len(dataLine)
+            assert len(header)==len(dataLine)
             dataCol = dict()
 
             for ii in range(len(header)-2):
