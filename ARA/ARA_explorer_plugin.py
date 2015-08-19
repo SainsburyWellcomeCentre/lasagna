@@ -172,34 +172,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
 
-
-    #The following hooks are for graceful shut down
-    def hook_showBaseStackLoadDialog_Start(self):
-        """
-        Hooks into base image file dialog method to shut down the ARA Explorer if the
-        user attempts to load a base stack
-        """
-        self.lasagna.removeIngredientByType('imagestack')
-
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
-
-        self.closePlugin()
-
-
-    def hook_loadRecentFileSlot_Start(self):
-        """
-        Hooks into the recent file loading method to shut down the ARA Explorer if the
-        user attempts to load a base stack
-        """
-        self.lasagna.removeIngredientByType('imagestack')
-
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
-
-        self.closePlugin()
-
-
+ 
     #--------------------------------------
     # core methods: these do the meat of the work
     #
@@ -295,8 +268,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         Display alert and quit the plugin
         """
-        #TODO: is not shutting down properly
+        #TODO: is not shutting down properly, although this same code does work in other contexts (e.g. when it was hooked into the load stack method)
         self.lasagna.alert = alert(self.lasagna,alertText=msg)
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
+        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+        
         self.closePlugin()
