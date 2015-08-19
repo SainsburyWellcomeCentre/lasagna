@@ -159,7 +159,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.showCrossHairs = lasHelp.readPreference('showCrossHairs')
         self.mouseX = None
         self.mouseY = None
-        self.pixelValue = None
+        self.inAxis = 0
         self.statusBarText = None
 
         #Lists of functions that are used as hooks for plugins to modify the behavior of built-in methods.
@@ -953,9 +953,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Y = self.mouseY
 
         #get pixels under image
-        imageItems = self.axes2D[0].getPlotItemByType('ImageItem')
+        imageItems = self.axes2D[self.inAxis].getPlotItemByType('ImageItem')
         pixelValues=[]
-        
+
         #Get the pixel intensity of all displayed image layers under the mouse
         #The following assumes that images have their origin at (0,0)
         for thisImageItem in imageItems:
@@ -978,6 +978,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.statusBarText = "X=%d, Y=%d, val=[%s]" % (X,Y,valueStr)
 
         self.runHook(self.hooks['updateStatusBar_End']) #Hook goes here to modify or append message
+
         self.statusBar.showMessage(self.statusBarText)
 
 
@@ -1089,6 +1090,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeCrossHairs()
 
         if self.axes2D[0].view.sceneBoundingRect().contains(pos):
+            self.inAxis=0
             #TODO: figure out how to integrate this into object, because when we have that, we could
             #      do everything but the axis linking in the object. 
             if self.showCrossHairs:
@@ -1108,6 +1110,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeCrossHairs()
 
         if self.axes2D[1].view.sceneBoundingRect().contains(pos):
+            self.inAxis=1
             if self.showCrossHairs:
                 self.axes2D[1].view.addItem(self.crossHairVLine, ignoreBounds=True)
                 self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
@@ -1125,6 +1128,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeCrossHairs()
 
         if self.axes2D[2].view.sceneBoundingRect().contains(pos):
+            self.inAxis=2
             if self.showCrossHairs:
                 self.axes2D[2].view.addItem(self.crossHairVLine, ignoreBounds=True) 
                 self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
