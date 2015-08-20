@@ -105,7 +105,7 @@ class loaderClass(lasagna_plugin):
             self.lasagna.addIngredient(objectName=objName, 
                         kind=self.kind,
                         data=data, 
-                        fname=fname
+                        fname=fname,
                         )
 
             self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots

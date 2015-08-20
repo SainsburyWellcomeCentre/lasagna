@@ -89,7 +89,7 @@ class lines(lasagna_ingredient):
             pen = self.pen
 
 
-        pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('b', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True)
+        pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('b', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True,connect="finite")
         """
                         pen=pen,
                         symbolSize=self.symbolSize, 
