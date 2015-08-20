@@ -189,6 +189,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     }
 
 
+
         #Handle IO plugins. For instance these are the loaders that handle different data types
         #and different loading actions. 
         IO_Paths = lasHelp.readPreference('IO_modulePaths') #directories containing IO modules
@@ -202,10 +203,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #TODO: currently we only have code to handle load actions as no save actions are available
         self.loadActions = {} #actions must be attached to the lasagna object or they won't function
         for thisIOmodule in IO_plugins:
-            print "Adding %s to load menu" % thisIOmodule
+
             IOclass,IOname=pluginHandler.getPluginInstanceFromFileName(thisIOmodule,attributeToImport='loaderClass')
             thisInstance = IOclass(self)
             self.loadActions[thisInstance.objectName] = thisInstance
+            print "Added %s to load menu as object name %s" % (thisIOmodule,thisInstance.objectName)
 
         print ""
 
@@ -1160,12 +1162,13 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     if not sparsePointsToLoad==None:
         for thisFname in sparsePointsToLoad:
             print "Loading " + thisFname
-            pass
+            tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
+
 
     if not linesToLoad==None:
         for thisFname in linesToLoad:
             print "Loading " + thisFname
-            pass
+            tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
     
 
     tasty.initialiseAxes()

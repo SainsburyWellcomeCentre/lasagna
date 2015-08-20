@@ -43,13 +43,17 @@ class loaderClass(lasagna_plugin):
 
 
  #Slots follow
-    def showLoadDialog(self):
+    def showLoadDialog(self,fname=None):
         """
         This slot brings up the load dialog and retrieves the file name.
+        If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
+
         """
         
-        fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
+        if fname == None:
+            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
+
         if fname == None:
             return
 
