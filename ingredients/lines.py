@@ -1,5 +1,9 @@
 """
-This class overlays points on top of the image stacks. 
+This class overlays lines on top of the image stacks. 
+Unlike the sparsepoints ingredient, multiple lines associated 
+with the same ingredient will likely have to be different plot 
+items. See: 
+https://groups.google.com/forum/?fromgroups=#!topic/pyqtgraph/h0PNUV2ToKg
 """
 
 from __future__ import division
@@ -14,7 +18,7 @@ import lasagna_helperFunctions as lasHelp
 class sparsepoints(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
         super(sparsepoints,self).__init__(parent, data, fnameAbsPath, enable, objectName,
-                                        pgObject='ScatterPlotItem'
+                                        pgObject='PlotDataItem'
                                         )
 
         
@@ -35,7 +39,7 @@ class sparsepoints(lasagna_ingredient):
         thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
         thing.setCheckState(QtCore.Qt.Checked)
 
-        #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
+        #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get access to the checkbox state
         self.modelItems=name
         self.model = self.parent.points_Model
 
@@ -50,24 +54,17 @@ class sparsepoints(lasagna_ingredient):
         Sparse point data are an n by 3 array where each row defines the location
         of a single point in x, y, and z
         """
-        if len(self._data)==0:
-            return False
-
         data = np.delete(self._data,axisToPlot,1)
         if axisToPlot==2:
             data = np.fliplr(data)
 
         return data
 
-
     def plotIngredient(self,pyqtObject,axisToPlot=0,sliceToPlot=0):
         """
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
-        if len(self._data)==0:
-            return
-
         z = np.round(self._data[:,axisToPlot])
 
         data = self.data(axisToPlot)
@@ -77,41 +74,21 @@ class sparsepoints(lasagna_ingredient):
         fromLayer = sliceToPlot-zRange
         toLayer = sliceToPlot+zRange
         data = data[(z>=fromLayer) * (z<=toLayer),:]
-        z = z[(z>=fromLayer) * (z<=toLayer)]
+
         if self.pen == True:            
             pen = self.symbolBrush()
         else:
             pen = self.pen
 
 
-        #Add points, making points further from the current
-        #layer less prominent 
-        #TODO: make how this settable by the user via YAML or UI elements
-        dataToAdd = []
-        for ii in range(len(data)):
-
-            #Get size for out-of layer points
-            size = (self.symbolSize - abs(z[ii]-sliceToPlot)*2)
-            if size<1:
-                size=1
-            #Get opacity for out-of layer points
-            alpha = (self.alpha - abs(z[ii]-sliceToPlot)*20)
-            if alpha<10:
-                alpha=10
+        pyqtObject.setData(x=data[:,0], y=data[:,1], 
+                        symbol=self.symbol, 
+                        pen=pen, 
+                        symbolSize=self.symbolSize, 
+                        symbolBrush=self.symbolBrush()
+                        )
 
 
-            dataToAdd.append(
-                    {
-                     'pos': (data[ii,0],data[ii,1]),
-                     'symbol': self.symbol,
-                     'brush': self.symbolBrush(alpha=alpha),
-                     'pen': pen,
-                     'size': size
-                     }
-                    )
-
-        pyqtObject.setData(dataToAdd)
-     
 
 
     def addToList(self):
@@ -128,17 +105,11 @@ class sparsepoints(lasagna_ingredient):
             
 
 
-    def symbolBrush(self,alpha=False):
-        """
-        Returns an RGB + opacity tuple 
-        """
-        if alpha==False:
-            alpha=self.alpha
-
+    def symbolBrush(self):
         if isinstance(self.color,str):
-            return tuple(self.colorName2value(self.color, alpha=alpha))
+            return tuple(self.colorName2value(self.color, alpha=self.alpha))
         elif isinstance(self.color,list):
-            return tuple(self.color + [alpha])
+            return tuple(self.color + [self.alpha])
         else:
             print "sparsepoints.color can not cope with type " + type(self.color)
 
