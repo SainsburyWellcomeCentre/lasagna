@@ -84,10 +84,7 @@ class lines(lasagna_ingredient):
         fromLayer = sliceToPlot-zRange
         toLayer = sliceToPlot+zRange
 
-        #Now filter our data list by this Z range. 
-        #The problem is that if points in the middle of a line series leave then re-enter
-        #the plane, we will end up linking stuff that should not be linked. Need a solution 
-        #for this before proceeding
+        #Now filter the data list by this Z range. 
         data = data[(z>=fromLayer) * (z<=toLayer),:]
 
         if self.pen == True:            
