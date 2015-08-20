@@ -79,7 +79,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
                 dataCol[header[ii]]=dataTypeFromString.convertString(dataLine[ii])
 
         else:
-            dataCol = dataLine[2:] #add as list
+            dataCol = dataLine[2:] #add as list of strings
 
 
         theseData.append(dataCol) 

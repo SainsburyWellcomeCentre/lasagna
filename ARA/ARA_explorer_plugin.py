@@ -22,6 +22,9 @@ import ara_explorer_UI
 #For handling the labels files
 import ara_json, tree
 
+#For contour drawing
+#from skimage import measure
+
 class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #must inherit lasagna_plugin first
     def __init__(self,lasagna):
         super(plugin,self).__init__(lasagna)
@@ -47,6 +50,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.statusBarName_checkBox.setChecked(self.prefs['enableNameInStatusBar'])
         self.highlightArea_checkBox.setChecked(self.prefs['enableOverlay'])
 
+        #Link signals to slots
+        self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
+        self.load_pushButton.released.connect(self.load_pushButton_slot)
 
         #Loop through all paths and add to combobox.
         self.paths = dict()
@@ -90,40 +96,23 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
            return
 
 
-        self.data = dict() #Loaded data will be in this dictionary
+        
+        #Make an sparsepoints ingredient (TODO: turn into a still to be made line ingredient)
+        #self.lasagna.addIngredient(objectName='ARA_CONTOUR', kind='sparsepoints', data=[])
+        
 
-        self.initPlugin()
-
-
-
-    def initPlugin(self):
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
 
         #If the user has asked for this, load the first ARA entry automatically
+        self.data = dict(loaded='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
         if self.prefs['loadFirstAtlasOnStartup']:
             print "Auto-Loading " + self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
-            self.loadARA(self.paths[self.paths.keys()[0]])
+            self.loadARA(self.paths.keys()[0])
+            self.load_pushButton.setEnabled(False) #disable because the current selection has now been loaded
 
 
-        #Make up a disjointed colormap
-        pos = np.array([0.0, 0.001, 0.25, 0.35, 0.45, 0.65, 0.9])
-        color = np.array([[0,0,0,255],[255,0,0,255], [0,2,230,255], [7,255,112,255], [255,240,7,255], [7,153,255,255], [255,7,235,255]], dtype=np.ubyte)
-        map = pg.ColorMap(pos, color)
-        lut = map.getLookupTable(0.0, 1.0, 256)
 
-        #Assign the colormap to the imagestack object
-        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString() #TODO: a bit horrible
-        firstLayer = self.lasagna.returnIngredientByName(self.ARAlayerName)
-        firstLayer.lut=lut
-        #Specify what colors the histogram should be so it doesn't end up megenta and 
-        #vomit-yellow, or who knows what, due to the weird color map we use here.
-        firstLayer.histPenCustomColor = [180,180,180,255]
-        firstLayer.histBrushCustomColor = [150,150,150,150]
-
-        self.lasagna.initialiseAxes(resetAxes=True)
-        self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
-
-
+        
 
     def closePlugin(self):
         """
@@ -145,6 +134,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         as the user mouses over the images
         """
        
+        if not self.statusBarName_checkBox.isChecked():
+            return
+            
         stackName = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
         thisAxis = self.lasagna.axes2D[self.lasagna.inAxis]
         thisItem = thisAxis.getPlotItemByName(stackName)
@@ -168,49 +160,68 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
+        if value>0 & self.highlightArea_checkBox.isChecked():
+            #contours = measure.find_contours(thisItem.image, value)
+            pass
+            
 
-
-    #The following hooks are for graceful shut down
-    def hook_showBaseStackLoadDialog_Start(self):
+ 
+    #--------------------------------------
+    # UI slots
+    #all methods starting with hook_ are automatically registered as hooks with lasagna 
+    #when the plugin is started this happens in the lasagna_plugin constructor 
+    def araName_comboBox_slot(self):
         """
-        Hooks into base image file dialog method to shut down the ARA Explorer if the
-        user attempts to load a base stack
+        Enables the load button only if the currently selected item is not loaded
         """
-        self.lasagna.removeIngredientByType('imagestack')
+        #If nothing has been loaded then for sure we need the load button enabled
+        if len(self.data['loaded'])==0:
+            self.load_pushButton.setEnabled(True) 
+            return
 
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+        if self.data['loaded'] != self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+            self.load_pushButton.setEnabled(True) 
+        elif self.data['loaded'] == self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+            self.load_pushButton.setEnabled(False) 
 
-        self.closePlugin()
 
-
-    def hook_loadRecentFileSlot_Start(self):
+    def load_pushButton_slot(self):
         """
-        Hooks into the recent file loading method to shut down the ARA Explorer if the
-        user attempts to load a base stack
+        Load the currently selected ARA version
         """
-        self.lasagna.removeIngredientByType('imagestack')
+        selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        self.loadARA(selectedName)
 
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
-
-        self.closePlugin()
 
 
     #--------------------------------------
     # core methods: these do the meat of the work
     #
-    def loadARA(self,paths):
+    def loadARA(self,araName):
         """
-        Coordinates loading of the ARA items defined in the dictionary paths. 
-        Paths has these keys: 
+        Coordinate loading of the ARA items defined in the dictionary paths. 
+        araName is a value from the self.paths dictionary. The values will be 
+        combobox item texts and will load a dictionary from self.paths. The keys
+        of this dictionary have these keys: 
         'atlas' (full path to atlas volume file)
         'labels' (full path to atlas labels file - csv or json)
         'template' (full path to average template file - optional)
         """
+        
+        paths = self.paths[araName]
+        print paths
+        #remove the currently loaded ARA (if present)
+        if len(self.data['loaded'])>0:
+            self.lasagna.removeIngredientByName(self.data['loaded'])
+
         self.data['labels'] = self.loadLabels(paths['labels'])
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
         #self.data['template'] = self.loadVolume(paths['template'])   #TODO: set up code for this. 
+        self.data['loaded'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+
+        self.setARAcolors()
+        self.lasagna.initialiseAxes(resetAxes=True)
+        self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
 
 
     def loadLabels(self,fname):
@@ -245,6 +256,22 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         return self.lasagna.loadImageStack(fname)
 
+
+    def setARAcolors(self):
+        #Make up a disjointed colormap
+        pos = np.array([0.0, 0.001, 0.25, 0.35, 0.45, 0.65, 0.9])
+        color = np.array([[0,0,0,255],[255,0,0,255], [0,2,230,255], [7,255,112,255], [255,240,7,255], [7,153,255,255], [255,7,235,255]], dtype=np.ubyte)
+        map = pg.ColorMap(pos, color)
+        lut = map.getLookupTable(0.0, 1.0, 256)
+
+        #Assign the colormap to the imagestack object
+        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString() #TODO: a bit horrible
+        firstLayer = self.lasagna.returnIngredientByName(self.ARAlayerName)
+        firstLayer.lut=lut
+        #Specify what colors the histogram should be so it doesn't end up megenta and 
+        #vomit-yellow, or who knows what, due to the weird color map we use here.
+        firstLayer.histPenCustomColor = [180,180,180,255]
+        firstLayer.histBrushCustomColor = [150,150,150,150]
 
 
     def guessFileSep(self,fname):
@@ -292,8 +319,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         Display alert and quit the plugin
         """
-        #TODO: is not shutting down properly
+        #TODO: is not shutting down properly, although this same code does work in other contexts (e.g. when it was hooked into the load stack method)
         self.lasagna.alert = alert(self.lasagna,alertText=msg)
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
+        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+        
         self.closePlugin()

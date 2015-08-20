@@ -18,9 +18,12 @@ Lasagna runs on Python 2.7, PyQt4, and uses PyQtGraph for the plotting. You'll n
 * tifffile [for importing LSM files]
 * vtk [optional, for faster import of MHD files]
 * PyLibTiff
+* pynrrd
 * numpy
 * pyqtgraph 9.10
 * yaml
 * PyQt4
 * SIP
 
+## Current status ##
+Even the master branch is currently highly unstable (although should always be usable). Stability is expected by Q4 2015. 
