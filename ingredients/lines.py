@@ -53,18 +53,29 @@ class lines(lasagna_ingredient):
         lines data are an n by 3 array where each row defines the location
         of a single point in x, y, and z
         """
-        data = np.delete(self._data,axisToPlot,1)
-        if axisToPlot==2:
-            data = np.fliplr(data)
+        data = []
+        for thisSeries in self._data:
+            theseData = np.delete(thisSeries,axisToPlot,1)
+            if axisToPlot==2:
+                theseData = np.fliplr(theseData)
+
+            data.append(theseData)
 
         return data
+
 
     def plotIngredient(self,pyqtObject,axisToPlot=0,sliceToPlot=0):
         """
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
-        z = np.round(self._data[:,axisToPlot])
+
+        #Ensure our z dimension is a whole number
+        z = []
+        print "seeking to plot %d" % axisToPlot
+        for thisSeries in self._data:
+            thisZ = np.round(thisSeries[:,axisToPlot])
+            z.append(thisZ)
 
         data = self.data(axisToPlot)
 
@@ -72,6 +83,11 @@ class lines(lasagna_ingredient):
         zRange = self.parent.viewZ_spinBoxes[axisToPlot].value()-1
         fromLayer = sliceToPlot-zRange
         toLayer = sliceToPlot+zRange
+
+        #Now filter our data list by this Z range. 
+        #The problem is that if points in the middle of a line series leave then re-enter
+        #the plane, we will end up linking stuff that should not be linked. Need a solution 
+        #for this before proceeding
         data = data[(z>=fromLayer) * (z<=toLayer),:]
 
         if self.pen == True:            
