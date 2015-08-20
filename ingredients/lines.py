@@ -80,7 +80,7 @@ class lines(lasagna_ingredient):
         toLayer = sliceToPlot+zRange
 
         #Now filter the data list by this Z range. Points that will not be plotted are replaced with nan
-        data[z<fromLayer,1] = np.nan
+        data[z<fromLayer,:] = np.nan
         data[z>toLayer,:] = np.nan
 
         if self.pen == True:            

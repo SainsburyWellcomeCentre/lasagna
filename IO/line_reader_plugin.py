@@ -75,6 +75,7 @@ class loaderClass(lasagna_plugin):
             asList = contents.split('\n')
             data=[]
             lastLineSeries=None
+            n=0
             for ii in range(len(asList)):
                 if len(asList[ii])==0:
                     continue
@@ -82,17 +83,22 @@ class loaderClass(lasagna_plugin):
                 thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
                 if lastLineSeries==None:
                     lastLineSeries=thisLineAsFloats[0]
+
                 if lastLineSeries != thisLineAsFloats[0]:
+                    n+=1
                     data.append([np.nan, np.nan, np.nan])
 
+                lastLineSeries=thisLineAsFloats[0]
                 data.append(thisLineAsFloats[1:])
 
-
+            print "Added %d nan rows" % n
             #TEMPORARY HACK
             data = np.asarray(data)
             data[:,0] = data[:,0]/5
             data[:,1:] = data[:,1:]/20.8
             #TEMPORAY HACK
+
+
 
 
             objName=fname.split(os.path.sep)[-1]
