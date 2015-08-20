@@ -92,8 +92,6 @@ class projection2D():
             print '** removeItemFromPlotWidget: %d items before removal and %d after removal **' % (nItemsBefore,nItemsAfter)
             return False
 
-
-
         print "%d items after remove call" % len(self.view.items())
 
 
@@ -169,11 +167,6 @@ class projection2D():
         """
 
         # loop through all plot items searching for imagestack items (these need to be plotted first)
-        #NOTE: the following two loops will be changed soon
-        #TODO: CHECK HOW ORDER IS DECIDED
-        #TODO: have just one loop
-        #     the plot order may already have been decided at the time the objects were added so having these 
-        #     two loops may be of no use
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack):
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -205,7 +198,7 @@ class projection2D():
 
         # the image is now displayed
 
-        # loop through all plot items searching for non-image items (these need to be overlaid onto the image)
+        # loop through all plot items searching for non-image items (these need to be overlaid on top of the image)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: #TODO: too specific 
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
