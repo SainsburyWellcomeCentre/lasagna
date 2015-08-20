@@ -61,24 +61,24 @@ args = parser.parse_args()
 
 
 
-fnames=[None,None]
+imStackFnamesToLoad=[None,None]
 pluginToStart = args.P
 if args.D==True:
     import tempfile
     import urllib
 
-    fnames = [tempfile.gettempdir()+os.path.sep+'reference.tiff',
+    imStackFnamesToLoad = [tempfile.gettempdir()+os.path.sep+'reference.tiff',
               tempfile.gettempdir()+os.path.sep+'sample.tiff']
 
     loadUrl = 'http://mouse.vision/lasagna/'
-    for fname in fnames:
+    for fname in imStackFnamesToLoad:
         if not os.path.exists(fname):
             url = loadUrl + fname.split(os.path.sep)[-1]
             print 'Downloading %s to %s' % (url,fname)
             urllib.urlretrieve(url,fname)
     
 elif args.im != None:
-    fnames = args.im
+    imStackFnamesToLoad = args.im
   
     
 
@@ -1141,15 +1141,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def main(fnames, pluginToStart=None):
+def main(imStackFnamesToLoad, pluginToStart=None):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
     tasty.app = app
 
     #Load stacks from command line input if any was provided
-    if not fnames[0]==None:
-        for thisFname in fnames:
+    if not imStackFnamesToLoad[0]==None:
+        for thisFname in imStackFnamesToLoad:
             print "Loading " + thisFname
             tasty.loadImageStack(thisFname)
 
@@ -1174,7 +1174,7 @@ def main(fnames, pluginToStart=None):
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(fnames=fnames, pluginToStart=pluginToStart)
+    main(imStackFnamesToLoad=imStackFnamesToLoad, pluginToStart=pluginToStart)
 
 
     """
