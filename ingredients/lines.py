@@ -15,9 +15,9 @@ from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
 
 
-class sparsepoints(lasagna_ingredient):
+class lines(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
-        super(sparsepoints,self).__init__(parent, data, fnameAbsPath, enable, objectName,
+        super(lines,self).__init__(parent, data, fnameAbsPath, enable, objectName,
                                         pgObject='PlotDataItem'
                                         )
 
@@ -50,7 +50,7 @@ class sparsepoints(lasagna_ingredient):
        
     def data(self,axisToPlot=0):
         """
-        Sparse point data are an n by 3 array where each row defines the location
+        lines data are an n by 3 array where each row defines the location
         of a single point in x, y, and z
         """
         data = np.delete(self._data,axisToPlot,1)
@@ -94,7 +94,7 @@ class sparsepoints(lasagna_ingredient):
         """
         Add to list and then set UI elements
         """
-        super(sparsepoints,self).addToList()
+        super(lines,self).addToList()
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
         if self.pen == None:
@@ -109,7 +109,7 @@ class sparsepoints(lasagna_ingredient):
         elif isinstance(self.color,list):
             return tuple(self.color + [self.alpha])
         else:
-            print "sparsepoints.color can not cope with type " + type(self.color)
+            print "lines.color can not cope with type " + type(self.color)
 
 
     #---------------------------------------------------------------
