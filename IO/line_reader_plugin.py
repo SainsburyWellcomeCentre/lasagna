@@ -79,11 +79,46 @@ class loaderClass(lasagna_plugin):
                 data.append([float(x) for x in asList[ii].split(',')])
 
 
+            #Get the line series data
+
+            #These are the unique line series numbers
+            lineSeries=[]
+            uniqueLineSeries=[]
+            z=[]
+            x=[]
+            y=[]
+            for thisLine in data:
+                thisSeries = int(thisLine[0])
+                lineSeries.append(thisSeries)
+                z.append(thisLine[1])
+                x.append(thisLine[2])
+                y.append(thisLine[3])
+                try:
+                    uniqueLineSeries.index(thisSeries)
+                except ValueError:
+                    uniqueLineSeries.append(thisSeries)
+
+
+            #Now make a list of np arrays where each np array is a zxy set of line data
+            lineSeries = np.asarray(lineSeries)
+            z = np.asarray(z)
+            x = np.asarray(z)
+            y = np.asarray(y)
+
+            data = []
+            for ii in uniqueLineSeries:
+                f = (lineSeries==ii)
+                (z[f],x[f],y[f])
+                data.append(np.array((z[f],x[f],y[f])).transpose())
+
+            print "Found lines data with %d line series" % len(data)
+
+
 
             objName=fname.split(os.path.sep)[-1]
             self.lasagna.addIngredient(objectName=objName, 
                         kind=self.kind,
-                        data=np.asarray(data), 
+                        data=data, 
                         fname=fname
                         )
 
