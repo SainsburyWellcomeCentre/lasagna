@@ -81,7 +81,7 @@ if args.D==True:
             print 'Downloading %s to %s' % (url,fname)
             urllib.urlretrieve(url,fname)
     
-elif args.im != None:
+else:
     imStackFnamesToLoad = args.im
 
     
@@ -1145,7 +1145,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def main(imStackFnamesToLoad, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None):
+def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
