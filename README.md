@@ -25,3 +25,5 @@ Lasagna runs on Python 2.7, PyQt4, and uses PyQtGraph for the plotting. You'll n
 * PyQt4
 * SIP
 
+## Current status ##
+Even the master branch is currently highly unstable (although should always be usable). Stability is expected by Q4 2015. 
