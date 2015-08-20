@@ -51,7 +51,7 @@ class sparsepoints(lasagna_ingredient):
         Sparse point data are an n by 3 array where each row defines the location
         of a single point in x, y, and z
         """
-        if len(self_data)==0:
+        if len(self._data)==0:
             return False
 
         data = np.delete(self._data,axisToPlot,1)
