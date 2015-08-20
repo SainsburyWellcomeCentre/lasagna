@@ -18,11 +18,12 @@ import lasagna_helperFunctions as lasHelp
 class lines(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
         super(lines,self).__init__(parent, data, fnameAbsPath, enable, objectName,
-                                        pgObject='PlotDataItem'
+                                        pgObject='PlotCurveItem'
                                         )
 
         
-        #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
+        #Choose symbols from preferences file. 
+        #TODO: remove symbol stuff if we indeed will get rid of this here
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
         self.pen = None
         self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
@@ -53,13 +54,12 @@ class lines(lasagna_ingredient):
         lines data are an n by 3 array where each row defines the location
         of a single point in x, y, and z
         """
-        data = []
-        for thisSeries in self._data:
-            theseData = np.delete(thisSeries,axisToPlot,1)
-            if axisToPlot==2:
-                theseData = np.fliplr(theseData)
+        if len(self._data)==0:
+            return False
 
-            data.append(theseData)
+        data = np.delete(self._data,axisToPlot,1)
+        if axisToPlot==2:
+            data = np.fliplr(data)
 
         return data
 
@@ -71,12 +71,7 @@ class lines(lasagna_ingredient):
         """
 
         #Ensure our z dimension is a whole number
-        z = []
-        print "seeking to plot %d" % axisToPlot
-        for thisSeries in self._data:
-            thisZ = np.round(thisSeries[:,axisToPlot])
-            z.append(thisZ)
-
+        z = np.round(self._data[:,axisToPlot])
         data = self.data(axisToPlot)
 
         #Find points within this z-plane +/- a certain region
@@ -84,8 +79,9 @@ class lines(lasagna_ingredient):
         fromLayer = sliceToPlot-zRange
         toLayer = sliceToPlot+zRange
 
-        #Now filter the data list by this Z range. 
-        data = data[(z>=fromLayer) * (z<=toLayer),:]
+        #Now filter the data list by this Z range. Points that will not be plotted are replaced with nan
+        data[z<fromLayer,1] = np.nan
+        data[z>toLayer,:] = np.nan
 
         if self.pen == True:            
             pen = self.symbolBrush()
@@ -93,13 +89,13 @@ class lines(lasagna_ingredient):
             pen = self.pen
 
 
-        pyqtObject.setData(x=data[:,0], y=data[:,1], 
-                        symbol=self.symbol, 
-                        pen=pen, 
+        pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('b', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True)
+        """
+                        pen=pen,
                         symbolSize=self.symbolSize, 
                         symbolBrush=self.symbolBrush()
                         )
-
+        """
 
 
 

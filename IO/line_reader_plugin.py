@@ -71,48 +71,28 @@ class loaderClass(lasagna_plugin):
 
 
             # a list of strings with each string being one line from the file
+            # add nans between lineseries
             asList = contents.split('\n')
             data=[]
+            lastLineSeries=None
             for ii in range(len(asList)):
                 if len(asList[ii])==0:
                     continue
-                data.append([float(x) for x in asList[ii].split(',')])
+
+                thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
+                if lastLineSeries==None:
+                    lastLineSeries=thisLineAsFloats[0]
+                if lastLineSeries != thisLineAsFloats[0]:
+                    data.append([np.nan, np.nan, np.nan])
+
+                data.append(thisLineAsFloats[1:])
 
 
-            #Get the line series data
-
-            #These are the unique line series numbers
-            lineSeries=[]
-            uniqueLineSeries=[]
-            z=[]
-            x=[]
-            y=[]
-            for thisLine in data:
-                thisSeries = int(thisLine[0])
-                lineSeries.append(thisSeries)
-                z.append(thisLine[1])
-                x.append(thisLine[2])
-                y.append(thisLine[3])
-                try:
-                    uniqueLineSeries.index(thisSeries)
-                except ValueError:
-                    uniqueLineSeries.append(thisSeries)
-
-
-            #Now make a list of np arrays where each np array is a zxy set of line data
-            lineSeries = np.asarray(lineSeries)
-            z = np.asarray(z)
-            x = np.asarray(z)
-            y = np.asarray(y)
-
-            data = []
-            for ii in uniqueLineSeries:
-                f = (lineSeries==ii)
-                (z[f],x[f],y[f])
-                data.append(np.array((z[f],x[f],y[f])).transpose())
-
-            print "Found lines data with %d line series" % len(data)
-
+            #TEMPORARY HACK
+            data = np.asarray(data)
+            data[:,0] = data[:,0]/5
+            data[:,1:] = data[:,1:]/20.8
+            #TEMPORAY HACK
 
 
             objName=fname.split(os.path.sep)[-1]
