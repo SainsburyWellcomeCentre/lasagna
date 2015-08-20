@@ -29,11 +29,11 @@ class loaderClass(lasagna_plugin):
 
         self.lasagna = lasagna
         self.objectName = 'lines_reader'
+        self.kind = 'lines'
 
         #Construct the QActions and other stuff required to integrate the load dialog into the menu
         self.loadAction = QtGui.QAction(self.lasagna) #Instantiate the menu action
 
-        #TODO: make an icon
         #Add an icon to the action
         iconLoadOverlay = QtGui.QIcon()
         iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/lines_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -79,15 +79,17 @@ class loaderClass(lasagna_plugin):
                 data.append([float(x) for x in asList[ii].split(',')])
 
 
+
             objName=fname.split(os.path.sep)[-1]
             self.lasagna.addIngredient(objectName=objName, 
-                        kind='sparsepoints', 
+                        kind=self.kind,
                         data=np.asarray(data), 
                         fname=fname
                         )
 
             self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots
             self.lasagna.initialiseAxes()
+
 
         else:
             self.lasagna.statusBar.showMessage("Unable to find " + str(fname))

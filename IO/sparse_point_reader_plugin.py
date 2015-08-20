@@ -22,11 +22,10 @@ class loaderClass(lasagna_plugin):
 
         self.lasagna = lasagna
         self.objectName = 'sparse_point_reader'
-
+        self.kind = 'sparsepoints'
         #Construct the QActions and other stuff required to integrate the load dialog into the menu
         self.loadAction = QtGui.QAction(self.lasagna) #Instantiate the menu action
 
-        #TODO: make an icon
         #Add an icon to the action
         iconLoadOverlay = QtGui.QIcon()
         iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -75,7 +74,7 @@ class loaderClass(lasagna_plugin):
 
             objName=fname.split(os.path.sep)[-1]
             self.lasagna.addIngredient(objectName=objName, 
-                        kind='sparsepoints', 
+                        kind=self.kind, 
                         data=np.asarray(data), 
                         fname=fname
                         )
