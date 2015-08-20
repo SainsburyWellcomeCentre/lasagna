@@ -56,13 +56,17 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-D", help="Load demo images", action="store_true")
 parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
+parser.add_argument("-S", nargs='+', help="file names of sparse points file(s) to load")
+parser.add_argument("-L", nargs='+', help="file names of lines file(s) to load")
 parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
 
 
-
-imStackFnamesToLoad=[None,None]
 pluginToStart = args.P
+sparsePointsToLoad = args.S
+linesToLoad = args.L
+
+#Either load the demo stacks or a user-specified stacks
 if args.D==True:
     import tempfile
     import urllib
@@ -79,7 +83,7 @@ if args.D==True:
     
 elif args.im != None:
     imStackFnamesToLoad = args.im
-  
+
     
 
 
@@ -1141,17 +1145,28 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def main(imStackFnamesToLoad, pluginToStart=None):
+def main(imStackFnamesToLoad, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
     tasty.app = app
 
-    #Load stacks from command line input if any was provided
-    if not imStackFnamesToLoad[0]==None:
+    #Data from command line input if the user specified this
+    if not imStackFnamesToLoad==None:
         for thisFname in imStackFnamesToLoad:
             print "Loading " + thisFname
             tasty.loadImageStack(thisFname)
+
+    if not sparsePointsToLoad==None:
+        for thisFname in sparsePointsToLoad:
+            print "Loading " + thisFname
+            pass
+
+    if not linesToLoad==None:
+        for thisFname in linesToLoad:
+            print "Loading " + thisFname
+            pass
+    
 
     tasty.initialiseAxes()
 
@@ -1174,4 +1189,4 @@ def main(imStackFnamesToLoad, pluginToStart=None):
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(imStackFnamesToLoad=imStackFnamesToLoad, pluginToStart=pluginToStart)
+    main(imStackFnamesToLoad=imStackFnamesToLoad, sparsePointsToLoad=sparsePointsToLoad, linesToLoad=linesToLoad, pluginToStart=pluginToStart)

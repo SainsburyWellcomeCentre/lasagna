@@ -41,9 +41,9 @@ class loaderClass(lasagna_plugin):
 
 
         #Insert the action into the menu
-        self.loadAction.setObjectName("sparsePointRead")
+        self.loadAction.setObjectName("linesRead")
         self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
-        self.loadAction.setText("Sparse point read")
+        self.loadAction.setText("Lines read")
 
         self.loadAction.triggered.connect(self.showLoadDialog) #Link the action to the slot
 

@@ -22,7 +22,7 @@ class sparsepoints(lasagna_ingredient):
                                         )
 
         
-        #Choose symbols from preferences file. TODO: in future could increment through so successive items have different symbols and colors
+        #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
         self.pen = None
         self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
@@ -42,7 +42,6 @@ class sparsepoints(lasagna_ingredient):
         #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get access to the checkbox state
         self.modelItems=name
         self.model = self.parent.points_Model
-
 
 
         self.addToList()
@@ -103,7 +102,6 @@ class sparsepoints(lasagna_ingredient):
         else:
             self.parent.addLines_checkBox.setCheckState(True)
             
-
 
     def symbolBrush(self):
         if isinstance(self.color,str):
