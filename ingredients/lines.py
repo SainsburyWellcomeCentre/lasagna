@@ -98,7 +98,7 @@ class lines(lasagna_ingredient):
 
         #If we have only NaNs we should not plot. 
         if np.all(np.isnan(data))==False:
-            pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('w', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True,connect="finite")
+            pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('r', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True,connect="finite")
         """
                         pen=pen,
                         symbolSize=self.symbolSize, 

@@ -175,35 +175,35 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
             allContours = nans
             
-            #Add contours to axes 0
             for axNum in range(len(self.lasagna.axes2D)):
                 contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
 
                 if highlightOnlyCurrentAxis == True and axNum != self.lasagna.inAxis:
-                    print "SKIP"
                     continue
 
+                print "ax:%d slice:%d" % (axNum,self.lasagna.axes2D[axNum].currentSlice)
                 for thisContour in contours:
                     tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*self.lasagna.axes2D[axNum].currentSlice
 
                     if axNum==0:
                         tmp[:,1:] = thisContour
 
-                    if axNum==1:
+                    elif axNum==1:
                         tmp[:,0] = thisContour[:,0]
                         tmp[:,2] = thisContour[:,1]
 
-                    if axNum==2:
+                    elif axNum==2:
                         tmp[:,1] = thisContour[:,0]
                         tmp[:,0] = thisContour[:,1]
 
-                    tmp = np.append(tmp,nans,axis=0)
+                    tmp = np.append(tmp,nans,axis=0) #Terminate each contour with nans so that they are not  linked
                     allContours = np.append(allContours,tmp,axis=0)
 
 
 
             #Replace the data in the ingredient so they are plotted
             self.lasagna.returnIngredientByName(self.contourName)._data = allContours
+            #self.lasagna.initialiseAxes()
 
         if highlightOnlyCurrentAxis:
             self.lastValue = value 
@@ -222,7 +222,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         #Make a copy of the image and set values lower than our value to a greater number
         #since the countour finder will draw around everything less than our value
         tmpImage = np.array(thisItem.image)
-        tmpImage[tmpImage<value]=value+10 
+        tmpImage[tmpImage<value] = value+10
         return measure.find_contours(tmpImage, value)
 
 
