@@ -170,7 +170,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
-        if self.lastValue != value & value>0 & self.highlightArea_checkBox.isChecked():
+        if self.lastValue != value and value>0 and self.highlightArea_checkBox.isChecked():
          
             nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
             allContours = nans
