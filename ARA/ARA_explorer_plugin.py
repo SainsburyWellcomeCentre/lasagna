@@ -23,7 +23,7 @@ import ara_explorer_UI
 import ara_json, tree
 
 #For contour drawing
-#from skimage import measure
+from skimage import measure
 
 class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #must inherit lasagna_plugin first
     def __init__(self,lasagna):
@@ -38,6 +38,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         #Read file locations from preferences file (creating a default file if none exists)
         self.pref_file = lasHelp.getLasagna_prefDir() + 'ARA_plugin_prefs.yml'
         self.prefs = lasHelp.loadAllPreferences(prefFName=self.pref_file,defaultPref=self.defaultPrefs())
+
+        #The last value the mouse hovered over. When this changes, we re-calcualte the contour 
+        self.lastValue=-1
 
         #Warn and quit if there are no paths
         if len(self.prefs['ara_paths'])==0:
@@ -112,6 +115,16 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
 
 
+
+        #Make a lines ingredient that will house the contours for the currently selected area.
+        self.contourName = 'aracontour'
+        self.lasagna.addIngredient(objectName=self.contourName, 
+                                kind='lines', 
+                                data=[])
+
+        #TODO: confirm that the following line is not needed and remove if so
+        self.lasagna.initialiseAxes(resetAxes=True) #update the plots.
+
         
 
     def closePlugin(self):
@@ -147,8 +160,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         
         if X<0 or Y<0:
             thisArea='outside image area'
+            value=-1
         elif X>=imShape[0] or Y>=imShape[1]:
             thisArea='outside image area'
+            value=-1
         else:
             value = thisItem.image[X,Y]
             if value==0:
@@ -160,9 +175,21 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
-        if value>0 & self.highlightArea_checkBox.isChecked():
-            #contours = measure.find_contours(thisItem.image, value)
-            pass
+
+        if self.lastValue != value & value>0 & self.highlightArea_checkBox.isChecked():
+            contours = measure.find_contours(thisItem.image, value)
+            print "ARA thinks %d" % thisAxis.currentSlice
+            for thisContour in contours:
+                tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*thisAxis.currentSlice
+                tmp[:,1:] = thisContour
+                self.lasagna.returnIngredientByName(self.contourName)._data = tmp
+                #print self.lasagna.returnIngredientByName(self.contourName).raw_data()
+                break
+
+            #self.lasagna.initialiseAxes()
+
+
+        self.lastValue = value
             
 
  
