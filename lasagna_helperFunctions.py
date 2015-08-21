@@ -55,8 +55,9 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
             if thisItem.objectName == itemName:
                 return thisItem
 
-
-    print "Failed to find " + itemName + " in PlotWidget"
+    verbose=False
+    if verbose:
+        print "Failed to find %s in PlotWidget" %  itemName
     return False
 
 
