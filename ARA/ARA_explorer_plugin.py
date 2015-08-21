@@ -56,7 +56,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         #Link signals to slots
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.load_pushButton.released.connect(self.load_pushButton_slot)
-
+        self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
         #Loop through all paths and add to combobox.
         self.paths = dict()
         for ara in self.prefs['ara_paths']:
@@ -101,7 +101,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
 
         #If the user has asked for this, load the first ARA entry automatically
-        self.data = dict(loaded='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
+        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
         if self.prefs['loadFirstAtlasOnStartup']:
             print "Auto-Loading " + self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
             self.loadARA(self.paths.keys()[0])
@@ -235,13 +235,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         Enables the load button only if the currently selected item is not loaded
         """
         #If nothing has been loaded then for sure we need the load button enabled
-        if len(self.data['loaded'])==0:
+        if len(self.data['currentlyLoadedAtlasName'])==0:
             self.load_pushButton.setEnabled(True) 
             return
 
-        if self.data['loaded'] != self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+        if self.data['currentlyLoadedAtlasName'] != self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
             self.load_pushButton.setEnabled(True) 
-        elif self.data['loaded'] == self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+        elif self.data['currentlyLoadedAtlasName'] == self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
             self.load_pushButton.setEnabled(False) 
 
 
@@ -253,6 +253,25 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.loadARA(selectedName)
 
 
+    def overlayTemplate_checkBox_slot(self):
+        """
+        Load or unload the template overlay
+        """
+        fname = self.data['template']
+        if len(fname)==0:
+            return
+
+        if self.overlayTemplate_checkBox.isChecked()==True:
+            if os.path.exists(fname):
+                self.loadVolume(fname)
+                return
+
+        if self.overlayTemplate_checkBox.isChecked()==False:
+            overlayName = fname.split(os.path.sep)[-1]
+            self.lasagna.removeIngredientByName(overlayName)
+
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
+        self.lasagna.initialiseAxes()
 
     #--------------------------------------
     # core methods: these do the meat of the work
@@ -271,17 +290,40 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         paths = self.paths[araName]
         print paths
         #remove the currently loaded ARA (if present)
-        if len(self.data['loaded'])>0:
-            self.lasagna.removeIngredientByName(self.data['loaded'])
+        if len(self.data['currentlyLoadedAtlasName'])>0:
+            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
 
         self.data['labels'] = self.loadLabels(paths['labels'])
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
-        #self.data['template'] = self.loadVolume(paths['template'])   #TODO: set up code for this. 
-        self.data['loaded'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        self.data['currentlyLoadedAtlasName'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        self.data['template']=paths['template']
+
+        if os.path.exists(paths['template']):
+            self.overlayTemplate_checkBox.setEnabled(True)
+            if self.overlayTemplate_checkBox.isChecked()==True:
+                self.addOverlay(self.data['template'])
+        else:
+            self.overlayTemplate_checkBox.setEnabled(False)
+
 
         #self.setARAcolors()
         self.lasagna.initialiseAxes(resetAxes=True)
-        self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).minMax = [0,1.2E3]
+        self.lasagna.initialiseAxes(resetAxes=True)
+
+
+    def addOverlay(self,fname):
+        """
+        Add an overlay
+        """
+        print "ADDING"
+        self.loadVolume(fname)
+        self.data['currentlyLoadedOverlay'] = fname.split(os.path.sep)[-1]
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).lut='cyan'
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0,1.5E3]
+        self.lasagna.initialiseAxes(resetAxes=True)
+
 
 
     def loadLabels(self,fname):

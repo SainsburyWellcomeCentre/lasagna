@@ -658,6 +658,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredientInstance.removePlotItem() #remove from axes
         self.ingredientList.remove(ingredientInstance) 
         ingredientInstance.removeFromList() #remove ingredient from the list with which it is associated        
+        self.selectedStackName() #Ensures something is highlighted
 
     def removeIngredientByName(self,objectName):
         """
@@ -676,6 +677,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 if verbose:
                     print 'Removing ingredient ' + objectName
                 self.removeIngredient(thisIngredient)
+                self.selectedStackName() #Ensures something is highlighted
                 removedIngredient=True
 
         if removedIngredient == False & verbose==True:
@@ -695,7 +697,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             if thisIngredient.__module__.endswith(ingredientType): #TODO: fix this so we look for it by instance not name
                 if verbose:
                     print 'Removing ingredient ' + thisIngredient.objectName
-
+                self.selectedStackName() #Ensures something is highlighted
                 self.removeIngredient(thisIngredient)
 
 
