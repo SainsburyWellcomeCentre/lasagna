@@ -168,16 +168,23 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
 
         if self.lastValue != value & value>0 & self.highlightArea_checkBox.isChecked():
-            contours = measure.find_contours(thisItem.image, value)
+            #Make a copy of the image and set values lower than our value to a greater number
+            #since the countour finder will draw around everything less than our value
+            tmpImage = np.array(thisItem.image)
+            tmpImage[tmpImage<value]=value+10
+            contours = measure.find_contours(tmpImage, value)
 
+
+            nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
+            allContours = nans
             for thisContour in contours:
                 tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*thisAxis.currentSlice
                 tmp[:,1:] = thisContour
-                self.lasagna.returnIngredientByName(self.contourName)._data = tmp
-                #print self.lasagna.returnIngredientByName(self.contourName).raw_data()
-                break
-
-            #self.lasagna.initialiseAxes()
+                tmp = np.append(tmp,nans,axis=0)
+                allContours = np.append(allContours,tmp,axis=0)
+            
+            self.lasagna.returnIngredientByName(self.contourName)._data = allContours
+            
 
 
         self.lastValue = value
