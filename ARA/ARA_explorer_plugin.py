@@ -138,7 +138,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         as the user mouses over the images
         """
         
-        highlightOnlyCurrentAxis = False #If True, we draw highlights only on the axis we are mousing over
+        highlightOnlyCurrentAxis = True #If True, we draw highlights only on the axis we are mousing over
 
         if not self.statusBarName_checkBox.isChecked():
             return
@@ -170,7 +170,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
-        if self.lastValue != value and value>0 and self.highlightArea_checkBox.isChecked():
+        if self.lastValue != value  and  value>0  and  self.highlightArea_checkBox.isChecked():
          
             nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
             allContours = nans
@@ -178,10 +178,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             for axNum in range(len(self.lasagna.axes2D)):
                 contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
 
-                if highlightOnlyCurrentAxis == True and axNum != self.lasagna.inAxis:
+                if highlightOnlyCurrentAxis == True  and  axNum != self.lasagna.inAxis:
                     continue
 
-                print "ax:%d slice:%d" % (axNum,self.lasagna.axes2D[axNum].currentSlice)
                 for thisContour in contours:
                     tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*self.lasagna.axes2D[axNum].currentSlice
 
