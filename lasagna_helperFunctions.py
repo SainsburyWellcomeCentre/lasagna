@@ -55,8 +55,9 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
             if thisItem.objectName == itemName:
                 return thisItem
 
-
-    print "Failed to find " + itemName + " in PlotWidget"
+    verbose=False
+    if verbose:
+        print "Failed to find %s in PlotWidget" %  itemName
     return False
 
 
@@ -220,11 +221,6 @@ def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=ge
         return value
     else:
         print "Did not find preference %s in default preferences" % preferenceName
-
-
-
-
-
 
 
 def writeAllPreferences(preferences,prefFName=getLasagnaPrefFile()):

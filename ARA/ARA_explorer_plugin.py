@@ -23,7 +23,7 @@ import ara_explorer_UI
 import ara_json, tree
 
 #For contour drawing
-#from skimage import measure
+from skimage import measure
 
 class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #must inherit lasagna_plugin first
     def __init__(self,lasagna):
@@ -39,6 +39,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.pref_file = lasHelp.getLasagna_prefDir() + 'ARA_plugin_prefs.yml'
         self.prefs = lasHelp.loadAllPreferences(prefFName=self.pref_file,defaultPref=self.defaultPrefs())
 
+        #The last value the mouse hovered over. When this changes, we re-calcualte the contour 
+        self.lastValue=-1
+
         #Warn and quit if there are no paths
         if len(self.prefs['ara_paths'])==0:
            self.warnAndQuit('Please fill in preferences file at<br>%s' % self.pref_file)
@@ -53,7 +56,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         #Link signals to slots
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.load_pushButton.released.connect(self.load_pushButton_slot)
-
+        self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
         #Loop through all paths and add to combobox.
         self.paths = dict()
         for ara in self.prefs['ara_paths']:
@@ -95,16 +98,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
            self.warnAndQuit('Found no valid paths is preferences file at<br>%s' % self.pref_file)
            return
 
-
-        
-        #Make an sparsepoints ingredient (TODO: turn into a still to be made line ingredient)
-        #self.lasagna.addIngredient(objectName='ARA_CONTOUR', kind='sparsepoints', data=[])
-        
-
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
 
         #If the user has asked for this, load the first ARA entry automatically
-        self.data = dict(loaded='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
+        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
         if self.prefs['loadFirstAtlasOnStartup']:
             print "Auto-Loading " + self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
             self.loadARA(self.paths.keys()[0])
@@ -112,7 +109,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
 
 
-        
+
+        #Make a lines ingredient that will house the contours for the currently selected area.
+        self.contourName = 'aracontour'
+        self.lasagna.addIngredient(objectName=self.contourName, 
+                                kind='lines', 
+                                data=[])
+        self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
+
 
     def closePlugin(self):
         """
@@ -133,7 +137,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-       
+        
+        highlightOnlyCurrentAxis = True #If True, we draw highlights only on the axis we are mousing over
+
         if not self.statusBarName_checkBox.isChecked():
             return
             
@@ -147,8 +153,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         
         if X<0 or Y<0:
             thisArea='outside image area'
+            value=-1
         elif X>=imShape[0] or Y>=imShape[1]:
             thisArea='outside image area'
+            value=-1
         else:
             value = thisItem.image[X,Y]
             if value==0:
@@ -160,12 +168,64 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
-        if value>0 & self.highlightArea_checkBox.isChecked():
-            #contours = measure.find_contours(thisItem.image, value)
-            pass
+
+        #Highlight the brain area we are mousing over by drawing a boundary around it
+        if self.lastValue != value  and  value>0  and  self.highlightArea_checkBox.isChecked():
+         
+            nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
+            allContours = nans
+            
+            for axNum in range(len(self.lasagna.axes2D)):
+                contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
+
+                if highlightOnlyCurrentAxis == True  and  axNum != self.lasagna.inAxis:
+                    continue
+
+                for thisContour in contours:
+                    tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*self.lasagna.axes2D[axNum].currentSlice
+
+                    if axNum==0:
+                        tmp[:,1:] = thisContour
+
+                    elif axNum==1:
+                        tmp[:,0] = thisContour[:,0]
+                        tmp[:,2] = thisContour[:,1]
+
+                    elif axNum==2:
+                        tmp[:,1] = thisContour[:,0]
+                        tmp[:,0] = thisContour[:,1]
+
+                    tmp = np.append(tmp,nans,axis=0) #Terminate each contour with nans so that they are not  linked
+                    allContours = np.append(allContours,tmp,axis=0)
+
+
+
+            #Replace the data in the ingredient so they are plotted
+            self.lasagna.returnIngredientByName(self.contourName)._data = allContours
+            #self.lasagna.initialiseAxes()
+
+        if highlightOnlyCurrentAxis:
+            self.lastValue = value 
             
 
- 
+    def getContoursFromAxis(self,axisNumber=-1,value=-1):
+        """
+        Return a contours array from the axis indexed by integer axisNumber
+        i.e. one of the three axes
+        """        
+        if axisNumber == -1:
+            return False
+
+        stackName = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        thisItem = self.lasagna.axes2D[axisNumber].getPlotItemByName(stackName)
+        #Make a copy of the image and set values lower than our value to a greater number
+        #since the countour finder will draw around everything less than our value
+        tmpImage = np.array(thisItem.image)
+        tmpImage[tmpImage<value] = value+10
+        return measure.find_contours(tmpImage, value)
+
+
+
     #--------------------------------------
     # UI slots
     #all methods starting with hook_ are automatically registered as hooks with lasagna 
@@ -175,13 +235,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         Enables the load button only if the currently selected item is not loaded
         """
         #If nothing has been loaded then for sure we need the load button enabled
-        if len(self.data['loaded'])==0:
+        if len(self.data['currentlyLoadedAtlasName'])==0:
             self.load_pushButton.setEnabled(True) 
             return
 
-        if self.data['loaded'] != self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+        if self.data['currentlyLoadedAtlasName'] != self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
             self.load_pushButton.setEnabled(True) 
-        elif self.data['loaded'] == self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+        elif self.data['currentlyLoadedAtlasName'] == self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
             self.load_pushButton.setEnabled(False) 
 
 
@@ -193,6 +253,25 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.loadARA(selectedName)
 
 
+    def overlayTemplate_checkBox_slot(self):
+        """
+        Load or unload the template overlay
+        """
+        fname = self.data['template']
+        if len(fname)==0:
+            return
+
+        if self.overlayTemplate_checkBox.isChecked()==True:
+            if os.path.exists(fname):
+                self.loadVolume(fname)
+                return
+
+        if self.overlayTemplate_checkBox.isChecked()==False:
+            overlayName = fname.split(os.path.sep)[-1]
+            self.lasagna.removeIngredientByName(overlayName)
+
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
+        self.lasagna.initialiseAxes()
 
     #--------------------------------------
     # core methods: these do the meat of the work
@@ -211,17 +290,40 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         paths = self.paths[araName]
         print paths
         #remove the currently loaded ARA (if present)
-        if len(self.data['loaded'])>0:
-            self.lasagna.removeIngredientByName(self.data['loaded'])
+        if len(self.data['currentlyLoadedAtlasName'])>0:
+            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
 
         self.data['labels'] = self.loadLabels(paths['labels'])
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
-        #self.data['template'] = self.loadVolume(paths['template'])   #TODO: set up code for this. 
-        self.data['loaded'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        self.data['currentlyLoadedAtlasName'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        self.data['template']=paths['template']
 
-        self.setARAcolors()
+        if os.path.exists(paths['template']):
+            self.overlayTemplate_checkBox.setEnabled(True)
+            if self.overlayTemplate_checkBox.isChecked()==True:
+                self.addOverlay(self.data['template'])
+        else:
+            self.overlayTemplate_checkBox.setEnabled(False)
+
+
+        #self.setARAcolors()
         self.lasagna.initialiseAxes(resetAxes=True)
-        self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).minMax = [0,1.2E3]
+        self.lasagna.initialiseAxes(resetAxes=True)
+
+
+    def addOverlay(self,fname):
+        """
+        Add an overlay
+        """
+        print "ADDING"
+        self.loadVolume(fname)
+        self.data['currentlyLoadedOverlay'] = fname.split(os.path.sep)[-1]
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).lut='cyan'
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0,1.5E3]
+        self.lasagna.initialiseAxes(resetAxes=True)
+
 
 
     def loadLabels(self,fname):

@@ -117,6 +117,25 @@
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QCheckBox" name="overlayTemplate_checkBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>241</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>overlay template</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>

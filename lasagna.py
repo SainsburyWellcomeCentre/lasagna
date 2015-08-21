@@ -622,7 +622,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredients are classes that are defined in the ingredients package
         """
 
-        print "Adding ingredient " + objectName
+        print "\nlasanga.addIngredient - Adding ingredient " + objectName
 
         if len(kind)==0:
             print "ERROR: no ingredient kind specified"
@@ -658,6 +658,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredientInstance.removePlotItem() #remove from axes
         self.ingredientList.remove(ingredientInstance) 
         ingredientInstance.removeFromList() #remove ingredient from the list with which it is associated        
+        self.selectedStackName() #Ensures something is highlighted
 
     def removeIngredientByName(self,objectName):
         """
@@ -676,6 +677,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 if verbose:
                     print 'Removing ingredient ' + objectName
                 self.removeIngredient(thisIngredient)
+                self.selectedStackName() #Ensures something is highlighted
                 removedIngredient=True
 
         if removedIngredient == False & verbose==True:
@@ -695,7 +697,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             if thisIngredient.__module__.endswith(ingredientType): #TODO: fix this so we look for it by instance not name
                 if verbose:
                     print 'Removing ingredient ' + thisIngredient.objectName
-
+                self.selectedStackName() #Ensures something is highlighted
                 self.removeIngredient(thisIngredient)
 
 
@@ -1100,9 +1102,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[0].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements 
             self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
-    
+            self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements     
 
     def mouseMovedSaggital(self,evt):
         if self.stacksInTreeList()==False:
@@ -1118,10 +1119,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.axes2D[1])
             self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+            self.updateMainWindowOnMouseMove(self.axes2D[1])        
 
-        
     def mouseMovedTransverse(self,evt):
         if self.stacksInTreeList()==False:
             return
@@ -1136,9 +1136,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.axes2D[2])
             self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
-
+            self.updateMainWindowOnMouseMove(self.axes2D[2])
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
