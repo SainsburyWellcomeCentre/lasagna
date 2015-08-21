@@ -137,7 +137,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-       
+        
+        highlightOnlyCurrentAxis = False #If True, we draw highlights only on the axis we are mousing over
+
         if not self.statusBarName_checkBox.isChecked():
             return
             
@@ -167,30 +169,64 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
 
 
+        #Highlight the brain area we are mousing over by drawing a boundary around it
         if self.lastValue != value & value>0 & self.highlightArea_checkBox.isChecked():
-            #Make a copy of the image and set values lower than our value to a greater number
-            #since the countour finder will draw around everything less than our value
-            tmpImage = np.array(thisItem.image)
-            tmpImage[tmpImage<value]=value+10
-            contours = measure.find_contours(tmpImage, value)
-
-
+         
             nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
             allContours = nans
-            for thisContour in contours:
-                tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*thisAxis.currentSlice
-                tmp[:,1:] = thisContour
-                tmp = np.append(tmp,nans,axis=0)
-                allContours = np.append(allContours,tmp,axis=0)
             
+            #Add contours to axes 0
+            for axNum in range(len(self.lasagna.axes2D)):
+                contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
+
+                if highlightOnlyCurrentAxis == True and axNum != self.lasagna.inAxis:
+                    print "SKIP"
+                    continue
+
+                for thisContour in contours:
+                    tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*self.lasagna.axes2D[axNum].currentSlice
+
+                    if axNum==0:
+                        tmp[:,1:] = thisContour
+
+                    if axNum==1:
+                        tmp[:,0] = thisContour[:,0]
+                        tmp[:,2] = thisContour[:,1]
+
+                    if axNum==2:
+                        tmp[:,1] = thisContour[:,0]
+                        tmp[:,0] = thisContour[:,1]
+
+                    tmp = np.append(tmp,nans,axis=0)
+                    allContours = np.append(allContours,tmp,axis=0)
+
+
+
+            #Replace the data in the ingredient so they are plotted
             self.lasagna.returnIngredientByName(self.contourName)._data = allContours
+
+        if highlightOnlyCurrentAxis:
+            self.lastValue = value 
             
 
+    def getContoursFromAxis(self,axisNumber=-1,value=-1):
+        """
+        Return a contours array from the axis indexed by integer axisNumber
+        i.e. one of the three axes
+        """        
+        if axisNumber == -1:
+            return False
 
-        self.lastValue = value
-            
+        stackName = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        thisItem = self.lasagna.axes2D[axisNumber].getPlotItemByName(stackName)
+        #Make a copy of the image and set values lower than our value to a greater number
+        #since the countour finder will draw around everything less than our value
+        tmpImage = np.array(thisItem.image)
+        tmpImage[tmpImage<value]=value+10 
+        return measure.find_contours(tmpImage, value)
 
- 
+
+
     #--------------------------------------
     # UI slots
     #all methods starting with hook_ are automatically registered as hooks with lasagna 
@@ -244,7 +280,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         #self.data['template'] = self.loadVolume(paths['template'])   #TODO: set up code for this. 
         self.data['loaded'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
 
-        self.setARAcolors()
+        #self.setARAcolors()
         self.lasagna.initialiseAxes(resetAxes=True)
         self.lasagna.plottedIntensityRegionObj.setRegion((0,2E3))
 
