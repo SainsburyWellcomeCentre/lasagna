@@ -622,7 +622,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredients are classes that are defined in the ingredients package
         """
 
-        print "Adding ingredient " + objectName
+        print "\nlasanga.addIngredient - Adding ingredient " + objectName
 
         if len(kind)==0:
             print "ERROR: no ingredient kind specified"

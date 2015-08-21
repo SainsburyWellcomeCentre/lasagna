@@ -70,13 +70,12 @@ class lines(lasagna_ingredient):
         onto the object with which it is associated
         """
         if pyqtObject==False:
+            print "lines.py not proceeding because pyqtObject is false"             
             return
 
-        if isinstance(self.raw_data,list):
         if isinstance(self.raw_data(),list):
             if len(self.raw_data()) == 0 or self.raw_data() == False:
                 return
-
 
         #Ensure our z dimension is a whole number
         z = np.round(self._data[:,axisToPlot])
@@ -99,7 +98,7 @@ class lines(lasagna_ingredient):
 
         #If we have only NaNs we should not plot. 
         if np.all(np.isnan(data))==False:
-            pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('b', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True,connect="finite")
+            pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('w', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True,connect="finite")
         """
                         pen=pen,
                         symbolSize=self.symbolSize, 

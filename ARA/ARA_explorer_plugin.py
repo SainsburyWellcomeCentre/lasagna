@@ -116,7 +116,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
                                 kind='lines', 
                                 data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
-        
+
 
     def closePlugin(self):
         """
@@ -169,7 +169,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         if self.lastValue != value & value>0 & self.highlightArea_checkBox.isChecked():
             contours = measure.find_contours(thisItem.image, value)
-            print "ARA thinks %d" % thisAxis.currentSlice
+
             for thisContour in contours:
                 tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*thisAxis.currentSlice
                 tmp[:,1:] = thisContour

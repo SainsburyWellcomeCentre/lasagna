@@ -53,6 +53,10 @@ class projection2D():
         Adds an ingredient to the PlotWidget as an item (i.e. the ingredient manages the process of 
         producing an item using information in the ingredient properties.
         """
+        verbose=False
+        if verbose:
+            print "\nlasagna_axis.addItemToPlotWidget adds item " + ingredient.objectName
+        
         _thisItem = ( getattr(pg,ingredient.pgObject)(**ingredient.pgObjectConstructionArgs) )
         _thisItem.objectName = ingredient.objectName
 
@@ -165,7 +169,7 @@ class projection2D():
         Update all plot items on axis, redrawing so everything associated with a specified 
         slice (sliceToPlot) is shown. This is done based upon a list of ingredients
         """
-
+        verbose=False
         # loop through all plot items searching for imagestack items (these need to be plotted first)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack):
@@ -201,6 +205,9 @@ class projection2D():
         # loop through all plot items searching for non-image items (these need to be overlaid on top of the image)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: 
+                if verbose:
+                    print "lasagna_axis.updatePlotItems_2D attempts to plot " + thisIngredient.objectName
+
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                               axisToPlot=self.axisToPlot, 
                                               sliceToPlot=sliceToPlotInThisLayer)
