@@ -1100,9 +1100,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[0].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements 
             self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
-    
+            self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements     
 
     def mouseMovedSaggital(self,evt):
         if self.stacksInTreeList()==False:
@@ -1118,10 +1117,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.axes2D[1])
             self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+            self.updateMainWindowOnMouseMove(self.axes2D[1])        
 
-        
     def mouseMovedTransverse(self,evt):
         if self.stacksInTreeList()==False:
             return
@@ -1136,9 +1134,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
-            self.updateMainWindowOnMouseMove(self.axes2D[2])
             self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
-
+            self.updateMainWindowOnMouseMove(self.axes2D[2])
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
