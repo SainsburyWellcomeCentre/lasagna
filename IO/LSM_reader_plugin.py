@@ -14,7 +14,7 @@ class loaderClass(lasagna_plugin):
 
         self.lasagna = lasagna
         self.objectName = 'LSM_reader'
-
+        self.kind = 'imagestack'
         #Construct the QActions and other stuff required to integrate the load dialog into the menu
         self.loadAction = QtGui.QAction(self.lasagna) #Instantiate the menu action
 
@@ -53,7 +53,7 @@ class loaderClass(lasagna_plugin):
                 objName="layer_%d" % (ii+1)
                 self.lasagna.addIngredient(objectName=objName, 
                            kind='imagestack', 
-                           data=stack, 
+                           data=self.kind, 
                            fname=fname
                            )
                 self.lasagna.returnIngredientByName(objName).lut=colorOrder[ii]

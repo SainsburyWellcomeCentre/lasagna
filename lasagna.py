@@ -56,30 +56,34 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-D", help="Load demo images", action="store_true")
 parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
+parser.add_argument("-S", nargs='+', help="file names of sparse points file(s) to load")
+parser.add_argument("-L", nargs='+', help="file names of lines file(s) to load")
 parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
 
 
-
-fnames=[None,None]
 pluginToStart = args.P
+sparsePointsToLoad = args.S
+linesToLoad = args.L
+
+#Either load the demo stacks or a user-specified stacks
 if args.D==True:
     import tempfile
     import urllib
 
-    fnames = [tempfile.gettempdir()+os.path.sep+'reference.tiff',
+    imStackFnamesToLoad = [tempfile.gettempdir()+os.path.sep+'reference.tiff',
               tempfile.gettempdir()+os.path.sep+'sample.tiff']
 
     loadUrl = 'http://mouse.vision/lasagna/'
-    for fname in fnames:
+    for fname in imStackFnamesToLoad:
         if not os.path.exists(fname):
             url = loadUrl + fname.split(os.path.sep)[-1]
             print 'Downloading %s to %s' % (url,fname)
             urllib.urlretrieve(url,fname)
     
-elif args.im != None:
-    fnames = args.im
-  
+else:
+    imStackFnamesToLoad = args.im
+
     
 
 
@@ -185,6 +189,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     }
 
 
+
         #Handle IO plugins. For instance these are the loaders that handle different data types
         #and different loading actions. 
         IO_Paths = lasHelp.readPreference('IO_modulePaths') #directories containing IO modules
@@ -198,10 +203,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #TODO: currently we only have code to handle load actions as no save actions are available
         self.loadActions = {} #actions must be attached to the lasagna object or they won't function
         for thisIOmodule in IO_plugins:
-            print "Adding %s to load menu" % thisIOmodule
+
             IOclass,IOname=pluginHandler.getPluginInstanceFromFileName(thisIOmodule,attributeToImport='loaderClass')
             thisInstance = IOclass(self)
             self.loadActions[thisInstance.objectName] = thisInstance
+            print "Added %s to load menu as object name %s" % (thisIOmodule,thisInstance.objectName)
 
         print ""
 
@@ -425,7 +431,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
-    def showStackLoadDialog(self,triggered=None,fileFilter=None):
+    def showStackLoadDialog(self,triggered=None,fileFilter=imageStackLoader.imageFilter()):
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
@@ -435,9 +441,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         triggered - just catches the input from the signal so we can set fileFilter
         """
 
-        #If no filter was provided, as for imageStackLoader what it's capable of loading and filter by this
-        if fileFilter==None:
-            fileFliter = imageStackLoader.imageFilter()
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
         fname = self.showFileLoadDialog(fileFilter=fileFilter)
@@ -461,7 +464,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Bring up the file load dialog. Return the file name. Update the last used path. 
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
-        print fileFilter
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
         fname = str(fname)
         if len(fname) == 0:
@@ -1141,17 +1143,29 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def main(fnames, pluginToStart=None):
+def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
     tasty.app = app
 
-    #Load stacks from command line input if any was provided
-    if not fnames[0]==None:
-        for thisFname in fnames:
+    #Data from command line input if the user specified this
+    if not imStackFnamesToLoad==None:
+        for thisFname in imStackFnamesToLoad:
             print "Loading " + thisFname
             tasty.loadImageStack(thisFname)
+
+    if not sparsePointsToLoad==None:
+        for thisFname in sparsePointsToLoad:
+            print "Loading " + thisFname
+            tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
+
+
+    if not linesToLoad==None:
+        for thisFname in linesToLoad:
+            print "Loading " + thisFname
+            tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
+    
 
     tasty.initialiseAxes()
 
@@ -1174,11 +1188,4 @@ def main(fnames, pluginToStart=None):
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(fnames=fnames, pluginToStart=pluginToStart)
-
-
-    """
-    original_sigint = signal.getsignal(signal.SIGINT)
-    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QtGui.QApplication.instance().exec_()
-    """
+    main(imStackFnamesToLoad=imStackFnamesToLoad, sparsePointsToLoad=sparsePointsToLoad, linesToLoad=linesToLoad, pluginToStart=pluginToStart)

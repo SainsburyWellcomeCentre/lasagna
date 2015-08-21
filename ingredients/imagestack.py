@@ -1,6 +1,5 @@
 """
 This class defines the basic imagestack and instructs lasagna as to how to handle image stacks.
-TODO: once this is working, pull out the general purpose stuff and set up an ingredient class that this inherits
 """
 
 from __future__ import division
