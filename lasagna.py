@@ -431,7 +431,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
-    def showStackLoadDialog(self,triggered=None,fileFilter=None):
+    def showStackLoadDialog(self,triggered=None,fileFilter=imageStackLoader.imageFilter()):
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
@@ -441,9 +441,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         triggered - just catches the input from the signal so we can set fileFilter
         """
 
-        #If no filter was provided, as for imageStackLoader what it's capable of loading and filter by this
-        if fileFilter==None:
-            fileFliter = imageStackLoader.imageFilter()
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
         fname = self.showFileLoadDialog(fileFilter=fileFilter)
@@ -467,7 +464,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Bring up the file load dialog. Return the file name. Update the last used path. 
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
-        print fileFilter
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
         fname = str(fname)
         if len(fname) == 0:
