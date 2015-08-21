@@ -65,6 +65,11 @@ class Ui_ara_explorer(object):
         self.highlightArea_checkBox.setGeometry(QtCore.QRect(10, 30, 241, 21))
         self.highlightArea_checkBox.setChecked(True)
         self.highlightArea_checkBox.setObjectName(_fromUtf8("highlightArea_checkBox"))
+        self.overlayTemplate_checkBox = QtGui.QCheckBox(self.frame)
+        self.overlayTemplate_checkBox.setEnabled(False)
+        self.overlayTemplate_checkBox.setGeometry(QtCore.QRect(10, 50, 241, 21))
+        self.overlayTemplate_checkBox.setChecked(False)
+        self.overlayTemplate_checkBox.setObjectName(_fromUtf8("overlayTemplate_checkBox"))
         self.verticalLayout.addWidget(self.frame)
         self.treeView = QtGui.QTreeView(ara_explorer)
         self.treeView.setObjectName(_fromUtf8("treeView"))
@@ -78,4 +83,5 @@ class Ui_ara_explorer(object):
         self.load_pushButton.setText(_translate("ara_explorer", "Load", None))
         self.statusBarName_checkBox.setText(_translate("ara_explorer", "show name in status bar", None))
         self.highlightArea_checkBox.setText(_translate("ara_explorer", "highlight area", None))
+        self.overlayTemplate_checkBox.setText(_translate("ara_explorer", "overlay template", None))
 
