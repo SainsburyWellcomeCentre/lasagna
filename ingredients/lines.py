@@ -72,8 +72,9 @@ class lines(lasagna_ingredient):
         if pyqtObject==False:
             return
 
-        if isinstance(self.data,list):
-            if len(self.data) == 0 or self.data == False:
+        if isinstance(self.raw_data,list):
+        if isinstance(self.raw_data(),list):
+            if len(self.raw_data()) == 0 or self.raw_data() == False:
                 return
 
 
