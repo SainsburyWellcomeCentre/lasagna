@@ -200,7 +200,7 @@ class projection2D():
 
         # loop through all plot items searching for non-image items (these need to be overlaid on top of the image)
         for thisIngredient in ingredientsList:
-            if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: #TODO: too specific 
+            if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: 
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                               axisToPlot=self.axisToPlot, 
                                               sliceToPlot=sliceToPlotInThisLayer)

@@ -223,11 +223,6 @@ def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=ge
         print "Did not find preference %s in default preferences" % preferenceName
 
 
-
-
-
-
-
 def writeAllPreferences(preferences,prefFName=getLasagnaPrefFile()):
     """
     Save the dictionary "preferences" as a YAML file in the .lasagna directory located in the 

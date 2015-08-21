@@ -98,12 +98,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
            self.warnAndQuit('Found no valid paths is preferences file at<br>%s' % self.pref_file)
            return
 
-
-        
-        #Make an sparsepoints ingredient (TODO: turn into a still to be made line ingredient)
-        #self.lasagna.addIngredient(objectName='ARA_CONTOUR', kind='sparsepoints', data=[])
-        
-
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
 
         #If the user has asked for this, load the first ARA entry automatically
@@ -121,10 +115,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.lasagna.addIngredient(objectName=self.contourName, 
                                 kind='lines', 
                                 data=[])
-
-        #TODO: confirm that the following line is not needed and remove if so
-        self.lasagna.initialiseAxes(resetAxes=True) #update the plots.
-
+        self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
         
 
     def closePlugin(self):
