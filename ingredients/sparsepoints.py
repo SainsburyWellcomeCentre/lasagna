@@ -64,10 +64,14 @@ class sparsepoints(lasagna_ingredient):
         """
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
-        """
-        if len(self._data)==0:
+        """ 
+        if pyqtObject==False:
             return
 
+        if isinstance(self.data,list):
+            if len(self.data) == 0 or self.data == False:
+                return    
+        
         z = np.round(self._data[:,axisToPlot])
 
         data = self.data(axisToPlot)
