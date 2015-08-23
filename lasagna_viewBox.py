@@ -100,7 +100,25 @@ class lasagna_viewBox(pg.ViewBox):
         """
         Allows mouse wheel zoom on ctrl-click [currently]
         """
-        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+        modifiers = QtGui.QApplication.keyboardModifiers()
+        if  modifiers == QtCore.Qt.ControlModifier  or (modifiers == (QtCore.Qt.ControlModifier |  QtCore.Qt.ShiftModifier)):
+            # Emit a signal when the wheel is rotated alone and return a positive or negative value in self.progressBy
+            # that we can use to incremement the image layer in the current axes
+            if ev.delta()>0:
+                self.progressBy=1
+            elif ev.delta()<0:
+                self.progressBy=-1
+            else:
+                self.progressBy=0
+            self.progressBy = self.progressBy * abs(ev.delta())/120 #this may be mouse-specific!
+
+            if modifiers == (QtCore.Qt.ControlModifier |  QtCore.Qt.ShiftModifier):
+                # Allow faster scrolling if it was a shift+wheel
+                self.progressBy = self.progressBy*5
+
+            self.progressLayer.emit()
+    
+        else:
             #Handle zoom (scaling with ctrl+mousewheel) 
             mask = np.array(self.state['mouseEnabled'], dtype=np.float)
  
@@ -150,21 +168,5 @@ class lasagna_viewBox(pg.ViewBox):
                             thisViewBox.scaleBy(s,x=center.x(),y=center.y())
                             self.centreOn(thisViewBox,x=center.x(),y=center.y())
             
-            return
     
 
-        # Emit a signal when the wheel is rotated alone and return a positive or negative value in self.progressBy
-        # that we can use to incremement the image layer in the current axes
-        if ev.delta()>0:
-            self.progressBy=1
-        elif ev.delta()<0:
-            self.progressBy=-1
-        else:
-            self.progressBy=0
-        self.progressBy = self.progressBy * abs(ev.delta())/120 #this may be mouse-specific!
-
-        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
-            # Allow faster scrolling if it was a shift+wheel
-            self.progressBy = self.progressBy*5
-
-        self.progressLayer.emit()
