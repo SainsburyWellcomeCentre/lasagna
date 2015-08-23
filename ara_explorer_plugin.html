@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Lasagna - extensible 3D slicing </title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Lasagna</h1>
+        <h2>3-D imaging visualisation through slicing</h2>
+        <a href="https://github.com/raacampbell13/lasagna" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="lasagna---python-volume-visualiser-for-3-d-data" class="anchor" href="#lasagna---python-volume-visualiser-for-3-d-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>ARA Explorer Plugin</h1>
+
+
+
+<h2>
+<a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is it?</h2>
+<p>The ARA explorer is a plugin for interacting with the Allen (mouse) Reference Atlas (ARA) anatomical sub-divisions. The plugin 
+currently has the following features:</p>
+
+<ul>
+<li>Display of the anatomical atlas using the 3 linked 2-D views.</li>
+<li>The name of the brain area under the mouse is listed in the status bar.</li>
+<li>The brain area under the mouse is highlighted on all three linked views.</li>
+<li>Different atlases with different associated brain area lists can be loaded via a drop-down menu.</li>
+<li>A tree view lists brain area names and allows them to be highlighted <b>coming soon</b>. </li>
+<li>The average template brain can optionally be overlaid on top of the atlas.</li>
+<li>An atlas that has been <i>registered to</i> a sample brain can be loaded along with the sample brain. This allows
+the user to hover the mouse over the sample brain and have the brain area under the mouse named and highlighted
+<b>coming soon</b>.</li> 
+</ul>
+
+
+<h2>
+<a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Starting the plugin</h2>
+<p> 
+The plugin is already installed with Lasagna. To start it, the user simply selects it from the plugins menu. Upon first load, the 
+plugin creates a default preferences file in <tt>HOME_DIR/.lasagna/</tt> The user is prompted to edit this file in order 
+to point the plugin to where the ARA files are stored.  
+</p>
+
+
+<h2>
+<a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up the plugin</h2>
+<p>
+The plugin needs access to the following files:
+</p>
+<ul>
+<li><b>atlas</b>: An image stack defining the locations of each brain. All pixels that are part of the same brain area share the same pixel value.</li>
+<li><b>labels</b>: A text file (JSON or CSV) defining which brain area is associated with which pixel value. </li>
+<li><b>template</b>: An image stack corresponding to the average template brain associated with the atlas file. Your sample brain may be registered to this 
+template (or the template registered to your sample). Defining this file is optional. 
+</ul>
+
+<p>
+The plugin assumes the above files will always be in the same location. This location is defined in the preferences file. 
+You may specify multiple sets of atlas, labels, and template files. This is useful because the atlas comes in different resolution levels and versions. To set up the plugin:
+</p>
+
+<ul>
+<li>Download the files from **here**</li>
+<li>Copy the files to a location on your computer</li>
+<li>Edit the preferences file to point to this location. Ensure string are quoted with single quotes. Syntax errors in the preferences file can cause
+the plugin to fail to load. See **HERE** for an example valid preferences file</li>
+<li>Start the plugin and the ARA should load automatically. You can configure the plugin via the preferences file to not auto-load on plugin start.</li> 
+</ul>
+
+
+<h2>
+<a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage notes</h2>
+<p>
+The 10 micron per pixel nrrd ARA files take a <i>very</i> long time to load. You may use Fiji to convert these to, say, TIFFs, so they load faster.   
+</p>
+
+<p align="center">
+<a href="./index.html"><b>Back to home</b></a>
+</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/raacampbell13/lasagna/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/raacampbell13/lasagna/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner">Lasagna<a href="https://github.com/raacampbell13/lasagna"></a> is maintained by <a href="https://github.com/raacampbell13">Rob Campbell</a>.</p>
+          
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
