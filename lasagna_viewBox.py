@@ -25,6 +25,7 @@ class lasagna_viewBox(pg.ViewBox):
             linkZoom  - link self's zoom with the key's zoom (True or False)
         """
         self.linkedAxis = linkedAxis #A list of ViewBox axes to link to 
+        self.controlDrag=False
 
         #Define a custom signal to indicate when the user has created an event that will increment the displayed layer
         self.progressBy = 0
@@ -42,13 +43,24 @@ class lasagna_viewBox(pg.ViewBox):
 
     def mouseDragEvent(self, ev, axis=None, linkX=False, linkY=False):
         """
-        Intercept pg.ViewBox.mouseDragEvent
+        Intercept pg.ViewBox.mouseDragEvent to provide linked panning
+        across different axes
         """
-        #Call the built-in mouseDragEvent
-        pg.ViewBox.mouseDragEvent(self,ev,axis)
-
+      
         if len(self.linkedAxis)==None:
             return
+
+        #Do not drag and link displays if we are pressing the control key.
+        #Instead, set the self.controlDrag boolean to True and bail out
+        modifiers = QtGui.QApplication.keyboardModifiers()
+        if  modifiers == QtCore.Qt.ControlModifier:
+            self.controlDrag=True
+            return
+        else:
+            self.controlDrag=False
+
+        #Call the built-in mouseDragEvent
+        pg.ViewBox.mouseDragEvent(self,ev,axis)
 
         for thisView in self.linkedAxis.keys():
             #Get the current view center in x and y

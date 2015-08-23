@@ -938,15 +938,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         [axis.removeItemFromPlotWidget(self.crossHairHLine) for axis in self.axes2D]
 
 
-    def updateCrossHairs(self):
+    def updateCrossHairs(self,highlightCrossHairs=False):
         """
-        Update the drawn cross hairs on the current image 
+        Update the drawn cross hairs on the current image. 
+        Highlight cross hairs in red if caller says so
         """
         if not self.showCrossHairs:
             return
 
         #make cross hairs red if control key is pressed
-        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and highlightCrossHairs:
             self.crossHairVLine.setPen(240,0,0,200)
             self.crossHairHLine.setPen(240,0,0,200)
         else:
@@ -1001,7 +1002,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         self.runHook(self.hooks['updateMainWindowOnMouseMove_Start']) #Runs each time the views are updated
 
-        self.updateCrossHairs()
+        self.updateCrossHairs(axis.view.getViewBox().controlDrag) #highlight cross hairs is axis says to do so
         self.updateStatusBar()
 
         self.runHook(self.hooks['updateMainWindowOnMouseMove_End']) #Runs each time the views are updated
@@ -1110,7 +1111,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[0].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
-            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+            
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[0].view.getViewBox().controlDrag:
                 self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
 
             self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements     
@@ -1132,7 +1134,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
-            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[1].view.getViewBox().controlDrag:
                 self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
             self.updateMainWindowOnMouseMove(self.axes2D[1])        
 
@@ -1150,7 +1152,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
-            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[2].view.getViewBox().controlDrag:
                 self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
             self.updateMainWindowOnMouseMove(self.axes2D[2])
 
