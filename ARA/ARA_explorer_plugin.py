@@ -137,7 +137,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
     # plugin hooks
     #all methods starting with hook_ are automatically registered as hooks with lasagna 
     #when the plugin is started this happens in the lasagna_plugin constructor 
-    def hook_updateMainWindowOnMouseMove_End(self):
+    def hook_updateStatusBar_End(self):
         """
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images

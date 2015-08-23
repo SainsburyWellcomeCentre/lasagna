@@ -169,7 +169,7 @@ class projection2D():
         Update all plot items on axis, redrawing so everything associated with a specified 
         slice (sliceToPlot) is shown. This is done based upon a list of ingredients
         """
-        verbose=True
+        verbose=False
         # loop through all plot items searching for imagestack items (these need to be plotted first)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack):
