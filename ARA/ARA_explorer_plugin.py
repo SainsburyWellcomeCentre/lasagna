@@ -52,7 +52,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.show()
         self.statusBarName_checkBox.setChecked(self.prefs['enableNameInStatusBar'])
         self.highlightArea_checkBox.setChecked(self.prefs['enableOverlay'])
-
+        
+        self.brainArea_itemModel = QtGui.QStandardItemModel(self.brainArea_treeView)
+        self.brainArea_treeView.setModel(self.brainArea_itemModel)
+  
         #Link signals to slots
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.load_pushButton.released.connect(self.load_pushButton_slot)
@@ -116,6 +119,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
                                 kind='lines', 
                                 data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
+
+
 
 
     def closePlugin(self):
@@ -294,6 +299,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
 
         self.data['labels'] = self.loadLabels(paths['labels'])
+
+        self.addAreaDataToTreeView(self.data['labels'])
+
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
         self.data['currentlyLoadedAtlasName'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
         self.data['template']=paths['template']
@@ -324,6 +332,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0,1.5E3]
         self.lasagna.initialiseAxes(resetAxes=True)
 
+
+    def addAreaDataToTreeView(self,data,idColumn=0,parentColumn=1,nameColumn=2):
+        """
+        data is a list 
+        """
+        print data
 
 
     def loadLabels(self,fname):

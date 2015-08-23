@@ -71,9 +71,9 @@ class Ui_ara_explorer(object):
         self.overlayTemplate_checkBox.setChecked(False)
         self.overlayTemplate_checkBox.setObjectName(_fromUtf8("overlayTemplate_checkBox"))
         self.verticalLayout.addWidget(self.frame)
-        self.treeView = QtGui.QTreeView(ara_explorer)
-        self.treeView.setObjectName(_fromUtf8("treeView"))
-        self.verticalLayout.addWidget(self.treeView)
+        self.brainArea_treeView = QtGui.QTreeView(ara_explorer)
+        self.brainArea_treeView.setObjectName(_fromUtf8("brainArea_treeView"))
+        self.verticalLayout.addWidget(self.brainArea_treeView)
 
         self.retranslateUi(ara_explorer)
         QtCore.QMetaObject.connectSlotsByName(ara_explorer)
