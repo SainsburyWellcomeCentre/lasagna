@@ -1089,6 +1089,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if self.stacksInTreeList()==False:
             return
 
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            return
 
         pos = evt[0] #Using signal proxy turns original arguments into a tuple
         self.removeCrossHairs()
@@ -1109,6 +1111,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if self.stacksInTreeList()==False:
             return
 
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            return
+
         pos = evt[0]
         self.removeCrossHairs()
 
@@ -1124,6 +1129,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def mouseMovedTransverse(self,evt):
         if self.stacksInTreeList()==False:
+            return
+            
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
             return
 
         pos = evt[0]  
