@@ -62,6 +62,7 @@ class lasagna_viewBox(pg.ViewBox):
         #Call the built-in mouseDragEvent
         pg.ViewBox.mouseDragEvent(self,ev,axis)
 
+        #the following is use dby lasagna_axis.updateDisplayedSlices_2D to link the views
         for thisView in self.linkedAxis.keys():
             #Get the current view center in x and y
             vr = self.targetRect()
@@ -112,6 +113,7 @@ class lasagna_viewBox(pg.ViewBox):
         """
         Allows mouse wheel zoom on ctrl-click [currently]
         """
+        self.controlDrag=False #TODO: hack that should not be needed
         modifiers = QtGui.QApplication.keyboardModifiers()
         if  modifiers == QtCore.Qt.ControlModifier  or (modifiers == (QtCore.Qt.ControlModifier |  QtCore.Qt.ShiftModifier)):
             # Emit a signal when the wheel is rotated alone and return a positive or negative value in self.progressBy

@@ -1097,10 +1097,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if self.stacksInTreeList()==False:
             return
 
-
-
         pos = evt[0] #Using signal proxy turns original arguments into a tuple
         self.removeCrossHairs()
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            self.axes2D[0].view.getViewBox().controlDrag=False
 
         if self.axes2D[0].view.sceneBoundingRect().contains(pos):
             self.inAxis=0
@@ -1117,16 +1117,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements     
 
+
+
     def mouseMovedSaggital(self,evt):
         if self.stacksInTreeList()==False:
             return
 
-        
-
-
         pos = evt[0]
         self.removeCrossHairs()
-
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            self.axes2D[1].view.getViewBox().controlDrag=False
+            
         if self.axes2D[1].view.sceneBoundingRect().contains(pos):
             self.inAxis=1
             if self.showCrossHairs:
@@ -1136,7 +1137,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
             if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[1].view.getViewBox().controlDrag:
                 self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+
             self.updateMainWindowOnMouseMove(self.axes2D[1])        
+
 
     def mouseMovedTransverse(self,evt):
         if self.stacksInTreeList()==False:
@@ -1144,6 +1147,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         pos = evt[0]  
         self.removeCrossHairs()
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            self.axes2D[2].view.getViewBox().controlDrag=False
 
         if self.axes2D[2].view.sceneBoundingRect().contains(pos):
             self.inAxis=2
@@ -1196,7 +1201,7 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     # Link slots to signals
     #connect views to the mouseMoved slot. After connection this runs in the background. 
     #TODO: set up with just one slot that accepts arguments
-    proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedCoronal)
+    proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=60, slot=tasty.mouseMovedCoronal)
     proxy2=pg.SignalProxy(tasty.axes2D[1].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
     proxy3=pg.SignalProxy(tasty.axes2D[2].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)
 
