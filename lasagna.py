@@ -780,10 +780,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #initialize cross hair
         if self.showCrossHairs:
             if self.crossHairVLine==None:
-                self.crossHairVLine = pg.InfiniteLine(angle=90, movable=False)
+                self.crossHairVLine = pg.InfiniteLine(pen=(220,200,0,180),angle=90, movable=False)
                 self.crossHairVLine.objectName = 'crossHairVLine'
             if self.crossHairHLine==None:
-                self.crossHairHLine = pg.InfiniteLine(angle=0, movable=False)
+                self.crossHairHLine = pg.InfiniteLine(pen=(220,200,0,180),angle=0, movable=False)
                 self.crossHairHLine.objectName = 'crossHairHLine'
 
         self.plotImageStackHistogram()
@@ -944,6 +944,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         if not self.showCrossHairs:
             return
+
+        #make cross hairs red if control key is pressed
+        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+            self.crossHairVLine.setPen(240,0,0,200)
+            self.crossHairHLine.setPen(240,0,0,200)
+        else:
+            self.crossHairVLine.setPen(220,200,0,180)
+            self.crossHairHLine.setPen(220,200,0,180)
+
         self.crossHairVLine.setPos(self.mouseX+0.5) #Add 0.5 to add line to middle of pixel
         self.crossHairHLine.setPos(self.mouseY+0.5)
 
@@ -1082,15 +1091,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 img.setLevels([minX,maxX]) #Sets levels immediately
                 thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
 
-            
-
 
     def mouseMovedCoronal(self,evt):
         if self.stacksInTreeList()==False:
             return
 
-        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
-            return
+
 
         pos = evt[0] #Using signal proxy turns original arguments into a tuple
         self.removeCrossHairs()
@@ -1104,15 +1110,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[0].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
-            self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+                self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
+
             self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements     
 
     def mouseMovedSaggital(self,evt):
         if self.stacksInTreeList()==False:
             return
 
-        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
-            return
+        
+
 
         pos = evt[0]
         self.removeCrossHairs()
@@ -1124,14 +1132,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
-            self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+                self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
             self.updateMainWindowOnMouseMove(self.axes2D[1])        
 
     def mouseMovedTransverse(self,evt):
         if self.stacksInTreeList()==False:
-            return
-            
-        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
             return
 
         pos = evt[0]  
@@ -1144,7 +1150,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
-            self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+                self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
             self.updateMainWindowOnMouseMove(self.axes2D[2])
 
 
