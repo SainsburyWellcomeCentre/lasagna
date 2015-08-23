@@ -775,7 +775,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         #show default images (snap to middle layer of each axis)
-        [axis.updatePlotItems_2D(self.ingredientList) for axis in self.axes2D]
+        [axis.updatePlotItems_2D(self.ingredientList, sliceToPlot=axis.currentSlice, resetToMiddleLayer=resetAxes) for axis in self.axes2D]
 
         #initialize cross hair
         if self.showCrossHairs:

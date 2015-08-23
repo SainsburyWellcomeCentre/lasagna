@@ -42,7 +42,7 @@ class projection2D():
         self.addItemsToPlotWidget(self.lasagna.ingredientList)
 
         #The currently plotted slice
-        self.currentSlice=False 
+        self.currentSlice=None
 
         #Link wheel-alone custom signal to a slot that will increment the current layer on mouse-wheel alone
         self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
@@ -164,12 +164,12 @@ class projection2D():
         return
 
 
-    def updatePlotItems_2D(self, ingredientsList, sliceToPlot=None):
+    def updatePlotItems_2D(self, ingredientsList, sliceToPlot=None, resetToMiddleLayer=False):
         """
         Update all plot items on axis, redrawing so everything associated with a specified 
         slice (sliceToPlot) is shown. This is done based upon a list of ingredients
         """
-        verbose=False
+        verbose=True
         # loop through all plot items searching for imagestack items (these need to be plotted first)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack):
@@ -181,23 +181,33 @@ class projection2D():
         
                 numSlices = thisIngredient.data(self.axisToPlot).shape[0]
 
-                #  remain within bounds (don't return a non-existant slice)
-                if sliceToPlot==None:
-                    sliceToPlotInThisLayer=numSlices/2 #The mid-point of the stack if no slice was specified
-                elif sliceToPlot>=numSlices:
-                    sliceToPlotInThisLayer=numSlices-1;
-                elif sliceToPlot<0:
-                    sliceToPlotInThisLayer=0;
-                else:
-                    sliceToPlotInThisLayer = sliceToPlot
+                if resetToMiddleLayer:
+                    if verbose:
+                        print "updatePlotItems_2D going to middle layer"
+                    self.currentSlice=numSlices/2
+
+                if not self.currentSlice > 0:
+                    self.currentSlice=numSlices/2
+
+                if sliceToPlot != None:
+                    self.currentSlice = sliceToPlot
+
+                #stay in range
+                if self.currentSlice>=numSlices:
+                    self.currentSlice=numSlices-1;
+                elif self.currentSlice<0:
+                    self.currentSlice=0;
+
 
 
                 thisIngredient.plotIngredient(
                                             pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                             axisToPlot=self.axisToPlot, 
-                                            sliceToPlot=sliceToPlotInThisLayer
+                                            sliceToPlot=self.currentSlice
                                             )
-                self.currentSlice = sliceToPlotInThisLayer
+
+                if verbose:
+                    print "lasagna_axis.updatePlotItems_2D in slice %d" % self.currentSlice
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
         # the image is now displayed
@@ -210,7 +220,7 @@ class projection2D():
 
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                               axisToPlot=self.axisToPlot, 
-                                              sliceToPlot=sliceToPlotInThisLayer)
+                                              sliceToPlot=self.currentSlice)
 
     def updateDisplayedSlices_2D(self, ingredients, slicesToPlot):
         """
@@ -247,6 +257,9 @@ class projection2D():
         """
         Capture mouse-wheel alone and report direction of mouse wheel alone
         """
-        sliceToPlot = self.currentSlice + self.view.getViewBox().progressBy
-        self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=sliceToPlot)
+        if self.currentSlice>0:
+            self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=self.currentSlice + self.view.getViewBox().progressBy)
+        else:
+            self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=None)
+
 
