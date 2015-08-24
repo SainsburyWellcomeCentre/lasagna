@@ -137,10 +137,28 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         Runs when the user unchecks the plugin in the menu box and also (in this case)
         when the user loads a new base stack
         """
-        #self.lasagna.removeIngredientByName(self.ARAlayerName) #TODO: remove stuff
-        self.lasagna.intensityHistogram.clear()
-        self.detachHooks()
+        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+        
+        #remove the currently loaded ARA (if present)
+        self.lasagna.removeIngredientByName('aracontour')
 
+        if len(self.data['currentlyLoadedAtlasName'])>0:
+            print self.data['currentlyLoadedAtlasName']
+            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
+
+        #self.lasagna.intensityHistogram.clear()
+        self.detachHooks()
+        self.lasagna.statusBar.showMessage("ARA explorer closed")
+        self.close()
+
+
+    def closeEvent(self, event):
+        """
+        This event is execute when the user presses the close window (cross) button in the title bar
+        """
+        self.closePlugin()
+        self.deleteLater()
+        event.accept()
 
     #--------------------------------------
     # plugin hooks
@@ -325,7 +343,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
         self.data['currentlyLoadedAtlasName'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
         self.data['template']=paths['template']
-
         if os.path.exists(paths['template']):
             self.overlayTemplate_checkBox.setEnabled(True)
             if self.overlayTemplate_checkBox.isChecked()==True:
@@ -344,7 +361,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         Add an overlay
         """
-        print "ADDING"
         self.loadVolume(fname)
         self.data['currentlyLoadedOverlay'] = fname.split(os.path.sep)[-1]
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
@@ -397,7 +413,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         This slot is run when the user clicks on a brain area in the list
         """
-        getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the dat
+        getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the data
 
         index = self.brainArea_treeView.selectedIndexes()[0]
         areaName = index.data().toString() 
@@ -510,8 +526,4 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         #TODO: is not shutting down properly, although this same code does work in other contexts (e.g. when it was hooked into the load stack method)
         self.lasagna.alert = alert(self.lasagna,alertText=msg)
-
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
-        
         self.closePlugin()

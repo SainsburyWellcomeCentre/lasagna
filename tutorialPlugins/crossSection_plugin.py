@@ -81,7 +81,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
     #We define this here because we can't assume all plugins will have QWidget::closeEvent
     def closeEvent(self, event):
         """
-        This event is execute when the user presses the close window (cross) button in the title bar
+        This event is executed when the user presses the close window (cross) button in the title bar
         """
         self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
