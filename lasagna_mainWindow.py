@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created: Mon Aug 24 10:14:20 2015
+# Created: Mon Aug 24 10:27:33 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -80,7 +80,7 @@ class Ui_lasagna_mainWindow(object):
         self.menuPlugins.setObjectName(_fromUtf8("menuPlugins"))
         lasagna_mainWindow.setMenuBar(self.menuBar)
         self.mainDockWidget = QtGui.QDockWidget(lasagna_mainWindow)
-        self.mainDockWidget.setMinimumSize(QtCore.QSize(315, 557))
+        self.mainDockWidget.setMinimumSize(QtCore.QSize(315, 584))
         self.mainDockWidget.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.mainDockWidget.setObjectName(_fromUtf8("mainDockWidget"))
         self.dockWidgetContents = QtGui.QWidget()
@@ -103,6 +103,8 @@ class Ui_lasagna_mainWindow(object):
         self.intensityHistogram.setMaximumSize(QtCore.QSize(16777215, 180))
         self.intensityHistogram.setObjectName(_fromUtf8("intensityHistogram"))
         self.verticalLayout_3.addWidget(self.intensityHistogram)
+        self.horizontalLayout_13 = QtGui.QHBoxLayout()
+        self.horizontalLayout_13.setObjectName(_fromUtf8("horizontalLayout_13"))
         self.logYcheckBox = QtGui.QCheckBox(self.imageSettingsTab)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -112,7 +114,17 @@ class Ui_lasagna_mainWindow(object):
         self.logYcheckBox.setMaximumSize(QtCore.QSize(16777215, 21))
         self.logYcheckBox.setChecked(True)
         self.logYcheckBox.setObjectName(_fromUtf8("logYcheckBox"))
-        self.verticalLayout_3.addWidget(self.logYcheckBox)
+        self.horizontalLayout_13.addWidget(self.logYcheckBox)
+        self.imageAlpha_horizontalSlider = QtGui.QSlider(self.imageSettingsTab)
+        self.imageAlpha_horizontalSlider.setMinimumSize(QtCore.QSize(221, 0))
+        self.imageAlpha_horizontalSlider.setMaximum(100)
+        self.imageAlpha_horizontalSlider.setProperty("value", 100)
+        self.imageAlpha_horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.imageAlpha_horizontalSlider.setInvertedAppearance(False)
+        self.imageAlpha_horizontalSlider.setInvertedControls(False)
+        self.imageAlpha_horizontalSlider.setObjectName(_fromUtf8("imageAlpha_horizontalSlider"))
+        self.horizontalLayout_13.addWidget(self.imageAlpha_horizontalSlider)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_13)
         self.imageStackLayers_TreeView = QtGui.QTreeView(self.imageSettingsTab)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -123,6 +135,8 @@ class Ui_lasagna_mainWindow(object):
         self.imageStackLayers_TreeView.setRootIsDecorated(False)
         self.imageStackLayers_TreeView.setObjectName(_fromUtf8("imageStackLayers_TreeView"))
         self.verticalLayout_3.addWidget(self.imageStackLayers_TreeView)
+        spacerItem = QtGui.QSpacerItem(20, 162, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_3.addItem(spacerItem)
         self.tabWidget.addTab(self.imageSettingsTab, _fromUtf8(""))
         self.pointsSettingsTab = QtGui.QWidget()
         self.pointsSettingsTab.setObjectName(_fromUtf8("pointsSettingsTab"))
@@ -322,8 +336,8 @@ class Ui_lasagna_mainWindow(object):
         self.verticalLayout_4.addWidget(self.markerColor_pushButton)
         self.horizontalLayout_10.addWidget(self.frame)
         self.verticalLayout_5.addLayout(self.horizontalLayout_10)
-        spacerItem = QtGui.QSpacerItem(20, 204, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem)
+        spacerItem1 = QtGui.QSpacerItem(20, 204, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_5.addItem(spacerItem1)
         self.tabWidget.addTab(self.pointsSettingsTab, _fromUtf8(""))
         self.axisSetingsTab = QtGui.QWidget()
         self.axisSetingsTab.setObjectName(_fromUtf8("axisSetingsTab"))

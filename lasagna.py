@@ -216,23 +216,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.actionQuit.triggered.connect(self.quitLasagna)
         self.actionAbout.triggered.connect(self.about_slot)
 
+
         # Link toolbar signals to slots
         self.actionResetAxes.triggered.connect(self.resetAxes)
 
         #Link tabbed view items to slots
-        #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
-        self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
-        self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
-        self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
-
-        #Flip axis 
-        self.pushButton_FlipView1.released.connect(lambda: self.flipAxis_Slot(0))
-        self.pushButton_FlipView2.released.connect(lambda: self.flipAxis_Slot(1))
-        self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
 
 
         #Image tab stuff
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
+        self.imageAlpha_horizontalSlider.valueChanged.connect(self.imageAlpha_horizontalSlider_slot)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
         labels = QtCore.QStringList("Name") 
         self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
@@ -261,6 +254,19 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #add the z-points spinboxes to a list to make them indexable
         self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
+
+        #Axis tab stuff
+        #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
+        self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
+        self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
+        self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
+
+        #Flip axis 
+        self.pushButton_FlipView1.released.connect(lambda: self.flipAxis_Slot(0))
+        self.pushButton_FlipView2.released.connect(lambda: self.flipAxis_Slot(1))
+        self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
+
+
 
         #Plugins menu and initialisation
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
@@ -796,6 +802,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if resetAxes:
             self.resetAxes()
 
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Slots for image stack tab
+    # In each case, we set the values of the currently selected ingredient using the spinbox value
+    # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
+    def imageAlpha_horizontalSlider_slot(self,value):
+        ingredient = self.selectedStackName()
+        if ingredient==False:
+            return
+        self.returnIngredientByName(ingredient).alpha = int(value)
+        self.initialiseAxes()
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for points tab
