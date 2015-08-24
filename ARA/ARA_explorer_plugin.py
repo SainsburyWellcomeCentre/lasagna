@@ -209,12 +209,16 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
         allContours = nans
-        self.lasagna.returnIngredientByName(self.contourName)._data = nans #make sure data are empty
+
 
         for axNum in range(len(self.lasagna.axes2D)):
             contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
 
-            if highlightOnlyCurrentAxis == True  and  axNum != self.lasagna.inAxis:
+
+            if (highlightOnlyCurrentAxis == True  and  axNum != self.lasagna.inAxis) or len(contours)==0:
+                tmpNan =  np.array([np.nan, np.nan, np.nan]).reshape(1,3)
+                tmpNan[0][axNum]=self.lasagna.axes2D[axNum].currentSlice #ensure nothing is plotted in this layer
+                allContours = np.append(allContours,tmpNan,axis=0)
                 continue
 
             #print "Plotting area %d in plane %d" % (value,self.lasagna.axes2D[axNum].currentSlice)
@@ -405,6 +409,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             treeIndex = self.AreaName2NodeID(self.data['labels'],areaName)
 
         if treeIndex != None:
+            print "highlighting %d" % treeIndex
             self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
 
 
