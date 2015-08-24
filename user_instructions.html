@@ -50,36 +50,39 @@ added on top of this base stack. Whenever a new base stack is loaded, any other 
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Navigating 3D data</h2>
-<p>Once a base stack is loaded you may navigate it with the mouse. When the mouse is moved over one 2D view, 
-a set of cross-hairs appear.  The other two axes show two orthogonal slices taken at the planes of the 
-X and Y cross-hairs. As the cross-hairs are moved across the image, the slices shown in the other two plots 
-update automatically. Zooming is performed with ctrl+mousewheel and panning by clicking and dragging the current view. 
-The other views automatically follow. If you lose the sample due to zooming out too much, hit the reset 
-(green circular arrow) button in the toolbar</p>
+<p>Once a base stack is loaded you may navigate it with the mouse:</p>
+<ul>
+<li><b>Pan</b> by left-clicking and dragging one of the 2-D views. The other two views follow the view being panned.</li>
+<li>Mouse wheel to <b>zoom</b> all three views in and out.</li>
+<li>Explore <b>different slices</b> within one 2-D view by ctrl-wheel. Go faster with shift-ctrl-wheel</li>
+<li><b>Dynamically slice</b> the other two views by ctrl-dragging (i.e. ctrl+left mouse+drag). The other two axes 
+will show two orthogonal slices taken at the planes of the X and Y cross-hairs. As the cross-hairs are moved across the
+image, the slices shown in the other two plots update automatically.</li>
+<li> If you lose the sample due to zooming out too much, hit the <b>reset</b>
+(green circular arrow) button in the toolbar</li>
+</ul>
 
-<p>You can change the intensity range of the image by moving the sliders on the histogram. Note that the
-intensity range in the histogram is currently that of the base stack only. This will be fixed and much
-greater control over the plotted data will provided soon.</p>
+<h2>
+<a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changing image properties</h2>
+<p>You can change the intensity range of the image by moving the sliders on the histogram. There is an opacity slider below the 
+histogram. You may change the color map by right-clicking on the layer name in the "Image" tab and selecting a different colour map. From here
+you may also delete the layer.</p>
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overlaying data</h2>
 <p>
-With a base stack loaded, you may overlay a second volume to compare the two. 
-The overlaid volume <i>must have the same size</i> as the base volume upon which you wish to overlay it. Once 
-an overlay is loaded, the first loaded layer turns red and the new layer is shown in green. 
-Overlapping regions are yellow. In this way Lasagna makes it easy to examine the accuracy of 3D image registration.
-To remove the overay, use the Remove Overlay button in the toolbar.
+You may overlay another volume via File > New Base Stack. Once an overlay is loaded, the first loaded layer turns 
+red and the new layer is shown in green. Overlapping regions are yellow. You may change the colours by right clicking on the layers. 
+You may also change the automatic colouring as more layers are added by editing the configuration file in <tt>/home/dir/.lasagna</tt>
 </p>
 
 <h2>
 <a id="concept" class="anchor" href="#concept" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using plugins</h2>
 <p>
-Plugins are independent pieces of Python code that modify the behavior or functionality of Lasagna. For example,
-the volume overlay described above is handled by a special core plugin that runs all the  time. Most plugins, 
-however, must be started as needed by the user. Plugins are started by selecting them from the plugin menu. 
+Plugins are independent pieces of Python code that modify the behavior or functionality of Lasagna. 
+Plugins are started by selecting them from the plugin menu. 
 Once started, a tick sybol appears next to the plugin's entry in the menu. Plugins can be stopped by unchecking 
-the menu or, where appropriate, closing the plugin's window. Some plugins, such as
-the Allen Reference Atlas explorer are shut automatically if the user attempts to load a new data set.</p>
+the menu or, where appropriate, closing the plugin's window. </p>
 
 
 <h2>
