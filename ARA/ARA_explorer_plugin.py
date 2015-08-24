@@ -42,6 +42,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         #The last value the mouse hovered over. When this changes, we re-calcualte the contour 
         self.lastValue=-1
 
+
+        #The root node index of the ARA
+        self.rootNode=8  
+
+
         #Warn and quit if there are no paths
         if len(self.prefs['ara_paths'])==0:
            self.warnAndQuit('Please fill in preferences file at<br>%s' % self.pref_file)
@@ -204,7 +209,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
         allContours = nans
-            
+        self.lasagna.returnIngredientByName(self.contourName)._data = nans #make sure data are empty
+
         for axNum in range(len(self.lasagna.axes2D)):
             contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
 
@@ -309,7 +315,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         self.data['labels'] = self.loadLabels(paths['labels'])
 
-        self.addAreaDataToTreeView(self.data['labels'])
+
+        self.addAreaDataToTreeView(self.data['labels'],self.rootNode,self.brainArea_itemModel.invisibleRootItem())
 
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
         self.data['currentlyLoadedAtlasName'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
@@ -344,41 +351,61 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
     #---------------
     #Methods to handle the tree 
-    def addAreaDataToTreeView(self,data,idColumn=0,parentColumn=1,nameColumn=2):
+    def addAreaDataToTreeView(self,thisTree,nodeID,parent):
         """
-        data is a list 
-        """ 
-        rootNode=8  #because 8 is "basic cell groups and regions"
-        self.populateTree(data,rootNode,self.brainArea_itemModel.invisibleRootItem())
+        Add a tree structure of area names to the QListView
+        """
 
-
-    def populateTree(self,thisTree,nodeID,parent):
         children = thisTree[nodeID].children
         for child in sorted(children):
             child_item = QtGui.QStandardItem(thisTree[child].data['name'])
-            child_item.setData(child) #Store index. Can be retrieved by: child_item.data().toInt()[0]
+            child_item.setData(child) #Store index. Can be retrieved by: child_item.data().toInt()[0] NOT USING THIS RIGHT NOW
             parent.appendRow(child_item)
             #print child_item
             #Print the details associated with the QStandardItemObject
-            print "%d. %s is a %s and has index %s" % (child_item.data().toInt()[0], child_item.data().toString(),str(child_item), str(child_item.index()))
+            #print "%d. %s is a %s and has index %s" % (child_item.data().toInt()[0], child_item.data().toString(),str(child_item), str(child_item.index()))
 
-            self.populateTree(thisTree, child, child_item)
+            self.addAreaDataToTreeView(thisTree, child, child_item)
+
+
+    def AreaName2NodeID(self,thisTree,name,nodeID=None):
+        """
+        Searches the tree for a brain area called name and returns the node ID (atlas index value)
+        Breaks out of the search loop if the area is found and propagates the value back through
+        the recursive function calls
+        """
+        if nodeID==None:
+            nodeID = self.rootNode
+        
+        children = thisTree[nodeID].children
+        for child in sorted(children):
+            if thisTree[child].data['name']==name:
+                return child
+            else:
+                returnVal = self.AreaName2NodeID(thisTree=thisTree, name=name, nodeID=child)
+                if returnVal != False:
+                    return returnVal
+
+        return False
 
 
     def highlightSelectedAreaFromList(self):
         """
         This slot is run when the user clicks on a brain area in the list
         """
+        getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the dat
 
         index = self.brainArea_treeView.selectedIndexes()[0]
-        print "Selected index has name: %s" % index.data().toString()
-        treeIndex = index.model().item(index.row(),index.column()).data().toInt()[0]
+        areaName = index.data().toString() 
+        if getFromModel:
+            #The following row and column indexes are also correct, but index.model() is the root model and this is wrong.
+            treeIndex = index.model().item(index.row(),index.column()).data().toInt()[0] 
+            print "treeIndex (%d,%d): %d" % (index.row(),index.column(),treeIndex)
+        else: #so we do it the stupid way from the reee
+            treeIndex = self.AreaName2NodeID(self.data['labels'],areaName)
 
-        self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
-
-
-
-
+        if treeIndex != None:
+            self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
 
 
     def loadLabels(self,fname):
