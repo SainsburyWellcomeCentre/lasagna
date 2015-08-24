@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './designerFiles/alert.ui'
 #
-# Created: Wed Aug 12 12:02:11 2015
+# Created: Mon Aug 24 17:42:15 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -63,6 +63,7 @@ class Ui_alertBox(object):
         self.label.setScaledContents(False)
         self.label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setWordWrap(True)
+        self.label.setOpenExternalLinks(True)
         self.label.setObjectName(_fromUtf8("label"))
 
         self.retranslateUi(alertBox)
