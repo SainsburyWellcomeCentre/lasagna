@@ -111,7 +111,7 @@
    <property name="minimumSize">
     <size>
      <width>315</width>
-     <height>557</height>
+     <height>584</height>
     </size>
    </property>
    <property name="features">
@@ -155,26 +155,55 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="logYcheckBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>21</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Log Y</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QCheckBox" name="logYcheckBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>21</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Log Y</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSlider" name="imageAlpha_horizontalSlider">
+             <property name="minimumSize">
+              <size>
+               <width>221</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>100</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="invertedAppearance">
+              <bool>false</bool>
+             </property>
+             <property name="invertedControls">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QTreeView" name="imageStackLayers_TreeView">
@@ -194,6 +223,19 @@
             <bool>false</bool>
            </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>162</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
@@ -540,23 +582,61 @@
                </layout>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_12">
+                <item>
+                 <widget class="QLabel" name="labelMarker_5">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Width</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="lineWidth_spinBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>25</number>
+                  </property>
+                  <property name="value">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <widget class="QPushButton" name="markerColor_pushButton">
                 <property name="text">
                  <string>Color</string>
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QCheckBox" name="addLines_checkBox">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Line</string>
-                </property>
-               </widget>
-              </item>
              </layout>
+             <zorder>layoutWidget</zorder>
+             <zorder></zorder>
+             <zorder>layoutWidget_2</zorder>
+             <zorder>layoutWidget_3</zorder>
+             <zorder>labelMarker_5</zorder>
+             <zorder>markerColor_pushButton</zorder>
             </widget>
            </item>
           </layout>
@@ -569,7 +649,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>208</height>
+             <height>204</height>
             </size>
            </property>
           </spacer>

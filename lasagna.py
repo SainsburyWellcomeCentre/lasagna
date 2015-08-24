@@ -216,23 +216,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.actionQuit.triggered.connect(self.quitLasagna)
         self.actionAbout.triggered.connect(self.about_slot)
 
+
         # Link toolbar signals to slots
         self.actionResetAxes.triggered.connect(self.resetAxes)
 
         #Link tabbed view items to slots
-        #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
-        self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
-        self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
-        self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
-
-        #Flip axis 
-        self.pushButton_FlipView1.released.connect(lambda: self.flipAxis_Slot(0))
-        self.pushButton_FlipView2.released.connect(lambda: self.flipAxis_Slot(1))
-        self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
 
 
         #Image tab stuff
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
+        self.imageAlpha_horizontalSlider.valueChanged.connect(self.imageAlpha_horizontalSlider_slot)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
         labels = QtCore.QStringList("Name") 
         self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
@@ -257,9 +250,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)        
         self.markerColor_pushButton.released.connect(self.markerColor_pushButton_slot)
-        self.addLines_checkBox.stateChanged.connect(self.addLines_checkBox_slot)
+        self.lineWidth_spinBox.valueChanged.connect(self.lineWidth_spinBox_slot)        
+
         #add the z-points spinboxes to a list to make them indexable
         self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
+
+        #Axis tab stuff
+        #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
+        self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
+        self.axisRatioLineEdit_2.textChanged.connect(self.axisRatio2Slot)
+        self.axisRatioLineEdit_3.textChanged.connect(self.axisRatio3Slot)
+
+        #Flip axis 
+        self.pushButton_FlipView1.released.connect(lambda: self.flipAxis_Slot(0))
+        self.pushButton_FlipView2.released.connect(lambda: self.flipAxis_Slot(1))
+        self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
+
+
 
         #Plugins menu and initialisation
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
@@ -775,15 +782,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         #show default images (snap to middle layer of each axis)
-        [axis.updatePlotItems_2D(self.ingredientList) for axis in self.axes2D]
+        [axis.updatePlotItems_2D(self.ingredientList, sliceToPlot=axis.currentSlice, resetToMiddleLayer=resetAxes) for axis in self.axes2D]
 
         #initialize cross hair
         if self.showCrossHairs:
             if self.crossHairVLine==None:
-                self.crossHairVLine = pg.InfiniteLine(angle=90, movable=False)
+                self.crossHairVLine = pg.InfiniteLine(pen=(220,200,0,180),angle=90, movable=False)
                 self.crossHairVLine.objectName = 'crossHairVLine'
             if self.crossHairHLine==None:
-                self.crossHairHLine = pg.InfiniteLine(angle=0, movable=False)
+                self.crossHairHLine = pg.InfiniteLine(pen=(220,200,0,180),angle=0, movable=False)
                 self.crossHairHLine.objectName = 'crossHairHLine'
 
         self.plotImageStackHistogram()
@@ -797,7 +804,20 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Slots for image stack tab
+    # In each case, we set the values of the currently selected ingredient using the spinbox value
+    # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
+    def imageAlpha_horizontalSlider_slot(self,value):
+        ingredient = self.selectedStackName()
+        if ingredient==False:
+            return
+        self.returnIngredientByName(ingredient).alpha = int(value)
+        self.initialiseAxes()
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for points tab
+    # In each case, we set the values of the currently selected ingredient using the spinbox value
+    # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
     def markerSymbol_comboBox_slot(self,index):
         symbol = str(self.markerSymbol_comboBox.currentText())
         ingredient = self.returnIngredientByName(self.selectedPointsName())
@@ -820,6 +840,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient.alpha = spinBoxValue
         self.initialiseAxes()
 
+    def lineWidth_spinBox_slot(self,spinBoxValue):
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
+        ingredient.lineWidth = spinBoxValue
+        self.initialiseAxes()
+
     def markerColor_pushButton_slot(self):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
         if ingredient==False:
@@ -830,17 +857,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient.color =rgb
         self.initialiseAxes()
 
-    def addLines_checkBox_slot(self,state):
-        ingredient = self.returnIngredientByName(self.selectedPointsName())
-        if ingredient==False:
-            return
-
-        if state==0:
-            ingredient.pen = None
-        else:
-            ingredient.pen = True
-
-        self.initialiseAxes()
 
 
     def selectedPointsName(self):
@@ -938,12 +954,22 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         [axis.removeItemFromPlotWidget(self.crossHairHLine) for axis in self.axes2D]
 
 
-    def updateCrossHairs(self):
+    def updateCrossHairs(self,highlightCrossHairs=False):
         """
-        Update the drawn cross hairs on the current image 
+        Update the drawn cross hairs on the current image. 
+        Highlight cross hairs in red if caller says so
         """
         if not self.showCrossHairs:
             return
+
+        #make cross hairs red if control key is pressed
+        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and highlightCrossHairs:
+            self.crossHairVLine.setPen(240,0,0,200)
+            self.crossHairHLine.setPen(240,0,0,200)
+        else:
+            self.crossHairVLine.setPen(220,200,0,180)
+            self.crossHairHLine.setPen(220,200,0,180)
+
         self.crossHairVLine.setPos(self.mouseX+0.5) #Add 0.5 to add line to middle of pixel
         self.crossHairHLine.setPos(self.mouseY+0.5)
 
@@ -992,7 +1018,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         self.runHook(self.hooks['updateMainWindowOnMouseMove_Start']) #Runs each time the views are updated
 
-        self.updateCrossHairs()
+        self.updateCrossHairs(axis.view.getViewBox().controlDrag) #highlight cross hairs is axis says to do so
         self.updateStatusBar()
 
         self.runHook(self.hooks['updateMainWindowOnMouseMove_End']) #Runs each time the views are updated
@@ -1082,16 +1108,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 img.setLevels([minX,maxX]) #Sets levels immediately
                 thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
 
-            
-
 
     def mouseMovedCoronal(self,evt):
         if self.stacksInTreeList()==False:
             return
 
-
         pos = evt[0] #Using signal proxy turns original arguments into a tuple
         self.removeCrossHairs()
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            self.axes2D[0].view.getViewBox().controlDrag=False
 
         if self.axes2D[0].view.sceneBoundingRect().contains(pos):
             self.inAxis=0
@@ -1102,8 +1127,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[0].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
-            self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
+            
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[0].view.getViewBox().controlDrag:
+                self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
+
             self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements     
+
+
 
     def mouseMovedSaggital(self,evt):
         if self.stacksInTreeList()==False:
@@ -1111,7 +1141,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         pos = evt[0]
         self.removeCrossHairs()
-
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            self.axes2D[1].view.getViewBox().controlDrag=False
+            
         if self.axes2D[1].view.sceneBoundingRect().contains(pos):
             self.inAxis=1
             if self.showCrossHairs:
@@ -1119,8 +1151,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
-            self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[1].view.getViewBox().controlDrag:
+                self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+
             self.updateMainWindowOnMouseMove(self.axes2D[1])        
+
 
     def mouseMovedTransverse(self,evt):
         if self.stacksInTreeList()==False:
@@ -1128,6 +1163,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         pos = evt[0]  
         self.removeCrossHairs()
+        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+            self.axes2D[2].view.getViewBox().controlDrag=False
 
         if self.axes2D[2].view.sceneBoundingRect().contains(pos):
             self.inAxis=2
@@ -1136,7 +1173,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
-            self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[2].view.getViewBox().controlDrag:
+                self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
             self.updateMainWindowOnMouseMove(self.axes2D[2])
 
 
@@ -1179,7 +1217,7 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     # Link slots to signals
     #connect views to the mouseMoved slot. After connection this runs in the background. 
     #TODO: set up with just one slot that accepts arguments
-    proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedCoronal)
+    proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=60, slot=tasty.mouseMovedCoronal)
     proxy2=pg.SignalProxy(tasty.axes2D[1].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
     proxy3=pg.SignalProxy(tasty.axes2D[2].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)
 

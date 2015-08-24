@@ -25,11 +25,10 @@ class lines(lasagna_ingredient):
         #Choose symbols from preferences file. 
         #TODO: remove symbol stuff if we indeed will get rid of this here
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.pen = None
         self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
         self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
         self.color = lasHelp.readPreference('colorOrder')[0]
-        
+        self.lineWidth = lasHelp.readPreference('defaultLineWidth')
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
         name = QtGui.QStandardItem(objectName)
@@ -91,21 +90,12 @@ class lines(lasagna_ingredient):
         data[z<fromLayer,:] = np.nan
         data[z>toLayer,:] = np.nan
 
-        if self.pen == True:            
-            pen = self.symbolBrush()
-        else:
-            pen = self.pen
-
         #If we have only NaNs we should not plot. 
         if np.all(np.isnan(data))==False:
-            pyqtObject.setData(x=data[:,0], y=data[:,1], pen=pg.mkPen('r', width=2), brush=pg.mkBrush(255, 255, 255, 180), antialias=True,connect="finite")
-        """
-                        pen=pen,
-                        symbolSize=self.symbolSize, 
-                        symbolBrush=self.symbolBrush()
-                        )
-        """
-
+            pyqtObject.setData(x=data[:,0], y=data[:,1], 
+                                pen=pg.mkPen(color=self.symbolBrush(), width=self.lineWidth), 
+                                antialias=True,
+                                connect="finite")
 
 
     def addToList(self):
@@ -115,10 +105,7 @@ class lines(lasagna_ingredient):
         super(lines,self).addToList()
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
-        if self.pen == None:
-            self.parent.addLines_checkBox.setCheckState(False)
-        else:
-            self.parent.addLines_checkBox.setCheckState(True)
+
             
 
     def symbolBrush(self):

@@ -26,6 +26,8 @@ class imagestack(lasagna_ingredient):
             self.minMax = minMax
 
         self.lut=lut #The look-up table
+        self._alpha=100 #image transparency stored here a
+        self.maxColMapValue=255
 
         #Add to the imageStackLayers_model which is associated with the imagestack QTreeView
         name = QtGui.QStandardItem(objectName)
@@ -48,8 +50,6 @@ class imagestack(lasagna_ingredient):
         self.histBrushCustomColor = False
 
 
-
-
     def setColorMap(self,cmap=''):
         """
         Sets the lookup table (colormap) property self.lut to the string defined by cmap.
@@ -66,9 +66,8 @@ class imagestack(lasagna_ingredient):
 
 
         pos = np.array([0.0, 1.0])
-
-        nVal = 255
-        finalColor = self.colorName2value(cmap,nVal=nVal,alpha=nVal)
+        nVal = self.maxColMapValue
+        finalColor = self.colorName2value(cmap,nVal=nVal,alpha=self.alpha)
         color = np.array([[ 0 , 0 , 0 ,nVal], finalColor], dtype=np.ubyte)
         map = pg.ColorMap(pos, color)
         lut = map.getLookupTable(0.0, 1.0, nVal+1)
@@ -181,3 +180,14 @@ class imagestack(lasagna_ingredient):
         if len(self.parent.ingredientList)==1:
                 self.parent.ingredientList[0].lut='gray'
                 self.parent.initialiseAxes()
+
+
+
+
+    #---------------------------------------------------------------
+    #Getters and setters
+    def get_alpha(self):
+        return int(self.maxColMapValue * (self._alpha/100.0))
+    def set_alpha(self,alpha):
+        self._alpha = alpha
+    alpha = property(get_alpha,set_alpha)

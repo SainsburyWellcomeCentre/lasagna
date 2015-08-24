@@ -25,6 +25,7 @@ class lasagna_viewBox(pg.ViewBox):
             linkZoom  - link self's zoom with the key's zoom (True or False)
         """
         self.linkedAxis = linkedAxis #A list of ViewBox axes to link to 
+        self.controlDrag=False
 
         #Define a custom signal to indicate when the user has created an event that will increment the displayed layer
         self.progressBy = 0
@@ -42,14 +43,26 @@ class lasagna_viewBox(pg.ViewBox):
 
     def mouseDragEvent(self, ev, axis=None, linkX=False, linkY=False):
         """
-        Intercept pg.ViewBox.mouseDragEvent
+        Intercept pg.ViewBox.mouseDragEvent to provide linked panning
+        across different axes
         """
-        #Call the built-in mouseDragEvent
-        pg.ViewBox.mouseDragEvent(self,ev,axis)
-
+      
         if len(self.linkedAxis)==None:
             return
 
+        #Do not drag and link displays if we are pressing the control key.
+        #Instead, set the self.controlDrag boolean to True and bail out
+        modifiers = QtGui.QApplication.keyboardModifiers()
+        if  modifiers == QtCore.Qt.ControlModifier:
+            self.controlDrag=True
+            return
+        else:
+            self.controlDrag=False
+
+        #Call the built-in mouseDragEvent
+        pg.ViewBox.mouseDragEvent(self,ev,axis)
+
+        #the following is use dby lasagna_axis.updateDisplayedSlices_2D to link the views
         for thisView in self.linkedAxis.keys():
             #Get the current view center in x and y
             vr = self.targetRect()
@@ -100,7 +113,26 @@ class lasagna_viewBox(pg.ViewBox):
         """
         Allows mouse wheel zoom on ctrl-click [currently]
         """
-        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+        self.controlDrag=False #TODO: hack that should not be needed
+        modifiers = QtGui.QApplication.keyboardModifiers()
+        if  modifiers == QtCore.Qt.ControlModifier  or (modifiers == (QtCore.Qt.ControlModifier |  QtCore.Qt.ShiftModifier)):
+            # Emit a signal when the wheel is rotated alone and return a positive or negative value in self.progressBy
+            # that we can use to incremement the image layer in the current axes
+            if ev.delta()>0:
+                self.progressBy=1
+            elif ev.delta()<0:
+                self.progressBy=-1
+            else:
+                self.progressBy=0
+            self.progressBy = self.progressBy * abs(ev.delta())/120 #this may be mouse-specific!
+
+            if modifiers == (QtCore.Qt.ControlModifier |  QtCore.Qt.ShiftModifier):
+                # Allow faster scrolling if it was a shift+wheel
+                self.progressBy = self.progressBy*5
+
+            self.progressLayer.emit()
+    
+        else:
             #Handle zoom (scaling with ctrl+mousewheel) 
             mask = np.array(self.state['mouseEnabled'], dtype=np.float)
  
@@ -150,21 +182,5 @@ class lasagna_viewBox(pg.ViewBox):
                             thisViewBox.scaleBy(s,x=center.x(),y=center.y())
                             self.centreOn(thisViewBox,x=center.x(),y=center.y())
             
-            return
     
 
-        # Emit a signal when the wheel is rotated alone and return a positive or negative value in self.progressBy
-        # that we can use to incremement the image layer in the current axes
-        if ev.delta()>0:
-            self.progressBy=1
-        elif ev.delta()<0:
-            self.progressBy=-1
-        else:
-            self.progressBy=0
-        self.progressBy = self.progressBy * abs(ev.delta())/120 #this may be mouse-specific!
-
-        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
-            # Allow faster scrolling if it was a shift+wheel
-            self.progressBy = self.progressBy*5
-
-        self.progressLayer.emit()

@@ -1,15 +1,10 @@
-#Example ara preferences fiel
 ara_paths:
-  1:
-    atlas: '/path/to/annotation_25.nrrd'
-    labels: '/path/to/brain_area_names.json' #This can be a csv or a json
-    template: '/path/to/average_template_25.nrrd'  
-  2:
-    atlas: '/path/to/annotation_10.nrrd'
-    labels: '/path/to/brain_area_names.json'
-    template: '' #This can be empty
-  3:
-    atlas: '/path/to/annotation_50.nrrd'
-    labels: '/path/to/brain_area_names.csv' #This can be a csv or a json
-    template: ''
-  
+  1: {atlas: '/path/to/atlas/ARA_CCFv3/annotation_25.nrrd',
+      labels: '/path/to/atlas/ARA_CCFv3/brain_area_names.json',
+      template: '/path/to/atlas/ARA_CCFv3/average_template_25.nrrd'}
+  2: {atlas: '/path/to/atlas/ARA_CCFv3/annotation_10.nrrd',
+      labels: '/path/to/atlas/ARA_CCFv3/brain_area_names.json',
+      template: '/path/to/atlas/ARA_CCFv3/average_template_10.nrrd'}
+enableNameInStatusBar: true
+enableOverlay: true
+loadFirstAtlasOnStartup: true
