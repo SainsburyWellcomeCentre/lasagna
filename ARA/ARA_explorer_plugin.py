@@ -337,13 +337,25 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
     def addAreaDataToTreeView(self,data,idColumn=0,parentColumn=1,nameColumn=2):
         """
         data is a list 
-        """
-        print data
+        """ 
+        rootNode=8  #because 8 is "basic cell groups and regions"
+        self.populateTree(data,rootNode,self.brainArea_itemModel.invisibleRootItem())
+
+
+    def populateTree(self,thisTree,nodeID,parent):
+        children = thisTree[nodeID].children
+        for child in sorted(children):
+            child_item = QtGui.QStandardItem(thisTree[child].data['name'])
+            child_item.setData(child) #Store index. Can be retrieved by: child_item.data().toInt()[0]
+            parent.appendRow(child_item)
+
+            self.populateTree(thisTree, child, child_item)
+
 
 
     def loadLabels(self,fname):
         """
-        Load the labels file, which may be in JSON or CSV format\
+        Load the labels file, which may be in JSON or CSV format
         
         The csv file should have the following format
         index,parent_index,data1,data1,dataN\n
