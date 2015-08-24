@@ -26,8 +26,9 @@ class imagestack(lasagna_ingredient):
             self.minMax = minMax
 
         self.lut=lut #The look-up table
-        self._alpha=100 #image transparency stored here a
         self.maxColMapValue=255
+        self._alpha=100 #image transparency stored here. see getters and setter at end of file
+
 
         #Add to the imageStackLayers_model which is associated with the imagestack QTreeView
         name = QtGui.QStandardItem(objectName)
@@ -186,8 +187,10 @@ class imagestack(lasagna_ingredient):
 
     #---------------------------------------------------------------
     #Getters and setters
+
+    #Alpha is set from a 0-100 range and is returned as a usually (0-255)
     def get_alpha(self):
         return int(self.maxColMapValue * (self._alpha/100.0))
-    def set_alpha(self,alpha):
-        self._alpha = alpha
+    def set_alpha(self,value):
+        self._alpha = value
     alpha = property(get_alpha,set_alpha)

@@ -234,7 +234,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenuStacks)
         #self.imageStackLayers_TreeView.setColumnWidth(0,200)
 
-        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.plotImageStackHistogram) 
+        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.imageStackLayers_TreeView_slot) 
 
 
         #Points tab stuff
@@ -616,8 +616,27 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.imageStackLayers_TreeView.setCurrentIndex(firstItem)
             print "lasagna.selectedStackName forced highlighting of first image stack"
 
-
         return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+
+
+    def imageStackLayers_TreeView_slot(self):
+        """
+        Runs when the user selects one of the stacks on the list
+        """
+
+        if len(self.ingredientList)==0:
+            return
+
+        name = self.selectedStackName() 
+        ingredient = self.returnIngredientByName(self.selectedStackName())
+        if ingredient==False:
+            return
+            
+        self.imageAlpha_horizontalSlider.setValue(ingredient._alpha) #see also: imageAlpha_horizontalSlider_slot
+
+        self.plotImageStackHistogram()
+
+
 
     #------------------------------------------------------------------------
 
@@ -808,6 +827,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # In each case, we set the values of the currently selected ingredient using the spinbox value
     # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
     def imageAlpha_horizontalSlider_slot(self,value):
+        """
+        Get the value of the slider and assign it to the currently selected imagestack ingredient. 
+        This is read back, and the slider assigned to the currently selected imagestack value in 
+        the slot: imageStackLayers_TreeView_slot
+        """
         ingredient = self.selectedStackName()
         if ingredient==False:
             return
