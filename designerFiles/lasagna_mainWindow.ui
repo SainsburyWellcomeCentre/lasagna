@@ -540,23 +540,61 @@
                </layout>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_12">
+                <item>
+                 <widget class="QLabel" name="labelMarker_5">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Width</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="lineWidth_spinBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>25</number>
+                  </property>
+                  <property name="value">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <widget class="QPushButton" name="markerColor_pushButton">
                 <property name="text">
                  <string>Color</string>
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QCheckBox" name="addLines_checkBox">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Line</string>
-                </property>
-               </widget>
-              </item>
              </layout>
+             <zorder>layoutWidget</zorder>
+             <zorder></zorder>
+             <zorder>layoutWidget_2</zorder>
+             <zorder>layoutWidget_3</zorder>
+             <zorder>labelMarker_5</zorder>
+             <zorder>markerColor_pushButton</zorder>
             </widget>
            </item>
           </layout>
@@ -569,7 +607,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>208</height>
+             <height>204</height>
             </size>
            </property>
           </spacer>

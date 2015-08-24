@@ -155,6 +155,7 @@ def defaultPreferences():
             'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
             'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
             'symbolOrder' : ['o','s','t','d','+'],
+            'defaultLineWidth' : 2,
             'defaultSymbolOpacity' : 180,
             'defaultSymbolSize' : 10,
             'hideZoomResetButtonOnImageAxes' : True,

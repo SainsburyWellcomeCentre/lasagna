@@ -257,7 +257,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)        
         self.markerColor_pushButton.released.connect(self.markerColor_pushButton_slot)
-        self.addLines_checkBox.stateChanged.connect(self.addLines_checkBox_slot)
+        self.lineWidth_spinBox.valueChanged.connect(self.lineWidth_spinBox_slot)        
+
         #add the z-points spinboxes to a list to make them indexable
         self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
 
@@ -798,6 +799,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for points tab
+    # In each case, we set the values of the currently selected ingredient using the spinbox value
+    # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
     def markerSymbol_comboBox_slot(self,index):
         symbol = str(self.markerSymbol_comboBox.currentText())
         ingredient = self.returnIngredientByName(self.selectedPointsName())
@@ -820,6 +823,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient.alpha = spinBoxValue
         self.initialiseAxes()
 
+    def lineWidth_spinBox_slot(self,spinBoxValue):
+        ingredient = self.returnIngredientByName(self.selectedPointsName())
+        if ingredient==False:
+            return
+        ingredient.lineWidth = spinBoxValue
+        self.initialiseAxes()
+
     def markerColor_pushButton_slot(self):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
         if ingredient==False:
@@ -830,17 +840,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient.color =rgb
         self.initialiseAxes()
 
-    def addLines_checkBox_slot(self,state):
-        ingredient = self.returnIngredientByName(self.selectedPointsName())
-        if ingredient==False:
-            return
-
-        if state==0:
-            ingredient.pen = None
-        else:
-            ingredient.pen = True
-
-        self.initialiseAxes()
 
 
     def selectedPointsName(self):

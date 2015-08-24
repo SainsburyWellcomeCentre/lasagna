@@ -20,11 +20,10 @@ class sparsepoints(lasagna_ingredient):
         
         #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.pen = None
         self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
         self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
         self.color = lasHelp.readPreference('colorOrder')[0]
-        
+        self.lineWidth = None #Not used right now
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
         name = QtGui.QStandardItem(objectName)
@@ -82,11 +81,6 @@ class sparsepoints(lasagna_ingredient):
         toLayer = sliceToPlot+zRange
         data = data[(z>=fromLayer) * (z<=toLayer),:]
         z = z[(z>=fromLayer) * (z<=toLayer)]
-        if self.pen == True:            
-            pen = self.symbolBrush()
-        else:
-            pen = self.pen
-
 
         #Add points, making points further from the current
         #layer less prominent 
@@ -109,7 +103,6 @@ class sparsepoints(lasagna_ingredient):
                      'pos': (data[ii,0],data[ii,1]),
                      'symbol': self.symbol,
                      'brush': self.symbolBrush(alpha=alpha),
-                     'pen': pen,
                      'size': size
                      }
                     )
@@ -125,10 +118,7 @@ class sparsepoints(lasagna_ingredient):
         super(sparsepoints,self).addToList()
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
-        if self.pen == None:
-            self.parent.addLines_checkBox.setCheckState(False)
-        else:
-            self.parent.addLines_checkBox.setCheckState(True)
+
             
 
     def symbolBrush(self,alpha=False):
