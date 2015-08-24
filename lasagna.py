@@ -352,7 +352,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         
         #delete the plugin instance and replace it in the dictionary with a reference (that what it is?) to the class
         #NOTE: plugins with a window do not run the following code when the window is closed. They should, however, 
-        #detach hooks (unless the plugin author forgot to do this)
+        #detach hooks (unless the plugin author forgot to do this)      
         del(self.plugins[pluginName])
         pluginClass, pluginName = pluginHandler.getPluginInstanceFromFileName(pluginName+".py",None) 
         self.plugins[pluginName] = pluginClass.plugin
@@ -631,7 +631,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient = self.returnIngredientByName(self.selectedStackName())
         if ingredient==False:
             return
-            
+
         self.imageAlpha_horizontalSlider.setValue(ingredient._alpha) #see also: imageAlpha_horizontalSlider_slot
 
         self.plotImageStackHistogram()

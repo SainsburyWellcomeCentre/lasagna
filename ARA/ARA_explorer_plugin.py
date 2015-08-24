@@ -131,35 +131,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
 
 
-
-    def closePlugin(self):
-        """
-        Runs when the user unchecks the plugin in the menu box and also (in this case)
-        when the user loads a new base stack
-        """
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
-        
-        #remove the currently loaded ARA (if present)
-        self.lasagna.removeIngredientByName('aracontour')
-
-        if len(self.data['currentlyLoadedAtlasName'])>0:
-            print self.data['currentlyLoadedAtlasName']
-            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
-
-        #self.lasagna.intensityHistogram.clear()
-        self.detachHooks()
-        self.lasagna.statusBar.showMessage("ARA explorer closed")
-        self.close()
-
-
-    def closeEvent(self, event):
-        """
-        This event is execute when the user presses the close window (cross) button in the title bar
-        """
-        self.closePlugin()
-        self.deleteLater()
-        event.accept()
-
     #--------------------------------------
     # plugin hooks
     #all methods starting with hook_ are automatically registered as hooks with lasagna 
@@ -520,10 +491,48 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             }
 
 
+
+    def closePlugin(self):
+        """
+        Runs when the user unchecks the plugin in the menu box and also (in this case)
+        when the user loads a new base stack
+        """        
+        
+        #remove the currently loaded ARA (if present)
+        self.lasagna.removeIngredientByName('aracontour')
+
+        if len(self.data['currentlyLoadedAtlasName'])>0:
+            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
+
+        if len(self.data['currentlyLoadedOverlay'])>0:
+            self.lasagna.removeIngredientByName(self.data['currentlyLoadedOverlay'])
+
+
+        #self.lasagna.intensityHistogram.clear()
+        self.detachHooks()
+        self.lasagna.statusBar.showMessage("ARA explorer closed")
+        self.close()
+
+
+    def closeEvent(self, event):
+        """
+        This event is execute when the user presses the close window (cross) button in the title bar
+        """
+        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
+        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+
+        self.closePlugin()
+        self.deleteLater()
+        event.accept()
+
+
     def warnAndQuit(self,msg):
         """
-        Display alert and quit the plugin
+        Display alert and (maybe) quit the plugin
         """
-        #TODO: is not shutting down properly, although this same code does work in other contexts (e.g. when it was hooked into the load stack method)
         self.lasagna.alert = alert(self.lasagna,alertText=msg)
-        self.closePlugin()
+        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
+        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+
+        #TODO: If we close the plugin the warning vanishes right away
+        #self.closePlugin()
