@@ -287,7 +287,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         if self.overlayTemplate_checkBox.isChecked()==True:
             if os.path.exists(fname):
-                self.loadVolume(fname)
+                self.addOverlay(fname)
                 return
 
         if self.overlayTemplate_checkBox.isChecked()==False:
