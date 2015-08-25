@@ -220,7 +220,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         So ok for flipping.
         """
 
-        rawName=self.originalOverlayFname.replace('mhd','raw')
+        rawName=self.originalOverlayFname.replace('mhd','raw') #TODO: can wipe the MHD file if it does not find it. e.g. if the extension is upper case need error checks!!!
         if os.path.exists(rawName) == False:
             print "Failed to find %s in path" % rawName
 
