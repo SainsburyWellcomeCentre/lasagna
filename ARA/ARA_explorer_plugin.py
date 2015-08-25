@@ -49,7 +49,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         #Warn and quit if there are no paths
         if len(self.prefs['ara_paths'])==0:
-           self.warnAndQuit('Please fill in preferences file at<br>%s' % self.pref_file)
+           self.warnAndQuit('Please fill in preferences file at<br>%s<br><a href="http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
            return
 
         #Set up the UI
@@ -107,7 +107,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         #If we have no paths to ARAs by the end of this, issue an error alertbox and quit
         if len(self.paths)==0:
-           self.warnAndQuit('Found no valid paths is preferences file at<br>%s' % self.pref_file)
+           self.warnAndQuit('Found no valid paths is preferences file at<br>%s.<br>SEE <a href="http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
            return
 
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
@@ -129,17 +129,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
                                 data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
 
-
-
-
-    def closePlugin(self):
-        """
-        Runs when the user unchecks the plugin in the menu box and also (in this case)
-        when the user loads a new base stack
-        """
-        #self.lasagna.removeIngredientByName(self.ARAlayerName) #TODO: remove stuff
-        self.lasagna.intensityHistogram.clear()
-        self.detachHooks()
 
 
     #--------------------------------------
@@ -287,7 +276,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         if self.overlayTemplate_checkBox.isChecked()==True:
             if os.path.exists(fname):
-                self.loadVolume(fname)
+                self.addOverlay(fname)
                 return
 
         if self.overlayTemplate_checkBox.isChecked()==False:
@@ -325,7 +314,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
         self.data['currentlyLoadedAtlasName'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
         self.data['template']=paths['template']
-
         if os.path.exists(paths['template']):
             self.overlayTemplate_checkBox.setEnabled(True)
             if self.overlayTemplate_checkBox.isChecked()==True:
@@ -344,7 +332,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         Add an overlay
         """
-        print "ADDING"
         self.loadVolume(fname)
         self.data['currentlyLoadedOverlay'] = fname.split(os.path.sep)[-1]
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
@@ -397,7 +384,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         This slot is run when the user clicks on a brain area in the list
         """
-        getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the dat
+        getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the data
 
         index = self.brainArea_treeView.selectedIndexes()[0]
         areaName = index.data().toString() 
@@ -467,9 +454,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         Guess the file separator in file fname.
         """
-        fid=open(fname,'r')
-        contents=fid.read()
-        fid.close()
+        with open(fname,'r') as fid:
+            contents=fid.read()
+    
         nLines = contents.count('\n')
         possibleSeparators = ['|','\t',','] #don't include space because for these data that would be crazy
         for thisSep in possibleSeparators:
@@ -504,14 +491,48 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             }
 
 
+
+    def closePlugin(self):
+        """
+        Runs when the user unchecks the plugin in the menu box and also (in this case)
+        when the user loads a new base stack
+        """        
+        
+        #remove the currently loaded ARA (if present)
+        self.lasagna.removeIngredientByName('aracontour')
+
+        if len(self.data['currentlyLoadedAtlasName'])>0:
+            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
+
+        if len(self.data['currentlyLoadedOverlay'])>0:
+            self.lasagna.removeIngredientByName(self.data['currentlyLoadedOverlay'])
+
+
+        #self.lasagna.intensityHistogram.clear()
+        self.detachHooks()
+        self.lasagna.statusBar.showMessage("ARA explorer closed")
+        self.close()
+
+
+    def closeEvent(self, event):
+        """
+        This event is execute when the user presses the close window (cross) button in the title bar
+        """
+        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
+        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+
+        self.closePlugin()
+        self.deleteLater()
+        event.accept()
+
+
     def warnAndQuit(self,msg):
         """
-        Display alert and quit the plugin
+        Display alert and (maybe) quit the plugin
         """
-        #TODO: is not shutting down properly, although this same code does work in other contexts (e.g. when it was hooked into the load stack method)
         self.lasagna.alert = alert(self.lasagna,alertText=msg)
-
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin as well as making it possible to restart the plugin
+        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
         self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
-        
-        self.closePlugin()
+
+        #TODO: If we close the plugin the warning vanishes right away
+        #self.closePlugin()
