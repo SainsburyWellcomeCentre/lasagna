@@ -225,11 +225,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             print "Failed to find %s in path" % rawName
 
 
-        handle = open(rawName, "wb")
         imStack = self.lasagna.returnIngredientByName('overlayImage').data()
-        handle.write( bytearray(imStack.ravel()) ) #This writes garbled files right now
-        handle.close()
-
+        with open(rawName, "wb") as handle:
+            handle.write( bytearray(imStack.ravel()) ) #This writes garbled files right now
+    
         self.saveModifiedMovingStack.setEnabled(False)
 
 
@@ -392,9 +391,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             print fname + " does not exist"
             return
 
-        fid = open(fname,'r')
-        contents = fid.read()
-        fid.close()
+        with open(fname,'r') as fid:
+            contents = fid.read()
+    
         self.plainTextEditParam.clear()
         self.plainTextEditParam.insertPlainText(contents)
 
@@ -408,9 +407,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             return
 
         tempFname = self.tmpParamFiles[currentFname]
-        fid = open(tempFname,'w')
-        fid.write(str(self.plainTextEditParam.toPlainText()))
-        fid.close()
+        with open(tempFname,'w') as fid:
+            fid.write(str(self.plainTextEditParam.toPlainText()))
+    
 
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

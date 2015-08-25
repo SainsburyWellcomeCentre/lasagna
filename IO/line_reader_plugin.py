@@ -65,10 +65,9 @@ class loaderClass(lasagna_plugin):
 
 
         if os.path.isfile(fname): 
-            fid = open(str(fname),'r')
-            contents = fid.read()
-            fid.close()
-
+            with open(str(fname),'r') as fid:
+                contents = fid.read()
+    
 
             # a list of strings with each string being one line from the file
             # add nans between lineseries

@@ -224,10 +224,9 @@ def mhd_read_raw_file(header):
 
 
   rawFname = header['elementdatafile']
-  fid = open(rawFname,'rb')
-  data = fid.read()
-  fid.close()
-  
+  with  open(rawFname,'rb') as fid:
+    data = fid.read()
+    
   dimSize = header['dimsize']
   #from: http://stackoverflow.com/questions/26542345/reading-data-from-a-16-bit-unsigned-big-endian-raw-image-file-in-python
   fmt = endian + str(int(np.prod(dimSize))) + formatType
@@ -240,12 +239,13 @@ def mhd_read_header_file(fname):
   """
   Read an MHD plain text header file and return contents as a dictionary
   """
-  fid = open(fname,'r')
+
   mhd_header = dict()
   mhd_header['FileName'] = fname
 
-  contents = fid.read()
-  fid.close()
+  with open(fname,'r') as fid:
+    contents = fid.read()
+
 
   info = dict() #header data stored here
 
@@ -339,9 +339,8 @@ def nrrdHeaderRead(fname):
   """
 
   import nrrd
-  fid = open(fname,'rb')
-  header = nrrd.read_header(fid)
-  fid.close()
+  with open(fname,'rb') as fid:
+    header = nrrd.read_header(fid)
 
   return header
 

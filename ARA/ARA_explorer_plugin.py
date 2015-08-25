@@ -454,9 +454,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         Guess the file separator in file fname.
         """
-        fid=open(fname,'r')
-        contents=fid.read()
-        fid.close()
+        with open(fname,'r') as fid:
+            contents=fid.read()
+    
         nLines = contents.count('\n')
         possibleSeparators = ['|','\t',','] #don't include space because for these data that would be crazy
         for thisSep in possibleSeparators:
