@@ -128,7 +128,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
                                 kind='lines', 
                                 data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
-
+        # End of constructor
 
 
     #--------------------------------------
@@ -174,7 +174,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         if self.lastValue != value  and  value>0  and  self.highlightArea_checkBox.isChecked():
             self.drawAreaHighlight(value)
 
-           
+    def hook_deleteLayerStack_Slot_End(self):
+        """
+        Runs when a stack is removed. Watches for the removal of the current atlas and 
+        triggers closing of the plugin if it is removed.
+        """
+        #is the current loaded atlas present
+        atlasName= self.data['currentlyLoadedAtlasName']
+        if self.lasagna.returnIngredientByName(atlasName)==False:
+            print "The current atlas has been removed by the user. Closing the ARA explorer plugin"
+            self.closePlugin()
+
+    #--------------------------------------
+    # Drawing-related methods
     def getContoursFromAxis(self,axisNumber=-1,value=-1):
         """
         Return a contours array from the axis indexed by integer axisNumber

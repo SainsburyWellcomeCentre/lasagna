@@ -185,8 +185,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             'showFileLoadDialog_End'        :   [] ,
             'loadRecentFileSlot_Start'      :   [] ,
             'updateMainWindowOnMouseMove_Start' : [] ,
-            'updateMainWindowOnMouseMove_End'   : []
-                    }
+            'updateMainWindowOnMouseMove_End'   : [],
+            'changeImageStackColorMap_Slot_End' : [],
+            'deleteLayerStack_Slot_End'     :   [],
+        }
 
 
 
@@ -379,7 +381,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
   
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # File menu and methods associated with loading the base image stack. 
-  
     def loadImageStack(self,fnameToLoad):
         """
         Loads an image image stack. 
@@ -1022,6 +1023,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     things for now and play it by ear. 
     """
     def layersMenuStacks(self,position): 
+        """
+        Defines a pop-up menu that appears when the user right-clicks on an imagestack-related item 
+        in the image stack layers QTreeView
+        """
         menu = QtGui.QMenu()
 
         changeColorMenu = QtGui.QMenu("Change color",self)
@@ -1043,16 +1048,24 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     def changeImageStackColorMap_Slot(self):
+        """
+        Change the color map of an image stack using methods in the imagestack ingredient
+        """
         color = str(self.sender().text())
         objName = self.selectedStackName()
         self.returnIngredientByName(objName).lut=color
         self.initialiseAxes()
-
+        self.runHook(self.hooks['changeImageStackColorMap_Slot_End'])
 
     def deleteLayerStack_Slot(self):
+        """
+        Remove an imagestack ingredient and list item
+        """
         objName = self.selectedStackName()
         self.removeIngredientByName(objName)
         print "removed " + objName
+        self.runHook(self.hooks['deleteLayerStack_Slot_End'])
+
 
 
     def stacksInTreeList(self):
@@ -1073,7 +1086,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def selectedStackName(self):
         """
-        Return the name of the selected image stack. If no stack selected, returns the first stack in the list
+        Return the name of the selected image stack. If no stack selected, returns the first stack in the list.
         """
         if self.imageStackLayers_Model.rowCount()==0:
             print "lasagna.selectedStackName finds no image stacks in list"
