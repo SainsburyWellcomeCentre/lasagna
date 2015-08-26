@@ -174,11 +174,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #Enable UI buttons
         self.loadMoving.setEnabled(True)        
-        #Enable when the saving is working
-        #self.flipAxis1.setEnabled(True)
-        #self.flipAxis2.setEnabled(True)
-        #self.flipAxis3.setEnabled(True)
-
+        
         self.updateWidgets_slot()
         self.sampleStackName_3.setText('')
         self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
@@ -198,8 +194,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.originalOverlayImage = overlay.raw_data()
         self.originalOverlayFname = overlay.fnameAbsPath
         self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
-        self.saveModifiedMovingStack.setEnabled(False)
+        
 
+        #Enable UI elements for modifying moving stack orientation
+        self.flipAxis1.setEnabled(True)
+        self.flipAxis2.setEnabled(True)
+        self.flipAxis3.setEnabled(True)     
+        self.rotAxis1.setEnabled(True)
+        self.rotAxis2.setEnabled(True)
+        self.rotAxis3.setEnabled(True)
+        self.swapAxis1_2.setEnabled(True)
+        self.swapAxis2_3.setEnabled(True)
+        self.swapAxis3_1.setEnabled(True)
+        self.saveModifiedMovingStack.setEnabled(True)
 
     def flipAxis_Slot(self,axisToFlip):
         """
