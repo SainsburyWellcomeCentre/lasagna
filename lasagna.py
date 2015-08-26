@@ -465,7 +465,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
     #Code to handle generic file loading, dialogs, etc
-
     def showFileLoadDialog(self, fileFilter="All files (*)" ):
         """
         Bring up the file load dialog. Return the file name. Update the last used path. 
@@ -541,105 +540,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.quitLasagna()
 
 
-    # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
-    #Code to handle ingredients and modify GUI as they are added or removed
-    """
-    TODO: ingredients can only be handled if they are in the ingredients module
-    ingredients defined in plugin directories, etc, can not be handled by this 
-    module. This potentially makes plugin creation awkward as it couples it too
-    strongly to the core code (new ingredients must be added to the ingredients
-    module). This may turn out to not be a problem in practice, so we leave 
-    things for now and play it by ear. 
-    """
-    #------------------------------------------------------------------------
-    # PROTOTYPE CODE
-    def layersMenuStacks(self,position): 
-        menu = QtGui.QMenu()
-
-        changeColorMenu = QtGui.QMenu("Change color",self)
-
-        #action.triggered.connect(self.changeImageStackColorMap_Slot)
-
-        for thisColor in lasHelp.readPreference('colorOrder'):
-            action = QtGui.QAction(thisColor,self)
-            #action.triggered.connect(lambda: self.changeImageStackColorMap_Slot(thisColor))
-            action.triggered.connect(self.changeImageStackColorMap_Slot)
-            changeColorMenu.addAction(action)
-
-        menu.addAction(changeColorMenu.menuAction())
-
-        action = QtGui.QAction("Delete",self)
-        action.triggered.connect(self.deleteLayerStack_Slot)
-        menu.addAction(action)
-        menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
-
-
-    def changeImageStackColorMap_Slot(self):
-        color = str(self.sender().text())
-        objName = self.selectedStackName()
-        self.returnIngredientByName(objName).lut=color
-        self.initialiseAxes()
-
-
-    def deleteLayerStack_Slot(self):
-        objName = self.selectedStackName()
-        self.removeIngredientByName(objName)
-        print "removed " + objName
-
-
-    def stacksInTreeList(self):
-        """
-        Goes through the list of image stack layers in the QTreeView list 
-        and pull out the names.
-        """
-        stacks=[]
-        for ii in range(self.imageStackLayers_Model.rowCount()):
-            stackName = self.imageStackLayers_Model.index(ii,0).data().toString()
-            stacks.append(stackName)
-
-        if len(stacks)>0:
-            return stacks
-        else:
-            return False
-
-    def selectedStackName(self):
-        """
-        Return the name of the selected image stack. If no stack selected, returns the first stack in the list
-        """
-        if self.imageStackLayers_Model.rowCount()==0:
-            print "lasagna.selectedStackName finds no image stacks in list"
-            return False
-
-        #Highlight the first row if nothing is selected (which shouldn't ever happen)        
-        if len(self.imageStackLayers_TreeView.selectedIndexes())==0:
-            firstItem  = self.imageStackLayers_Model.index(0,0)
-            self.imageStackLayers_TreeView.setCurrentIndex(firstItem)
-            print "lasagna.selectedStackName forced highlighting of first image stack"
-
-        return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
-
-
-    def imageStackLayers_TreeView_slot(self):
-        """
-        Runs when the user selects one of the stacks on the list
-        """
-
-        if len(self.ingredientList)==0:
-            return
-
-        name = self.selectedStackName() 
-        ingredient = self.returnIngredientByName(self.selectedStackName())
-        if ingredient==False:
-            return
-
-        self.imageAlpha_horizontalSlider.setValue(ingredient._alpha) #see also: imageAlpha_horizontalSlider_slot
-
-        self.plotImageStackHistogram()
-
-
 
     #------------------------------------------------------------------------
-
+    #Ingredient handling methods
     def addIngredient(self, kind='', objectName='', data=None, fname=''):
         """
         Adds an ingredient to the list of ingredients.
@@ -673,8 +576,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 )
 
 
-
-
     def removeIngredient(self,ingredientInstance):
         """
         Removes the ingredient "ingredientInstance" from self.ingredientList
@@ -685,6 +586,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.ingredientList.remove(ingredientInstance) 
         ingredientInstance.removeFromList() #remove ingredient from the list with which it is associated        
         self.selectedStackName() #Ensures something is highlighted
+
 
     def removeIngredientByName(self,objectName):
         """
@@ -709,9 +611,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if removedIngredient == False & verbose==True:
             print "** Failed to remove ingredient %s **" % objectName
 
+
     def removeIngredientByType(self,ingredientType):
         """
-        Finds ingredient by type and removes it
+        Finds ingredients of one type (e.g. all imagestacks) and removes them all
         """
         verbose = False
         if len(self.ingredientList)==0:
@@ -763,7 +666,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def returnIngredientByName(self,objectName):
         """
-        Return a specific ingredient based upon its object name.
+        Return a specific ingredient object based upon its object name.
         Returns False if the ingredient was not found
         """
         verbose = False
@@ -782,7 +685,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -           
-
+    #Functions involved in the display of plots on the screen
     def resetAxes(self):
         """
         Set X and Y limit of each axes to fit the data
@@ -1050,11 +953,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # Image Tab methods
+    # Image Tab methods and slots
     # These methods are involved with the tabs to the left of the three view axes
 
-
-    #The following are part of the image tab
     def plotImageStackHistogram(self):
         """
         Plot the image stack histogram in a PlotWidget to the left of the three image views.
@@ -1108,9 +1009,106 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.plottedIntensityRegionObj.setRegion(intRange)
         self.updateAxisLevels()
 
+    # -  -  -  -  -  
+    #The following methods and slots coordinate updating of the GUI
+    #as imagestack ingredients are added or removed. These methods also
+    #handle modifying the stack ingredients.
+    """
+    TODO: ingredients can only be handled if they are in the ingredients module
+    ingredients defined in plugin directories, etc, can not be handled by this 
+    module. This potentially makes plugin creation awkward as it couples it too
+    strongly to the core code (new ingredients must be added to the ingredients
+    module). This may turn out to not be a problem in practice, so we leave 
+    things for now and play it by ear. 
+    """
+    def layersMenuStacks(self,position): 
+        menu = QtGui.QMenu()
+
+        changeColorMenu = QtGui.QMenu("Change color",self)
+
+        #action.triggered.connect(self.changeImageStackColorMap_Slot)
+
+        for thisColor in lasHelp.readPreference('colorOrder'):
+            action = QtGui.QAction(thisColor,self)
+            #action.triggered.connect(lambda: self.changeImageStackColorMap_Slot(thisColor))
+            action.triggered.connect(self.changeImageStackColorMap_Slot)
+            changeColorMenu.addAction(action)
+
+        menu.addAction(changeColorMenu.menuAction())
+
+        action = QtGui.QAction("Delete",self)
+        action.triggered.connect(self.deleteLayerStack_Slot)
+        menu.addAction(action)
+        menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
+
+
+    def changeImageStackColorMap_Slot(self):
+        color = str(self.sender().text())
+        objName = self.selectedStackName()
+        self.returnIngredientByName(objName).lut=color
+        self.initialiseAxes()
+
+
+    def deleteLayerStack_Slot(self):
+        objName = self.selectedStackName()
+        self.removeIngredientByName(objName)
+        print "removed " + objName
+
+
+    def stacksInTreeList(self):
+        """
+        Goes through the list of image stack layers in the QTreeView list 
+        and pull out the names.
+        """
+        stacks=[]
+        for ii in range(self.imageStackLayers_Model.rowCount()):
+            stackName = self.imageStackLayers_Model.index(ii,0).data().toString()
+            stacks.append(stackName)
+
+        if len(stacks)>0:
+            return stacks
+        else:
+            return False
+
+
+    def selectedStackName(self):
+        """
+        Return the name of the selected image stack. If no stack selected, returns the first stack in the list
+        """
+        if self.imageStackLayers_Model.rowCount()==0:
+            print "lasagna.selectedStackName finds no image stacks in list"
+            return False
+
+        #Highlight the first row if nothing is selected (which shouldn't ever happen)        
+        if len(self.imageStackLayers_TreeView.selectedIndexes())==0:
+            firstItem  = self.imageStackLayers_Model.index(0,0)
+            self.imageStackLayers_TreeView.setCurrentIndex(firstItem)
+            print "lasagna.selectedStackName forced highlighting of first image stack"
+
+        return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+
+
+    def imageStackLayers_TreeView_slot(self):
+        """
+        Runs when the user selects one of the stacks on the list
+        """
+
+        if len(self.ingredientList)==0:
+            return
+
+        name = self.selectedStackName() 
+        ingredient = self.returnIngredientByName(self.selectedStackName())
+        if ingredient==False:
+            return
+
+        self.imageAlpha_horizontalSlider.setValue(ingredient._alpha) #see also: imageAlpha_horizontalSlider_slot
+
+        self.plotImageStackHistogram()
+
+
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # Slots relating to plotting
+    # Slots relating to updating of the axes, etc
     def updateAxisLevels(self):
         #TODO: Decide what to do with minMax. Setting it here by directly manipulating the item seems wrong
         minX, maxX = self.plottedIntensityRegionObj.getRegion()
