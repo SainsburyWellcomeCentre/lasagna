@@ -50,6 +50,10 @@ class lasagna_viewBox(pg.ViewBox):
         if len(self.linkedAxis)==None:
             return
 
+        #Not zoom if the user right-drags, because this messes up stuff. Let's just do all zooming with the wheel
+        if ev.button() & QtCore.Qt.RightButton:
+            return
+
         #Do not drag and link displays if we are pressing the control key.
         #Instead, set the self.controlDrag boolean to True and bail out
         modifiers = QtGui.QApplication.keyboardModifiers()
