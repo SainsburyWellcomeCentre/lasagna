@@ -175,6 +175,17 @@ class imagestack(lasagna_ingredient):
         else:
             print "Can not flip axis %d" % axisToFlip
 
+    
+    def swapAxes(self,ax1,ax2):
+        """
+        Swap axes ax1 and ax2
+        """
+        if ax1>2 or ax1<0 or ax2>2 or ax2<0:
+            print "Axes to swap out of range. "
+            return
+
+        self._data = np.swapaxes(self._data,ax1,ax2)
+
 
     def removeFromList(self):
         super(imagestack,self).removeFromList()
