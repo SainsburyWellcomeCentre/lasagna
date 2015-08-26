@@ -450,7 +450,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
-        fname = self.showFileLoadDialog(fileFilter=fileFilter)
+        fname = self.showFileLoadDialog(fileFilter=fileFilter) #TODO: this way the recently loaded files are updated before we succesfully loaded
         if fname == None:
             return
 

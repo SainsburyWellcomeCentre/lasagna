@@ -175,7 +175,20 @@ class imagestack(lasagna_ingredient):
         else:
             print "Can not flip axis %d" % axisToFlip
 
-    
+
+    def rotateAlongDimension(self,axisToRotate):
+        """
+        Rotate the image stack 90 degrees counter-clockwise along the axis "axisToRotate"
+        """
+        if axisToRotate>2 or axisToRotate<0:
+            print "imagestack.rotateAlongDimension can not rotate along axis %d" % axisToRotate            
+            return
+
+        self._data = np.swapaxes(self._data,0,axisToRotate)
+        self._data = np.rot90(self._data)
+        self._data = np.swapaxes(self._data,0,axisToRotate)
+
+        
     def swapAxes(self,ax1,ax2):
         """
         Swap axes ax1 and ax2
@@ -185,6 +198,7 @@ class imagestack(lasagna_ingredient):
             return
 
         self._data = np.swapaxes(self._data,ax1,ax2)
+
 
 
     def removeFromList(self):
