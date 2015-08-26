@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'elastix_plugin.ui'
 #
-# Created: Thu Aug  6 18:00:29 2015
+# Created: Wed Aug 26 16:30:57 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -68,11 +68,11 @@ class Ui_elastixMain(object):
         self.loadMoving.setMinimumSize(QtCore.QSize(180, 0))
         self.loadMoving.setObjectName(_fromUtf8("loadMoving"))
         self.horizontalLayout_2.addWidget(self.loadMoving)
-        self.sampleStackName_3 = QtGui.QLabel(self.layoutWidget)
-        self.sampleStackName_3.setMinimumSize(QtCore.QSize(250, 0))
-        self.sampleStackName_3.setText(_fromUtf8(""))
-        self.sampleStackName_3.setObjectName(_fromUtf8("sampleStackName_3"))
-        self.horizontalLayout_2.addWidget(self.sampleStackName_3)
+        self.movingStackName = QtGui.QLabel(self.layoutWidget)
+        self.movingStackName.setMinimumSize(QtCore.QSize(250, 0))
+        self.movingStackName.setText(_fromUtf8(""))
+        self.movingStackName.setObjectName(_fromUtf8("movingStackName"))
+        self.horizontalLayout_2.addWidget(self.movingStackName)
         spacerItem = QtGui.QSpacerItem(328, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
         self.layoutWidget1 = QtGui.QWidget(self.tabLoad)

@@ -186,7 +186,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.loadMoving.setEnabled(True)        
         
         self.updateWidgets_slot()
-        self.sampleStackName_3.setText('')
+        self.movingStackName.setText('')
         self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
 
 
@@ -195,7 +195,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if supressDialog==False:
             self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
             movingName=self.lasagna.stacksInTreeList()[1]
-            self.sampleStackName_3.setText(movingName)
+            self.movingStackName.setText(movingName)
             self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath
 
         self.updateWidgets_slot()
@@ -223,12 +223,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Flips the moving stack along the defined axis
         """
         print "Flipping axis %d of moving stack" % (axisToFlip+1)
-
-        if self.lasagna.returnIngredientByName('overlayImage') == False:
+        movingName = self.movingStackName.text()
+        if self.lasagna.returnIngredientByName(movingName) == False:
             print "Failed to flip moving image"
             return
 
-        self.lasagna.returnIngredientByName('overlayImage').flipAlongAxis(axisToFlip)
+        self.lasagna.returnIngredientByName(movingName).flipAlongAxis(axisToFlip)
         self.lasagna.initialiseAxes()
         self.saveModifiedMovingStack.setEnabled(True)
 
@@ -238,12 +238,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Rotates the moving stack along the defined axis
         """
         print "Rotating axis %d of moving stack" % (axisToRotate+1)
-
-        if self.lasagna.returnIngredientByName('overlayImage')==False:
+        movingName = self.movingStackName.text()
+        if self.lasagna.returnIngredientByName(movingName)==False:
             print "Failed to rotate moving image"
             return
 
-        self.lasagna.returnIngredientByName('overlayImage').rotateAlongDimension(axisToFlip)
+        self.lasagna.returnIngredientByName(movingName).rotateAlongDimension(axisToRotate)
         self.lasagna.initialiseAxes()
         self.saveModifiedMovingStack.setEnabled(True)
 
@@ -253,12 +253,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Swaps the moving stack axes along the defined dimensions
         """
         print "Swapping moving stack axes %d and %d" % (ax1+1,ax2+1)
-
-        if self.lasagna.returnIngredientByName('overlayImage')==False:
+        movingName = self.movingStackName.text()
+        if self.lasagna.returnIngredientByName(movingName)==False:
             print "Failed to swap moving image axes"
             return
 
-        self.lasagna.returnIngredientByName('overlayImage').swapAxes(ax1,ax2)
+        self.lasagna.returnIngredientByName(movingName).swapAxes(ax1,ax2)
         self.lasagna.initialiseAxes()
         self.saveModifiedMovingStack.setEnabled(True)
 

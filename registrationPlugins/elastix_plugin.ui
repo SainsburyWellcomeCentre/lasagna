@@ -128,7 +128,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="sampleStackName_3">
+       <widget class="QLabel" name="movingStackName">
         <property name="minimumSize">
          <size>
           <width>250</width>
@@ -951,8 +951,6 @@
     </widget>
    </widget>
   </widget>
-  <zorder>tabWidget</zorder>
-  <zorder>horizontalSpacer_3</zorder>
  </widget>
  <resources>
   <include location="elastix_plugin.qrc"/>

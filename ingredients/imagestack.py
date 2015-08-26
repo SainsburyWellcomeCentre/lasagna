@@ -183,9 +183,9 @@ class imagestack(lasagna_ingredient):
             print "imagestack.rotateAlongDimension can not rotate along axis %d" % axisToRotate            
             return
 
-        self._data = np.swapaxes(self._data,0,axisToRotate)
+        self._data = np.swapaxes(self._data,2,axisToRotate)
         self._data = np.rot90(self._data)
-        self._data = np.swapaxes(self._data,0,axisToRotate)
+        self._data = np.swapaxes(self._data,2,axisToRotate)
 
 
     def swapAxes(self,ax1,ax2):
