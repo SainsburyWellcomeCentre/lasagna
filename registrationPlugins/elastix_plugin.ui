@@ -933,7 +933,7 @@
       <string>Show &amp;Highlighted Result</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="showOriginalOverlay_radioButton">
+    <widget class="QRadioButton" name="showOriginalMovingImage_radioButton">
      <property name="geometry">
       <rect>
        <x>320</x>
@@ -943,7 +943,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Show &amp;Original Overlay</string>
+      <string>Show &amp;Original Moving Image</string>
      </property>
      <property name="checked">
       <bool>true</bool>

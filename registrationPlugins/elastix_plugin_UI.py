@@ -345,10 +345,10 @@ class Ui_elastixMain(object):
         self.showHighlightedResult_radioButton = QtGui.QRadioButton(self.tab)
         self.showHighlightedResult_radioButton.setGeometry(QtCore.QRect(20, 20, 231, 21))
         self.showHighlightedResult_radioButton.setObjectName(_fromUtf8("showHighlightedResult_radioButton"))
-        self.showOriginalOverlay_radioButton = QtGui.QRadioButton(self.tab)
-        self.showOriginalOverlay_radioButton.setGeometry(QtCore.QRect(320, 20, 231, 21))
-        self.showOriginalOverlay_radioButton.setChecked(True)
-        self.showOriginalOverlay_radioButton.setObjectName(_fromUtf8("showOriginalOverlay_radioButton"))
+        self.showOriginalMovingImage_radioButton = QtGui.QRadioButton(self.tab)
+        self.showOriginalMovingImage_radioButton.setGeometry(QtCore.QRect(320, 20, 231, 21))
+        self.showOriginalMovingImage_radioButton.setChecked(True)
+        self.showOriginalMovingImage_radioButton.setObjectName(_fromUtf8("showOriginalMovingImage_radioButton"))
         self.tabWidget.addTab(self.tab, _fromUtf8(""))
 
         self.retranslateUi(elastixMain)
@@ -391,7 +391,7 @@ class Ui_elastixMain(object):
         self.label_2.setText(_translate("elastixMain", "Currently running registrations", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabRun), _translate("elastixMain", "Run", None))
         self.showHighlightedResult_radioButton.setText(_translate("elastixMain", "Show &Highlighted Result", None))
-        self.showOriginalOverlay_radioButton.setText(_translate("elastixMain", "Show &Original Overlay", None))
+        self.showOriginalMovingImage_radioButton.setText(_translate("elastixMain", "Show &Original Moving Image", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("elastixMain", "Results", None))
 
 import elastix_plugin_rc
