@@ -85,6 +85,16 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.flipAxis2.released.connect(lambda: self.flipAxis_Slot(1))
         self.flipAxis3.released.connect(lambda: self.flipAxis_Slot(2))
 
+        #Rotate axis 
+        self.rotAxis1.released.connect(lambda: self.rotAxis_Slot(0))
+        self.rotAxis2.released.connect(lambda: self.rotAxis_Slot(1))
+        self.rotAxis3.released.connect(lambda: self.rotAxis_Slot(2))
+
+        #Swap axes
+        self.swapAxis1_2.released.connect(lambda: self.rotAxis_Slot(0,1))
+        self.swapAxis2_3.released.connect(lambda: self.rotAxis_Slot(1,2))
+        self.swapAxis3_1.released.connect(lambda: self.rotAxis_Slot(2,0))
+
         self.saveModifiedMovingStack.released.connect(self.saveModifiedMovingStack_slot)
 
         #Tab 2 - Building the registration command 
@@ -206,19 +216,49 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.swapAxis1_2.setEnabled(True)
         self.swapAxis2_3.setEnabled(True)
         self.swapAxis3_1.setEnabled(True)
-        self.saveModifiedMovingStack.setEnabled(True)
+
 
     def flipAxis_Slot(self,axisToFlip):
         """
-        Flips the overlay stack along the defined axis
+        Flips the moving stack along the defined axis
         """
         print "Flipping axis %d of moving stack" % (axisToFlip+1)
 
         if self.lasagna.returnIngredientByName('overlayImage')==False:
-            "Print failed to flip overlay image"
+            "Print failed to flip moving image"
             return
 
-        self.lasagna.returnIngredientByName('overlayImage').flipDataAlongAxis(axisToFlip)
+        self.lasagna.returnIngredientByName('overlayImage').flipAlongAxis(axisToFlip)
+        self.lasagna.initialiseAxes()
+        self.saveModifiedMovingStack.setEnabled(True)
+
+
+   def rotAxis_Slot(self,axisToRotate):
+        """
+        Rotates the moving stack along the defined axis
+        """
+        print "Rotating axis %d of moving stack" % (axisToRotate+1)
+
+        if self.lasagna.returnIngredientByName('overlayImage')==False:
+            "Print failed to rotate moving image"
+            return
+
+        self.lasagna.returnIngredientByName('overlayImage').rotateAlongDimension(axisToFlip)
+        self.lasagna.initialiseAxes()
+        self.saveModifiedMovingStack.setEnabled(True)
+
+
+  def swapAxis_Slot(self,ax1,ax2):
+        """
+        Swaps the moving stack axes along the defined dimensions
+        """
+        print "Swapping moving stack axes %d and %d" % (ax1+1,ax2+1)
+
+        if self.lasagna.returnIngredientByName('overlayImage')==False:
+            "Print failed to swap moving image axes"
+            return
+
+        self.lasagna.returnIngredientByName('overlayImage').swapAxes(ax1,ax2)
         self.lasagna.initialiseAxes()
         self.saveModifiedMovingStack.setEnabled(True)
 

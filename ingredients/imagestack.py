@@ -157,7 +157,7 @@ class imagestack(lasagna_ingredient):
             self.defaultHistRange()
 
 
-    def flipDataAlongAxis(self,axisToFlip):
+    def flipAlongAxis(self,axisToFlip):
         """
         Flip the data along axisToFlip. 
         """
@@ -188,7 +188,7 @@ class imagestack(lasagna_ingredient):
         self._data = np.rot90(self._data)
         self._data = np.swapaxes(self._data,0,axisToRotate)
 
-        
+
     def swapAxes(self,ax1,ax2):
         """
         Swap axes ax1 and ax2

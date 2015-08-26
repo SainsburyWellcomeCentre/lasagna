@@ -952,7 +952,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         for thisStack in imageStacks:
-            thisStack.flipDataAlongAxis(axisToFlip)
+            thisStack.flipAlongAxis(axisToFlip)
 
         self.initialiseAxes()
 
