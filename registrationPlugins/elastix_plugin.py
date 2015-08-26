@@ -77,13 +77,23 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Tab 1 - Loading data
         self.loadFixed.released.connect(self.loadFixed_slot)
         self.loadMoving.released.connect(self.loadMoving_slot)
-        self.originalOverlayImage = None #The original overlay image is stored here
-        self.originalOverlayFname = None 
+        self.originalMovingImage = None #The original moving image is stored here
+        self.originalMovingFname = None 
 
         #Flip axis 
         self.flipAxis1.released.connect(lambda: self.flipAxis_Slot(0))
         self.flipAxis2.released.connect(lambda: self.flipAxis_Slot(1))
         self.flipAxis3.released.connect(lambda: self.flipAxis_Slot(2))
+
+        #Rotate axis 
+        self.rotAxis1.released.connect(lambda: self.rotAxis_Slot(0))
+        self.rotAxis2.released.connect(lambda: self.rotAxis_Slot(1))
+        self.rotAxis3.released.connect(lambda: self.rotAxis_Slot(2))
+
+        #Swap axes
+        self.swapAxis1_2.released.connect(lambda: self.swapAxis_Slot(0,1))
+        self.swapAxis2_3.released.connect(lambda: self.swapAxis_Slot(1,2))
+        self.swapAxis3_1.released.connect(lambda: self.swapAxis_Slot(2,0))
 
         self.saveModifiedMovingStack.released.connect(self.saveModifiedMovingStack_slot)
 
@@ -119,7 +129,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.registrationResults_ListView.clicked.connect(self.resultImageClicked_Slot)
         self.resultImages_Dict={} #the keys are result image file names and the values are the result images
         self.showHighlightedResult_radioButton.toggled.connect(self.overlayRadioButtons_Slot)
-        self.showOriginalOverlay_radioButton.toggled.connect(self.overlayRadioButtons_Slot)
+        self.showOriginalMovingImage_radioButton.toggled.connect(self.overlayRadioButtons_Slot)
 
 
         #-------------------------------------------------------------------------------------
@@ -133,16 +143,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             doRealLoad=True
             if doRealLoad:
-                self.lasagna.loadImageStack(self.fixedStackPath)
+                self.lasagna.loadImageStack(self.fixedStackPath) #TODO: for some reason this doesn't get added to the image stack list even though the right code appears to be running. 
                 self.lasagna.initialiseAxes()
                 self.loadMoving.setEnabled(True)
                 self.flipAxis1.setEnabled(True)
                 self.flipAxis2.setEnabled(True)
-                self.flipAxis3.setEnabled(True)                
-                self.lasagna.loadActions['load_overlay'].load(self.movingStackPath) #TODO: this list index hack will need fixing
+                self.flipAxis3.setEnabled(True)           
+                self.rotAxis1.setEnabled(True)
+                self.rotAxis2.setEnabled(True)
+                self.rotAxis3.setEnabled(True)             
+                #self.lasagna.loadImageStack(self.movingStackPath) #TODO: this list index hack will need fixing
                 self.lasagna.initialiseAxes()
-                self.loadMoving_slot(supressDialog=True)
-            doParamFile=True
+                #self.loadMoving_slot(supressDialog=True)
+            doParamFile=False
             if doParamFile:
                 #load param file list
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
@@ -171,13 +184,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #Enable UI buttons
         self.loadMoving.setEnabled(True)        
-        #Enable when the saving is working
-        #self.flipAxis1.setEnabled(True)
-        #self.flipAxis2.setEnabled(True)
-        #self.flipAxis3.setEnabled(True)
-
+        
         self.updateWidgets_slot()
-        self.sampleStackName_3.setText('')
+        self.movingStackName.setText('')
         self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
 
 
@@ -186,29 +195,71 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if supressDialog==False:
             self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
             movingName=self.lasagna.stacksInTreeList()[1]
-            self.sampleStackName_3.setText(movingName)
+            self.movingStackName.setText(movingName)
             self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath
 
         self.updateWidgets_slot()
         movingName=self.lasagna.stacksInTreeList()[1]
-        overlay=self.lasagna.returnIngredientByName(movingName)
-        self.originalOverlayImage = overlay.raw_data()
-        self.originalOverlayFname = overlay.fnameAbsPath
+        moving=self.lasagna.returnIngredientByName(movingName)
+        self.originalMovingImage = moving.raw_data()
+        self.originalMovingFname = moving.fnameAbsPath
         self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
-        self.saveModifiedMovingStack.setEnabled(False)
+        
 
+        """
+        #Enable UI elements for modifying moving stack orientation
+        self.flipAxis1.setEnabled(True)
+        self.flipAxis2.setEnabled(True)
+        self.flipAxis3.setEnabled(True)     
+        self.rotAxis1.setEnabled(True)
+        self.rotAxis2.setEnabled(True)
+        self.rotAxis3.setEnabled(True)
+        self.swapAxis1_2.setEnabled(True)
+        self.swapAxis2_3.setEnabled(True)
+        self.swapAxis3_1.setEnabled(True)
+        """
 
     def flipAxis_Slot(self,axisToFlip):
         """
-        Flips the overlay stack along the defined axis
+        Flips the moving stack along the defined axis
         """
         print "Flipping axis %d of moving stack" % (axisToFlip+1)
-
-        if self.lasagna.returnIngredientByName('overlayImage')==False:
-            "Print failed to flip overlay image"
+        movingName = self.movingStackName.text()
+        if self.lasagna.returnIngredientByName(movingName) == False:
+            print "Failed to flip moving image"
             return
 
-        self.lasagna.returnIngredientByName('overlayImage').flipDataAlongAxis(axisToFlip)
+        self.lasagna.returnIngredientByName(movingName).flipAlongAxis(axisToFlip)
+        self.lasagna.initialiseAxes()
+        self.saveModifiedMovingStack.setEnabled(True)
+
+
+    def rotAxis_Slot(self,axisToRotate):
+        """
+        Rotates the moving stack along the defined axis
+        """
+        print "Rotating axis %d of moving stack" % (axisToRotate+1)
+        movingName = self.movingStackName.text()
+        if self.lasagna.returnIngredientByName(movingName)==False:
+            print "Failed to rotate moving image"
+            return
+
+        self.lasagna.returnIngredientByName(movingName).rotateAlongDimension(axisToRotate)
+        self.lasagna.initialiseAxes()
+        self.saveModifiedMovingStack.setEnabled(True)
+
+
+    def swapAxis_Slot(self,ax1,ax2):
+        """
+        Swaps the moving stack axes along the defined dimensions
+        """
+        print "Swapping moving stack axes %d and %d" % (ax1+1,ax2+1)
+        movingName = self.movingStackName.text()
+        if self.lasagna.returnIngredientByName(movingName)==False:
+            print "Failed to swap moving image axes"
+            return
+
+        self.lasagna.returnIngredientByName(movingName).swapAxes(ax1,ax2)
         self.lasagna.initialiseAxes()
         self.saveModifiedMovingStack.setEnabled(True)
 
@@ -219,17 +270,25 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Following code only works if the image dimensions have not changed.
         So ok for flipping.
         """
+        import imageStackLoader
+        
+        movingName = self.movingStackName.text()
+        imStack = self.lasagna.returnIngredientByName(movingName).raw_data()
+        
+        print "Saving..."
 
-        rawName=self.originalOverlayFname.replace('mhd','raw') #TODO: can wipe the MHD file if it does not find it. e.g. if the extension is upper case need error checks!!!
-        if os.path.exists(rawName) == False:
-            print "Failed to find %s in path" % rawName
+        origButtonText = self.saveModifiedMovingStack.text()
+        self.saveModifiedMovingStack.setText('SAVING') #TODO: bug - this text does not appear
 
-
-        imStack = self.lasagna.returnIngredientByName('overlayImage').data()
-        with open(rawName, "wb") as handle:
-            handle.write( bytearray(imStack.ravel()) ) #This writes garbled files right now
-    
-        self.saveModifiedMovingStack.setEnabled(False)
+        returnVal = imageStackLoader.mhdWrite(imStack,self.originalMovingFname)
+        
+        if returnVal:
+            self.saveModifiedMovingStack.setEnabled(False)
+            print "Saved"
+        else:
+            print "Save failed"
+        
+        self.saveModifiedMovingStack.setText(origButtonText)
 
 
 
@@ -528,7 +587,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Index is a QModelIndex
         """
 
-        overlay=self.lasagna.returnIngredientByName('overlayImage')
+        movingName = self.movingStackName.text()
+        moving=self.lasagna.returnIngredientByName(movingName)
+
         selectedIndex = self.registrationResults_ListView.selectedIndexes()
         if len(selectedIndex)==0:
             return
@@ -540,19 +601,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #Show the image if the highlighted overlay radio button is enabled
         if self.showHighlightedResult_radioButton.isChecked()==True:
-            if overlay.fnameAbsPath == imageFname:
+            if moving.fnameAbsPath == imageFname:
                 print "Skipping. Unchanged."
                 return
 
-            overlay.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
+            moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
             print "switched to overlay " + imageFname
 
         elif self.showOriginalOverlay_radioButton.isChecked()==True:
-            if overlay.fnameAbsPath ==  self.originalOverlayFname:
+            if moving.fnameAbsPath ==  self.originalMovingFname:
                 print "Skipping. Unchanged."
                 return
 
-            overlay.changeData(imageData=self.originalOverlayImage, imageAbsPath=self.originalOverlayFname)
+            moving.changeData(imageData=self.originalMovingImage, imageAbsPath=self.originalMovingFname)
             print "switched to original overlay"
 
         self.lasagna.initialiseAxes()

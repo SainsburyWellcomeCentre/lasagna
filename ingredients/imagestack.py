@@ -157,14 +157,13 @@ class imagestack(lasagna_ingredient):
             self.defaultHistRange()
 
 
-    def flipDataAlongAxis(self,axisToFlip):
+    def flipAlongAxis(self,axisToFlip):
         """
         Flip the data along axisToFlip. 
         """
         if isinstance(axisToFlip,int)==False:
             print "imagestack.flipDataAlongAxis - axisToFlip must be an integer"
             return
-
 
         if axisToFlip==0:
             self._data = self._data[::-1,:,:]
@@ -174,6 +173,30 @@ class imagestack(lasagna_ingredient):
             self._data = self._data[:,:,::-1]            
         else:
             print "Can not flip axis %d" % axisToFlip
+
+
+    def rotateAlongDimension(self,axisToRotate):
+        """
+        Rotate the image stack 90 degrees counter-clockwise along the axis "axisToRotate"
+        """
+        if axisToRotate>2 or axisToRotate<0:
+            print "imagestack.rotateAlongDimension can not rotate along axis %d" % axisToRotate            
+            return
+
+        self._data = np.swapaxes(self._data,2,axisToRotate)
+        self._data = np.rot90(self._data)
+        self._data = np.swapaxes(self._data,2,axisToRotate)
+
+
+    def swapAxes(self,ax1,ax2):
+        """
+        Swap axes ax1 and ax2
+        """
+        if ax1>2 or ax1<0 or ax2>2 or ax2<0:
+            print "Axes to swap out of range. "
+            return
+
+        self._data = np.swapaxes(self._data,ax1,ax2)
 
 
     def removeFromList(self):

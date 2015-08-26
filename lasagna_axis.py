@@ -44,8 +44,8 @@ class projection2D():
         #The currently plotted slice
         self.currentSlice=None
 
-        #Link wheel-alone custom signal to a slot that will increment the current layer on mouse-wheel alone
-        self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
+        #Link the progressLayer signal to a slot that will move through image layers as the wheel is turned
+        self.view.getViewBox().progressLayer.connect(self.wheel_layer_slot)
 
 
     def addItemToPlotWidget(self,ingredient):
@@ -198,8 +198,6 @@ class projection2D():
                 elif self.currentSlice<0:
                     self.currentSlice=0;
 
-
-
                 thisIngredient.plotIngredient(
                                             pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                             axisToPlot=self.axisToPlot, 
@@ -230,7 +228,6 @@ class projection2D():
         """
         #self.updatePlotItems_2D(ingredients)  #TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
                                               # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
-
         self.linkedYprojection.updatePlotItems_2D(ingredients,slicesToPlot[0])
         self.linkedXprojection.updatePlotItems_2D(ingredients,slicesToPlot[1])
 
@@ -253,9 +250,9 @@ class projection2D():
 
     #------------------------------------------------------
     #slots
-    def wheel_alone_slot(self):
+    def wheel_layer_slot(self):
         """
-        Capture mouse-wheel alone and report direction of mouse wheel alone
+        Handle the wheel action that allows the user to move through stack layers
         """
         if self.currentSlice>0:
             self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=self.currentSlice + self.view.getViewBox().progressBy)
