@@ -108,7 +108,6 @@ def mhdRead(fname,fallBackMode = False):
   Read an MHD file using either VTK (if available) or the slower-built in reader
   if fallBackMode is true we force use of the built-in reader
   """
-
   if fallBackMode == False: 
     #Attempt to load vtk
     try:
@@ -300,22 +299,27 @@ def mhd_getRatios(fname):
   Get relative axis ratios from MHD file defined by fname
   """
   try:
+    #Attempt to use the vtk module to read the element spacing
     imp.find_module('vtk')
     import vtk
-  except ImportError:
-    print "Failed to find VTK. Using default axis length values"
-    #TODO: read values from built-in info reader
-    return lasHelp.readPreference('defaultAxisRatios') #defaults
-
-
-  imr = vtk.vtkMetaImageReader()
-  imr.SetFileName(fname)
-  imr.Update()
+    imr = vtk.vtkMetaImageReader()
+    imr.SetFileName(fname)
+    imr.Update()
  
-  im = imr.GetOutput()
-  spacing = im.GetSpacing()
+    im = imr.GetOutput()
+    spacing = im.GetSpacing()    
+  except ImportError:
+    #If the vtk module fails, we try to read the spacing using the built-in reader
+    info = mhd_read_header_file(fname)
+    if info.has_key('elementspacing'):
+      spacing = info['elementspacing']
+    else:
+      print "Failed to find spacing info in MHA file. Using default axis length values"      
+      return lasHelp.readPreference('defaultAxisRatios') #defaults
+
 
   if len(spacing)==0: 
+    print "Failed to find spacing valid spacing info in MHA file. Using default axis length values"      
     return lasHelp.readPreference('defaultAxisRatios') #defaults
   
   return spacingToRatio(spacing)  
