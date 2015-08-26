@@ -119,7 +119,7 @@ def mhdRead(fname,fallBackMode = False):
       fallBackMode = True
 
   if fallBackMode:
-    return mhd_read_fallback(fname)
+    return mhdRead_fallback(fname)
   else:
     #use VTK
     imr = vtk.vtkMetaImageReader()
@@ -133,8 +133,24 @@ def mhdRead(fname,fallBackMode = False):
     print "Using VTK to read MHD image of size: rows: %d, cols: %d, layers: %d" % (rows,cols,z)
     return a.reshape(z, cols, rows) #TODO: Inverted from example I found. Why? Did I fuck up?
 
+def mhdWrite(imStack,fname):
+  """
+  Write MHD file, updating both the MHD and raw file.
+  imStack - is the image stack volume ndarray
+  fname - is the absolute path to the mhd file.
+  """
+  
+  out = mhd_write_raw_file(imStack,fname)
+  if out==False:
+    return
+  else:
+    info=out
 
-def mhd_read_fallback(fname):
+  #Write the mhd header file, as it may have been modified
+  mhd_write_header_file(fname,info)
+
+
+def mhdRead_fallback(fname):
   """
   Read the header file from the MHA file then use this to 
   build a 3D stack from the raw file
@@ -234,6 +250,40 @@ def mhd_read_raw_file(header):
   return pix.reshape((dimSize[2],dimSize[1],dimSize[0]))
 
 
+def mhd_write_raw_file(imStack,fname,info=None):
+  """
+  Write raw MHD file.
+  imStack - is the image stack volume ndarray
+  fname - is the absolute path to the mhd file.
+  info - is a dictionary containing imported data from the mhd file. This is optional. 
+        If info is missing, we read the data from the mhd file
+  """
+
+  if info==None:
+    info=mhd_read_header_file(fname)
+
+  #Get the name of the raw file and check it exists
+  path = os.path.dirname(fname)
+  pathToRaw = path + os.path.sep + info['elementdatafile']
+
+  if not os.path.exists(pathToRaw):
+    print "Unable to find raw file at %s. Aborting mhd_write_raw_file" % pathToRaw
+    return False
+
+
+  #replace the stack dimension sizes in the info stack in case the user changed this
+  info['dimsize'] = imStack.shape[::-1] #We need to flip the list for some reason
+
+  #TODO: the endianness is not set here or defined in the MHD file. Does this matter?
+  try:
+    with open(pathToRaw,'wb') as fid:
+      fid.write( bytearray(imStack.ravel()) )
+    return info
+  except IOError:
+    print "Failed to write raw file in mhd_write_raw_file"
+    return False
+
+
 def mhd_read_header_file(fname):
   """
   Read an MHD plain text header file and return contents as a dictionary
@@ -294,9 +344,9 @@ def mhd_read_header_file(fname):
   return info
 
 
-def writeMHD(fname,info):
+def mhd_write_header_file(fname,info):
   """
-  This is a quick and very dirty, *SIMPLE*, mha writer. It can only cope with the fields hard-coded described below. 
+  This is a quick and very dirty, *SIMPLE*, mhd header writer. It can only cope with the fields hard-coded described below. 
   """
 
   fileStr = '' #Build a string that we will write to a file
@@ -318,10 +368,9 @@ def writeMHD(fname,info):
     numbers = ' '.join(map(str,(map(int,info['elementspacing'])))) 
     fileStr = fileStr + ('ElementSpacing = %s\n' % numbers)
 
-  if info.has_key('elementType'):
-    numbers = ' '.join(map(str,(map(int,info['elementtype'])))) 
-    fileStr = fileStr + ('ElementType = %s\n' % numbers)
-
+  if info.has_key('elementtype'):
+    fileStr = fileStr + ('ElementType = %s\n' % info['elementtype'])
+  
   if info.has_key('elementbyteordermsb'):
     fileStr = fileStr + ('ElementByteOrderMSB = %s\n' % str(info['elementbyteordermsb']))
 
@@ -332,6 +381,9 @@ def writeMHD(fname,info):
   #If we're here, then hopefully things went well. We write to the file
   with open (fname,'w') as fid:
     fid.write(fileStr)
+
+
+
 
 
 def mhd_getRatios(fname):
