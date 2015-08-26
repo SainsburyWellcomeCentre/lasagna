@@ -165,7 +165,6 @@ class imagestack(lasagna_ingredient):
             print "imagestack.flipDataAlongAxis - axisToFlip must be an integer"
             return
 
-
         if axisToFlip==0:
             self._data = self._data[::-1,:,:]
         elif axisToFlip==1:
@@ -198,7 +197,6 @@ class imagestack(lasagna_ingredient):
             return
 
         self._data = np.swapaxes(self._data,ax1,ax2)
-
 
 
     def removeFromList(self):

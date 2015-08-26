@@ -224,8 +224,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         print "Flipping axis %d of moving stack" % (axisToFlip+1)
 
-        if self.lasagna.returnIngredientByName('overlayImage')==False:
-            "Print failed to flip moving image"
+        if self.lasagna.returnIngredientByName('overlayImage') == False:
+            print "Failed to flip moving image"
             return
 
         self.lasagna.returnIngredientByName('overlayImage').flipAlongAxis(axisToFlip)
@@ -240,7 +240,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         print "Rotating axis %d of moving stack" % (axisToRotate+1)
 
         if self.lasagna.returnIngredientByName('overlayImage')==False:
-            "Print failed to rotate moving image"
+            print "Failed to rotate moving image"
             return
 
         self.lasagna.returnIngredientByName('overlayImage').rotateAlongDimension(axisToFlip)
@@ -255,7 +255,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         print "Swapping moving stack axes %d and %d" % (ax1+1,ax2+1)
 
         if self.lasagna.returnIngredientByName('overlayImage')==False:
-            "Print failed to swap moving image axes"
+            print "Failed to swap moving image axes"
             return
 
         self.lasagna.returnIngredientByName('overlayImage').swapAxes(ax1,ax2)
