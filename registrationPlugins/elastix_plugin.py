@@ -91,9 +91,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.rotAxis3.released.connect(lambda: self.rotAxis_Slot(2))
 
         #Swap axes
-        self.swapAxis1_2.released.connect(lambda: self.rotAxis_Slot(0,1))
-        self.swapAxis2_3.released.connect(lambda: self.rotAxis_Slot(1,2))
-        self.swapAxis3_1.released.connect(lambda: self.rotAxis_Slot(2,0))
+        self.swapAxis1_2.released.connect(lambda: self.swapAxis_Slot(0,1))
+        self.swapAxis2_3.released.connect(lambda: self.swapAxis_Slot(1,2))
+        self.swapAxis3_1.released.connect(lambda: self.swapAxis_Slot(2,0))
 
         self.saveModifiedMovingStack.released.connect(self.saveModifiedMovingStack_slot)
 
@@ -233,7 +233,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.saveModifiedMovingStack.setEnabled(True)
 
 
-   def rotAxis_Slot(self,axisToRotate):
+    def rotAxis_Slot(self,axisToRotate):
         """
         Rotates the moving stack along the defined axis
         """
@@ -248,7 +248,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.saveModifiedMovingStack.setEnabled(True)
 
 
-  def swapAxis_Slot(self,ax1,ax2):
+    def swapAxis_Slot(self,ax1,ax2):
         """
         Swaps the moving stack axes along the defined dimensions
         """
