@@ -294,6 +294,46 @@ def mhd_read_header_file(fname):
   return info
 
 
+def writeMHD(fname,info):
+  """
+  This is a quick and very dirty, *SIMPLE*, mha writer. It can only cope with the fields hard-coded described below. 
+  """
+
+  fileStr = '' #Build a string that we will write to a file
+  if info.has_key('ndims'):
+    fileStr = fileStr + ('NDims = %d\n' % info['ndims'])
+
+  if info.has_key('datatype'):
+    fileStr = fileStr + ('DataType = %s\n' % info['datatype'])
+
+  if info.has_key('dimsize'):
+    numbers = ' '.join(map(str,(map(int,info['dimsize'])))) #convert a list of floats into a space separated series of ints
+    fileStr = fileStr + ('DimSize = %s\n' % numbers)
+
+  if info.has_key('elementsize'):
+    numbers = ' '.join(map(str,(map(int,info['elementsize'])))) 
+    fileStr = fileStr + ('ElementSize = %s\n' % numbers)
+
+  if info.has_key('elementspacing'):
+    numbers = ' '.join(map(str,(map(int,info['elementspacing'])))) 
+    fileStr = fileStr + ('ElementSpacing = %s\n' % numbers)
+
+  if info.has_key('elementType'):
+    numbers = ' '.join(map(str,(map(int,info['elementtype'])))) 
+    fileStr = fileStr + ('ElementType = %s\n' % numbers)
+
+  if info.has_key('elementbyteordermsb'):
+    fileStr = fileStr + ('ElementByteOrderMSB = %s\n' % str(info['elementbyteordermsb']))
+
+  if info.has_key('elementdatafile'):
+    fileStr = fileStr + ('ElementDataFile = %s\n' % info['elementdatafile'])
+
+
+  #If we're here, then hopefully things went well. We write to the file
+  with open (fname,'w') as fid:
+    fid.write(fileStr)
+
+
 def mhd_getRatios(fname):
   """
   Get relative axis ratios from MHD file defined by fname
