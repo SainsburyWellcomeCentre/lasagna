@@ -269,11 +269,25 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Following code only works if the image dimensions have not changed.
         So ok for flipping.
         """
-
-        movingFileName = self.movingStackName.text()
-
+        import imageStackLoader
         
-        self.saveModifiedMovingStack.setEnabled(False)
+        movingName = self.movingStackName.text()
+        imStack = self.lasagna.returnIngredientByName(movingName).raw_data()
+        
+        print "Saving..."
+
+        origButtonText = self.saveModifiedMovingStack.text()
+        self.saveModifiedMovingStack.setText('SAVING') #TODO: bug - this text does not appear
+
+        returnVal = imageStackLoader.mhdWrite(imStack,self.originalMovingFname)
+        
+        if returnVal:
+            self.saveModifiedMovingStack.setEnabled(False)
+            print "Saved"
+        else:
+            print "Save failed"
+        
+        self.saveModifiedMovingStack.setText(origButtonText)
 
 
 

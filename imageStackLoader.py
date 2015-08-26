@@ -142,13 +142,13 @@ def mhdWrite(imStack,fname):
   
   out = mhd_write_raw_file(imStack,fname)
   if out==False:
-    return
+    return False
   else:
     info=out
 
   #Write the mhd header file, as it may have been modified
   mhd_write_header_file(fname,info)
-
+  return True
 
 def mhdRead_fallback(fname):
   """
