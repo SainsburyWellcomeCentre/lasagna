@@ -133,16 +133,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             doRealLoad=True
             if doRealLoad:
-                self.lasagna.loadImageStack(self.fixedStackPath)
+                self.lasagna.loadImageStack(self.fixedStackPath) #TODO: for some reason this doesn't get added to the image stack list even though the right code appears to be running. 
                 self.lasagna.initialiseAxes()
                 self.loadMoving.setEnabled(True)
                 self.flipAxis1.setEnabled(True)
                 self.flipAxis2.setEnabled(True)
-                self.flipAxis3.setEnabled(True)                
-                self.lasagna.loadActions['load_overlay'].load(self.movingStackPath) #TODO: this list index hack will need fixing
+                self.flipAxis3.setEnabled(True)           
+                self.rotAxis1.setEnabled(True)
+                self.rotAxis2.setEnabled(True)
+                self.rotAxis3.setEnabled(True)             
+                #self.lasagna.loadImageStack(self.movingStackPath) #TODO: this list index hack will need fixing
                 self.lasagna.initialiseAxes()
-                self.loadMoving_slot(supressDialog=True)
-            doParamFile=True
+                #self.loadMoving_slot(supressDialog=True)
+            doParamFile=False
             if doParamFile:
                 #load param file list
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
