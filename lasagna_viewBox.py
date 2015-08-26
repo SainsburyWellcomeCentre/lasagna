@@ -83,6 +83,7 @@ class lasagna_viewBox(pg.ViewBox):
                 x = vr.center().y()
 
             self.centreOn(thisView,x,y)
+            thisView.scaleBy([1,1])
 
 
     def centreOn(self,thisViewBox,x=None,y=None):
@@ -133,7 +134,7 @@ class lasagna_viewBox(pg.ViewBox):
             self.progressLayer.emit()
     
         else:
-            #Handle zoom (scaling with ctrl+mousewheel) 
+            #Handle zoom (mousewheel with no keyboard modifier) 
             mask = np.array(self.state['mouseEnabled'], dtype=np.float)
  
             if axis is not None and axis >= 0 and axis < len(mask):
