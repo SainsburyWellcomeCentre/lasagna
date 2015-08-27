@@ -91,13 +91,7 @@ class loaderClass(lasagna_plugin):
                 data.append(thisLineAsFloats[1:])
 
             print "Added %d nan rows" % n
-            #TEMPORARY HACK
-            data = np.asarray(data)
-            data[:,0] = data[:,0]/5
-            data[:,1:] = data[:,1:]/20.8
-            #TEMPORAY HACK
-
-
+            
 
 
             objName=fname.split(os.path.sep)[-1]
