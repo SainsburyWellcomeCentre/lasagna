@@ -206,7 +206,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
         
 
-        """
         #Enable UI elements for modifying moving stack orientation
         self.flipAxis1.setEnabled(True)
         self.flipAxis2.setEnabled(True)
@@ -217,7 +216,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.swapAxis1_2.setEnabled(True)
         self.swapAxis2_3.setEnabled(True)
         self.swapAxis3_1.setEnabled(True)
-        """
+
 
     def flipAxis_Slot(self,axisToFlip):
         """

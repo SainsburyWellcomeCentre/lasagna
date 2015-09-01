@@ -131,7 +131,8 @@ def mhdRead(fname,fallBackMode = False):
     sc = im.GetPointData().GetScalars()
     a = vtk_to_numpy(sc)
     print "Using VTK to read MHD image of size: rows: %d, cols: %d, layers: %d" % (rows,cols,z)
-    return a.reshape(z, cols, rows) #TODO: Inverted from example I found. Why? Did I fuck up?
+    return a.reshape(z, cols, rows) 
+
 
 def mhdWrite(imStack,fname):
   """
@@ -139,7 +140,7 @@ def mhdWrite(imStack,fname):
   imStack - is the image stack volume ndarray
   fname - is the absolute path to the mhd file.
   """
-  
+  imStack = np.swapaxes(imStack,1,2) #I don't know why we need this but we do
   out = mhd_write_raw_file(imStack,fname)
   if out==False:
     return False
@@ -147,8 +148,10 @@ def mhdWrite(imStack,fname):
     info=out
 
   #Write the mhd header file, as it may have been modified
+  print "Saving image of size %s" % str(imStack.shape)
   mhd_write_header_file(fname,info)
   return True
+
 
 def mhdRead_fallback(fname):
   """
@@ -179,6 +182,7 @@ def mhdRead_fallback(fname):
     return False
 
   return mhd_read_raw_file(info)
+
 
 
 def mhd_read_raw_file(header):
@@ -381,9 +385,6 @@ def mhd_write_header_file(fname,info):
   #If we're here, then hopefully things went well. We write to the file
   with open (fname,'w') as fid:
     fid.write(fileStr)
-
-
-
 
 
 def mhd_getRatios(fname):
