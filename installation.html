@@ -65,16 +65,46 @@ Python 2.7 install with all the following Python modules. Binaries for Mac and W
 </ul>
 
 
+
 <h3><a id="what-applications-is-lasagna-designed-for" 
   class="anchor" href="#what-applications-is-lasagna-designed-for" 
-  aria-hidden="true"><span class="octicon octicon-link"></span></a>Mac</h3>
+  aria-hidden="true"><span class="octicon octicon-link"></span></a>Mac: the easy way</h3>
+This is currenly the easiest way to install. The catch is that it involves using a Python virtual environment
+  that might not be compatible with your Mac. If this fails you will have to try the hard way, below.
+  
+<ul>
+  <li>Download the virual environment from the releases: <a href="https://github.com/raacampbell13/lasagna/releases">releases</a></li>
+  
+  <li>Open a terminal and create a directory called <tt>lasagna</tt> in your home directory by running:<br /> <tt>mkdir ~/lasanga</tt></li>
+  
+  <li>Unpack the virtual environment into this directory. If the archive is in Downloads you will run: <br />
+  <tt>cd ~/lasagna</tt>
+  <br />
+  <tt>tar -zxvf ~/Downloads/mac_virtualenv.tar.gz</tt></li>
+  
+  <li>Now clone the repository with: <br />
+  <tt>git clone https://github.com/raacampbell13/lasagna.git</tt></li>
+  
+  <li>Enable the virtual environment by running:
+  <br />
+  <tt> source ~/lasagna/lasenv/bin/activate</tt>
+  <br />
+  If it worked, your command prompt will now begin with the string "<tt>(lasenv)</tt>"
+  </li>
+  <li>Start lasagna by running: python ~/lasagna/lasagna/lasagna.py 
+  <br />
+  You can close and re-start Lasagna as long as your command prompt starts with <tt>(lasenv)</tt> </li>
+</ul>
+
+<h3><a id="what-applications-is-lasagna-designed-for" 
+  class="anchor" href="#what-applications-is-lasagna-designed-for" 
+  aria-hidden="true"><span class="octicon octicon-link"></span></a>Mac: the hard way</h3>
 <ul>
 
   <li>I had success by installing Python 2.7 and PyQt4 via <a href="http://brew.sh/">brew</a>. 
   Then I set up a <a href="http://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/">virtualenv</a>
   where I used <a href="https://docs.python.org/2.7/installing/">pip</a> to 
   install the required modules. I manually copied PyQt4 from the brew install location to the virtualenv. 
-  If you get stuck, you can find my virualenv in the <a href="https://github.com/raacampbell13/lasagna/releases">releases</a>.
   <li>Download the archive or pull the Master branch from Github into a directory of you choice. </li>
   <li>Run lasagna.py from within the source directory or symlink it to a location within your path. e.g.
   <br />
