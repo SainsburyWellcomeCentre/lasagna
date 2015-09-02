@@ -132,10 +132,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.showOriginalMovingImage_radioButton.toggled.connect(self.overlayRadioButtons_Slot)
 
 
+        #Clear all image stacks 
+        self.lasagna.removeIngredientByType('imagestack')
+
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
-        debug=False #runs certain things quickly to help development
+        debug=True #runs certain things quickly to help development
         if debug:
          
             self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
@@ -144,6 +147,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             doRealLoad=True
             if doRealLoad:
                 self.lasagna.loadImageStack(self.fixedStackPath) #TODO: for some reason this doesn't get added to the image stack list even though the right code appears to be running. 
+                
                 self.lasagna.initialiseAxes()
                 self.loadMoving.setEnabled(True)
                 self.flipAxis1.setEnabled(True)
@@ -169,8 +173,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #-------------------------------------------------------------------------------------
 
-        #Clear all image stacks 
-        self.lasagna.removeIngredientByType('imagestack')
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -453,7 +455,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if os.path.exists(fname)==False:
             print fname + " does not exist"
             return
-
 
         with open(fname,'r') as fid:
             contents = fid.read()
