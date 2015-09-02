@@ -83,6 +83,10 @@ def loadTiffStack(fname,useLibTiff=False):
   Bugs: known to fail with tiffs produced by Icy [23/07/15]
 
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.loadTiffStack can not find %s" % fname
+    return
+
   purePython = True
   if useLibTiff:
     from libtiff import TIFFfile
@@ -391,6 +395,10 @@ def mhd_getRatios(fname):
   """
   Get relative axis ratios from MHD file defined by fname
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.mhd_getRatios can not find %s" % fname
+    return
+    
   try:
     #Attempt to use the vtk module to read the element spacing
     imp.find_module('vtk')
@@ -425,6 +433,10 @@ def nrrdRead(fname):
   """
   Read NRRD file
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.nrrdRead can not find %s" % fname
+    return
+
   import nrrd 
   (data,header) = nrrd.read(fname)
   return data
@@ -434,6 +446,9 @@ def nrrdHeaderRead(fname):
   """
   Read NRRD header
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.nrrdHeaderRead can not find %s" % fname
+    return
 
   import nrrd
   with open(fname,'rb') as fid:
@@ -446,6 +461,10 @@ def nrrd_getRatios(fname):
   """
   Get the aspect ratios from the NRRD file
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.nrrd_getRatios can not find %s" % fname
+    return
+
   header = nrrdHeaderRead(fname)
   axSizes = header['space directions']
 
