@@ -28,7 +28,7 @@ from skimage import measure
 from ARA_plotter import ARA_plotter
 
 
-class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #must inherit lasagna_plugin first
+class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): 
     def __init__(self,lasagna):
         super(plugin,self).__init__(lasagna)
         self.lasagna=lasagna
