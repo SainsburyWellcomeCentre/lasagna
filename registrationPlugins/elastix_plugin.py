@@ -155,7 +155,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 #load param file list
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
                               '/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000bspline.txt']
-                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
+                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine_quick.txt']
                 self.loadParamFile_slot(paramFiles)
 
             self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg2'))
@@ -375,11 +375,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #Remove from list view
         self.paramItemModel.removeRows(currentRow,1)
-        self.updateWidgets_slot()
+
 
         #remove from dictionary
         print "removing " + paramFile
         del self.tmpParamFiles[paramFile]
+
+        self.updateWidgets_slot()
 
 
     def updateWidgets_slot(self):
@@ -469,6 +471,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Temporary file is updated on every change 
         """ 
         currentFname = str(self.comboBoxParam.itemText(self.comboBoxParam.currentIndex()))
+        if len(currentFname)==0:
+            return
+            
+        if not self.tmpParamFiles.has_key(currentFname):
+            print "plainTextEditParam_slot no key %s" % currentFname
+            return
+
         fname = self.tmpParamFiles[currentFname]
         if os.path.exists(fname)==False:
             print "Failed to find temporary file at " + fname
