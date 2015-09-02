@@ -56,13 +56,12 @@ class loaderClass(lasagna_plugin):
         If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
         """
-        
-        if fname==None:
+        print fname
+        if fname == None or fname == False:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
     
-        if fname == None:
+        if fname == None or fname == False:
             return
-
 
         if os.path.isfile(fname): 
             with open(str(fname),'r') as fid:
