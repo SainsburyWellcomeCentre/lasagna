@@ -141,8 +141,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         debug=True #runs certain things quickly to help development
         if debug and os.path.expanduser("~")=='/home/rob' : #Ensure only I can trigger this. Ensures that it doesn't activate if I accidently push with debug enabled
          
-            self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
-            self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
+            self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
+            self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
 
             doRealLoad=True
             if doRealLoad:
@@ -610,6 +610,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         supplied when this slot is called from resultImageClicked_Slot
         Index is a QModelIndex
         """
+        verbose=False
 
         movingName = self.movingStackName.text()
         moving=self.lasagna.returnIngredientByName(movingName)
@@ -626,7 +627,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Show the image if the highlighted overlay radio button is enabled
         if self.showHighlightedResult_radioButton.isChecked()==True:
             if moving.fnameAbsPath == imageFname:
-                print "Skipping. Unchanged."
+                if verbose:
+                    print "Skipping. Unchanged."
                 return
 
             moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
@@ -634,11 +636,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         elif self.showOriginalMovingImage_radioButton.isChecked()==True:
             if moving.fnameAbsPath ==  self.originalMovingFname:
-                print "Skipping. Unchanged."
+                if verbose:
+                    print "Skipping. Unchanged."
                 return
 
             moving.changeData(imageData=self.originalMovingImage, imageAbsPath=self.originalMovingFname)
-            print "switched to original overlay"
+            if verbose:
+                print "switched to original overlay"
 
         self.lasagna.initialiseAxes()
 
