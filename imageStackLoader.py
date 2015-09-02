@@ -83,6 +83,10 @@ def loadTiffStack(fname,useLibTiff=False):
   Bugs: known to fail with tiffs produced by Icy [23/07/15]
 
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.loadTiffStack can not find %s" % fname
+    return
+
   purePython = True
   if useLibTiff:
     from libtiff import TIFFfile
@@ -131,7 +135,8 @@ def mhdRead(fname,fallBackMode = False):
     sc = im.GetPointData().GetScalars()
     a = vtk_to_numpy(sc)
     print "Using VTK to read MHD image of size: rows: %d, cols: %d, layers: %d" % (rows,cols,z)
-    return a.reshape(z, cols, rows) #TODO: Inverted from example I found. Why? Did I fuck up?
+    return a.reshape(z, cols, rows) 
+
 
 def mhdWrite(imStack,fname):
   """
@@ -139,7 +144,7 @@ def mhdWrite(imStack,fname):
   imStack - is the image stack volume ndarray
   fname - is the absolute path to the mhd file.
   """
-  
+  imStack = np.swapaxes(imStack,1,2) #I don't know why we need this but we do
   out = mhd_write_raw_file(imStack,fname)
   if out==False:
     return False
@@ -147,8 +152,10 @@ def mhdWrite(imStack,fname):
     info=out
 
   #Write the mhd header file, as it may have been modified
+  print "Saving image of size %s" % str(imStack.shape)
   mhd_write_header_file(fname,info)
   return True
+
 
 def mhdRead_fallback(fname):
   """
@@ -179,6 +186,7 @@ def mhdRead_fallback(fname):
     return False
 
   return mhd_read_raw_file(info)
+
 
 
 def mhd_read_raw_file(header):
@@ -383,13 +391,14 @@ def mhd_write_header_file(fname,info):
     fid.write(fileStr)
 
 
-
-
-
 def mhd_getRatios(fname):
   """
   Get relative axis ratios from MHD file defined by fname
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.mhd_getRatios can not find %s" % fname
+    return
+    
   try:
     #Attempt to use the vtk module to read the element spacing
     imp.find_module('vtk')
@@ -424,6 +433,10 @@ def nrrdRead(fname):
   """
   Read NRRD file
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.nrrdRead can not find %s" % fname
+    return
+
   import nrrd 
   (data,header) = nrrd.read(fname)
   return data
@@ -433,6 +446,9 @@ def nrrdHeaderRead(fname):
   """
   Read NRRD header
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.nrrdHeaderRead can not find %s" % fname
+    return
 
   import nrrd
   with open(fname,'rb') as fid:
@@ -445,6 +461,10 @@ def nrrd_getRatios(fname):
   """
   Get the aspect ratios from the NRRD file
   """
+  if not os.path.exists(fname):
+    print "imageStackLoader.nrrd_getRatios can not find %s" % fname
+    return
+
   header = nrrdHeaderRead(fname)
   axSizes = header['space directions']
 

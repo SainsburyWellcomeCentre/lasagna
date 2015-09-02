@@ -43,9 +43,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.lastValue=-1
 
 
+        #default names of the three files that we need:
+        self.atlasFileName = 'atlas'
+        self.templateFileName = 'template'
+        self.labelsFileName = 'labels'
+
         #The root node index of the ARA
         self.rootNode=8  
-
 
         #Warn and quit if there are no paths
         if len(self.prefs['ara_paths'])==0:
@@ -69,41 +73,75 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.load_pushButton.released.connect(self.load_pushButton_slot)
         self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
+
         #Loop through all paths and add to combobox.
         self.paths = dict()
-        for ara in self.prefs['ara_paths']:
-            pths = self.prefs['ara_paths'][ara] #paths
+        n=1
+        for path in self.prefs['ara_paths']:
 
-            #Skip if we can't find valid files
+            if not os.path.exists(path):
+                print "%s does not exist. skipping" % path 
+                continue
+
+            filesInPath = os.listdir(path) 
+            if len(filesInPath)==0:
+                print "No files in %s . skipping" % path 
+                continue
+
+            pths = dict(atlas='', labels='', template='')
+            print "\n %d. Looking for files in directory %s" % (n,path)
+            n += 1
+
+            files = os.listdir(path)
+
+            #get the file names
+            for thisFile in files:
+                if thisFile.startswith(self.atlasFileName):
+                    if thisFile.endswith('raw'):
+                        continue
+                    pths['atlas'] = os.path.join(path,thisFile)
+                    print "Adding atlas file %s" % thisFile
+                    break 
+
+            for thisFile in files:
+                if thisFile.startswith(self.labelsFileName):
+                    pths['labels'] = os.path.join(path,thisFile)
+                    print "Adding labels file %s" % thisFile
+                    break 
+
+            for thisFile in files:
+                if thisFile.startswith(self.templateFileName):
+                    if thisFile.endswith('raw'):
+                        continue
+                    pths['template'] = os.path.join(path,thisFile)
+                    print "Adding template file %s" % thisFile
+                    break 
+
+
             if len(pths['atlas'])==0 | len(pths['labels'])==0 :
                 print 'Skipping empty empty paths entry'
                 continue
 
-            skip = False
-            for fileType in ['atlas','labels']:
-                if not os.path.exists(pths[fileType]):
-                    print 'Can not find %s. Skipping.' % pths[fileType]
-                    skip = True
-            if skip:
-                continue
 
             #If we're here, this entry should at least have a valid atlas file and a valid labels file
 
             #We will index the self.paths dictionary by the name of the atlas file as this is also 
             #what will be put into the combobox. 
-            atlasFileName = pths['atlas'].split(os.path.sep)[-1]
+            atlasDirName = path.split(os.path.sep)[-1]
 
             #skip if a file with this name already exists
-            if self.paths.has_key(atlasFileName):
-                print "Skipping as a file called %s is already in the list" % atlasFileName
+            if self.paths.has_key(atlasDirName):
+                print "Skipping as a directory called %s is already in the list" % atlasDirName
                 continue
 
 
             #Add this ARA to the paths dictionary and to the combobox
-            self.paths[atlasFileName] = pths            
-            self.araName_comboBox.addItem(atlasFileName)
+            self.paths[atlasDirName] = pths
+            self.araName_comboBox.addItem(atlasDirName)
 
 
+        #blank line
+        print ""
 
         #If we have no paths to ARAs by the end of this, issue an error alertbox and quit
         if len(self.paths)==0:
@@ -113,14 +151,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
 
         #If the user has asked for this, load the first ARA entry automatically
-        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='') #Loaded data will be in this dictionary, but we need the "loaded" key for sure
+        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='') 
+
+        currentlySelectedARA = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
         if self.prefs['loadFirstAtlasOnStartup']:
-            print "Auto-Loading " + self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
-            self.loadARA(self.paths.keys()[0])
+            print "Auto-Loading " +  currentlySelectedARA
+            self.loadARA(currentlySelectedARA)
             self.load_pushButton.setEnabled(False) #disable because the current selection has now been loaded
-
-
-
 
         #Make a lines ingredient that will house the contours for the currently selected area.
         self.contourName = 'aracontour'
@@ -144,9 +181,15 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         if not self.statusBarName_checkBox.isChecked():
             return
             
-        stackName = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
         thisAxis = self.lasagna.axes2D[self.lasagna.inAxis]
-        thisItem = thisAxis.getPlotItemByName(stackName)
+        thisItem = thisAxis.getPlotItemByName(atlasLayerName)
+
+        if thisItem == None:
+            print "ARA_explorer_plugin.hook_updateStatusBar_End Failed to find plot item named %s" % stackName
+            return
+        
         imShape = thisItem.image.shape
 
         X = self.lasagna.mouseX
@@ -195,8 +238,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         if axisNumber == -1:
             return False
 
-        stackName = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
-        thisItem = self.lasagna.axes2D[axisNumber].getPlotItemByName(stackName)
+        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
+        thisAxis = self.lasagna.axes2D[axisNumber]
+        thisItem = thisAxis.getPlotItemByName(atlasLayerName)
+
         #Make a copy of the image and set values lower than our value to a greater number
         #since the countour finder will draw around everything less than our value
         tmpImage = np.array(thisItem.image)
@@ -264,9 +310,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             self.load_pushButton.setEnabled(True) 
             return
 
-        if self.data['currentlyLoadedAtlasName'] != self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+        if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
             self.load_pushButton.setEnabled(True) 
-        elif self.data['currentlyLoadedAtlasName'] == self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()):
+        elif self.data['currentlyLoadedAtlasName'] == str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
             self.load_pushButton.setEnabled(False) 
 
 
@@ -313,7 +359,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         """
         
         paths = self.paths[araName]
-        print paths
+
         #remove the currently loaded ARA (if present)
         if len(self.data['currentlyLoadedAtlasName'])>0:
             self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
@@ -324,7 +370,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         self.addAreaDataToTreeView(self.data['labels'],self.rootNode,self.brainArea_itemModel.invisibleRootItem())
 
         self.data['atlas'] = self.loadVolume(paths['atlas'])        
-        self.data['currentlyLoadedAtlasName'] = self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())
+        self.data['currentlyLoadedAtlasName'] =  paths['atlas'].split(os.path.sep)[-1]
+
         self.data['template']=paths['template']
         if os.path.exists(paths['template']):
             self.overlayTemplate_checkBox.setEnabled(True)
@@ -345,7 +392,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         Add an overlay
         """
         self.loadVolume(fname)
-        self.data['currentlyLoadedOverlay'] = fname.split(os.path.sep)[-1]
+        self.data['currentlyLoadedOverlay'] = str(fname.split(os.path.sep)[-1])
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).lut='cyan'
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0,1.5E3]

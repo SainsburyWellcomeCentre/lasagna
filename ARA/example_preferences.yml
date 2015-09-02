@@ -1,10 +1,6 @@
-ara_paths:
-  1: {atlas: '/path/to/atlas/ARA_CCFv3/annotation_25.nrrd',
-      labels: '/path/to/atlas/ARA_CCFv3/brain_area_names.json',
-      template: '/path/to/atlas/ARA_CCFv3/average_template_25.nrrd'}
-  2: {atlas: '/path/to/atlas/ARA_CCFv3/annotation_10.nrrd',
-      labels: '/path/to/atlas/ARA_CCFv3/brain_area_names.json',
-      template: '/path/to/atlas/ARA_CCFv3/average_template_10.nrrd'}
+ara_paths:  [/path/to/referenceAtlas/ARA_CCFv3/ARA_50_micron,
+/path/to/referenceAtlas/ARA_CCFv3/ARA_25_micron,
+/path/to/referenceAtlas/ARA_CCFv3/ARA_10_micron]
 enableNameInStatusBar: true
 enableOverlay: true
 loadFirstAtlasOnStartup: true
