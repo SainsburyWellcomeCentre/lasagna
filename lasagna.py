@@ -400,7 +400,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         loadedImageStack = imageStackLoader.loadStack(fnameToLoad).swapaxes(1,2) 
  
         if len(loadedImageStack)==0 and loadedImageStack==False:
-            return
+            return False
 
         # Set up default values in tabs
         # It's ok to load images of different sizes but their voxel sizes need to be the same

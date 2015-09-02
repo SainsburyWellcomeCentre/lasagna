@@ -160,7 +160,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg2'))
             self.updateWidgets_slot()
-            self.tabWidget.setCurrentIndex(2)
+            self.tabWidget.setCurrentIndex(3)
 
         #-------------------------------------------------------------------------------------
 
@@ -579,7 +579,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                             print "Result item '%s' already exists. Over-writing." % resultFname
         
                         print "Loading " + resultFname
-                        self.resultImages_Dict[resultFname] = self.lasagna.loadImageStack(resultFname)
+                        self.lasagna.loadImageStack(resultFname)
+                        #Get the data from this ingredient. Store it. Then wipe the ingredient
+                        thisIngredient = self.lasagna.ingredientList[-1]
+                        self.resultImages_Dict[resultFname] = thisIngredient.raw_data()
+
+                        self.lasagna.removeIngredientByName(thisIngredient.objectName)
+
+
                         print "Image loading complete"
 
             
