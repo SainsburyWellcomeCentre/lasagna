@@ -447,11 +447,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         into the text box on Tab 3
         """
 
-        fname=self.paramItemModel.index(indexToLoad,0).data().toString()
+        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data().toString())
+        fname = self.tmpParamFiles[selectedFname]
 
         if os.path.exists(fname)==False:
             print fname + " does not exist"
             return
+
 
         with open(fname,'r') as fid:
             contents = fid.read()
@@ -465,11 +467,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Temporary file is updated on every change 
         """ 
         currentFname = str(self.comboBoxParam.itemText(self.comboBoxParam.currentIndex()))
-        if os.path.exists(currentFname)==False:
+        fname = self.tmpParamFiles[currentFname]
+        if os.path.exists(fname)==False:
+            print "Failed to find temporary file at " + fname
             return
 
-        tempFname = self.tmpParamFiles[currentFname]
-        with open(tempFname,'w') as fid:
+        with open(fname,'w') as fid:
             fid.write(str(self.plainTextEditParam.toPlainText()))
     
 
@@ -611,7 +614,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
             print "switched to overlay " + imageFname
 
-        elif self.showOriginalOverlay_radioButton.isChecked()==True:
+        elif self.showOriginalMovingImage_radioButton.isChecked()==True:
             if moving.fnameAbsPath ==  self.originalMovingFname:
                 print "Skipping. Unchanged."
                 return
