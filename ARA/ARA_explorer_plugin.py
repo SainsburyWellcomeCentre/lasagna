@@ -25,7 +25,10 @@ import ara_json, tree
 #For contour drawing
 from skimage import measure
 
-class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #must inherit lasagna_plugin first
+from ARA_plotter import ARA_plotter
+
+
+class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #must inherit lasagna_plugin first
     def __init__(self,lasagna):
         super(plugin,self).__init__(lasagna)
         self.lasagna=lasagna
@@ -178,9 +181,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         as the user mouses over the images
         """
         
-        if not self.statusBarName_checkBox.isChecked():
-            return
-            
+        #Get the image below the mouse
         araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
         atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
         thisAxis = self.lasagna.axes2D[self.lasagna.inAxis]
@@ -189,33 +190,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         if thisItem == None:
             print "ARA_explorer_plugin.hook_updateStatusBar_End Failed to find plot item named %s" % stackName
             return
-        
-        imShape = thisItem.image.shape
 
-        X = self.lasagna.mouseX
-        Y = self.lasagna.mouseY
-        
-        if X<0 or Y<0:
-            thisArea='outside image area'
-            value=-1
-        elif X>=imShape[0] or Y>=imShape[1]:
-            thisArea='outside image area'
-            value=-1
-        else:
-            value = thisItem.image[X,Y]
-            if value==0:
-                thisArea='outside brain'
-            elif value in self.data['labels'].nodes :
-                thisArea=self.data['labels'][value].data['name']
-            else:
-                thisArea='UNKNOWN'
-
-        self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
-
+        value = self.writeAreaNameInStatusBar(thisItem.image,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
         if self.lastValue != value  and  value>0  and  self.highlightArea_checkBox.isChecked():
-            self.drawAreaHighlight(value)
+            self.drawAreaHighlight(value) #Inherited from ARA_plotter
+
 
     def hook_deleteLayerStack_Slot_End(self):
         """
@@ -228,74 +209,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             print "The current atlas has been removed by the user. Closing the ARA explorer plugin"
             self.closePlugin()
 
-    #--------------------------------------
-    # Drawing-related methods
-    def getContoursFromAxis(self,axisNumber=-1,value=-1):
-        """
-        Return a contours array from the axis indexed by integer axisNumber
-        i.e. one of the three axes
-        """        
-        if axisNumber == -1:
-            return False
-
-        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        thisAxis = self.lasagna.axes2D[axisNumber]
-        thisItem = thisAxis.getPlotItemByName(atlasLayerName)
-
-        #Make a copy of the image and set values lower than our value to a greater number
-        #since the countour finder will draw around everything less than our value
-        tmpImage = np.array(thisItem.image)
-        tmpImage[tmpImage<value] = value+10
-        return measure.find_contours(tmpImage, value)
-
-
-    def drawAreaHighlight(self, value, highlightOnlyCurrentAxis=False):
-        """
-        if highlightOnlyCurrentAxis is True, we draw highlights only on the axis we are mousing over
-        """
-        nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
-        allContours = nans
-
-
-        for axNum in range(len(self.lasagna.axes2D)):
-            contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
-
-
-            if (highlightOnlyCurrentAxis == True  and  axNum != self.lasagna.inAxis) or len(contours)==0:
-                tmpNan =  np.array([np.nan, np.nan, np.nan]).reshape(1,3)
-                tmpNan[0][axNum]=self.lasagna.axes2D[axNum].currentSlice #ensure nothing is plotted in this layer
-                allContours = np.append(allContours,tmpNan,axis=0)
-                continue
-
-            #print "Plotting area %d in plane %d" % (value,self.lasagna.axes2D[axNum].currentSlice)
-            for thisContour in contours:
-                tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0],3)*self.lasagna.axes2D[axNum].currentSlice
-
-                if axNum==0:
-                    tmp[:,1:] = thisContour
-
-                elif axNum==1:
-                    tmp[:,0] = thisContour[:,0]
-                    tmp[:,2] = thisContour[:,1]
-
-                elif axNum==2:
-                    tmp[:,1] = thisContour[:,0]
-                    tmp[:,0] = thisContour[:,1]
-
-                tmp = np.append(tmp,nans,axis=0) #Terminate each contour with nans so that they are not  linked
-                allContours = np.append(allContours,tmp,axis=0)
-
-            if highlightOnlyCurrentAxis:
-                self.lastValue = value 
-        
-            
-        #Replace the data in the ingredient so they are plotted
-        self.lasagna.returnIngredientByName(self.contourName)._data = allContours
-        [axis.updatePlotItems_2D(self.lasagna.ingredientList) for axis in self.lasagna.axes2D]
-
-
-            
+   
 
     #--------------------------------------
     # UI slots
@@ -343,6 +257,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
 
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
         self.lasagna.initialiseAxes()
+
 
     #--------------------------------------
     # core methods: these do the meat of the work
@@ -459,30 +374,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
             self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
 
 
-    def loadLabels(self,fname):
-        """
-        Load the labels file, which may be in JSON or CSV format
-        
-        The csv file should have the following format
-        index,parent_index,data1,data1,dataN\n
-        The first line should be a header line. Suggested separators: | or ,
-
-        Header must include at least the name of the area. So we can get, e.g. 
-        'name': 'Entorhinal area, lateral part, layer 2'
-
-        The JSON should be the raw JSON from the ARA website
-
-        Returns the labels as a tree structure that can be indexed by ID
-        """
-
-        if fname.lower().endswith('.csv'):
-            colSep = self.guessFileSep(fname)
-            return tree.importData(fname,colSep=colSep, headerLine=True)
-
-        if fname.lower().endswith('.json'):
-            (flattened,colNames) = ara_json.importData(fname)
-            return tree.importData(flattened.split('\n'), colSep='|', headerLine=colNames)
-
 
     def loadVolume(self,fname):
         """
@@ -492,65 +383,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): #m
         return self.lasagna.loadImageStack(fname)
 
 
-    def setARAcolors(self):
-        #Make up a disjointed colormap
-        pos = np.array([0.0, 0.001, 0.25, 0.35, 0.45, 0.65, 0.9])
-        color = np.array([[0,0,0,255],[255,0,0,255], [0,2,230,255], [7,255,112,255], [255,240,7,255], [7,153,255,255], [255,7,235,255]], dtype=np.ubyte)
-        map = pg.ColorMap(pos, color)
-        lut = map.getLookupTable(0.0, 1.0, 256)
-
-        #Assign the colormap to the imagestack object
-        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString() #TODO: a bit horrible
-        firstLayer = self.lasagna.returnIngredientByName(self.ARAlayerName)
-        firstLayer.lut=lut
-        #Specify what colors the histogram should be so it doesn't end up megenta and 
-        #vomit-yellow, or who knows what, due to the weird color map we use here.
-        firstLayer.histPenCustomColor = [180,180,180,255]
-        firstLayer.histBrushCustomColor = [150,150,150,150]
-
-
-    def guessFileSep(self,fname):
-        """
-        Guess the file separator in file fname.
-        """
-        with open(fname,'r') as fid:
-            contents=fid.read()
-    
-        nLines = contents.count('\n')
-        possibleSeparators = ['|','\t',','] #don't include space because for these data that would be crazy
-        for thisSep in possibleSeparators:
-            if contents.count(thisSep)>=nLines:
-                return thisSep
-
-        #Just return comma if nothing was found. At least we tried!
-        return ','
-
-
 
 
 
     #----------------------------
-    #the following are housekeeping methods
-    def defaultPrefs(self):
-        """
-        Return default preferences in the YAML file in this directory
-        """
-
-        emptyPathPref = {1: 
-                        {'atlas': '',    #full path to atlas file (segmented brain area volume)
-                         'labels': '',   #full path to labels JSON or CSV
-                         'template': ''} #full path to average template (optional)
-                    }
-
-        return {
-            'ara_paths' : emptyPathPref ,
-            'loadFirstAtlasOnStartup' : True,
-            'enableNameInStatusBar' : True ,
-            'enableOverlay' : True ,
-            }
-
-
-
+    # Methods to handle close events and errors
     def closePlugin(self):
         """
         Runs when the user unchecks the plugin in the menu box and also (in this case)
