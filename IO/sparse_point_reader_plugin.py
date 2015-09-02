@@ -50,10 +50,10 @@ class loaderClass(lasagna_plugin):
 
         """
         
-        if fname == None:
+        if fname == None or fname == False:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
 
-        if fname == None:
+        if fname == None or fname == False:
             return
 
 

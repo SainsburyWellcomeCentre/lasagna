@@ -132,51 +132,53 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.showOriginalMovingImage_radioButton.toggled.connect(self.overlayRadioButtons_Slot)
 
 
+        #Clear all image stacks 
+        self.lasagna.removeIngredientByType('imagestack')
+
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
-        debug=False #runs certain things quickly to help development
-        if debug:
+        debug=True #runs certain things quickly to help development
+        if debug and os.path.expanduser("~")=='/home/rob' : #Ensure only I can trigger this. Ensures that it doesn't activate if I accidently push with debug enabled
          
             self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
             self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
 
             doRealLoad=True
             if doRealLoad:
-                self.lasagna.loadImageStack(self.fixedStackPath) #TODO: for some reason this doesn't get added to the image stack list even though the right code appears to be running. 
+                self.loadFixed_slot(self.fixedStackPath)                
+                self.loadMoving_slot(self.movingStackPath)
                 self.lasagna.initialiseAxes()
-                self.loadMoving.setEnabled(True)
-                self.flipAxis1.setEnabled(True)
-                self.flipAxis2.setEnabled(True)
-                self.flipAxis3.setEnabled(True)           
-                self.rotAxis1.setEnabled(True)
-                self.rotAxis2.setEnabled(True)
-                self.rotAxis3.setEnabled(True)             
-                #self.lasagna.loadImageStack(self.movingStackPath) #TODO: this list index hack will need fixing
-                self.lasagna.initialiseAxes()
-                #self.loadMoving_slot(supressDialog=True)
-            doParamFile=False
+
+            doParamFile=True
             if doParamFile:
                 #load param file list
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
                               '/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000bspline.txt']
-                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
+                paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine_quick.txt']
                 self.loadParamFile_slot(paramFiles)
 
-            self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg1'))
+            self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg2'))
             self.updateWidgets_slot()
-            self.tabWidget.setCurrentIndex(0)
+            self.tabWidget.setCurrentIndex(2)
 
         #-------------------------------------------------------------------------------------
 
-        #Clear all image stacks 
-        self.lasagna.removeIngredientByType('imagestack')
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Tab 1 - Loading -  slots
-    def loadFixed_slot(self):
-        self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
+    def loadFixed_slot(self, fnameToLoad=False):
+        """
+        Clear all stacks and load a fixed image
+        can optionally load a specific file name (used for de-bugging)
+        """
+        self.lasagna.removeIngredientByType('imagestack')
+        if fnameToLoad==False:
+            self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
+        else:
+            self.lasagna.loadImageStack(fnameToLoad)
+
 
         fixedName=self.lasagna.stacksInTreeList()[0]
         self.referenceStackName.setText(fixedName)
@@ -190,13 +192,18 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
 
 
-    def loadMoving_slot(self,supressDialog=False):
-        #TODO: allow only MHD files to be read
-        if supressDialog==False:
+    def loadMoving_slot(self,fnameToLoad=False):
+        """
+        Load the moving stack can optionally load a specific file name (used for de-bugging)
+        """
+        if fnameToLoad==False:
             self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
-            movingName=self.lasagna.stacksInTreeList()[1]
-            self.movingStackName.setText(movingName)
-            self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath
+        else:
+            self.lasagna.loadImageStack(fnameToLoad)
+
+        movingName=self.lasagna.stacksInTreeList()[1]
+        self.movingStackName.setText(movingName)
+        self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath
 
         self.updateWidgets_slot()
         movingName=self.lasagna.stacksInTreeList()[1]
@@ -368,11 +375,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
         #Remove from list view
         self.paramItemModel.removeRows(currentRow,1)
-        self.updateWidgets_slot()
+
 
         #remove from dictionary
         print "removing " + paramFile
         del self.tmpParamFiles[paramFile]
+
+        self.updateWidgets_slot()
 
 
     def updateWidgets_slot(self):
@@ -443,7 +452,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         into the text box on Tab 3
         """
 
-        fname=self.paramItemModel.index(indexToLoad,0).data().toString()
+        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data().toString())
+        fname = self.tmpParamFiles[selectedFname]
 
         if os.path.exists(fname)==False:
             print fname + " does not exist"
@@ -461,11 +471,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         Temporary file is updated on every change 
         """ 
         currentFname = str(self.comboBoxParam.itemText(self.comboBoxParam.currentIndex()))
-        if os.path.exists(currentFname)==False:
+        if len(currentFname)==0:
             return
 
-        tempFname = self.tmpParamFiles[currentFname]
-        with open(tempFname,'w') as fid:
+        if not self.tmpParamFiles.has_key(currentFname):
+            print "plainTextEditParam_slot no key %s" % currentFname
+            return
+
+        fname = self.tmpParamFiles[currentFname]
+        if os.path.exists(fname)==False:
+            print "Failed to find temporary file at " + fname
+            return
+
+        with open(fname,'w') as fid:
             fid.write(str(self.plainTextEditParam.toPlainText()))
     
 
@@ -607,7 +625,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
             print "switched to overlay " + imageFname
 
-        elif self.showOriginalOverlay_radioButton.isChecked()==True:
+        elif self.showOriginalMovingImage_radioButton.isChecked()==True:
             if moving.fnameAbsPath ==  self.originalMovingFname:
                 print "Skipping. Unchanged."
                 return

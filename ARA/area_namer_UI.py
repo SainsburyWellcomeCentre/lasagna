@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ara_explorer.ui'
+# Form implementation generated from reading ui file 'area_namer.ui'
 #
 # Created: Wed Sep  2 16:05:04 2015
 #      by: PyQt4 UI code generator 4.11.2
@@ -23,14 +23,13 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_ara_explorer(object):
-    def setupUi(self, ara_explorer):
-        ara_explorer.setObjectName(_fromUtf8("ara_explorer"))
-        ara_explorer.resize(443, 574)
-        ara_explorer.setMinimumSize(QtCore.QSize(443, 500))
-        self.verticalLayout = QtGui.QVBoxLayout(ara_explorer)
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.load_frame = QtGui.QFrame(ara_explorer)
+class Ui_area_namer(object):
+    def setupUi(self, area_namer):
+        area_namer.setObjectName(_fromUtf8("area_namer"))
+        area_namer.resize(443, 200)
+        area_namer.setMinimumSize(QtCore.QSize(443, 200))
+        self.load_frame = QtGui.QFrame(area_namer)
+        self.load_frame.setGeometry(QtCore.QRect(0, 10, 435, 101))
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -41,13 +40,16 @@ class Ui_ara_explorer(object):
         self.load_frame.setFrameShadow(QtGui.QFrame.Raised)
         self.load_frame.setObjectName(_fromUtf8("load_frame"))
         self.araName_comboBox = QtGui.QComboBox(self.load_frame)
-        self.araName_comboBox.setGeometry(QtCore.QRect(10, 20, 271, 24))
+        self.araName_comboBox.setGeometry(QtCore.QRect(10, 20, 411, 24))
         self.araName_comboBox.setObjectName(_fromUtf8("araName_comboBox"))
-        self.load_pushButton = QtGui.QPushButton(self.load_frame)
-        self.load_pushButton.setGeometry(QtCore.QRect(300, 20, 95, 24))
-        self.load_pushButton.setObjectName(_fromUtf8("load_pushButton"))
-        self.verticalLayout.addWidget(self.load_frame)
-        self.frame = QtGui.QFrame(ara_explorer)
+        self.loadOrig_pushButton = QtGui.QPushButton(self.load_frame)
+        self.loadOrig_pushButton.setGeometry(QtCore.QRect(10, 50, 191, 24))
+        self.loadOrig_pushButton.setObjectName(_fromUtf8("loadOrig_pushButton"))
+        self.loadOther_pushButton = QtGui.QPushButton(self.load_frame)
+        self.loadOther_pushButton.setGeometry(QtCore.QRect(230, 50, 191, 24))
+        self.loadOther_pushButton.setObjectName(_fromUtf8("loadOther_pushButton"))
+        self.frame = QtGui.QFrame(area_namer)
+        self.frame.setGeometry(QtCore.QRect(0, 110, 435, 80))
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -67,21 +69,18 @@ class Ui_ara_explorer(object):
         self.highlightArea_checkBox.setObjectName(_fromUtf8("highlightArea_checkBox"))
         self.overlayTemplate_checkBox = QtGui.QCheckBox(self.frame)
         self.overlayTemplate_checkBox.setEnabled(False)
-        self.overlayTemplate_checkBox.setGeometry(QtCore.QRect(10, 50, 241, 21))
+        self.overlayTemplate_checkBox.setGeometry(QtCore.QRect(220, 10, 181, 21))
         self.overlayTemplate_checkBox.setChecked(False)
         self.overlayTemplate_checkBox.setObjectName(_fromUtf8("overlayTemplate_checkBox"))
-        self.verticalLayout.addWidget(self.frame)
-        self.brainArea_treeView = QtGui.QTreeView(ara_explorer)
-        self.brainArea_treeView.setObjectName(_fromUtf8("brainArea_treeView"))
-        self.verticalLayout.addWidget(self.brainArea_treeView)
 
-        self.retranslateUi(ara_explorer)
-        QtCore.QMetaObject.connectSlotsByName(ara_explorer)
+        self.retranslateUi(area_namer)
+        QtCore.QMetaObject.connectSlotsByName(area_namer)
 
-    def retranslateUi(self, ara_explorer):
-        ara_explorer.setWindowTitle(_translate("ara_explorer", "Form", None))
-        self.load_pushButton.setText(_translate("ara_explorer", "Load", None))
-        self.statusBarName_checkBox.setText(_translate("ara_explorer", "show name in status bar", None))
-        self.highlightArea_checkBox.setText(_translate("ara_explorer", "highlight area", None))
-        self.overlayTemplate_checkBox.setText(_translate("ara_explorer", "overlay template", None))
+    def retranslateUi(self, area_namer):
+        area_namer.setWindowTitle(_translate("area_namer", "Form", None))
+        self.loadOrig_pushButton.setText(_translate("area_namer", "Attach original atlas", None))
+        self.loadOther_pushButton.setText(_translate("area_namer", "Attach warped atlas", None))
+        self.statusBarName_checkBox.setText(_translate("area_namer", "show name in status bar", None))
+        self.highlightArea_checkBox.setText(_translate("area_namer", "highlight area", None))
+        self.overlayTemplate_checkBox.setText(_translate("area_namer", "overlay template", None))
 
