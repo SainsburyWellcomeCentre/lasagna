@@ -139,7 +139,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #The following will either be hugely changed or deleted when the plugin is no longer
         #under heavy development
         debug=True #runs certain things quickly to help development
-        if debug:
+        if debug and os.path.expanduser("~")=='/home/rob' : #Ensure only I can trigger this. Ensures that it doesn't activate if I accidently push with debug enabled
          
             self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
             self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
@@ -473,7 +473,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         currentFname = str(self.comboBoxParam.itemText(self.comboBoxParam.currentIndex()))
         if len(currentFname)==0:
             return
-            
+
         if not self.tmpParamFiles.has_key(currentFname):
             print "plainTextEditParam_slot no key %s" % currentFname
             return
