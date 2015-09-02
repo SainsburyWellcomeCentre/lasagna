@@ -146,20 +146,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             doRealLoad=True
             if doRealLoad:
-                self.lasagna.loadImageStack(self.fixedStackPath) #TODO: for some reason this doesn't get added to the image stack list even though the right code appears to be running. 
-                
+                self.loadFixed_slot(self.fixedStackPath)                
+                self.loadMoving_slot(self.movingStackPath)
                 self.lasagna.initialiseAxes()
-                self.loadMoving.setEnabled(True)
-                self.flipAxis1.setEnabled(True)
-                self.flipAxis2.setEnabled(True)
-                self.flipAxis3.setEnabled(True)           
-                self.rotAxis1.setEnabled(True)
-                self.rotAxis2.setEnabled(True)
-                self.rotAxis3.setEnabled(True)             
-                #self.lasagna.loadImageStack(self.movingStackPath) #TODO: this list index hack will need fixing
-                self.lasagna.initialiseAxes()
-                #self.loadMoving_slot(supressDialog=True)
-            doParamFile=False
+
+            doParamFile=True
             if doParamFile:
                 #load param file list
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt',
@@ -167,7 +158,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 paramFiles = ['/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/Par0000affine.txt']
                 self.loadParamFile_slot(paramFiles)
 
-            self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg1'))
+            self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg2'))
             self.updateWidgets_slot()
             self.tabWidget.setCurrentIndex(0)
 
@@ -177,12 +168,17 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Tab 1 - Loading -  slots
-    def loadFixed_slot(self):
+    def loadFixed_slot(self, fnameToLoad=False):
         """
         Clear all stacks and load a fixed image
+        can optionally load a specific file name (used for de-bugging)
         """
         self.lasagna.removeIngredientByType('imagestack')
-        self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
+        if fnameToLoad==False:
+            self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
+        else:
+            self.lasagna.loadImageStack(fnameToLoad)
+
 
         fixedName=self.lasagna.stacksInTreeList()[0]
         self.referenceStackName.setText(fixedName)
@@ -196,13 +192,18 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
 
 
-    def loadMoving_slot(self,supressDialog=False):
-        #TODO: allow only MHD files to be read
-        if supressDialog==False:
+    def loadMoving_slot(self,fnameToLoad=False):
+        """
+        Load the moving stack can optionally load a specific file name (used for de-bugging)
+        """
+        if fnameToLoad==False:
             self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
-            movingName=self.lasagna.stacksInTreeList()[1]
-            self.movingStackName.setText(movingName)
-            self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath
+        else:
+            self.lasagna.loadImageStack(fnameToLoad)
+
+        movingName=self.lasagna.stacksInTreeList()[1]
+        self.movingStackName.setText(movingName)
+        self.movingStackPath = self.lasagna.returnIngredientByName(movingName).fnameAbsPath
 
         self.updateWidgets_slot()
         movingName=self.lasagna.stacksInTreeList()[1]
