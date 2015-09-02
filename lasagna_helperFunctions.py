@@ -191,9 +191,9 @@ def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPrefere
         print "Created default preferences file in " + prefFName
 
     #Load preferences YAML file as a dictionary
-    stream = file(prefFName, 'r')    
-    return yaml.load(stream)
-    stream.close()
+    with file(prefFName, 'r') as stream: 
+        return yaml.load(stream)
+
 
 
 def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=getLasagnaPrefFile()):
@@ -232,10 +232,8 @@ def writeAllPreferences(preferences,prefFName=getLasagnaPrefFile()):
     assert isinstance(preferences,dict)
 
     #TODO: check ability to write to the file before proceeding
-
-    stream = file(prefFName, 'w')
-    yaml.dump(preferences, stream)
-    stream.close()
+    with file(prefFName, 'w') as stream:
+        yaml.dump(preferences, stream)
 
 
 def preferenceWriter(preferenceName,newValue,prefFName=getLasagnaPrefFile()):
