@@ -150,11 +150,17 @@ class imagestack(lasagna_ingredient):
         Replace the current image stack with imageData. 
         Must also supply imageAbsPath.
         """
+
+        if not isinstance(imageData,np.ndarray):
+            return False
+
         self._data = imageData
         self.fnameAbsPath = imageAbsPath 
 
         if recalculateDefaultHistRange:
             self.defaultHistRange()
+
+        return True
 
 
     def flipAlongAxis(self,axisToFlip):
