@@ -176,6 +176,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Tab 1 - Loading -  slots
     def loadFixed_slot(self):
+        """
+        Clear all stacks and load a fixed image
+        """
+        self.lasagna.removeIngredientByType('imagestack')
         self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
 
         fixedName=self.lasagna.stacksInTreeList()[0]
