@@ -160,7 +160,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg2'))
             self.updateWidgets_slot()
-            self.tabWidget.setCurrentIndex(0)
+            self.tabWidget.setCurrentIndex(2)
 
         #-------------------------------------------------------------------------------------
 
