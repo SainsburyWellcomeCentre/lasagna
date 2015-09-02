@@ -85,7 +85,7 @@ You may specify multiple sets of atlas, labels, and template files. This is usef
 that page (it's badly organised) the atlas image stack is <a href="http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2015/">here</a>, the average template stack is <a href="http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/average_template/">here</a> and the labels file is <a href="http://api.brain-map.org/api/v2/structure_graph_download/1.json">here</a>.</li>
 <li>Copy the files to a location on your computer: put the two or three files associated with the same atlas into the same directory. Name the directory in some
 reasonable way (e.g. ARA_25_micron). Name the files atlas.XXX, template.XXX, and labels.XXX, where XXX is the file extension.</li>
-<li>Edit the preferences file to point to this location. Ensure strings are quoted with single quotes. Syntax errors in the preferences file can cause
+<li>Edit the preferences file to add this directory to the ara_paths list. Syntax errors in the preferences file can cause
 the plugin to fail to load. An example valid preferences file is <a href="https://github.com/raacampbell13/lasagna/blob/master/ARA/example_preferences.yml">here</a>. </li>
 <li>Start the plugin and the ARA should load automatically. You can configure the plugin via the preferences file to not auto-load on plugin start.</li> 
 </ul>
