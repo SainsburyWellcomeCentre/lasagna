@@ -632,7 +632,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 return
 
             moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
-            print "switched to overlay " + imageFname
+            if verbose:
+                print "switched to overlay " + imageFname
 
         elif self.showOriginalMovingImage_radioButton.isChecked()==True:
             if moving.fnameAbsPath ==  self.originalMovingFname:
