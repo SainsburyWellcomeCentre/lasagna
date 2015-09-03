@@ -163,7 +163,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.showCrossHairs = lasHelp.readPreference('showCrossHairs')
         self.mouseX = None
         self.mouseY = None
-        self.inAxis = 0
+        self.inAxis = 0  #The axis the mouse is currently in [see mouseMoved()]
+        self.mousePositionInStack = []  #A list defining voxel (Z,X,Y) in which the mouse cursor is currently positioned [see mouseMoved()]
         self.statusBarText = None
 
         #Lists of functions that are used as hooks for plugins to modify the behavior of built-in methods.
@@ -1159,12 +1160,22 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.axes2D[axisID].view.getViewBox().controlDrag=False
 
         if self.axes2D[axisID].view.sceneBoundingRect().contains(pos):
-            self.inAxis=axisID
+
             if self.showCrossHairs:
                 self.axes2D[axisID].view.addItem(self.crossHairVLine, ignoreBounds=True) 
                 self.axes2D[axisID].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
             (self.mouseX,self.mouseY)=self.axes2D[axisID].getMousePositionInCurrentView(pos)
+            #Record the current axis in which the mouse is in and the position of the mouse in the stack
+            self.inAxis=axisID
+            voxelPosition = [self.axes2D[axisID].currentSlice,self.mouseX,self.mouseY];
+            if axisID==1:
+                voxelPosition = [voxelPosition[1],voxelPosition[0],voxelPosition[2]]
+            elif axisID==2:
+                voxelPosition = [voxelPosition[2],voxelPosition[1],voxelPosition[0]]
+
+            self.mousePositionInStack = voxelPosition
+
             if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[axisID].view.getViewBox().controlDrag:
                 self.axes2D[axisID].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
             self.updateMainWindowOnMouseMove(self.axes2D[axisID])
