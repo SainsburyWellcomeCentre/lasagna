@@ -180,18 +180,19 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-        
-        #Get the image below the mouse
+
+        #Get the atlas volume and find in which voxel the mouse cursor is located        
         araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
         atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        thisAxis = self.lasagna.axes2D[self.lasagna.inAxis]
-        thisItem = thisAxis.getPlotItemByName(atlasLayerName)
+        ingredient = self.lasagna.returnIngredientByName(atlasLayerName)
 
-        if thisItem == None:
-            print "ARA_explorer_plugin.hook_updateStatusBar_End Failed to find plot item named %s" % stackName
+        if ingredient == False:
+            print "ARA_explorer_plugin.hook_updateStatusBar_End Failed to find imageStack named %s" % atlasLayerName
             return
 
-        value = self.writeAreaNameInStatusBar(thisItem.image,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
+        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+
+        value = self.writeAreaNameInStatusBar(imageStack,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
         if self.lastValue != value  and  value>0  and  self.highlightArea_checkBox.isChecked():
@@ -298,7 +299,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
 
         #self.setARAcolors()
-        self.lasagna.initialiseAxes(resetAxes=True)
+        #self.lasagna.initialiseAxes(resetAxes=True)
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).minMax = [0,1.2E3]
         self.lasagna.initialiseAxes(resetAxes=True)
 
