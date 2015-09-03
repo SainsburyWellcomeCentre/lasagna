@@ -284,7 +284,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
         self.addAreaDataToTreeView(self.data['labels'],self.rootNode,self.brainArea_itemModel.invisibleRootItem())
 
-        self.data['atlas'] = self.loadVolume(paths['atlas'])        
+        self.lasagna.loadImageStack(paths['atlas'])
+        
         self.data['currentlyLoadedAtlasName'] =  paths['atlas'].split(os.path.sep)[-1]
 
         self.data['template']=paths['template']
@@ -306,7 +307,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         """
         Add an overlay
         """
-        self.loadVolume(fname)
+        self.lasagna.loadImageStack(fname)
         self.data['currentlyLoadedOverlay'] = str(fname.split(os.path.sep)[-1])
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).lut='cyan'
@@ -372,16 +373,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         if treeIndex != None:
             print "highlighting %d" % treeIndex
             self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
-
-
-
-    def loadVolume(self,fname):
-        """
-        Load the volume file, which may be in any format that the main viewer accepts through the
-        load stack dialog
-        """
-        return self.lasagna.loadImageStack(fname)
-
 
 
 
