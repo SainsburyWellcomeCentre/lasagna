@@ -144,7 +144,7 @@ def mhdWrite(imStack,fname):
   imStack - is the image stack volume ndarray
   fname - is the absolute path to the mhd file.
   """
-  imStack = np.swapaxes(imStack,1,2) #I don't know why we need this but we do
+
   out = mhd_write_raw_file(imStack,fname)
   if out==False:
     return False

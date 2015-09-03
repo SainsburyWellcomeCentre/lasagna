@@ -260,7 +260,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.data['labels'] = self.loadLabels(paths['labels'])
 
         #Load the raw image data but do not display it.
-        self.data['atlas'] = imageStackLoader.loadStack(paths['atlas']).swapaxes(1,2)
+        self.data['atlas'] = imageStackLoader.loadStack(paths['atlas'])
 
         self.data['currentlyLoadedAtlasName'] =  paths['atlas'].split(os.path.sep)[-1]
 

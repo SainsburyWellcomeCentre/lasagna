@@ -398,7 +398,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         print "Loading image stack " + fnameToLoad
  
         #TODO: The axis swap likely shouldn't be hard-coded here
-        loadedImageStack = imageStackLoader.loadStack(fnameToLoad).swapaxes(1,2) 
+        loadedImageStack = imageStackLoader.loadStack(fnameToLoad)
  
         if len(loadedImageStack)==0 and loadedImageStack==False:
             return False
@@ -612,6 +612,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         if removedIngredient == False & verbose==True:
             print "** Failed to remove ingredient %s **" % objectName
+            return False
+
+        return True
 
 
     def removeIngredientByType(self,ingredientType):
