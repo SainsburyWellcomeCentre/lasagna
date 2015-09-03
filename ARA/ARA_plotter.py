@@ -94,6 +94,10 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         Write brain area name in the status bar (optional) return value of atlas pixel under mouse.
         Atlas need not be visible.
         """
+
+        if len(thisImage.shape)==0:
+            return
+            
         imShape = thisImage.shape
 
         X = self.lasagna.mouseX
