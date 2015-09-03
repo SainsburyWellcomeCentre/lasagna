@@ -9,6 +9,7 @@ import numpy as np
 import pyqtgraph as pg
 import os.path
 from alert import alert
+import imageStackLoader
 
 #For the UI
 from PyQt4 import QtGui, QtCore
@@ -140,16 +141,17 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
            self.warnAndQuit('Found no valid paths is preferences file at<br>%s.<br>SEE <a href="http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
            return
 
-        self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
-
         #If the user has asked for this, load the first ARA entry automatically
-        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='') 
+        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='', atlas=np.ndarray([])) 
 
+        #TODO: DELETE THE FOLLOWING?
+        """
         currentlySelectedARA = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
         if self.prefs['loadFirstAtlasOnStartup']:
             print "Auto-Loading " +  currentlySelectedARA
-            self.loadARA(currentlySelectedARA)
+            self.loadAtlas(currentlySelectedARA)
             self.loadOrig_pushButton.setEnabled(False) #disable because the current selection has now been loaded
+        """
 
         #Make a lines ingredient that will house the contours for the currently selected area.
         self.contourName = 'aracontour'
@@ -169,21 +171,11 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-        
-        #Get the image below the mouse
-        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        thisAxis = self.lasagna.axes2D[self.lasagna.inAxis]
-        thisItem = thisAxis.getPlotItemByName(atlasLayerName)
-
-        if thisItem == None:
-            print "ARA_explorer_plugin.hook_updateStatusBar_End Failed to find plot item named %s" % stackName
-            return
-
-        value = self.writeAreaNameInStatusBar(thisItem.image,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
+        thisLayer = self.data['atlas'] 
+        value = self.writeAreaNameInStatusBar(thisLayer,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
-        if self.lastValue != value  and  value>0  and  self.highlightArea_checkBox.isChecked():
+        if self.lastValue != value  and self.highlightArea_checkBox.isChecked():
             self.drawAreaHighlight(value) #Inherited from ARA_plotter
 
 
@@ -224,7 +216,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         Load the currently selected ARA version
         """
         selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        self.loadARA(selectedName)
+        self.loadAtlas(selectedName)
 
 
     def overlayTemplate_checkBox_slot(self):
@@ -251,9 +243,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
     #--------------------------------------
     # core methods: these do the meat of the work
     #
-    def loadARA(self,araName):
+    def loadAtlas(self,araName):
         """
-        Coordinate loading of the ARA items defined in the dictionary paths. 
+        Loads the atlas file but does not display it. Coordinate loading of the ARA items defined in the dictionary paths. 
         araName is a value from the self.paths dictionary. The values will be 
         combobox item texts and will load a dictionary from self.paths. The keys
         of this dictionary have these keys: 
@@ -264,16 +256,18 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         
         paths = self.paths[araName]
 
-        #remove the currently loaded ARA (if present)
-        if len(self.data['currentlyLoadedAtlasName'])>0:
-            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
-
+        #Load the labels (this associates brain area index values with brain area names)
         self.data['labels'] = self.loadLabels(paths['labels'])
 
-        self.data['atlas'] = self.loadVolume(paths['atlas'])        
+        #Load the raw image data but do not display it.
+        self.data['atlas'] = imageStackLoader.loadStack(paths['atlas']).swapaxes(1,2)
+
         self.data['currentlyLoadedAtlasName'] =  paths['atlas'].split(os.path.sep)[-1]
 
+        #comment out for now because the template loading is not urgent and we can add it last
+        """
         self.data['template']=paths['template']
+
         if os.path.exists(paths['template']):
             self.overlayTemplate_checkBox.setEnabled(True)
             if self.overlayTemplate_checkBox.isChecked()==True:
@@ -282,34 +276,23 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
             self.overlayTemplate_checkBox.setEnabled(False)
 
 
-        #self.setARAcolors()
         self.lasagna.initialiseAxes(resetAxes=True)
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).minMax = [0,1.2E3]
         self.lasagna.initialiseAxes(resetAxes=True)
 
 
+
+
     def addOverlay(self,fname):
-        """
-        Add an overlay
-        """
-        self.loadVolume(fname)
+        #Add an overlay
+        self.lasagna.loadImageStack(fname)
         self.data['currentlyLoadedOverlay'] = str(fname.split(os.path.sep)[-1])
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).lut='cyan'
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0,1.5E3]
         self.lasagna.initialiseAxes(resetAxes=True)
 
-
-
-
-    def loadVolume(self,fname):
-        """
-        Load the volume file, which may be in any format that the main viewer accepts through the
-        load stack dialog
-        """
-        return self.lasagna.loadImageStack(fname)
-
-
+    """
 
 
 
