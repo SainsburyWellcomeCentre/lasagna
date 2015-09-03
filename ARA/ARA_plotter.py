@@ -131,7 +131,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         return value
 
 
-    def getContoursFromAxis(self,axisNumber=-1,value=-1):
+    def getContoursFromAxis(self,imageStack,axisNumber=-1,value=-1):
         """
         Return a contours array from the axis indexed by integer axisNumber
         i.e. one of the three axes
@@ -139,19 +139,17 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         if axisNumber == -1:
             return False
 
-        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        thisAxis = self.lasagna.axes2D[axisNumber]
-        thisItem = thisAxis.getPlotItemByName(atlasLayerName)
+        imageStack = np.swapaxes(imageStack,0,axisNumber)
+        thisSlice = self.lasagna.axes2D[axisNumber].currentSlice  #This is the current slice in this axis
+        tmpImage = np.array(imageStack[thisSlice]) #So this is the image associated with that slice
 
         #Make a copy of the image and set values lower than our value to a greater number
         #since the countour finder will draw around everything less than our value
-        tmpImage = np.array(thisItem.image)
         tmpImage[tmpImage<value] = value+10
         return measure.find_contours(tmpImage, value)
 
 
-    def drawAreaHighlight(self, value, highlightOnlyCurrentAxis=False):
+    def drawAreaHighlight(self, imageStack, value, highlightOnlyCurrentAxis=False):
         """
         if highlightOnlyCurrentAxis is True, we draw highlights only on the axis we are mousing over
         """
@@ -164,7 +162,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
 
 
         for axNum in range(len(self.lasagna.axes2D)):
-            contours = self.getContoursFromAxis(axisNumber=axNum,value=value)
+            contours = self.getContoursFromAxis(imageStack,axisNumber=axNum,value=value)
 
 
             if (highlightOnlyCurrentAxis == True  and  axNum != self.lasagna.inAxis) or len(contours)==0:

@@ -128,6 +128,11 @@ class imagestack(lasagna_ingredient):
         """
 
         (y,x) = np.histogram(self.data(),bins=100)
+        y=np.append(y,0)
+
+        #Remove negative numbers from the calculation. Sometimes these happen with registered images
+        y = y[x>0]
+        x = x[x>0]
 
         if logY==True:
             y=np.log10(y+0.1)
@@ -136,10 +141,11 @@ class imagestack(lasagna_ingredient):
         #I'm sure this isn't the most robust approach but it works for now
         thresh=0.925 #find values greater than this proportion
 
-        y=np.append(y,0)
+
 
         m = x*y
         vals = np.cumsum(m)/np.sum(m)
+
         vals = vals>thresh
 
         return x[vals.tolist().index(True)]

@@ -196,7 +196,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
         if self.lastValue != value  and  self.highlightArea_checkBox.isChecked():
-            self.drawAreaHighlight(value) #Inherited from ARA_plotter
+            self.drawAreaHighlight(imageStack,value) #Inherited from ARA_plotter
 
 
     def hook_deleteLayerStack_Slot_End(self):
