@@ -1,11 +1,6 @@
 
 """
-lasagna plugin for exploring the Allen Brain Atlas:
-1. Display of average template brain.
-2. Reporting of brain area name
-more stuff... 
-plugin under construction
-
+Overlays brain area onto a registered sample brain without overlaying the atlas.
 """
 
 import lasagna_helperFunctions as lasHelp 
@@ -14,10 +9,11 @@ import numpy as np
 import pyqtgraph as pg
 import os.path
 from alert import alert
+import imageStackLoader
 
 #For the UI
 from PyQt4 import QtGui, QtCore
-import ara_explorer_UI
+import area_namer_UI
 
 #For handling the labels files
 import ara_json, tree
@@ -28,13 +24,13 @@ from skimage import measure
 from ARA_plotter import ARA_plotter
 
 
-class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): 
+class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_namer): 
     def __init__(self,lasagna):
         super(plugin,self).__init__(lasagna)
         self.lasagna=lasagna
 
-        self.pluginShortName="ARA explorer"
-        self.pluginLongName="Allen Reference Atlas explorer"
+        self.pluginShortName="area namer"
+        self.pluginLongName="brain area namer"
         self.pluginAuthor="Rob Campbell"
 
 
@@ -65,16 +61,10 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.statusBarName_checkBox.setChecked(self.prefs['enableNameInStatusBar'])
         self.highlightArea_checkBox.setChecked(self.prefs['enableOverlay'])
         
-        self.brainArea_itemModel = QtGui.QStandardItemModel(self.brainArea_treeView)
-        self.brainArea_treeView.setModel(self.brainArea_itemModel)
-
-        #Link the selections in the tree view to a slot in order to allow highlighting of the selected area
-        QtCore.QObject.connect(self.brainArea_treeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.highlightSelectedAreaFromList) 
-
 
         #Link signals to slots
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
-        self.load_pushButton.released.connect(self.load_pushButton_slot)
+        self.loadOrig_pushButton.released.connect(self.loadOrig_pushButton_slot)
         self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
 
         #Loop through all paths and add to combobox.
@@ -151,16 +141,17 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
            self.warnAndQuit('Found no valid paths is preferences file at<br>%s.<br>SEE <a href="http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
            return
 
-        self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
-
         #If the user has asked for this, load the first ARA entry automatically
-        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='') 
+        self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='', atlas=np.ndarray([])) 
 
+        #TODO: DELETE THE FOLLOWING?
+        """
         currentlySelectedARA = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
         if self.prefs['loadFirstAtlasOnStartup']:
             print "Auto-Loading " +  currentlySelectedARA
-            self.loadARA(currentlySelectedARA)
-            self.load_pushButton.setEnabled(False) #disable because the current selection has now been loaded
+            self.loadAtlas(currentlySelectedARA)
+            self.loadOrig_pushButton.setEnabled(False) #disable because the current selection has now been loaded
+        """
 
         #Make a lines ingredient that will house the contours for the currently selected area.
         self.contourName = 'aracontour'
@@ -180,22 +171,11 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-
-        #Get the atlas volume and find in which voxel the mouse cursor is located        
-        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        ingredient = self.lasagna.returnIngredientByName(atlasLayerName)
-
-        if ingredient == False:
-            print "ARA_explorer_plugin.hook_updateStatusBar_End Failed to find imageStack named %s" % atlasLayerName
-            return
-
-        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
-
-        value = self.writeAreaNameInStatusBar(imageStack,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
+        thisLayer = self.data['atlas'] 
+        value = self.writeAreaNameInStatusBar(thisLayer,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
-        if self.lastValue != value  and  self.highlightArea_checkBox.isChecked():
+        if self.lastValue != value  and self.highlightArea_checkBox.isChecked():
             self.drawAreaHighlight(value) #Inherited from ARA_plotter
 
 
@@ -222,21 +202,21 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         """
         #If nothing has been loaded then for sure we need the load button enabled
         if len(self.data['currentlyLoadedAtlasName'])==0:
-            self.load_pushButton.setEnabled(True) 
+            self.loadOrig_pushButton.setEnabled(True) 
             return
 
         if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
-            self.load_pushButton.setEnabled(True) 
+            self.loadOrig_pushButton.setEnabled(True) 
         elif self.data['currentlyLoadedAtlasName'] == str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
-            self.load_pushButton.setEnabled(False) 
+            self.loadOrig_pushButton.setEnabled(False) 
 
 
-    def load_pushButton_slot(self):
+    def loadOrig_pushButton_slot(self):
         """
         Load the currently selected ARA version
         """
         selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        self.loadARA(selectedName)
+        self.loadAtlas(selectedName)
 
 
     def overlayTemplate_checkBox_slot(self):
@@ -263,9 +243,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
     #--------------------------------------
     # core methods: these do the meat of the work
     #
-    def loadARA(self,araName):
+    def loadAtlas(self,araName):
         """
-        Coordinate loading of the ARA items defined in the dictionary paths. 
+        Loads the atlas file but does not display it. Coordinate loading of the ARA items defined in the dictionary paths. 
         araName is a value from the self.paths dictionary. The values will be 
         combobox item texts and will load a dictionary from self.paths. The keys
         of this dictionary have these keys: 
@@ -276,20 +256,18 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         
         paths = self.paths[araName]
 
-        #remove the currently loaded ARA (if present)
-        if len(self.data['currentlyLoadedAtlasName'])>0:
-            self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
-
+        #Load the labels (this associates brain area index values with brain area names)
         self.data['labels'] = self.loadLabels(paths['labels'])
 
+        #Load the raw image data but do not display it.
+        self.data['atlas'] = imageStackLoader.loadStack(paths['atlas']).swapaxes(1,2)
 
-        self.addAreaDataToTreeView(self.data['labels'],self.rootNode,self.brainArea_itemModel.invisibleRootItem())
-
-        self.lasagna.loadImageStack(paths['atlas'])
-        
         self.data['currentlyLoadedAtlasName'] =  paths['atlas'].split(os.path.sep)[-1]
 
+        #comment out for now because the template loading is not urgent and we can add it last
+        """
         self.data['template']=paths['template']
+
         if os.path.exists(paths['template']):
             self.overlayTemplate_checkBox.setEnabled(True)
             if self.overlayTemplate_checkBox.isChecked()==True:
@@ -298,16 +276,15 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             self.overlayTemplate_checkBox.setEnabled(False)
 
 
-        #self.setARAcolors()
-        #self.lasagna.initialiseAxes(resetAxes=True)
+        self.lasagna.initialiseAxes(resetAxes=True)
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).minMax = [0,1.2E3]
         self.lasagna.initialiseAxes(resetAxes=True)
 
 
+
+
     def addOverlay(self,fname):
-        """
-        Add an overlay
-        """
+        #Add an overlay
         self.lasagna.loadImageStack(fname)
         self.data['currentlyLoadedOverlay'] = str(fname.split(os.path.sep)[-1])
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
@@ -315,66 +292,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0,1.5E3]
         self.lasagna.initialiseAxes(resetAxes=True)
 
-
-    #---------------
-    #Methods to handle the tree 
-    def addAreaDataToTreeView(self,thisTree,nodeID,parent):
-        """
-        Add a tree structure of area names to the QListView
-        """
-
-        children = thisTree[nodeID].children
-        for child in sorted(children):
-            child_item = QtGui.QStandardItem(thisTree[child].data['name'])
-            child_item.setData(child) #Store index. Can be retrieved by: child_item.data().toInt()[0] NOT USING THIS RIGHT NOW
-            parent.appendRow(child_item)
-            #print child_item
-            #Print the details associated with the QStandardItemObject
-            #print "%d. %s is a %s and has index %s" % (child_item.data().toInt()[0], child_item.data().toString(),str(child_item), str(child_item.index()))
-
-            self.addAreaDataToTreeView(thisTree, child, child_item)
-
-
-    def AreaName2NodeID(self,thisTree,name,nodeID=None):
-        """
-        Searches the tree for a brain area called name and returns the node ID (atlas index value)
-        Breaks out of the search loop if the area is found and propagates the value back through
-        the recursive function calls
-        """
-        if nodeID==None:
-            nodeID = self.rootNode
-        
-        children = thisTree[nodeID].children
-        for child in sorted(children):
-            if thisTree[child].data['name']==name:
-                return child
-            else:
-                returnVal = self.AreaName2NodeID(thisTree=thisTree, name=name, nodeID=child)
-                if returnVal != False:
-                    return returnVal
-
-        return False
-
-
-    def highlightSelectedAreaFromList(self):
-        """
-        This slot is run when the user clicks on a brain area in the list
-        """
-        getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the data
-
-        index = self.brainArea_treeView.selectedIndexes()[0]
-        areaName = index.data().toString() 
-        if getFromModel:
-            #The following row and column indexes are also correct, but index.model() is the root model and this is wrong.
-            treeIndex = index.model().item(index.row(),index.column()).data().toInt()[0] 
-            print "treeIndex (%d,%d): %d" % (index.row(),index.column(),treeIndex)
-        else: #so we do it the stupid way from the reee
-            treeIndex = self.AreaName2NodeID(self.data['labels'],areaName)
-
-        if treeIndex != None:
-            print "highlighting %d" % treeIndex
-            self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
-
+    """
 
 
 

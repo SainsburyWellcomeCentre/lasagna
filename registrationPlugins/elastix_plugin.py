@@ -141,8 +141,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         debug=True #runs certain things quickly to help development
         if debug and os.path.expanduser("~")=='/home/rob' : #Ensure only I can trigger this. Ensures that it doesn't activate if I accidently push with debug enabled
          
-            self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
-            self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
+            self.fixedStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_target.mhd'
+            self.movingStackPath='/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
 
             doRealLoad=True
             if doRealLoad:
@@ -160,7 +160,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             self.outputDir_label.setText(self.absToRelPath('/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/reg2'))
             self.updateWidgets_slot()
-            self.tabWidget.setCurrentIndex(2)
+            self.tabWidget.setCurrentIndex(3)
 
         #-------------------------------------------------------------------------------------
 
@@ -579,7 +579,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                             print "Result item '%s' already exists. Over-writing." % resultFname
         
                         print "Loading " + resultFname
-                        self.resultImages_Dict[resultFname] = self.lasagna.loadImageStack(resultFname)
+                        self.lasagna.loadImageStack(resultFname)
+                        #Get the data from this ingredient. Store it. Then wipe the ingredient
+                        thisIngredient = self.lasagna.ingredientList[-1]
+                        self.resultImages_Dict[resultFname] = thisIngredient.raw_data()
+
+                        self.lasagna.removeIngredientByName(thisIngredient.objectName)
+
+
                         print "Image loading complete"
 
             
@@ -603,6 +610,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         supplied when this slot is called from resultImageClicked_Slot
         Index is a QModelIndex
         """
+        verbose=False
 
         movingName = self.movingStackName.text()
         moving=self.lasagna.returnIngredientByName(movingName)
@@ -619,19 +627,23 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Show the image if the highlighted overlay radio button is enabled
         if self.showHighlightedResult_radioButton.isChecked()==True:
             if moving.fnameAbsPath == imageFname:
-                print "Skipping. Unchanged."
+                if verbose:
+                    print "Skipping. Unchanged."
                 return
 
             moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
-            print "switched to overlay " + imageFname
+            if verbose:
+                print "switched to overlay " + imageFname
 
         elif self.showOriginalMovingImage_radioButton.isChecked()==True:
             if moving.fnameAbsPath ==  self.originalMovingFname:
-                print "Skipping. Unchanged."
+                if verbose:
+                    print "Skipping. Unchanged."
                 return
 
             moving.changeData(imageData=self.originalMovingImage, imageAbsPath=self.originalMovingFname)
-            print "switched to original overlay"
+            if verbose:
+                print "switched to original overlay"
 
         self.lasagna.initialiseAxes()
 

@@ -87,26 +87,37 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
 
     #--------------------------------------
     # Drawing-related methods
-    def writeAreaNameInStatusBar(self, thisImage, displayAreaName=True):
+    def writeAreaNameInStatusBar(self, imageStack, displayAreaName=True):
         """
-        thisImage - the image from the axis over which the mouse is currently hovering
+        imageStack - the 3-D atlas stack
         displayAreaName - display area name in status bar if this True
         Write brain area name in the status bar (optional) return value of atlas pixel under mouse.
         Atlas need not be visible.
         """
-        imShape = thisImage.shape
 
-        X = self.lasagna.mouseX
-        Y = self.lasagna.mouseY
+        if len(imageStack.shape)==0:
+            return -1
+
+        imShape = imageStack.shape
+        pos = self.lasagna.mousePositionInStack
         
-        if X<0 or Y<0:
-            thisArea='outside image area'
-            value=-1
-        elif X>=imShape[0] or Y>=imShape[1]:
-            thisArea='outside image area'
-            value=-1
-        else:
-            value = thisImage[X,Y]
+        verbose=False
+        if verbose:
+            print "Mouse is in %d,%d,%d and image size is %d,%d,%d" % (pos[0],pos[1],pos[2],imShape[0],imShape[1],imShape[2])
+
+        #Detect if the mouse is outside of the atlas
+        value=0
+        for ii in range(len(imShape)):
+            if pos[ii]<0 or pos[ii]>=imShape[ii]:
+                if verbose:
+                    print "NOT IN RANGE: pos: %d shape %d" % (pos[ii], imShape[ii])
+                thisArea='outside image area'
+                value=-1
+                break
+
+        #If value is still zero we're inside the atlas image area
+        if value==0:
+            value = imageStack[pos[0],pos[1],pos[2]]
             if value==0:
                 thisArea='outside brain'
             elif value in self.data['labels'].nodes :
@@ -144,6 +155,10 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         """
         if highlightOnlyCurrentAxis is True, we draw highlights only on the axis we are mousing over
         """
+
+        if value<=0:
+            return
+
         nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
         allContours = nans
 

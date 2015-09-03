@@ -163,7 +163,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.showCrossHairs = lasHelp.readPreference('showCrossHairs')
         self.mouseX = None
         self.mouseY = None
-        self.inAxis = 0
+        self.inAxis = 0  #The axis the mouse is currently in [see mouseMoved()]
+        self.mousePositionInStack = []  #A list defining voxel (Z,X,Y) in which the mouse cursor is currently positioned [see mouseMoved()]
         self.statusBarText = None
 
         #Lists of functions that are used as hooks for plugins to modify the behavior of built-in methods.
@@ -400,7 +401,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         loadedImageStack = imageStackLoader.loadStack(fnameToLoad).swapaxes(1,2) 
  
         if len(loadedImageStack)==0 and loadedImageStack==False:
-            return
+            return False
 
         # Set up default values in tabs
         # It's ok to load images of different sizes but their voxel sizes need to be the same
@@ -1144,73 +1145,42 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 thisImageStack.minMax=[minX,maxX] #ensures levels stay set during all plot updates that follow
 
 
-    def mouseMovedCoronal(self,evt):
+    def mouseMoved(self,evt):
+        """
+        Update the UI as the mouse interacts with one of the axes
+        """
         if self.stacksInTreeList()==False:
             return
 
-        pos = evt[0] #Using signal proxy turns original arguments into a tuple
-        self.removeCrossHairs()
-        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
-            self.axes2D[0].view.getViewBox().controlDrag=False
-
-        if self.axes2D[0].view.sceneBoundingRect().contains(pos):
-            self.inAxis=0
-            #TODO: figure out how to integrate this into object, because when we have that, we could
-            #      do everything but the axis linking in the object. 
-            if self.showCrossHairs:
-                self.axes2D[0].view.addItem(self.crossHairVLine, ignoreBounds=True)
-                self.axes2D[0].view.addItem(self.crossHairHLine, ignoreBounds=True)
-
-            (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
-            
-            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[0].view.getViewBox().controlDrag:
-                self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
-
-            self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements     
-
-
-
-    def mouseMovedSaggital(self,evt):
-        if self.stacksInTreeList()==False:
-            return
-
-        pos = evt[0]
-        self.removeCrossHairs()
-        if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
-            self.axes2D[1].view.getViewBox().controlDrag=False
-            
-        if self.axes2D[1].view.sceneBoundingRect().contains(pos):
-            self.inAxis=1
-            if self.showCrossHairs:
-                self.axes2D[1].view.addItem(self.crossHairVLine, ignoreBounds=True)
-                self.axes2D[1].view.addItem(self.crossHairHLine, ignoreBounds=True)
-
-            (self.mouseX,self.mouseY)=self.axes2D[1].getMousePositionInCurrentView(pos)
-            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[1].view.getViewBox().controlDrag:
-                self.axes2D[1].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
-
-            self.updateMainWindowOnMouseMove(self.axes2D[1])        
-
-
-    def mouseMovedTransverse(self,evt):
-        if self.stacksInTreeList()==False:
-            return
+        axisID=self.sender().axisID 
 
         pos = evt[0]  
         self.removeCrossHairs()
         if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
-            self.axes2D[2].view.getViewBox().controlDrag=False
+            self.axes2D[axisID].view.getViewBox().controlDrag=False
 
-        if self.axes2D[2].view.sceneBoundingRect().contains(pos):
-            self.inAxis=2
+        if self.axes2D[axisID].view.sceneBoundingRect().contains(pos):
+
             if self.showCrossHairs:
-                self.axes2D[2].view.addItem(self.crossHairVLine, ignoreBounds=True) 
-                self.axes2D[2].view.addItem(self.crossHairHLine, ignoreBounds=True)
+                self.axes2D[axisID].view.addItem(self.crossHairVLine, ignoreBounds=True) 
+                self.axes2D[axisID].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
-            (self.mouseX,self.mouseY)=self.axes2D[2].getMousePositionInCurrentView(pos)
-            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[2].view.getViewBox().controlDrag:
-                self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
-            self.updateMainWindowOnMouseMove(self.axes2D[2])
+            (self.mouseX,self.mouseY)=self.axes2D[axisID].getMousePositionInCurrentView(pos)
+            #Record the current axis in which the mouse is in and the position of the mouse in the stack
+            self.inAxis=axisID
+            voxelPosition = [self.axes2D[axisID].currentSlice,self.mouseX,self.mouseY];
+            if axisID==1:
+                voxelPosition = [voxelPosition[1],voxelPosition[0],voxelPosition[2]]
+            elif axisID==2:
+                voxelPosition = [voxelPosition[2],voxelPosition[1],voxelPosition[0]]
+
+            self.mousePositionInStack = voxelPosition
+
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[axisID].view.getViewBox().controlDrag:
+                self.axes2D[axisID].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
+            self.updateMainWindowOnMouseMove(self.axes2D[axisID])
+
+
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1251,10 +1221,11 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Link slots to signals
     #connect views to the mouseMoved slot. After connection this runs in the background. 
-    #TODO: set up with just one slot that accepts arguments
-    proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=60, slot=tasty.mouseMovedCoronal)
-    proxy2=pg.SignalProxy(tasty.axes2D[1].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
-    proxy3=pg.SignalProxy(tasty.axes2D[2].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)
+    proxies=[]
+    for ii in range(3):
+        thisProxy=pg.SignalProxy(tasty.axes2D[ii].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
+        thisProxy.axisID=ii #this is picked up the mouseMoved slot
+        proxies.append(thisProxy)
 
     sys.exit(app.exec_())
 
