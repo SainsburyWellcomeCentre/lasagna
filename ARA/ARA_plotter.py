@@ -95,13 +95,22 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         Atlas need not be visible.
         """
 
+        if len(imageStack.shape)==0:
+            return -1
+
         imShape = imageStack.shape
         pos = self.lasagna.mousePositionInStack
         
+        verbose=False
+        if verbose:
+            print "Mouse is in %d,%d,%d and image size is %d,%d,%d" % (pos[0],pos[1],pos[2],imShape[0],imShape[1],imShape[2])
+
         #Detect if the mouse is outside of the atlas
         value=0
         for ii in range(len(imShape)):
             if pos[ii]<0 or pos[ii]>=imShape[ii]:
+                if verbose:
+                    print "NOT IN RANGE: pos: %d shape %d" % (pos[ii], imShape[ii])
                 thisArea='outside image area'
                 value=-1
                 break
@@ -146,6 +155,10 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         """
         if highlightOnlyCurrentAxis is True, we draw highlights only on the axis we are mousing over
         """
+
+        if value<=0:
+            return
+
         nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
         allContours = nans
 

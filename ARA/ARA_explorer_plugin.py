@@ -195,7 +195,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         value = self.writeAreaNameInStatusBar(imageStack,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
-        if self.lastValue != value  and  value>0  and  self.highlightArea_checkBox.isChecked():
+        if self.lastValue != value  and  self.highlightArea_checkBox.isChecked():
             self.drawAreaHighlight(value) #Inherited from ARA_plotter
 
 
