@@ -159,6 +159,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
                                 kind='lines', 
                                 data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
+
+        #DISABLE BUTTON FOR NOW:
+        self.loadOther_pushButton.setEnabled(False)
         # End of constructor
 
 
