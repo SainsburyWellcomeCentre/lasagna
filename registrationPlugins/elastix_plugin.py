@@ -196,6 +196,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         Load the moving stack can optionally load a specific file name (used for de-bugging)
         """
+
+        #If there is already a moving stack loaded we should wipe it
+        currentMovingStack = str(self.movingStackName.text())
+        if len(currentMovingStack)>0:
+            self.lasagna.removeIngredientByName(currentMovingStack)
+
         if fnameToLoad==False:
             self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
         else:
