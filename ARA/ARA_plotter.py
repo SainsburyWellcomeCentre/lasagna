@@ -140,7 +140,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
             return False
 
         imageStack = np.swapaxes(imageStack,0,axisNumber)
-        thisSlice = self.lasagna.mousePositionInStack[axisNumber] #This is the current slice in this axis
+        thisSlice = self.lasagna.axes2D[axisNumber].currentSlice  #This is the current slice in this axis
         tmpImage = np.array(imageStack[thisSlice]) #So this is the image associated with that slice
 
         #Make a copy of the image and set values lower than our value to a greater number
