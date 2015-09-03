@@ -171,12 +171,12 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-        thisLayer = self.data['atlas'] 
-        value = self.writeAreaNameInStatusBar(thisLayer,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
+        imageStack = self.data['atlas'] 
+        value = self.writeAreaNameInStatusBar(imageStack,self.statusBarName_checkBox.isChecked()) #Inherited from ARA_plotter
 
         #Highlight the brain area we are mousing over by drawing a boundary around it
         if self.lastValue != value  and self.highlightArea_checkBox.isChecked():
-            self.drawAreaHighlight(value) #Inherited from ARA_plotter
+            self.drawAreaHighlight(imageStack,value) #Inherited from ARA_plotter
 
 
     def hook_deleteLayerStack_Slot_End(self):
