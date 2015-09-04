@@ -552,38 +552,11 @@
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_SelectFixedImage">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>281</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>180</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>1. Swap moving and fixed</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_selectOutputDir">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>170</y>
+       <y>40</y>
        <width>661</width>
        <height>16</height>
       </rect>
@@ -600,7 +573,7 @@
       </font>
      </property>
      <property name="text">
-      <string>2. Select output directory</string>
+      <string>1. Select output directory</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_selectParamFiles">
@@ -624,7 +597,7 @@
       </font>
      </property>
      <property name="text">
-      <string>3. Choose parameter files (these are applied sequentially)</string>
+      <string>2. Choose parameter files (these are applied sequentially)</string>
      </property>
     </widget>
     <widget class="QListView" name="paramListView">
@@ -684,7 +657,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>60</y>
        <width>61</width>
        <height>31</height>
       </rect>
@@ -745,7 +718,7 @@
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>190</y>
+       <y>60</y>
        <width>741</width>
        <height>31</height>
       </rect>

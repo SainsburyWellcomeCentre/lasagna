@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'elastix_plugin.ui'
 #
-# Created: Wed Aug 26 16:30:57 2015
+# Created: Fri Sep  4 16:32:38 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -215,16 +215,8 @@ class Ui_elastixMain(object):
         font.setPointSize(11)
         self.labelCommand.setFont(font)
         self.labelCommand.setObjectName(_fromUtf8("labelCommand"))
-        self.label_SelectFixedImage = QtGui.QLabel(self.tabCommand)
-        self.label_SelectFixedImage.setEnabled(False)
-        self.label_SelectFixedImage.setGeometry(QtCore.QRect(20, 20, 281, 16))
-        self.label_SelectFixedImage.setMinimumSize(QtCore.QSize(180, 0))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label_SelectFixedImage.setFont(font)
-        self.label_SelectFixedImage.setObjectName(_fromUtf8("label_SelectFixedImage"))
         self.label_selectOutputDir = QtGui.QLabel(self.tabCommand)
-        self.label_selectOutputDir.setGeometry(QtCore.QRect(20, 170, 661, 16))
+        self.label_selectOutputDir.setGeometry(QtCore.QRect(20, 40, 661, 16))
         self.label_selectOutputDir.setMinimumSize(QtCore.QSize(180, 0))
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -257,7 +249,7 @@ class Ui_elastixMain(object):
         self.removeParameter.setIcon(icon1)
         self.removeParameter.setObjectName(_fromUtf8("removeParameter"))
         self.outputDirSelect_button = QtGui.QPushButton(self.tabCommand)
-        self.outputDirSelect_button.setGeometry(QtCore.QRect(10, 190, 61, 31))
+        self.outputDirSelect_button.setGeometry(QtCore.QRect(10, 60, 61, 31))
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -280,7 +272,7 @@ class Ui_elastixMain(object):
         self.moveParamDown_button.setIcon(icon3)
         self.moveParamDown_button.setObjectName(_fromUtf8("moveParamDown_button"))
         self.frame = QtGui.QFrame(self.tabCommand)
-        self.frame.setGeometry(QtCore.QRect(70, 190, 741, 31))
+        self.frame.setGeometry(QtCore.QRect(70, 60, 741, 31))
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
         self.frame.setObjectName(_fromUtf8("frame"))
@@ -379,9 +371,8 @@ class Ui_elastixMain(object):
         self.saveModifiedMovingStack.setText(_translate("elastixMain", "Save modified moving stack", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabLoad), _translate("elastixMain", "Load", None))
         self.labelCommand.setText(_translate("elastixMain", "Command", None))
-        self.label_SelectFixedImage.setText(_translate("elastixMain", "1. Swap moving and fixed", None))
-        self.label_selectOutputDir.setText(_translate("elastixMain", "2. Select output directory", None))
-        self.label_selectParamFiles.setText(_translate("elastixMain", "3. Choose parameter files (these are applied sequentially)", None))
+        self.label_selectOutputDir.setText(_translate("elastixMain", "1. Select output directory", None))
+        self.label_selectParamFiles.setText(_translate("elastixMain", "2. Choose parameter files (these are applied sequentially)", None))
         self.loadParamFile.setText(_translate("elastixMain", "Load param file", None))
         self.outputDirSelect_button.setText(_translate("elastixMain", "Select", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabCommand), _translate("elastixMain", "Command", None))
