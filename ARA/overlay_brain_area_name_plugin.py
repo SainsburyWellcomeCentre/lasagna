@@ -65,6 +65,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         #Link signals to slots
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.loadOrig_pushButton.released.connect(self.loadOrig_pushButton_slot)
+        self.loadOther_pushButton.released.connect(self.loadOther_pushButton_slot)
         self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
 
         #Loop through all paths and add to combobox.
@@ -213,38 +214,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
 
     def loadOrig_pushButton_slot(self):
         """
-        Load the currently selected ARA version
-        """
-        selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        self.loadAtlas(selectedName)
-
-
-    def overlayTemplate_checkBox_slot(self):
-        """
-        Load or unload the template overlay
-        """
-        fname = self.data['template']
-        if len(fname)==0:
-            return
-
-        if self.overlayTemplate_checkBox.isChecked()==True:
-            if os.path.exists(fname):
-                self.addOverlay(fname)
-                return
-
-        if self.overlayTemplate_checkBox.isChecked()==False:
-            overlayName = fname.split(os.path.sep)[-1]
-            self.lasagna.removeIngredientByName(overlayName)
-
-        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
-        self.lasagna.initialiseAxes()
-
-
-    #--------------------------------------
-    # core methods: these do the meat of the work
-    #
-    def loadAtlas(self,araName):
-        """
         Loads the atlas file but does not display it. Coordinate loading of the ARA items defined in the dictionary paths. 
         araName is a value from the self.paths dictionary. The values will be 
         combobox item texts and will load a dictionary from self.paths. The keys
@@ -253,8 +222,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         'labels' (full path to atlas labels file - csv or json)
         'template' (full path to average template file - optional)
         """
-        
-        paths = self.paths[araName]
+        selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+
+        paths = self.paths[selectedName]
 
         #Load the labels (this associates brain area index values with brain area names)
         self.data['labels'] = self.loadLabels(paths['labels'])
@@ -294,6 +264,48 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
 
     """
 
+
+    def loadOther_pushButton_slot(self,fnameToLoad=False):
+        """
+        Load a user-selected atlas file but use the labels from the ARA in the drop-down box.
+        Can optionally load a specific file name (used for de-bugging)
+        """
+        if fnameToLoad==False:       
+            fileFilter="Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
+            fnameToLoad = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
+            fnameToLoad = str(fnameToLoad)
+
+        #re-load labels        
+        selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        paths = self.paths[selectedName]
+        self.data['labels'] = self.loadLabels(paths['labels'])
+
+        #load the selected atlas (without displaying it)
+        self.data['atlas'] = imageStackLoader.loadStack(fnameToLoad)
+
+        self.data['currentlyLoadedAtlasName'] =  fnameToLoad.split(os.path.sep)[-1]
+
+
+
+    def overlayTemplate_checkBox_slot(self):
+        """
+        Load or unload the template overlay
+        """
+        fname = self.data['template']
+        if len(fname)==0:
+            return
+
+        if self.overlayTemplate_checkBox.isChecked()==True:
+            if os.path.exists(fname):
+                self.addOverlay(fname)
+                return
+
+        if self.overlayTemplate_checkBox.isChecked()==False:
+            overlayName = fname.split(os.path.sep)[-1]
+            self.lasagna.removeIngredientByName(overlayName)
+
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
+        self.lasagna.initialiseAxes()
 
 
     #----------------------------

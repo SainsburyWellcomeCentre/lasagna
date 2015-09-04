@@ -137,11 +137,8 @@ class imagestack(lasagna_ingredient):
         if logY==True:
             y=np.log10(y+0.1)
 
-        
         #I'm sure this isn't the most robust approach but it works for now
         thresh=0.925 #find values greater than this proportion
-
-
 
         m = x*y
         vals = np.cumsum(m)/np.sum(m)

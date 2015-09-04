@@ -175,7 +175,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         self.lasagna.removeIngredientByType('imagestack')
         if fnameToLoad==False:
-            self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
+            self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *.mha)") 
         else:
             self.lasagna.loadImageStack(fnameToLoad)
 

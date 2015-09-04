@@ -153,7 +153,6 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         """
         if highlightOnlyCurrentAxis is True, we draw highlights only on the axis we are mousing over
         """
-
         if value<=0:
             return
 
