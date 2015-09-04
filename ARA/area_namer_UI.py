@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'area_namer.ui'
 #
-# Created: Wed Sep  2 16:05:04 2015
+# Created: Fri Sep  4 15:57:57 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -67,11 +67,6 @@ class Ui_area_namer(object):
         self.highlightArea_checkBox.setGeometry(QtCore.QRect(10, 30, 241, 21))
         self.highlightArea_checkBox.setChecked(True)
         self.highlightArea_checkBox.setObjectName(_fromUtf8("highlightArea_checkBox"))
-        self.overlayTemplate_checkBox = QtGui.QCheckBox(self.frame)
-        self.overlayTemplate_checkBox.setEnabled(False)
-        self.overlayTemplate_checkBox.setGeometry(QtCore.QRect(220, 10, 181, 21))
-        self.overlayTemplate_checkBox.setChecked(False)
-        self.overlayTemplate_checkBox.setObjectName(_fromUtf8("overlayTemplate_checkBox"))
 
         self.retranslateUi(area_namer)
         QtCore.QMetaObject.connectSlotsByName(area_namer)
@@ -82,5 +77,4 @@ class Ui_area_namer(object):
         self.loadOther_pushButton.setText(_translate("area_namer", "Attach warped atlas", None))
         self.statusBarName_checkBox.setText(_translate("area_namer", "show name in status bar", None))
         self.highlightArea_checkBox.setText(_translate("area_namer", "highlight area", None))
-        self.overlayTemplate_checkBox.setText(_translate("area_namer", "overlay template", None))
 
