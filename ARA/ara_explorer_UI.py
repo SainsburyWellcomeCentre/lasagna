@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ara_explorer.ui'
 #
-# Created: Wed Sep  2 16:05:04 2015
+# Created: Fri Sep  4 15:57:57 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
