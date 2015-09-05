@@ -515,6 +515,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             #NOTE: tried the lambda approach but it always assigns the last file name to the list to all signals
             #      http://stackoverflow.com/questions/940555/pyqt-sending-parameter-to-slot-when-connecting-to-a-signal
 
+
     def loadRecentFileSlot(self):
         """
         load a file from recently opened list
