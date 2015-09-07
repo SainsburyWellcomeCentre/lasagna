@@ -111,10 +111,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             #TODO: make an alert box for this case
             print "that file does not exits"
         
-        #TODO: update stackName_label
         self.checkIfReadyToRun()
         lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fnameToChoose))
-
+        self.stackName_label.setText(fnameToChoose.split(os.path.sep)[-1])
 
     def chooseTransform_slot(self, fnameToChoose=False):
         """
@@ -134,9 +133,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             #TODO: make an alert box for this case
             print "that file does not exits"
 
-        #TODO: update transformName_label
+
         self.checkIfReadyToRun()
         lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fnameToChoose))
+        self.transformName_label.setText(fnameToChoose.split(os.path.sep)[-1])
 
 
     def selectOutputDir_slot(self):
@@ -154,7 +154,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
 
         self.checkIfReadyToRun()
 
- 
+
     def run_slot(self):  
         """
         Run the transformix session
@@ -216,6 +216,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         self.chooseStack_pushButton.setEnabled(True)
         self.chooseTransform_pushButton.setEnabled(True)
         self.outputDirSelect_pushButton.setEnabled(True)
+
+        self.stackName_label.setText('')
+        self.transformName_label.setText('') 
+        self.outputDir_label.setText('')
 
         if success: #Display result if it is available
             self.loadResult_pushButton.setEnabled(True)
