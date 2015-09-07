@@ -158,8 +158,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         """
         Run the transformix session
         """
-        
-        if len (self.transformixCommand):
+
+        if len (self.transformixCommand)==0:
             print "transformix command is empty"
             return False
 
@@ -172,6 +172,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             cmd = cmd + "  > /dev/null 2>&1"
     
         subprocess.Popen(cmd, shell=True) #The command is now run
+
 
         #Deactivate the UI elements whilst we're running
         self.run_pushButton.setEnabled(False)
@@ -186,7 +187,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         finishedText = 'Elapsed time:'
         running = True
         while running:
-            line = returnLastLineOfFile(pathToLog)
+            line = self.returnLastLineOfFile(pathToLog)
+            if line is None: 
+                continue
+                #"Errors occurred"
+
             self.commandText_label.setText(line)
             if re.match('.*Elapsed time',line)  is not None:
                 running = False
@@ -265,8 +270,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         with open(fname, 'rb') as fh:
             first = next(fh).decode()
             fh.seek(-1024, 2)
-            last = fh.readlines()[-1].decode()
-        print last
+            lines = fh.readlines()
+            if len(lines)>0:
+                return lines[-1].decode()
+        
+        return None
 
 
     def lookForStringInFile(self,fname,searchString):
@@ -294,12 +302,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             cmd = '%s -in %s' % (cmd,self.inputImagePath)
 
         if len(self.transformPath)>0 and os.path.exists(self.transformPath):
-            cmd = '%s -in %s' % (cmd,self.transformPath)
+            cmd = '%s -tp %s' % (cmd,self.transformPath)
 
         if len(self.outputDirPath)>0 and os.path.exists(self.outputDirPath):
-            cmd = '%s -in %s' % (cmd,self.outputDirPath)
+            cmd = '%s -out %s' % (cmd,self.outputDirPath)
         
-        print cmd        
         if len(cmd)>0:
             self.transformixCommand = 'transformix ' + cmd
             self.commandText_label.setText(self.transformixCommand)
