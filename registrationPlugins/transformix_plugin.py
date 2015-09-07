@@ -17,6 +17,7 @@ import subprocess #To run the transformix binary
 import shutil 
 import re
 import lasagna_helperFunctions as lasHelp
+import time
 
 class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin): #must inherit lasagna_plugin first
 
@@ -171,30 +172,40 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         if os.name == 'posix' or os.name == 'mac':
             cmd = cmd + "  > /dev/null 2>&1"
     
-        subprocess.Popen(cmd, shell=True) #The command is now run
+        #If the log file exists already, delete it
+        pathToLog = os.path.join(self.outputDirPath,self.transformixLogName)
+        if os.path.exists(pathToLog):
+            os.remove(pathToLog)
+
+
 
 
         #Deactivate the UI elements whilst we're running
+        self.labelCommand.setText('RUNNING...')
         self.run_pushButton.setEnabled(False)
         self.loadResult_pushButton.setEnabled(False)
         self.chooseStack_pushButton.setEnabled(False)
         self.chooseTransform_pushButton.setEnabled(False)
         self.outputDirSelect_pushButton.setEnabled(False)
 
-        #Show progress in the commandText_label
-        self.labelCommand.setText('Progress...')
-        pathToLog = os.path.join(self.outputDirPath,self.transformixLogName)
-        finishedText = 'Elapsed time:'
+        #Watch for completion
         running = True
+        time.sleep(0.1)
+        subprocess.Popen(cmd, shell=True) #The command is now run
         while running:
-            line = self.returnLastLineOfFile(pathToLog)
-            if line is None: 
-                continue
-                #"Errors occurred"
 
-            self.commandText_label.setText(line)
-            if re.match('.*Elapsed time',line)  is not None:
+            if not os.path.exists(pathToLog): #wait for the file to appear
+                time.sleep(0.15)
+                continue
+
+            if self.lookForStringInFile(pathToLog, 'Errors occurred'):
+                print "FAILED"
                 running = False
+
+            if self.lookForStringInFile(pathToLog, 'Elapsed time'):
+                print "FINISHED!"
+                running = False
+
 
         #Return to the original state so we can start another round
         self.labelCommand.setText('Command...')
@@ -259,24 +270,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         return  relPath
 
 
-    def returnLastLineOfFile(self,fname):
-        """
-        Returns last line of a file:
-        http://stackoverflow.com/questions/3346430/most-efficient-way-to-get-first-and-last-line-of-file-python
-        """     
-        if not os.path.exists(fname):
-            return None
-
-        with open(fname, 'rb') as fh:
-            first = next(fh).decode()
-            fh.seek(-1024, 2)
-            lines = fh.readlines()
-            if len(lines)>0:
-                return lines[-1].decode()
-        
-        return None
-
-
+   
     def lookForStringInFile(self,fname,searchString):
         """
         Search file "fname" for any line containing the string "searchString"
