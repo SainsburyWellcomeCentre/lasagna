@@ -193,6 +193,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         running = True
         time.sleep(0.1)
         subprocess.Popen(cmd, shell=True) #The command is now run
+        success=False
         while running:
 
             if not os.path.exists(pathToLog): #wait for the file to appear
@@ -205,16 +206,23 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
 
             if self.lookForStringInFile(pathToLog, 'Elapsed time'):
                 print "FINISHED!"
+                success=True
                 running = False
 
 
         #Return to the original state so we can start another round
         self.labelCommand.setText('Command...')
-        self.commandText_label.setText('')
+
         self.chooseStack_pushButton.setEnabled(True)
         self.chooseTransform_pushButton.setEnabled(True)
         self.outputDirSelect_pushButton.setEnabled(True)
-        self.loadResult_pushButton.setEnabled(True)
+
+        if success: #Display result if it is available
+            self.loadResult_pushButton.setEnabled(True)
+            self.commandText_label.setText('Transform sucessful ')
+        else:
+            self.commandText_label.setText('Transform FAILED! See %s for details ' % pathToLog)
+
 
 
 
