@@ -572,7 +572,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
                 #Look for result images
                 for file in os.listdir(thisDir):
-                    if file.startswith('result') and file.endswith('.mhd'):
+                    if file.startswith('result') and file.endswith('.mhd'): #TODO: will fail if user asks for something that is not an MHD file
                         resultFname = str(thisDir + os.path.sep + file)
 
                         #Don't add if it already exists
@@ -674,19 +674,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             relPath = '.' + relPath
 
         return  relPath
-
-
-    def returnLastLineOfFile(self,fname):
-        """
-        Returns last line of a file:
-        http://stackoverflow.com/questions/3346430/most-efficient-way-to-get-first-and-last-line-of-file-python
-        """     
-        #TODO: currently not using this function but may do so in future. keep for now.   
-        with open(fname, 'rb') as fh:
-            first = next(fh).decode()
-            fh.seek(-1024, 2)
-            last = fh.readlines()[-1].decode()
-        print last
 
 
     def lookForStringInFile(self,fname,searchString):
