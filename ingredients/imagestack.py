@@ -117,7 +117,7 @@ class imagestack(lasagna_ingredient):
                         data[sliceToPlot], 
                         levels=self.minMax, 
                         compositionMode=self.compositionMode,
-                        lut=self.setColorMap(self.lut)
+                        lut=self.setColorMap(self.lut),
                         )
 
 

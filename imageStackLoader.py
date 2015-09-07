@@ -100,7 +100,8 @@ def loadTiffStack(fname,useLibTiff=False):
     from tifffile import imread 
     im = imread(fname)
 
-  print "read image of size: rows: %d, cols: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
+  im=im.swapaxes(1,2) 
+  print "read image of size: cols: %d, rows: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
   return im
 
 
@@ -131,10 +132,11 @@ def mhdRead(fname,fallBackMode = False):
     imr.Update()
 
     im = imr.GetOutput()
+    im=im.swapaxes(1,2) 
     rows, cols, z = im.GetDimensions()
     sc = im.GetPointData().GetScalars()
     a = vtk_to_numpy(sc)
-    print "Using VTK to read MHD image of size: rows: %d, cols: %d, layers: %d" % (rows,cols,z)
+    print "Using VTK to read MHD image of size: cols: %d, rows: %d, layers: %d" % (rows,cols,z)
     return a.reshape(z, cols, rows) 
 
 
@@ -439,7 +441,7 @@ def nrrdRead(fname):
 
   import nrrd 
   (data,header) = nrrd.read(fname)
-  return data
+  return data.swapaxes(1,2)
 
 
 def nrrdHeaderRead(fname):
