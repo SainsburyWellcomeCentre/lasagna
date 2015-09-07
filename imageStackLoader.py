@@ -132,12 +132,14 @@ def mhdRead(fname,fallBackMode = False):
     imr.Update()
 
     im = imr.GetOutput()
-    im=im.swapaxes(1,2) 
+
     rows, cols, z = im.GetDimensions()
     sc = im.GetPointData().GetScalars()
     a = vtk_to_numpy(sc)
+    a = a.reshape(z, cols, rows) 
+    a = a.swapaxes(1,2)
     print "Using VTK to read MHD image of size: cols: %d, rows: %d, layers: %d" % (rows,cols,z)
-    return a.reshape(z, cols, rows) 
+    return a    
 
 
 def mhdWrite(imStack,fname):
