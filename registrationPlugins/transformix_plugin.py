@@ -1,7 +1,7 @@
 
 
 """
-Elastix registration plugin for Lasagna 
+Transformix plugin for Lasagna 
 Rob Campbell
 """
 
@@ -15,7 +15,8 @@ import tempfile
 from which import which #To test if binaries exist in system path
 import subprocess #To run the transformix binary
 import shutil 
-
+import re
+import lasagna_helperFunctions as lasHelp
 
 class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin): #must inherit lasagna_plugin first
 
@@ -56,14 +57,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         #removed when the registration starts
         self.tmpParamFiles = {}
 
-
- 
-
         #Create some properties which we will need
         self.inputImagePath = '' #absolute path to the image we will transform
         self.transformPath = '' #absolute path to the tranform file we will use
         self.outputDirPath = ''
-  
+        self.transformixCommand = ''
+
+
         #Link signals to slots
         self.chooseStack_pushButton.released.connect(self.chooseStack_slot)
         self.chooseTransform_pushButton.released.connect(self.chooseTransform_slot)
@@ -72,17 +72,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         self.run_pushButton.released.connect(self.run_slot)
         self.loadResult_pushButton.released.connect(self.loadResult_slot)
         
+
         #Disable UI elements that won't be available until the user has completed all actions
         self.run_pushButton.setEnabled(False)
         self.loadResult_pushButton.setEnabled(False)
-
-
-        #Start a QTimer to poll for finished analyses
-        self.finishedMonitorTimer = QtCore.QTimer()
-        self.finishedMonitorTimer.timeout.connect(self.analysisFinished_slot)
-        self.finishedMonitorTimer.start(2500) #Number of milliseconds between poll events
-
-
 
         #-------------------------------------------------------------------------------------
         #The following will either be hugely changed or deleted when the plugin is no longer
@@ -104,7 +97,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         Choose the stack to transform
         can optionally load a specific file name (used for de-bugging)
         """
-
         if fnameToChoose==False:         
             fileFilter="Images (*.mhd *.mha)"
             fnameToChoose = QtGui.QFileDialog.getOpenFileName(self, 'Choose stack', lasHelp.readPreference('lastLoadDir'), fileFilter)
@@ -114,18 +106,20 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         if os.path.exists(fnameToChoose):
             self.inputImagePath = fnameToChoose
         else:
+            self.inputImagePath = ''
             #TODO: make an alert box for this case
             print "that file does not exits"
         
         #TODO: update stackName_label
         self.checkIfReadyToRun()
+        lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fnameToChoose))
+
 
     def chooseTransform_slot(self, fnameToChoose=False):
         """
         Choose the transform file to use
         can optionally load a specific file name (used for de-bugging)
         """
-
         if fnameToChoose==False:         
             fileFilter="Images (*.txt)"
             fnameToChoose = QtGui.QFileDialog.getOpenFileName(self, 'Choose transform', lasHelp.readPreference('lastLoadDir'), fileFilter)
@@ -133,132 +127,44 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
 
 
         if os.path.exists(fnameToChoose):
-            self.inputImagePath = fnameToChoose
+            self.transformPath = fnameToChoose
         else:
+            self.transformPath = ''
             #TODO: make an alert box for this case
             print "that file does not exits"
 
         #TODO: update transformName_label
         self.checkIfReadyToRun()
-
-
+        lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fnameToChoose))
 
 
     def selectOutputDir_slot(self):
         """
-        Select the Elastix output directory
+        Select the Transformix output directory via a QFileDialog
         """
         selectedDir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
         #TODO: check if directory is not empty. If it's not empty, prompt to delete contents
         self.outputDir_label.setText(selectedDir)
-        self.updateWidgets_slot()
+        
+        if os.path.exists(selectedDir):
+            self.outputDirPath = selectedDir
+        else:
+            self.outputDirPath = ''
 
         self.checkIfReadyToRun()
 
-
-    def checkIfReadyToRun(self):
+ 
+    def run_slot(self):  
         """
-        Enables run button if we are ready to run. Also returns True or False
+        Run the transformix session
         """
-        #Build the command
-        self.transformixCommand =''
-
-        if os.path.exists(self.inputImagePath) and os.path.exists(self.transformPath) and os.path.exists(self.outputDirPath):
-            self.run_pushButton.setEnabled(True)
-            return True
-        else:
-            self.run_pushButton.setEnabled(False)
+        
+        if len (self.transformixCommand):
+            print "transformix command is empty"
             return False
 
-
-
-
-   
-
-    def updateWidgets_slot(self):
-        """
-        Build the elastix command and show on text boxes on screen.
-        This slot is called by the radio buttons but also by other 
-        slots, such moving parameters up and down.
-        """
-
-        self.elastix_cmd['f'] = self.absToRelPath(self.fixedStackPath)
-        self.elastix_cmd['m'] = self.absToRelPath(self.movingStackPath)
-
-
-
-
-        #Build the command
-        sl
-    
-        #If the output directory exists, add it to the command along with any parameter files 
-        #TODO: paths become absolute if we didn't call Lasagna from within the registration path. 
-        #      could cd somewhere then run in order to make paths suck less
-        if os.path.exists(self.outputDir_label.text()): 
-            outputDir = self.absToRelPath(self.outputDir_label.text())
-            cmd_str = '%s -out %s ' % (cmd_str, outputDir)
-
-            #Build the parameter string that will be added to the command
-            for ii in range(self.paramItemModel.rowCount()):
-                paramFile = self.paramItemModel.index(ii,0).data().toString()
-                cmd_str = "%s -p %s%s%s " % (cmd_str,outputDir,os.path.sep,paramFile)
-
-
-        #Write the command to the boxes in tabs 2 and 4
-        self.labelCommandText.setText(cmd_str) #On Tab 2
-        self.labelCommandText_copy.setText(cmd_str) #On Tab 4
-
-        #Refresh the parameter file list combobox on Tab 3
-        self.comboBoxParam.clear()
-        for ii in range(self.paramItemModel.rowCount()):
-            paramFile = self.paramItemModel.index(ii,0).data().toString()
-            paramFile = paramFile.split(os.path.sep)[-1] #Only the file name since we'll be saving to a different location
-            self.comboBoxParam.addItem(paramFile)
-
-        #Load the file from the first index into the text box 
-        #TODO: there is no check for whether the load operation will wipe modifications to the buffer!
-        if self.comboBoxParam.count()>0:
-            self.comboBoxParamLoadOnSelect_slot(0)
-
-        #Enable the run tab if all is ready
-        if self.comboBoxParam.count()>0 and os.path.exists(self.outputDir_label.text()) and os.path.exists(self.elastix_cmd['m']) and os.path.exists(self.elastix_cmd['f']):
-            #Can all param files in the temporary directory be found?
-            for ii in range(self.paramItemModel.rowCount()):
-                paramFile = str(self.paramItemModel.index(ii,0).data().toString())
-                if os.path.exists(self.tmpParamFiles[paramFile])==False:
-                    return #Don't proceed if we can't find the parameter file
-
-            self.runElastix_button.setEnabled(True)
-        else:
-            self.runElastix_button.setEnabled(False)
-
-
-  
-
-
-    
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # Tab 4 - Run - slots    
-    def runElastix_button_slot(self):  
-        """
-        Performs all of the steps needed to run Elastix:
-        1. Moves (potentially modified) parameter files from the temporary dir to the output dir
-        2. Runs the command. 
-        3. Cleans up references to the parameter files that have now moved
-        """
-
-        #Move files
-        outputDir = self.absToRelPath(self.outputDir_label.text())
-        for ii in range(self.paramItemModel.rowCount()):
-            paramFile = str(self.paramItemModel.index(ii,0).data().toString())
-            tempLocation = self.tmpParamFiles[paramFile]
-            destinationLocation = outputDir + os.path.sep + paramFile
-            print "moving %s to %s" % (tempLocation,destinationLocation)
-            shutil.move(tempLocation,destinationLocation)
-
-
         #Run command (non-blocking in the background)
-        cmd = str(self.labelCommandText.text())
+        cmd = self.transformixCommand
         print "Running:\n" + cmd
 
         #Pipe everything to /dev/null if that's an option
@@ -266,136 +172,65 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             cmd = cmd + "  > /dev/null 2>&1"
     
         subprocess.Popen(cmd, shell=True) #The command is now run
-       
 
-        #Tidy up GUI references to the now-moved parameter files
-        while self.paramItemModel.rowCount()>0:
-            self.removeParameter_slot(0)
+        #Deactivate the UI elements whilst we're running
+        self.run_pushButton.setEnabled(False)
+        self.loadResult_pushButton.setEnabled(False)
+        self.chooseStack_pushButton.setEnabled(False)
+        self.chooseTransform_pushButton.setEnabled(False)
+        self.outputDirSelect_pushButton.setEnabled(False)
 
-        #Add directory (with absolute path) to the list of those with running analyses
-        outputDirFullPath = str(self.outputDir_label.text())
-        outputDirFullPath = os.path.abspath(outputDir)
-        self.listofDirectoriesWithRunningAnalyses.append(outputDirFullPath)
+        #Show progress in the commandText_label
+        self.labelCommand.setText('Progress...')
+        pathToLog = os.path.join(self.outputDirPath,self.transformixLogName)
+        finishedText = 'Elapsed time:'
+        running = True
+        while running:
+            line = returnLastLineOfFile(pathToLog)
+            self.commandText_label.setText(line)
+            if re.match('.*Elapsed time',line)  is not None:
+                running = False
 
-        #Add directory to list view of running analyses
-        item = QtGui.QStandardItem()
-        item.setText(outputDirFullPath)
-        item.setEditable(False)
-        self.runningAnalysesItemModel.appendRow(item)
-
-
-        #Wipe the parameter text and the output directory
-        self.plainTextEditParam.setPlainText("")
-        #self.outputDir_label.setText("")
-        self.updateWidgets_slot()
+        #Return to the original state so we can start another round
+        self.labelCommand.setText('Command...')
+        self.commandText_label.setText('')
+        self.chooseStack_pushButton.setEnabled(True)
+        self.chooseTransform_pushButton.setEnabled(True)
+        self.outputDirSelect_pushButton.setEnabled(True)
 
 
 
-    def analysisFinished_slot(self):
+
+    def loadResult_slot(self):
         """
-        This slot is called by the self.finishedMonitorTimer QTimer.
-        It updates the list of directories that contain running analyses.
+        Show the result image in the main view.
         """
-        if len(self.listofDirectoriesWithRunningAnalyses) ==0:
-            return
+        #Find the result image format
+        pathToLog = os.path.join(self.outputDirPath,self.transformixLogName)
+        if not os.path.exists(pathToLog):
+            print "Can not find " + pathToLog
+            return False
 
-        for thisDir in self.listofDirectoriesWithRunningAnalyses:
-            logName = thisDir + os.path.sep + self.elastixLogName
+        fileExtension = ''
+        with open(pathToLog, 'r') as fid:
+            for line in fid:
+                M = re.match('\(ResultImageFormat "(\w+)"',line)
+                if M is not None:
+                    g = M.groups()
+                    if len(g)>0:
+                        fileExtension = g[0]
 
-            if self.lookForStringInFile(logName,'Total time elapsed: '):                
-                print "%s is finished." % thisDir
-                self.listofDirectoriesWithRunningAnalyses.remove(thisDir)
-                
-                #remove from list view
-                for thisRow in range(self.runningAnalysesItemModel.rowCount()):
-                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data().toString())
-                    if dirName == thisDir:
-                        self.runningAnalysesItemModel.removeRows(thisRow,1)            
-                        break
+        if len(fileExtension)==0:
+            print "could not determine result file type from transformix log file"
+            return False
 
-                #Look for result images
-                for file in os.listdir(thisDir):
-                    if file.startswith('result') and file.endswith('.mhd'):
-                        resultFname = str(thisDir + os.path.sep + file)
+        #build the image name
+        fileName = os.path.join(self.outputDirPath,'result') + '.' + fileExtension
 
-                        #Don't add if it already exists
-                        if len(self.resultsItemModel.findItems(resultFname))==0:
-                            item = QtGui.QStandardItem()    
-                            item.setText(resultFname)
-                            item.setEditable(False)
-                            self.resultsItemModel.appendRow(item)
-                        else:
-                            print "Result item '%s' already exists. Over-writing." % resultFname
-        
-                        print "Loading " + resultFname
-                        self.lasagna.loadImageStack(resultFname)
-                        #Get the data from this ingredient. Store it. Then wipe the ingredient
-                        thisIngredient = self.lasagna.ingredientList[-1]
-                        self.resultImages_Dict[resultFname] = thisIngredient.raw_data()
+        if not os.path.exists(fileName):
+            print "Can not find " + fileName
 
-                        self.lasagna.removeIngredientByName(thisIngredient.objectName)
-
-
-                        print "Image loading complete"
-
-            
-
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # Tab 5 - Results - slots
-    def resultImageClicked_Slot(self,index):
-        """
-        Show the result image into the main view.
-        """
-        if isinstance(index,QtCore.QModelIndex)==False: #Nothing is selected
-                return
-        else:
-            self.overlayRadioButtons_Slot(index)
-
-
-    def overlayRadioButtons_Slot(self,Index=False):
-        """
-        Overlay selected image or original image. Index is optionally
-        supplied when this slot is called from resultImageClicked_Slot
-        Index is a QModelIndex
-        """
-        verbose=False
-
-        movingName = self.movingStackName.text()
-        moving=self.lasagna.returnIngredientByName(movingName)
-
-        selectedIndex = self.registrationResults_ListView.selectedIndexes()
-        if len(selectedIndex)==0:
-            return
-        else:
-            selectedIndex = selectedIndex[0] #in case there are multiple selections, select the first one
-
-        imageFname = str(selectedIndex.data().toString())
-
-
-        #Show the image if the highlighted overlay radio button is enabled
-        if self.showHighlightedResult_radioButton.isChecked()==True:
-            if moving.fnameAbsPath == imageFname:
-                if verbose:
-                    print "Skipping. Unchanged."
-                return
-
-            moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
-            if verbose:
-                print "switched to overlay " + imageFname
-
-        elif self.showOriginalMovingImage_radioButton.isChecked()==True:
-            if moving.fnameAbsPath ==  self.originalMovingFname:
-                if verbose:
-                    print "Skipping. Unchanged."
-                return
-
-            moving.changeData(imageData=self.originalMovingImage, imageAbsPath=self.originalMovingFname)
-            if verbose:
-                print "switched to original overlay"
-
-        self.lasagna.initialiseAxes()
-
+        self.lasagna.loadImageStack(fileName)
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -419,6 +254,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         return  relPath
 
 
+    def returnLastLineOfFile(self,fname):
+        """
+        Returns last line of a file:
+        http://stackoverflow.com/questions/3346430/most-efficient-way-to-get-first-and-last-line-of-file-python
+        """     
+        if not os.path.exists(fname):
+            return None
+
+        with open(fname, 'rb') as fh:
+            first = next(fh).decode()
+            fh.seek(-1024, 2)
+            last = fh.readlines()[-1].decode()
+        print last
 
 
     def lookForStringInFile(self,fname,searchString):
@@ -433,13 +281,46 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
 
         return False
 
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Housekeeping functions
+    def checkIfReadyToRun(self):
+        """
+        Enables run button if we are ready to run. Also returns True or False
+        """
+        #Build the command
+        cmd = ''
+        if len(self.inputImagePath)>0 and os.path.exists(self.inputImagePath):
+            cmd = '%s -in %s' % (cmd,self.inputImagePath)
+
+        if len(self.transformPath)>0 and os.path.exists(self.transformPath):
+            cmd = '%s -in %s' % (cmd,self.transformPath)
+
+        if len(self.outputDirPath)>0 and os.path.exists(self.outputDirPath):
+            cmd = '%s -in %s' % (cmd,self.outputDirPath)
+        
+        print cmd        
+        if len(cmd)>0:
+            self.transformixCommand = 'transformix ' + cmd
+            self.commandText_label.setText(self.transformixCommand)
+        else:
+            self.transformixCommand = ''
+
+
+        if os.path.exists(self.inputImagePath) and os.path.exists(self.transformPath) and os.path.exists(self.outputDirPath):
+            self.run_pushButton.setEnabled(True)
+            return True
+        else:
+            self.run_pushButton.setEnabled(False)
+            return False
+
+
     #The following methods are involved in shutting down the plugin window
     """
     This method is called by lasagna when the user unchecks the plugin in the menu
     """
     def closePlugin(self):
         #self.detachHooks()
-        self.finishedMonitorTimer.stop()
         self.close()
 
 
