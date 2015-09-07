@@ -187,6 +187,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         self.chooseStack_pushButton.setEnabled(False)
         self.chooseTransform_pushButton.setEnabled(False)
         self.outputDirSelect_pushButton.setEnabled(False)
+        QtCore.QCoreApplication.processEvents() #TODO: does not work
 
         #Watch for completion
         running = True
@@ -213,6 +214,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         self.chooseStack_pushButton.setEnabled(True)
         self.chooseTransform_pushButton.setEnabled(True)
         self.outputDirSelect_pushButton.setEnabled(True)
+        self.loadResult_pushButton.setEnabled(True)
 
 
 
@@ -247,7 +249,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             print "Can not find " + fileName
 
         self.lasagna.loadImageStack(fileName)
-
+        self.lasagna.initialiseAxes()
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     #Utilities
