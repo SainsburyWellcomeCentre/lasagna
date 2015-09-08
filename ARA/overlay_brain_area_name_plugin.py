@@ -66,7 +66,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.loadOrig_pushButton.released.connect(self.loadOrig_pushButton_slot)
         self.loadOther_pushButton.released.connect(self.loadOther_pushButton_slot)
-        self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
+        #self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
 
         #Loop through all paths and add to combobox.
         self.paths = dict()
@@ -161,8 +161,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
                                 data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
 
-        #DISABLE BUTTON FOR NOW:
-        self.loadOther_pushButton.setEnabled(False)
+
         # End of constructor
 
 
