@@ -44,7 +44,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
 
         #default names of the three files that we need:
         self.atlasFileName = 'atlas'
-        self.templateFileName = 'template'
         self.labelsFileName = 'labels'
 
         #The root node index of the ARA
@@ -66,7 +65,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.loadOrig_pushButton.released.connect(self.loadOrig_pushButton_slot)
         self.loadOther_pushButton.released.connect(self.loadOther_pushButton_slot)
-        #self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
 
         #Loop through all paths and add to combobox.
         self.paths = dict()
@@ -82,7 +80,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
                 print "No files in %s . skipping" % path 
                 continue
 
-            pths = dict(atlas='', labels='', template='')
+            pths = dict(atlas='', labels='')
             print "\n %d. Looking for files in directory %s" % (n,path)
             n += 1
 
@@ -101,14 +99,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
                 if thisFile.startswith(self.labelsFileName):
                     pths['labels'] = os.path.join(path,thisFile)
                     print "Adding labels file %s" % thisFile
-                    break 
-
-            for thisFile in files:
-                if thisFile.startswith(self.templateFileName):
-                    if thisFile.endswith('raw'):
-                        continue
-                    pths['template'] = os.path.join(path,thisFile)
-                    print "Adding template file %s" % thisFile
                     break 
 
 
@@ -144,15 +134,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
 
         #If the user has asked for this, load the first ARA entry automatically
         self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='', atlas=np.ndarray([])) 
-
-        #TODO: DELETE THE FOLLOWING?
-        """
-        currentlySelectedARA = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        if self.prefs['loadFirstAtlasOnStartup']:
-            print "Auto-Loading " +  currentlySelectedARA
-            self.loadAtlas(currentlySelectedARA)
-            self.loadOrig_pushButton.setEnabled(False) #disable because the current selection has now been loaded
-        """
 
         #Make a lines ingredient that will house the contours for the currently selected area.
         self.contourName = 'aracontour'
@@ -222,7 +203,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         of this dictionary have these keys: 
         'atlas' (full path to atlas volume file)
         'labels' (full path to atlas labels file - csv or json)
-        'template' (full path to average template file - optional)
         """
         selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
 
@@ -235,36 +215,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.data['atlas'] = imageStackLoader.loadStack(paths['atlas'])
 
         self.data['currentlyLoadedAtlasName'] =  paths['atlas'].split(os.path.sep)[-1]
-
-        #comment out for now because the template loading is not urgent and we can add it last
-        """
-        self.data['template']=paths['template']
-
-        if os.path.exists(paths['template']):
-            self.overlayTemplate_checkBox.setEnabled(True)
-            if self.overlayTemplate_checkBox.isChecked()==True:
-                self.addOverlay(self.data['template'])
-        else:
-            self.overlayTemplate_checkBox.setEnabled(False)
-
-
-        self.lasagna.initialiseAxes(resetAxes=True)
-        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).minMax = [0,1.2E3]
-        self.lasagna.initialiseAxes(resetAxes=True)
-
-
-
-
-    def addOverlay(self,fname):
-        #Add an overlay
-        self.lasagna.loadImageStack(fname)
-        self.data['currentlyLoadedOverlay'] = str(fname.split(os.path.sep)[-1])
-        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
-        self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).lut='cyan'
-        self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0,1.5E3]
-        self.lasagna.initialiseAxes(resetAxes=True)
-
-    """
 
 
     def loadOther_pushButton_slot(self,fnameToLoad=False):
@@ -286,28 +236,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.data['atlas'] = imageStackLoader.loadStack(fnameToLoad)
 
         self.data['currentlyLoadedAtlasName'] =  fnameToLoad.split(os.path.sep)[-1]
-
-
-
-    def overlayTemplate_checkBox_slot(self):
-        """
-        Load or unload the template overlay
-        """
-        fname = self.data['template']
-        if len(fname)==0:
-            return
-
-        if self.overlayTemplate_checkBox.isChecked()==True:
-            if os.path.exists(fname):
-                self.addOverlay(fname)
-                return
-
-        if self.overlayTemplate_checkBox.isChecked()==False:
-            overlayName = fname.split(os.path.sep)[-1]
-            self.lasagna.removeIngredientByName(overlayName)
-
-        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
-        self.lasagna.initialiseAxes()
 
 
     #----------------------------
