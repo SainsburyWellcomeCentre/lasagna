@@ -258,6 +258,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #add the z-points spinboxes to a list to make them indexable
         self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
 
+        #create a slot to force a re-draw of the screen when the spinbox value changes
+        self.view1Z_spinBox.valueChanged.connect(self.viewZ_spinBoxes_slot)
+        self.view2Z_spinBox.valueChanged.connect(self.viewZ_spinBoxes_slot)
+        self.view3Z_spinBox.valueChanged.connect(self.viewZ_spinBoxes_slot)
+
         #Axis tab stuff
         #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
         self.axisRatioLineEdit_1.textChanged.connect(self.axisRatio1Slot)
@@ -751,6 +756,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # Slots for points tab
     # In each case, we set the values of the currently selected ingredient using the spinbox value
     # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
+    def viewZ_spinBoxes_slot(self):
+        self.initialiseAxes()
+        
     def markerSymbol_comboBox_slot(self,index):
         symbol = str(self.markerSymbol_comboBox.currentText())
         ingredient = self.returnIngredientByName(self.selectedPointsName())
