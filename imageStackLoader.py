@@ -122,7 +122,7 @@ def mhdRead(fname,fallBackMode = False):
     except ImportError:
       print "Failed to find VTK. Falling back to built in (but slower) MHD reader"
       fallBackMode = True
-      
+
   if fallBackMode:
     return mhdRead_fallback(fname)
   else:

@@ -9,7 +9,7 @@ import pyqtgraph as pg
 import numpy as np
 import pyqtgraph.functions as fn
 from PyQt4 import QtCore, QtGui
-
+import platform
 class lasagna_viewBox(pg.ViewBox):
     mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal
     progressLayer = QtCore.pyqtSignal() #This fires when the user mouse-wheels without keyboard modifiers
@@ -27,7 +27,9 @@ class lasagna_viewBox(pg.ViewBox):
         self.linkedAxis = linkedAxis #A list of ViewBox axes to link to 
         self.controlDrag=False
 
-        self.invertY()
+        #TODO: why the hell does the Mac version not require the flip but the Linux version does. What about Win?
+        if platform.system() != 'Darwin':
+            self.invertY()
 
         #Define a custom signal to indicate when the user has created an event that will increment the displayed layer
         self.progressBy = 0
