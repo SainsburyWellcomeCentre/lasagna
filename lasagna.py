@@ -54,7 +54,7 @@ import nrrd
 #Parse command-line input arguments
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-D", help="Load demo images", action="store_true")
+parser.add_argument("-D", help="Load demo images", action="store_true") #store true makes it zero by default
 parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
 parser.add_argument("-S", nargs='+', help="file names of sparse points file(s) to load")
 parser.add_argument("-L", nargs='+', help="file names of lines file(s) to load")

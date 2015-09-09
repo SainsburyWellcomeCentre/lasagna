@@ -1,10 +1,7 @@
 
 """
-Read line data from a text file. This reader is versy similar to sparse pointer reader. 
-The principle difference is that points are not linked the text files we read are 
-simply a list of z,x, and y positions. On the other hand, we may want to numerous 
-non-linked lines (e.g. as part of a tree structure) all under the same ingredient. 
-This loader class handles this case. The data format is:
+Read line data from a text file. This reader is very similar to sparse pointer reader. 
+The data format is:
 
 lineseries_id,z_position,x_position,y_position\n
 lineseries_id,z_position,x_position,y_position\n
