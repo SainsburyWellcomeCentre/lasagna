@@ -93,7 +93,7 @@ class loaderClass(lasagna_plugin):
             objName=fname.split(os.path.sep)[-1]
             self.lasagna.addIngredient(objectName=objName, 
                         kind=self.kind,
-                        data=data, 
+                        data=np.array(data), 
                         fname=fname,
                         )
 
