@@ -96,7 +96,9 @@ class lines(lasagna_ingredient):
                                 pen=pg.mkPen(color=self.symbolBrush(), width=self.lineWidth), 
                                 antialias=True,
                                 connect="finite")
-
+            pyqtObject.setVisible(True)
+        else:
+            pyqtObject.setVisible(False)
 
     def addToList(self):
         """
