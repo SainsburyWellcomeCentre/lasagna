@@ -122,7 +122,7 @@ def mhdRead(fname,fallBackMode = False):
     except ImportError:
       print "Failed to find VTK. Falling back to built in (but slower) MHD reader"
       fallBackMode = True
-
+      
   if fallBackMode:
     return mhdRead_fallback(fname)
   else:
@@ -189,11 +189,11 @@ def mhdRead_fallback(fname):
     print "Can not find the data file as the key 'elementdatafile' does not exist in the MHD file"
     return False
 
-  return mhd_read_raw_file(info)
+  return mhd_read_raw_file(fname,info)
 
 
 
-def mhd_read_raw_file(header):
+def mhd_read_raw_file(fname,header):
   """
   Raw .raw file associated with the MHD header file
   CAUTION: this may not adhere to MHD specs! Report bugs to author.
@@ -249,8 +249,8 @@ def mhd_read_raw_file(header):
     return False
 
 
-
-  rawFname = header['elementdatafile']
+  pathToFile = lasHelp.stripTrailingFileFromPath(fname)
+  rawFname = os.path.join(pathToFile,header['elementdatafile'])
   with  open(rawFname,'rb') as fid:
     data = fid.read()
     
@@ -259,7 +259,7 @@ def mhd_read_raw_file(header):
   fmt = endian + str(int(np.prod(dimSize))) + formatType
   pix = np.asarray(struct.unpack(fmt, data))
   
-  return pix.reshape((dimSize[2],dimSize[1],dimSize[0]))
+  return pix.reshape((dimSize[2],dimSize[1],dimSize[0])).swapaxes(1,2)
 
 
 def mhd_write_raw_file(imStack,fname,info=None):
