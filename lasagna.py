@@ -597,6 +597,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredientInstance._data = None #TODO: apparently fails
         del(ingredientInstance) #TODO: apparently fails
 
+        self.initialiseAxes() #force an update
+
+
     def removeIngredientByName(self,objectName):
         """
         Finds ingredient by name and removes it from the list
@@ -713,6 +716,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Initial display of images in axes and also update other parts of the GUI. 
         """
         if self.stacksInTreeList()==False:
+            self.plotImageStackHistogram() #wipes the histogram
             return
 
         #show default images (snap to middle layer of each axis)
@@ -729,7 +733,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.plotImageStackHistogram()
 
-        #TODO: turn into list by making the axisRatioLineEdits a list
         for ii in range(len(self.axisRatioLineEdits)):
             self.axes2D[ii].view.setAspectLocked(True, float(self.axisRatioLineEdits[ii].text()))
         
@@ -976,6 +979,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Plot the image stack histogram in a PlotWidget to the left of the three image views.
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
+
+        also see: self.initialiseAxes
         """
         img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,self.selectedStackName())
         if img==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
