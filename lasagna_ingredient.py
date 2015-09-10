@@ -60,6 +60,9 @@ class lasagna_ingredient(object):
 
 
     def removeFromList(self):
+        """
+        Remove ingredient from the UI list with which it is associated  
+        """
     	items = self.model.findItems(self.objectName)
     	self.model.removeRow(items[0].row())
 

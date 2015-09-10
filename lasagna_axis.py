@@ -88,6 +88,7 @@ class projection2D():
 
         #Optionally return True of False depending on whether the removal was successful
         nItemsAfter = len(self.view.items())
+
         if nItemsAfter<nItemsBefore:
             return True
         elif nItemsAfter==nItemsBefore:
@@ -169,7 +170,7 @@ class projection2D():
         Update all plot items on axis, redrawing so everything associated with a specified 
         slice (sliceToPlot) is shown. This is done based upon a list of ingredients
         """
-        verbose=False
+
         # loop through all plot items searching for imagestack items (these need to be plotted first)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack):
@@ -178,13 +179,9 @@ class projection2D():
                 #      that this same object needs to be plotted in different axes, each of which has its own
                 #      plot items. So I can't assign a single plot item to the ingredient. Options?
                 #      a list of items and axes in the ingredient? I don't like that.
-                if resetToMiddleLayer:
-                    if verbose:
-                        print "updatePlotItems_2D going to middle layer"
-                    self.currentSlice=numSlices/2
 
                 #Got to the middle of the stack
-                if sliceToPlot == None:
+                if sliceToPlot == None or resetToMiddleLayer:
                     stacks = self.lasagna.returnIngredientByType('imagestack')
                     numSlices = [] 
                     [numSlices.append(thisStack.data(self.axisToPlot).shape[0]) for thisStack in stacks]
@@ -199,9 +196,6 @@ class projection2D():
                                             axisToPlot=self.axisToPlot, 
                                             sliceToPlot=self.currentSlice
                                             )
-
-                if verbose:
-                    print "lasagna_axis.updatePlotItems_2D in slice %d" % self.currentSlice
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
         # the image is now displayed
