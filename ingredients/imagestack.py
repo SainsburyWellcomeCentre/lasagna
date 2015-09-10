@@ -112,7 +112,18 @@ class imagestack(lasagna_ingredient):
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
+
         data = self.data(axisToPlot)
+
+        if data.shape[0]-1 < sliceToPlot:
+            pyqtObject.setVisible(False)
+            sliceToPlot = data.shape[0]-1
+        elif sliceToPlot<0:
+            pyqtObject.setVisible(False)
+            sliceToPlot = 0
+        else:
+            pyqtObject.setVisible(True)
+
         pyqtObject.setImage(
                         data[sliceToPlot], 
                         levels=self.minMax, 

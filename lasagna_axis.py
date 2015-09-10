@@ -178,25 +178,21 @@ class projection2D():
                 #      that this same object needs to be plotted in different axes, each of which has its own
                 #      plot items. So I can't assign a single plot item to the ingredient. Options?
                 #      a list of items and axes in the ingredient? I don't like that.
-        
-                numSlices = thisIngredient.data(self.axisToPlot).shape[0]
-
                 if resetToMiddleLayer:
                     if verbose:
                         print "updatePlotItems_2D going to middle layer"
                     self.currentSlice=numSlices/2
 
-                if not self.currentSlice > 0:
-                    self.currentSlice=numSlices/2
+                #Got to the middle of the stack
+                if sliceToPlot == None:
+                    stacks = self.lasagna.returnIngredientByType('imagestack')
+                    numSlices = [] 
+                    [numSlices.append(thisStack.data(self.axisToPlot).shape[0]) for thisStack in stacks]
+                    numSlices = max(numSlices)
+                    sliceToPlot=numSlices/2
 
-                if sliceToPlot != None:
-                    self.currentSlice = sliceToPlot
 
-                #stay in range
-                if self.currentSlice>=numSlices:
-                    self.currentSlice=numSlices-1;
-                elif self.currentSlice<0:
-                    self.currentSlice=0;
+                self.currentSlice = sliceToPlot
 
                 thisIngredient.plotIngredient(
                                             pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
@@ -254,9 +250,7 @@ class projection2D():
         """
         Handle the wheel action that allows the user to move through stack layers
         """
-        if self.currentSlice>0:
-            self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=self.currentSlice + self.view.getViewBox().progressBy)
-        else:
-            self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=None)
+        self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=self.currentSlice + self.view.getViewBox().progressBy)
+
 
 

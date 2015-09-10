@@ -982,7 +982,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         x,y = img.getHistogram()
-      
+        
         #Plot the histogram
         if self.logYcheckBox.isChecked():
             y=np.log10(y+0.1)
