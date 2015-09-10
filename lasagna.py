@@ -591,10 +591,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient name or type         
         """
         ingredientInstance.removePlotItem() #remove from axes
-        self.ingredientList.remove(ingredientInstance) 
+        self.ingredientList.remove(ingredientInstance) #Remove ingredient from the list of ingredients
         ingredientInstance.removeFromList() #remove ingredient from the list with which it is associated        
         self.selectedStackName() #Ensures something is highlighted
-
+        ingredientInstance._data = None #TODO: apparently fails
+        del(ingredientInstance) #TODO: apparently fails
 
     def removeIngredientByName(self,objectName):
         """
@@ -982,7 +983,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         x,y = img.getHistogram()
-        
+
         #Plot the histogram
         if self.logYcheckBox.isChecked():
             y=np.log10(y+0.1)
