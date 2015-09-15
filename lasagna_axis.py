@@ -203,9 +203,6 @@ class projection2D():
         # loop through all plot items searching for non-image items (these need to be overlaid on top of the image)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: 
-                if verbose:
-                    print "lasagna_axis.updatePlotItems_2D attempts to plot " + thisIngredient.objectName
-
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
                                               axisToPlot=self.axisToPlot, 
                                               sliceToPlot=self.currentSlice)
