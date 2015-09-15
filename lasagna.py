@@ -594,10 +594,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.ingredientList.remove(ingredientInstance) #Remove ingredient from the list of ingredients
         ingredientInstance.removeFromList() #remove ingredient from the list with which it is associated        
         self.selectedStackName() #Ensures something is highlighted
-        ingredientInstance._data = None #TODO: apparently fails
-        del(ingredientInstance) #TODO: apparently fails
 
-        self.initialiseAxes() #force an update
+        #TODO: The following two lines fail to clear the image data from RAM. Somehow there are other references to the object...
+        ingredientInstance._data = None 
+        del(ingredientInstance) 
+        
+        self.initialiseAxes() 
 
 
     def removeIngredientByName(self,objectName):
@@ -1199,10 +1201,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.updateMainWindowOnMouseMove(self.axes2D[axisID])
 
 
-
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None):
     app = QtGui.QApplication([])
 
