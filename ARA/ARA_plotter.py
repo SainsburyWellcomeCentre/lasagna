@@ -159,7 +159,6 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
         allContours = nans
 
-
         for axNum in range(len(self.lasagna.axes2D)):
             contours = self.getContoursFromAxis(imageStack,axisNumber=axNum,value=value)
 
@@ -194,9 +193,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
             
         #Replace the data in the ingredient so they are plotted
         self.lasagna.returnIngredientByName(self.contourName)._data = allContours
-        [axis.updatePlotItems_2D(self.lasagna.ingredientList) for axis in self.lasagna.axes2D]
-
-
+        self.lasagna.initialiseAxes()
             
 
     def setARAcolors(self):
