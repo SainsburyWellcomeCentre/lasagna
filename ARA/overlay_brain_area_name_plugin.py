@@ -67,6 +67,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.loadOther_pushButton.released.connect(self.loadOther_pushButton_slot)
 
         self.statusBarName_checkBox.stateChanged.connect(self.statusBarName_checkBox_slot)
+        self.highlightArea_checkBox.stateChanged.connect(self.highlightArea_checkBox_slot)
 
         #Loop through all paths and add to combobox.
         self.paths = dict()
@@ -138,11 +139,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='', atlas=np.ndarray([])) 
 
         #Make a lines ingredient that will house the contours for the currently selected area.
-        self.contourName = 'aracontour'
-        self.lasagna.addIngredient(objectName=self.contourName, 
-                                kind='lines', 
-                                data=[])
-        self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
+        self.addAreaContour() #from ARA_plotter
 
 
         # End of constructor
@@ -242,7 +239,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
 
     def statusBarName_checkBox_slot(self):
         """
-        Remove the area name or ad it as soon as the check box is unchecked
+        Remove the area name or add it as soon as the check box is unchecked
         """
         if not self.statusBarName_checkBox.isChecked():
             self.writeAreaNameInStatusBar(self.data['atlas'],False)
@@ -252,6 +249,16 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
 
         self.lasagna.updateStatusBar()
 
+
+    def highlightArea_checkBox_slot(self):
+        """
+        Remove the contour or add it as soon as the check box is unchecked
+        """
+        if not self.highlightArea_checkBox.isChecked():
+            self.removeAreaContour()
+        elif self.highlightArea_checkBox.isChecked():
+            self.addAreaContour()
+            
 
     #----------------------------
     # Methods to handle close events and errors
