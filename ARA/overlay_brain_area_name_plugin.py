@@ -246,7 +246,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         elif self.statusBarName_checkBox.isChecked():
             self.writeAreaNameInStatusBar(self.data['atlas'],True)
             
-
         self.lasagna.updateStatusBar()
 
 

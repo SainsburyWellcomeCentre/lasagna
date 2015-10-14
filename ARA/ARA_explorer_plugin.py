@@ -77,6 +77,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.load_pushButton.released.connect(self.load_pushButton_slot)
         self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
 
+        self.statusBarName_checkBox.stateChanged.connect(self.statusBarName_checkBox_slot)
+        self.highlightArea_checkBox.stateChanged.connect(self.highlightArea_checkBox_slot)
+
         #Loop through all paths and add to combobox.
         self.paths = dict()
         n=1
@@ -260,6 +263,32 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.lasagna.initialiseAxes()
 
 
+    def statusBarName_checkBox_slot(self):
+        """
+        Remove the area name or add it as soon as the check box is unchecked
+        """
+        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
+        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+        
+        if not self.statusBarName_checkBox.isChecked():
+            self.writeAreaNameInStatusBar(imageStack,False)
+        elif self.statusBarName_checkBox.isChecked():
+            self.writeAreaNameInStatusBar(imageStack,True)
+            
+        self.lasagna.updateStatusBar()
+
+
+    def highlightArea_checkBox_slot(self):
+        """
+        Remove the contour or add it as soon as the check box is unchecked
+        """
+        if not self.highlightArea_checkBox.isChecked():
+            self.removeAreaContour()
+        elif self.highlightArea_checkBox.isChecked():
+            self.addAreaContour()
+            
+            
     #--------------------------------------
     # core methods: these do the meat of the work
     #
