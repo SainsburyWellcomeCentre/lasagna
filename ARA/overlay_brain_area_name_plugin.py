@@ -66,6 +66,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.loadOrig_pushButton.released.connect(self.loadOrig_pushButton_slot)
         self.loadOther_pushButton.released.connect(self.loadOther_pushButton_slot)
 
+        self.statusBarName_checkBox.stateChanged.connect(self.statusBarName_checkBox_slot)
+
         #Loop through all paths and add to combobox.
         self.paths = dict()
         n=1
@@ -236,6 +238,19 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.data['atlas'] = imageStackLoader.loadStack(fnameToLoad)
 
         self.data['currentlyLoadedAtlasName'] =  fnameToLoad.split(os.path.sep)[-1]
+
+
+    def statusBarName_checkBox_slot(self):
+        """
+        Remove the area name or ad it as soon as the check box is unchecked
+        """
+        if not self.statusBarName_checkBox.isChecked():
+            self.writeAreaNameInStatusBar(self.data['atlas'],False)
+        elif self.statusBarName_checkBox.isChecked():
+            self.writeAreaNameInStatusBar(self.data['atlas'],True)
+            
+
+        self.lasagna.updateStatusBar()
 
 
     #----------------------------
