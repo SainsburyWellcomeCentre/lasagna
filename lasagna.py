@@ -717,6 +717,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Initial display of images in axes and also update other parts of the GUI. 
         """
+
         if self.stacksInTreeList()==False:
             self.plotImageStackHistogram() #wipes the histogram
             return
@@ -803,8 +804,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         rgb = [col.toRgb().red(), col.toRgb().green(), col.toRgb().blue()]
         ingredient.color =rgb
         self.initialiseAxes()
-
-
 
     def selectedPointsName(self):
         """
@@ -984,13 +983,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         also see: self.initialiseAxes
         """
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,self.selectedStackName())
-        if img==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
+
+        ing = self.returnIngredientByName(self.selectedStackName())
+        if ing==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
             self.intensityHistogram.clear()
             return
 
-        x,y = img.getHistogram()
-
+        x=ing.histogram['x']
+        y=ing.histogram['y']
+        
         #Plot the histogram
         if self.logYcheckBox.isChecked():
             y=np.log10(y+0.1)
