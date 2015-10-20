@@ -210,6 +210,39 @@ class Tree(object):
         return nodesThatAreBranches
 
 
+    def findSegments(self,linkSegments=1,nodeID=0,segments=[]):
+        """ 
+        Return a list containing all unique segments of the tree
+
+        If linkSegments is 1, then the branch node is added to each returned segement. This makes
+        it possible to plot the data without gaps appearing. This is the default. 
+        If linksegments is 0, then the no duplicate points are returned.
+        """
+        print "Calling find segments with nodeID %d" % nodeID
+
+        if linkSegments and nodeID>0:
+            thisPath = [self.nodes[nodeID].parent]
+        else:
+            thisPath = []
+
+        if isinstance(nodeID,int):
+            nodeID = [nodeID]
+
+        while len(nodeID)==1:
+            #print "appending node %d" % nodeID[0]
+            thisPath.append(nodeID[0])
+            nodeID = self.nodes[nodeID[0]].children
+            
+
+        #Store this segment
+        segments.append(thisPath)
+
+        #Go into the branches with a recursive call
+        for thisNode in nodeID:
+            segments=self.findSegments(linkSegments,thisNode,segments)
+
+        return segments
+
 
     def pathToRoot(self, fromNode):
         """
