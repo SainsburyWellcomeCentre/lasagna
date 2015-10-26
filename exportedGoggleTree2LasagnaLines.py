@@ -7,11 +7,20 @@ nodeId,parentID,z position,x position,y position
 This file imports this file and turns it into a format suitable
 for plotting in lasagna. i.e. into a line series format:
 line series #, z, x, y
-This is not done very efficiently right now, but it works.
-The algorithm just finds the path from each leaf to the root node. 
+Where each line series is one segment from the tree. This is 
+produced using tree.findSegments, which returns all unique segments 
+such that only nodes at the end of each segment are duplicated. 
 
 Processed text is dumped to standard output by default unless
 the user specifies otherwise with -q
+
+Example:
+1. Plot and don't dump data to screen
+exportedGoggleTree2LasagnaLines.py -pqf exampleTreeDump.csv 
+
+2. Dump data to text file and don't plot
+exportedGoggleTree2LasagnaLines.py -f exampleTreeDump.csv  > dumpedTree.csv
+
 """
 
 
@@ -52,14 +61,13 @@ dataTree = importData(fname,headerLine=['id','parent','x','y','z'])
 #Get the paths from each leaf back to the root. 
 #This is the brute-force method of plotting the tree
 paths=[]
-for thisLeaf in dataTree.findLeaves():
-    paths.append(dataTree.pathToRoot(thisLeaf))
+for thisSegment in dataTree.findSegments():
+    paths.append(thisSegment)
 
 
 def dataFromPath(tree,path):
     """
     Get the data from the tree given a path.
-    TODO: make more efficient as we're over-plotting a lot here. 
     """
     x=[]
     y=[]
