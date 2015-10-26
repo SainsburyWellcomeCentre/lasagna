@@ -16,10 +16,10 @@ the user specifies otherwise with -q
 
 Example:
 1. Plot and don't dump data to screen
-exportedGoggleTree2LasagnaLines.py -pqf exampleTreeDump.csv 
+exportedGoggleTree2LasagnaLines.py -pqf ./ingredients/exampleTreeDump.csv 
 
 2. Dump data to text file and don't plot
-exportedGoggleTree2LasagnaLines.py -f exampleTreeDump.csv  > dumpedTree.csv
+exportedGoggleTree2LasagnaLines.py -f ./ingredients/exampleTreeDump.csv  > /tmp/dumpedTree.csv
 
 """
 
