@@ -53,7 +53,6 @@ class loaderClass(lasagna_plugin):
         If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
         """
-        print fname
         if fname == None or fname == False:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
     
@@ -85,9 +84,6 @@ class loaderClass(lasagna_plugin):
 
                 lastLineSeries=thisLineAsFloats[0]
                 data.append(thisLineAsFloats[1:])
-
-            print "Added %d nan rows" % n
-            
 
 
             objName=fname.split(os.path.sep)[-1]

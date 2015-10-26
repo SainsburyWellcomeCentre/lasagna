@@ -1,9 +1,16 @@
 """
 This class overlays lines on top of the image stacks. 
-Unlike the sparsepoints ingredient, multiple lines associated 
-with the same ingredient will likely have to be different plot 
-items. See: 
-https://groups.google.com/forum/?fromgroups=#!topic/pyqtgraph/h0PNUV2ToKg
+This class loads csv files with columns in the format:
+line series, z, x, y
+
+line series is a scalar. All points within the same line series
+are joined by lines. Different line series are not joined but all
+line series from the same CSV file are part of the same ingredient
+(and the same plot item) and are rendered with the same colours, etc. 
+
+Instances of lines are created by line_reader_plugin. It is 
+line_reader_plugin that creates the menu entry in the file menu, 
+loads the data from the csv file, and calles lines.py 
 """
 
 from __future__ import division
@@ -21,7 +28,6 @@ class lines(lasagna_ingredient):
                                         pgObject='PlotCurveItem'
                                         )
 
-        
         #Choose symbols from preferences file. 
         #TODO: remove symbol stuff if we indeed will get rid of this here
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
