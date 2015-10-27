@@ -56,10 +56,9 @@ if os.path.exists(fname) == False:
     sys.exit(0)
 
 
-dataTree = importData(fname,headerLine=['id','parent','x','y','z'])
+dataTree = importData(fname,headerLine=['id','parent','z','x','y']) 
 
-#Get the paths from each leaf back to the root. 
-#This is the brute-force method of plotting the tree
+#Get the unique segments of each tree
 paths=[]
 for thisSegment in dataTree.findSegments():
     paths.append(thisSegment)
@@ -80,7 +79,7 @@ def dataFromPath(tree,path):
         y.append(tree.nodes[thisNode].data['y'])
 
 
-    return (x,y,z)
+    return (z,x,y)
 
 
 #Show paths in standard output
