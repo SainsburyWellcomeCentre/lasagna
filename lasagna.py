@@ -58,6 +58,7 @@ parser.add_argument("-D", help="Load demo images", action="store_true") #store t
 parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
 parser.add_argument("-S", nargs='+', help="file names of sparse points file(s) to load")
 parser.add_argument("-L", nargs='+', help="file names of lines file(s) to load")
+parser.add_argument("-T", nargs='+', help="file names of tree file(s) to load")
 parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
 
@@ -65,6 +66,7 @@ args = parser.parse_args()
 pluginToStart = args.P
 sparsePointsToLoad = args.S
 linesToLoad = args.L
+treesToLoad = args.T
 
 #Either load the demo stacks or a user-specified stacks
 if args.D==True:
@@ -1220,13 +1222,16 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
             print "Loading " + thisFname
             tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
 
-
     if not linesToLoad==None:
         for thisFname in linesToLoad:
             print "Loading " + thisFname
             tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
     
-
+    if not treesToLoad==None:
+        for thisFname in treesToLoad:
+            print "Loading " + thisFname
+            tasty.loadActions['tree_reader'].showLoadDialog(thisFname)
+  
     tasty.initialiseAxes()
 
     if pluginToStart != None:
