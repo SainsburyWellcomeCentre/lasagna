@@ -21,9 +21,15 @@ Lasagna runs on Python 2.7, PyQt4, and uses PyQtGraph for the plotting. You'll n
 * pynrrd
 * numpy
 * pyqtgraph 0.9.10
-* yaml
+* yaml [and pyyaml]
 * PyQt4
 * SIP
+* Scipy [optional - ARA explorer]
+* Scikit-Image [optional - ARA explorer]
+
+## Usage
+
+See the [website](http://raacampbell13.github.io/lasagna).
 
 ## Current status ##
 Even the master branch is currently highly unstable (although should always be usable). Stability is expected by Q4 2015. 
