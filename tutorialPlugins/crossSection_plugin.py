@@ -55,7 +55,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
 
         #Extract data from base image
         if ImageItem != None:
-            if ImageItem.image.shape[1]<=Y:
+            if ImageItem.image.shape[1]<=Y or Y<0:
                 return
             xData = ImageItem.image[:,Y]
 

@@ -35,6 +35,10 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
     if regex==True:
         import re
 
+    if not hasattr(PlotWidget, 'getPlotItem'):
+        print "findPyQtGraphObjectNameInPlotWidget finds no attribute getPlotItem"
+        return False
+
     pltItem = PlotWidget.getPlotItem()
 
     if not hasattr(pltItem,'items'):
