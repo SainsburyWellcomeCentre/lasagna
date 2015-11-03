@@ -654,7 +654,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Return a list of ingredient objectNames
         """
         ingredientNames = [] 
-        for thisIngredient in ingredientList:
+        for thisIngredient in self.ingredientList:
             ingredientNames.append(thisIngredient.objectName)
 
         return ingredientNames
