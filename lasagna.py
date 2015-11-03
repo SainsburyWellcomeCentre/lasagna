@@ -59,9 +59,9 @@ parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load
 parser.add_argument("-S", nargs='+', help="file names of sparse points file(s) to load")
 parser.add_argument("-L", nargs='+', help="file names of lines file(s) to load")
 parser.add_argument("-T", nargs='+', help="file names of tree file(s) to load")
+parser.add_argument("-C", help="start a ipython console", action='store_true')
 parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
-
 
 pluginToStart = args.P
 sparsePointsToLoad = args.S
@@ -1205,7 +1205,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None):
+def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None, embedConsole=False):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
@@ -1249,9 +1249,13 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
         thisProxy=pg.SignalProxy(tasty.axes2D[ii].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
         thisProxy.axisID=ii #this is picked up the mouseMoved slot
         proxies.append(thisProxy)
+    if embedConsole:
+        from IPython import embed
+        embed()
 
     sys.exit(app.exec_())
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(imStackFnamesToLoad=imStackFnamesToLoad, sparsePointsToLoad=sparsePointsToLoad, linesToLoad=linesToLoad, pluginToStart=pluginToStart)
+    main(imStackFnamesToLoad=imStackFnamesToLoad, sparsePointsToLoad=sparsePointsToLoad, linesToLoad=linesToLoad,
+         pluginToStart=pluginToStart, embedConsole=args.C)
