@@ -19,9 +19,6 @@ from alert import alert
 from PyQt4 import QtGui, QtCore
 import ara_explorer_UI
 
-#For handling the labels files
-import ara_json, tree
-
 #For contour drawing
 from skimage import measure
 
@@ -309,7 +306,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         if len(self.data['currentlyLoadedAtlasName'])>0:
             self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
 
-        self.data['labels'] = self.loadLabels(paths['labels'])
+        self.data['labels'] = self.loadLabels(paths['labels']) #see ARA_plotter.py
 
 
         self.addAreaDataToTreeView(self.data['labels'],self.rootNode,self.brainArea_itemModel.invisibleRootItem())
