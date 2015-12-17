@@ -87,7 +87,6 @@ class imagestack(lasagna_ingredient):
         return {'x':x, 'y':y}
 
 
-
     def histBrushColor(self):
         """
         The brush color of the histogram

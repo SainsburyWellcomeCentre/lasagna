@@ -39,7 +39,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.pref_file = lasHelp.getLasagna_prefDir() + 'ARA_plugin_prefs.yml'
         self.prefs = lasHelp.loadAllPreferences(prefFName=self.pref_file,defaultPref=self.defaultPrefs())
 
-        #The last value the mouse hovered over. When this changes, we re-calcualte the contour 
+        #The last value the mouse hovered over. When this changes, we re-calculate the contour 
         self.lastValue=-1
 
 
@@ -389,17 +389,23 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the data
 
         index = self.brainArea_treeView.selectedIndexes()[0]
-        areaName = index.data().toString() 
+
+        #Get the image stack, as we need to feed it to drawAreaHighlight
+        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
+        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+
         if getFromModel:
             #The following row and column indexes are also correct, but index.model() is the root model and this is wrong.
             treeIndex = index.model().item(index.row(),index.column()).data().toInt()[0] 
             print "treeIndex (%d,%d): %d" % (index.row(),index.column(),treeIndex)
         else: #so we do it the stupid way from the reee
+            areaName = index.data().toString()
             treeIndex = self.AreaName2NodeID(self.data['labels'],areaName)
 
         if treeIndex != None:
-            print "highlighting %d" % treeIndex
-            self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
+            #print "highlighting %d" % treeIndex
+            self.drawAreaHighlight(imageStack,treeIndex,highlightOnlyCurrentAxis=False)
 
 
 
