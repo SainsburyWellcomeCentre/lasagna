@@ -191,6 +191,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             'updateMainWindowOnMouseMove_End'   : [],
             'changeImageStackColorMap_Slot_End' : [],
             'deleteLayerStack_Slot_End'     :   [],
+            'axisClicked'                   :   [],
         }
 
 
@@ -368,7 +369,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.plugins[pluginName] = pluginClass.plugin
 
 
-    def runHook(self,hookArray):
+    def runHook(self,hookArray, *args):
         """
         loops through list of functions and runs them
         """
@@ -381,7 +382,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     print "Skipping empty hook in hook list"
                     continue
                 else:
-                     thisHook()
+                     thisHook(*args)
             except:
                 print  "Error running plugin method " + str(thisHook) 
                 raise
@@ -959,6 +960,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.statusBar.showMessage(self.statusBarText)
 
+    def axisClicked(self, event):
+        axisID=self.sender().axisID
+        self.runHook(self.hooks['axisClicked'], self.axes2D[axisID])
 
     def updateMainWindowOnMouseMove(self,axis):
         """
@@ -1249,6 +1253,11 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
         thisProxy=pg.SignalProxy(tasty.axes2D[ii].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
         thisProxy.axisID=ii #this is picked up the mouseMoved slot
         proxies.append(thisProxy)
+
+        thisProxy=pg.SignalProxy(tasty.axes2D[ii].view.getViewBox().mouseClicked, rateLimit=30, slot=tasty.axisClicked)
+        thisProxy.axisID=ii #this is picked up the mouseMoved slot
+        proxies.append(thisProxy)
+
     if embedConsole:
         from IPython import embed
         embed()
