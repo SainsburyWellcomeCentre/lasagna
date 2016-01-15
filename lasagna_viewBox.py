@@ -13,6 +13,7 @@ import platform
 class lasagna_viewBox(pg.ViewBox):
     mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal
     progressLayer = QtCore.pyqtSignal() #This fires when the user mouse-wheels without keyboard modifiers
+    mouseClicked = QtCore.pyqtSignal(object) #Make a mouseClicked signal
 
     def __init__(self, linkedAxis={}):
         super(lasagna_viewBox,self).__init__()
@@ -115,6 +116,7 @@ class lasagna_viewBox(pg.ViewBox):
         """
         Can be used to capture mouse clicks
         """
+        self.mouseClicked.emit(ev) # just re-emit an event to hook plugins
         pg.ViewBox.mouseClickEvent(self,ev)
 
 

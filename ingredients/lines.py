@@ -78,9 +78,10 @@ class lines(lasagna_ingredient):
             print "lines.py not proceeding because pyqtObject is false"             
             return
 
-        if isinstance(self.raw_data(),list):
-            if len(self.raw_data()) == 0 or self.raw_data() == False:
-                return
+        # check if there is data. Use `is False` because np.array == False returns an array
+        if self.data() is False or len(self.data()) == 0:
+            pyqtObject.setData([],[]) # make sure there is no left data on plot
+            return
 
         #Ensure our z dimension is a whole number
         z = np.round(self._data[:,axisToPlot])

@@ -33,33 +33,52 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="PlotWidget" name="graphicsView_1">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <widget class="QSplitter" name="splitter_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="PlotWidget" name="graphicsView_2">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="PlotWidget" name="graphicsView_3">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+      <widget class="QSplitter" name="splitter">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <widget class="LasagnaPlotWidget" name="graphicsView_1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+       <widget class="LasagnaPlotWidget" name="graphicsView_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QSplitter" name="splitter_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <widget class="LasagnaPlotWidget" name="graphicsView_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -631,11 +650,7 @@
                </widget>
               </item>
              </layout>
-             <zorder>layoutWidget</zorder>
              <zorder></zorder>
-             <zorder>layoutWidget_2</zorder>
-             <zorder>layoutWidget_3</zorder>
-             <zorder>labelMarker_5</zorder>
              <zorder>markerColor_pushButton</zorder>
             </widget>
            </item>
@@ -656,12 +671,7 @@
          </item>
         </layout>
         <zorder>points_TreeView</zorder>
-        <zorder>groupBoxAxisRatio_2</zorder>
         <zorder>verticalSpacer</zorder>
-        <zorder>layoutWidget_2</zorder>
-        <zorder>markerSymbol_comboBox</zorder>
-        <zorder>markerSize_spinBox</zorder>
-        <zorder>frame</zorder>
        </widget>
        <widget class="QWidget" name="axisSetingsTab">
         <attribute name="title">
@@ -1096,6 +1106,11 @@
    <class>PlotWidget</class>
    <extends>QGraphicsView</extends>
    <header>pyqtgraph</header>
+  </customwidget>
+  <customwidget>
+   <class>LasagnaPlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>lasagnaplotwidget</header>
   </customwidget>
  </customwidgets>
  <resources>
