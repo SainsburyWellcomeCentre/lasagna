@@ -156,5 +156,16 @@ class lines(lasagna_ingredient):
         self._alpha = alpha        
     alpha = property(get_alpha,set_alpha)
 
-
+    def save(self, path=None):
+        if path is None:
+            path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s'%self.objectName)
+        if not path:
+            return
+        line_series= 0
+        with open(path, 'w') as F:
+            for c in self.raw_data():
+                if all(np.isnan(c)): # if there is a line with 3 nans, it's another line series
+                    line_series+=1
+                F.write(','.join(['%i'%line_series]+['%s'%i for i in c])+'\n')
+        print '%s saved as %s'%(self.objectName, path)
    
