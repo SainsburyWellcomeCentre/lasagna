@@ -139,7 +139,8 @@ class sparsepoints(lasagna_ingredient):
 
     def save(self, path=None):
         if path is None:
-            path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s'%self.objectName)
+            path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s'%self.objectName,
+                                                     self.objectName)
         if not path:
             return
         with open(path, 'w') as F:
