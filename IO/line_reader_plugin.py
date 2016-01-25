@@ -47,55 +47,56 @@ class loaderClass(lasagna_plugin):
 
 
  #Slots follow
-    def showLoadDialog(self,fname=None):
+    def showLoadDialog(self,fnames=None):
         """
         This slot brings up the load dialog and retrieves the file name.
         If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
         """
-        if fname == None or fname == False:
-            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
-    
-        if fname == None or fname == False:
-            return
+        if fnames == None or fnames == False:
+            fnames = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)"
+                                                    , singleFile=False)
+        for fname in fnames:
+            if fname == None or fname == False:
+                return
 
-        if os.path.isfile(fname): 
-            with open(str(fname),'r') as fid:
-                contents = fid.read()
-    
+            if os.path.isfile(fname):
+                with open(str(fname),'r') as fid:
+                    contents = fid.read()
 
-            # a list of strings with each string being one line from the file
-            # add nans between lineseries
-            asList = contents.split('\n')
-            data=[]
-            lastLineSeries=None
-            n=0
-            for ii in range(len(asList)):
-                if len(asList[ii])==0:
-                    continue
 
-                thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
-                if lastLineSeries==None:
+                # a list of strings with each string being one line from the file
+                # add nans between lineseries
+                asList = contents.split('\n')
+                data=[]
+                lastLineSeries=None
+                n=0
+                for ii in range(len(asList)):
+                    if len(asList[ii])==0:
+                        continue
+
+                    thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
+                    if lastLineSeries==None:
+                        lastLineSeries=thisLineAsFloats[0]
+
+                    if lastLineSeries != thisLineAsFloats[0]:
+                        n+=1
+                        data.append([np.nan, np.nan, np.nan])
+
                     lastLineSeries=thisLineAsFloats[0]
-
-                if lastLineSeries != thisLineAsFloats[0]:
-                    n+=1
-                    data.append([np.nan, np.nan, np.nan])
-
-                lastLineSeries=thisLineAsFloats[0]
-                data.append(thisLineAsFloats[1:])
+                    data.append(thisLineAsFloats[1:])
 
 
-            objName=fname.split(os.path.sep)[-1]
-            self.lasagna.addIngredient(objectName=objName, 
-                        kind=self.kind,
-                        data=np.asarray(data), 
-                        fname=fname,
-                        )
+                objName=fname.split(os.path.sep)[-1]
+                self.lasagna.addIngredient(objectName=objName,
+                            kind=self.kind,
+                            data=np.asarray(data),
+                            fname=fname,
+                            )
 
-            self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots
-            self.lasagna.initialiseAxes()
+                self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots
+                self.lasagna.initialiseAxes()
 
 
-        else:
-            self.lasagna.statusBar.showMessage("Unable to find " + str(fname))
+            else:
+                self.lasagna.statusBar.showMessage("Unable to find " + str(fname))
