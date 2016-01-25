@@ -24,7 +24,7 @@ class plugin(lasagna_plugin):
     """
 
     def hook_updateStatusBar_End(self):
-        self.lasagna.statusBarText = "CuReNt CoOrDiNaTeS: " + self.lasagna.statusBarText 
+        self.lasagna.statusBarText = "CuReNt CoOrDiNaTeS: " + self.lasagna.statusBarText + 'Slice %s'%self.lasagna.axes2D[0].currentSlice
 
     def closePlugin(self):
         self.detachHooks()
