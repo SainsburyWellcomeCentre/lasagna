@@ -233,6 +233,11 @@ class Tree(object):
         else:
             thisPath = []
 
+        #If nodeID is zero then this is the first call and we've not started
+        #to call recursively
+        if nodeID==0:
+            segments=[] #we have to wipe this here
+
         if isinstance(nodeID,int):
             nodeID = [nodeID]
 
@@ -241,9 +246,7 @@ class Tree(object):
             thisPath.append(nodeID[0])
             nodeID = self.nodes[nodeID[0]].children
             
-
-        #Store this segment
-        segments.append(thisPath)
+        segments.append(thisPath) #Store this segment
 
         #Go into the branches with a recursive call
         for thisNode in nodeID:
