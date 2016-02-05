@@ -20,6 +20,7 @@ import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
+import warnings #to disable some annoying NaN-related warnings
 
 
 class lines(lasagna_ingredient):
@@ -94,6 +95,7 @@ class lines(lasagna_ingredient):
         toLayer = sliceToPlot+zRange
 
         #Now filter the data list by this Z range. Points that will not be plotted are replaced with nan
+        warnings.simplefilter(action = "ignore", category = RuntimeWarning) #To block weird run-time warnings that aren't of interest produced by the following two lines
         data[z<fromLayer,:] = np.nan
         data[z>toLayer,:] = np.nan
 

@@ -155,7 +155,8 @@ def defaultPreferences():
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', 
                              absPathToLasagna()+'registrationPlugins', 
                              absPathToLasagna()+'ARA'], #must be asbolute paths
-            'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
+            'defaultAxisRatios' : [1,2,0.5],         #The default axis ratios
+            'defaultPointZSpread' : [3,5,5],         #The range of layers over which points or lines are visible
             'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
             'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
             'symbolOrder' : ['o','s','t','d','+'],
