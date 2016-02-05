@@ -567,7 +567,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredients are classes that are defined in the ingredients package
         """
 
-        print "\nlasanga.addIngredient - Adding ingredient " + objectName
+        print "\nlasanga.addIngredient - Adding " + kind + " ingredient: " + objectName
 
         if len(kind)==0:
             print "ERROR: no ingredient kind specified"
@@ -1223,22 +1223,22 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     #Data from command line input if the user specified this
     if not imStackFnamesToLoad==None:
         for thisFname in imStackFnamesToLoad:
-            print "Loading " + thisFname
+            print "Loading stack " + thisFname
             tasty.loadImageStack(thisFname)
 
     if not sparsePointsToLoad==None:
         for thisFname in sparsePointsToLoad:
-            print "Loading " + thisFname
+            print "Loading points " + thisFname
             tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
 
     if not linesToLoad==None:
         for thisFname in linesToLoad:
-            print "Loading " + thisFname
+            print "Loading lines " + thisFname
             tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
     
     if not treesToLoad==None:
         for thisFname in treesToLoad:
-            print "Loading " + thisFname
+            print "Loading tree " + thisFname
             tasty.loadActions['tree_reader'].showLoadDialog(thisFname)
   
     tasty.initialiseAxes()

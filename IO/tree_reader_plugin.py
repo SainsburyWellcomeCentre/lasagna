@@ -69,6 +69,7 @@ class loaderClass(lasagna_plugin):
     def showLoadDialog(self,fname=None):
         """
         This slot brings up the load dialog and retrieves the file name.
+        NOTE:
         If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
         """
@@ -82,6 +83,7 @@ class loaderClass(lasagna_plugin):
             with open(str(fname),'r') as fid:
 
                 #import the tree 
+
                 dataTree = importData(fname,headerLine=['id','parent','z','x','y'])
                 #We now have an array of unique paths (segments)
                 paths=[]
