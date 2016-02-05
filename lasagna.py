@@ -122,6 +122,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.view1Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[0])
         self.view2Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[1])
         self.view3Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[2])
+        self.lineWidth_spinBox.setValue(lasHelp.readPreference('defaultLineWidth'))
 
         #set up axes 
         #Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them

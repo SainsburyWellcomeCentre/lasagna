@@ -30,7 +30,7 @@ class lines(lasagna_ingredient):
                                         )
 
         #Choose symbols from preferences file. 
-        #TODO: remove symbol stuff if we indeed will get rid of this here
+        #TODO: read symbols from GUI
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
         self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
         self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
@@ -100,6 +100,7 @@ class lines(lasagna_ingredient):
         data[z>toLayer,:] = np.nan
 
         #If we have only NaNs we should not plot. 
+
         if np.all(np.isnan(data))==False:
             pyqtObject.setData(x=data[:,0], y=data[:,1], 
                                 pen=pg.mkPen(color=self.symbolBrush(), width=self.lineWidth), 
