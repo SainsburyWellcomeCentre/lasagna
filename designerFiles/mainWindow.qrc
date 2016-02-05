@@ -6,6 +6,7 @@
     <file>icons/lines_64.png</file>
     <file>icons/points.png</file>
     <file>icons/window-close.png</file>
+    <file>icons/tree_64.png</file>
     <file>icons/overlay.png</file>
   </qresource>
   <qresource prefix="icons">

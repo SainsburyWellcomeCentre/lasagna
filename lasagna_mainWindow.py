@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created: Mon Aug 24 10:27:33 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created: Fri Jan 15 15:38:29 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -40,33 +40,44 @@ class Ui_lasagna_mainWindow(object):
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.graphicsView_1 = PlotWidget(self.centralwidget,viewBox=lasagna_viewBox())
+        self.splitter_3 = QtGui.QSplitter(self.centralwidget)
+        self.splitter_3.setOrientation(QtCore.Qt.Vertical)
+        self.splitter_3.setObjectName(_fromUtf8("splitter_3"))
+        self.splitter = QtGui.QSplitter(self.splitter_3)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setObjectName(_fromUtf8("splitter"))
+        self.graphicsView_1 = LasagnaPlotWidget(self.splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_1.sizePolicy().hasHeightForWidth())
         self.graphicsView_1.setSizePolicy(sizePolicy)
         self.graphicsView_1.setObjectName(_fromUtf8("graphicsView_1"))
-        self.gridLayout.addWidget(self.graphicsView_1, 0, 0, 1, 1)
-        self.graphicsView_2 = PlotWidget(self.centralwidget,viewBox=lasagna_viewBox())
+        self.graphicsView_2 = LasagnaPlotWidget(self.splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_2.sizePolicy().hasHeightForWidth())
         self.graphicsView_2.setSizePolicy(sizePolicy)
         self.graphicsView_2.setObjectName(_fromUtf8("graphicsView_2"))
-        self.gridLayout.addWidget(self.graphicsView_2, 0, 1, 1, 1)
-        self.graphicsView_3 = PlotWidget(self.centralwidget,viewBox=lasagna_viewBox())
+        self.splitter_2 = QtGui.QSplitter(self.splitter_3)
+        self.splitter_2.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter_2.setObjectName(_fromUtf8("splitter_2"))
+        self.graphicsView_3 = LasagnaPlotWidget(self.splitter_2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_3.sizePolicy().hasHeightForWidth())
         self.graphicsView_3.setSizePolicy(sizePolicy)
         self.graphicsView_3.setObjectName(_fromUtf8("graphicsView_3"))
-        self.gridLayout.addWidget(self.graphicsView_3, 1, 0, 1, 1)
+        self.frame_2 = QtGui.QFrame(self.splitter_2)
+        self.frame_2.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.frame_2.setFrameShadow(QtGui.QFrame.Raised)
+        self.frame_2.setObjectName(_fromUtf8("frame_2"))
+        self.gridLayout.addWidget(self.splitter_3, 0, 0, 1, 1)
         lasagna_mainWindow.setCentralWidget(self.centralwidget)
         self.menuBar = QtGui.QMenuBar(lasagna_mainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 21))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 27))
         self.menuBar.setObjectName(_fromUtf8("menuBar"))
         self.menuFile = QtGui.QMenu(self.menuBar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
@@ -80,7 +91,7 @@ class Ui_lasagna_mainWindow(object):
         self.menuPlugins.setObjectName(_fromUtf8("menuPlugins"))
         lasagna_mainWindow.setMenuBar(self.menuBar)
         self.mainDockWidget = QtGui.QDockWidget(lasagna_mainWindow)
-        self.mainDockWidget.setMinimumSize(QtCore.QSize(315, 584))
+        self.mainDockWidget.setMinimumSize(QtCore.QSize(331, 587))
         self.mainDockWidget.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
         self.mainDockWidget.setObjectName(_fromUtf8("mainDockWidget"))
         self.dockWidgetContents = QtGui.QWidget()
@@ -165,7 +176,7 @@ class Ui_lasagna_mainWindow(object):
         self.groupBoxAxisRatio_2.setMaximumSize(QtCore.QSize(131, 16777215))
         self.groupBoxAxisRatio_2.setObjectName(_fromUtf8("groupBoxAxisRatio_2"))
         self.layoutWidget = QtGui.QWidget(self.groupBoxAxisRatio_2)
-        self.layoutWidget.setGeometry(QtCore.QRect(11, 30, 106, 25))
+        self.layoutWidget.setGeometry(QtCore.QRect(11, 30, 106, 29))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.horizontalLayout_5 = QtGui.QHBoxLayout(self.layoutWidget)
         self.horizontalLayout_5.setMargin(0)
@@ -183,7 +194,7 @@ class Ui_lasagna_mainWindow(object):
         self.axisRatioLabel_4.setObjectName(_fromUtf8("axisRatioLabel_4"))
         self.horizontalLayout_5.addWidget(self.axisRatioLabel_4)
         self.view1Z_spinBox = QtGui.QSpinBox(self.layoutWidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.view1Z_spinBox.sizePolicy().hasHeightForWidth())
@@ -193,7 +204,7 @@ class Ui_lasagna_mainWindow(object):
         self.view1Z_spinBox.setObjectName(_fromUtf8("view1Z_spinBox"))
         self.horizontalLayout_5.addWidget(self.view1Z_spinBox)
         self.layoutWidget1 = QtGui.QWidget(self.groupBoxAxisRatio_2)
-        self.layoutWidget1.setGeometry(QtCore.QRect(11, 60, 106, 25))
+        self.layoutWidget1.setGeometry(QtCore.QRect(11, 60, 106, 29))
         self.layoutWidget1.setObjectName(_fromUtf8("layoutWidget1"))
         self.horizontalLayout_6 = QtGui.QHBoxLayout(self.layoutWidget1)
         self.horizontalLayout_6.setMargin(0)
@@ -214,7 +225,7 @@ class Ui_lasagna_mainWindow(object):
         self.view2Z_spinBox.setObjectName(_fromUtf8("view2Z_spinBox"))
         self.horizontalLayout_6.addWidget(self.view2Z_spinBox)
         self.layoutWidget2 = QtGui.QWidget(self.groupBoxAxisRatio_2)
-        self.layoutWidget2.setGeometry(QtCore.QRect(11, 90, 106, 25))
+        self.layoutWidget2.setGeometry(QtCore.QRect(11, 90, 106, 29))
         self.layoutWidget2.setObjectName(_fromUtf8("layoutWidget2"))
         self.horizontalLayout_7 = QtGui.QHBoxLayout(self.layoutWidget2)
         self.horizontalLayout_7.setMargin(0)
@@ -432,7 +443,7 @@ class Ui_lasagna_mainWindow(object):
         self.groupBoxFlip.setToolTip(_fromUtf8(""))
         self.groupBoxFlip.setObjectName(_fromUtf8("groupBoxFlip"))
         self.layoutWidget6 = QtGui.QWidget(self.groupBoxFlip)
-        self.layoutWidget6.setGeometry(QtCore.QRect(20, 20, 43, 83))
+        self.layoutWidget6.setGeometry(QtCore.QRect(20, 20, 43, 92))
         self.layoutWidget6.setObjectName(_fromUtf8("layoutWidget6"))
         self.verticalLayout = QtGui.QVBoxLayout(self.layoutWidget6)
         self.verticalLayout.setMargin(0)
@@ -535,7 +546,7 @@ class Ui_lasagna_mainWindow(object):
         self.toolBar.addSeparator()
 
         self.retranslateUi(lasagna_mainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(lasagna_mainWindow)
 
     def retranslateUi(self, lasagna_mainWindow):
@@ -584,5 +595,5 @@ class Ui_lasagna_mainWindow(object):
         self.actionOpen_2.setText(_translate("lasagna_mainWindow", "Open", None))
 
 from pyqtgraph import PlotWidget
+from lasagnaplotwidget import LasagnaPlotWidget
 import mainWindow_rc
-from lasagna_viewBox import lasagna_viewBox

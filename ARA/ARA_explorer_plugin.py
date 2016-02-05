@@ -19,9 +19,6 @@ from alert import alert
 from PyQt4 import QtGui, QtCore
 import ara_explorer_UI
 
-#For handling the labels files
-import ara_json, tree
-
 #For contour drawing
 from skimage import measure
 
@@ -42,7 +39,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.pref_file = lasHelp.getLasagna_prefDir() + 'ARA_plugin_prefs.yml'
         self.prefs = lasHelp.loadAllPreferences(prefFName=self.pref_file,defaultPref=self.defaultPrefs())
 
-        #The last value the mouse hovered over. When this changes, we re-calcualte the contour 
+        #The last value the mouse hovered over. When this changes, we re-calculate the contour 
         self.lastValue=-1
 
 
@@ -76,6 +73,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.araName_comboBox.activated.connect(self.araName_comboBox_slot)
         self.load_pushButton.released.connect(self.load_pushButton_slot)
         self.overlayTemplate_checkBox.stateChanged.connect(self.overlayTemplate_checkBox_slot)
+
+        self.statusBarName_checkBox.stateChanged.connect(self.statusBarName_checkBox_slot)
+        self.highlightArea_checkBox.stateChanged.connect(self.highlightArea_checkBox_slot)
 
         #Loop through all paths and add to combobox.
         self.paths = dict()
@@ -260,6 +260,32 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.lasagna.initialiseAxes()
 
 
+    def statusBarName_checkBox_slot(self):
+        """
+        Remove the area name or add it as soon as the check box is unchecked
+        """
+        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
+        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+        
+        if not self.statusBarName_checkBox.isChecked():
+            self.writeAreaNameInStatusBar(imageStack,False)
+        elif self.statusBarName_checkBox.isChecked():
+            self.writeAreaNameInStatusBar(imageStack,True)
+            
+        self.lasagna.updateStatusBar()
+
+
+    def highlightArea_checkBox_slot(self):
+        """
+        Remove the contour or add it as soon as the check box is unchecked
+        """
+        if not self.highlightArea_checkBox.isChecked():
+            self.removeAreaContour()
+        elif self.highlightArea_checkBox.isChecked():
+            self.addAreaContour()
+            
+            
     #--------------------------------------
     # core methods: these do the meat of the work
     #
@@ -280,7 +306,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         if len(self.data['currentlyLoadedAtlasName'])>0:
             self.lasagna.removeIngredientByName(self.data['currentlyLoadedAtlasName'])
 
-        self.data['labels'] = self.loadLabels(paths['labels'])
+        self.data['labels'] = self.loadLabels(paths['labels']) #see ARA_plotter.py
 
 
         self.addAreaDataToTreeView(self.data['labels'],self.rootNode,self.brainArea_itemModel.invisibleRootItem())
@@ -363,17 +389,23 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         getFromModel = False #It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the data
 
         index = self.brainArea_treeView.selectedIndexes()[0]
-        areaName = index.data().toString() 
+
+        #Get the image stack, as we need to feed it to drawAreaHighlight
+        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
+        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+
         if getFromModel:
             #The following row and column indexes are also correct, but index.model() is the root model and this is wrong.
             treeIndex = index.model().item(index.row(),index.column()).data().toInt()[0] 
             print "treeIndex (%d,%d): %d" % (index.row(),index.column(),treeIndex)
         else: #so we do it the stupid way from the reee
+            areaName = index.data().toString()
             treeIndex = self.AreaName2NodeID(self.data['labels'],areaName)
 
         if treeIndex != None:
-            print "highlighting %d" % treeIndex
-            self.drawAreaHighlight(treeIndex,highlightOnlyCurrentAxis=False)
+            #print "highlighting %d" % treeIndex
+            self.drawAreaHighlight(imageStack,treeIndex,highlightOnlyCurrentAxis=False)
 
 
 

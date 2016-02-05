@@ -25,6 +25,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         super(ARA_plotter,self).__init__(lasagna)
        
         self.lasagna = lasagna
+        self.contourName = 'aracontour' #The ingredient name for the ARA contour
 
 
 
@@ -87,6 +88,23 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
 
     #--------------------------------------
     # Drawing-related methods
+    def addAreaContour(self):
+        """
+        Add the line ingredient for ARA contour 
+        """
+        self.lasagna.addIngredient(objectName=self.contourName, 
+                                kind='lines', 
+                                data=[])
+        self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
+
+
+    def removeAreaContour(self):
+        """
+        Remove area contour from the plot
+        """
+        self.lasagna.removeIngredientByName(self.contourName)
+
+
     def writeAreaNameInStatusBar(self, imageStack, displayAreaName=True):
         """
         imageStack - the 3-D atlas stack
@@ -159,7 +177,6 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         nans = np.array([np.nan, np.nan, np.nan]).reshape(1,3)
         allContours = nans
 
-
         for axNum in range(len(self.lasagna.axes2D)):
             contours = self.getContoursFromAxis(imageStack,axisNumber=axNum,value=value)
 
@@ -194,9 +211,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
             
         #Replace the data in the ingredient so they are plotted
         self.lasagna.returnIngredientByName(self.contourName)._data = allContours
-        [axis.updatePlotItems_2D(self.lasagna.ingredientList) for axis in self.lasagna.axes2D]
-
-
+        self.lasagna.initialiseAxes()
             
 
     def setARAcolors(self):

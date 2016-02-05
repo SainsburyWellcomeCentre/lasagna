@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file './designerFiles/alert.ui'
 #
-# Created: Mon Aug 24 17:42:15 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created: Fri Jan 15 15:38:30 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 

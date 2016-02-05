@@ -30,8 +30,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
     colSep - the data separator, a comma by default.
     headerLine - if True, the first line is stripped off and considered to be the column headings.
                 headerLine can also be a CSV string or a list that defines the column headings. Must have the
-                same number of columns as the rest of the file
-
+                same number of columns as the rest of the file.
     """
 
     #Error check
@@ -210,6 +209,39 @@ class Tree(object):
         return nodesThatAreBranches
 
 
+    def findSegments(self,linkSegments=1,nodeID=0,segments=[]):
+        """ 
+        Return a list containing all unique segments of the tree
+
+        If linkSegments is 1, then the branch node is added to each returned segement. This makes
+        it possible to plot the data without gaps appearing. This is the default. 
+        If linksegments is 0, then the no duplicate points are returned.
+        """
+        #print "Calling find segments with nodeID %d" % nodeID
+
+        if linkSegments and nodeID>0:
+            thisPath = [self.nodes[nodeID].parent]
+        else:
+            thisPath = []
+
+        if isinstance(nodeID,int):
+            nodeID = [nodeID]
+
+        while len(nodeID)==1:
+            #print "appending node %d" % nodeID[0]
+            thisPath.append(nodeID[0])
+            nodeID = self.nodes[nodeID[0]].children
+            
+
+        #Store this segment
+        segments.append(thisPath)
+
+        #Go into the branches with a recursive call
+        for thisNode in nodeID:
+            segments=self.findSegments(linkSegments,thisNode,segments)
+
+        return segments
+
 
     def pathToRoot(self, fromNode):
         """
@@ -225,8 +257,8 @@ class Tree(object):
             path.append(self.nodes[currentNode].parent)
             currentNode = self.nodes[currentNode].parent
 
-
         return path
+
 
     def __getitem__(self, key):
         return self.__nodes[key]
@@ -268,7 +300,6 @@ class Node(object):
     def add_child(self, identifier):
         self.__children.append(identifier)
 
-    
     def isbranch(self):
         """
         Is this node a branch?

@@ -36,14 +36,19 @@ class plugin(lasagna_plugin, QtGui.QWidget, infoBox_UI.Ui_infoBox): #must inheri
     #self.lasagna.updateMainWindowOnMouseMove is run each time the axes are updated. So we can hook into it 
     #to update this window also
     def hook_updateMainWindowOnMouseMove_End(self):
-        X = self.lasagna.mouseX
-        Y = self.lasagna.mouseY
+        Z, X, Y = self.lasagna.mousePositionInStack
 
         pos = QtGui.QCursor.pos()
-        PlotWidget = QtGui.qApp.widgetAt(pos).parent()
-        currentAxisName = PlotWidget.objectName()
+        curWidget = QtGui.qApp.widgetAt(pos)
+        try:
+            PlotWidget = curWidget.parent()
+            currentAxisName = PlotWidget.objectName()
+        except AttributeError:
+            print('Mouse seems lost somewhere in a parentless widget')
+            currentAxisName = 'the void'
+
         
-        msg = "Mouse is in %s\nX: %d , Y: %d" % (currentAxisName,X,Y)
+        msg = "Mouse is in %s\nZ: %d, X: %d, Y: %d" % (currentAxisName,Z, X,Y)
         self.label.setText(msg)
 
 

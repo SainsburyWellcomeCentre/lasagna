@@ -100,7 +100,8 @@ def loadTiffStack(fname,useLibTiff=False):
     from tifffile import imread 
     im = imread(fname)
 
-  print "read image of size: rows: %d, cols: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
+  im=im.swapaxes(1,2) 
+  print "read image of size: cols: %d, rows: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
   return im
 
 
@@ -131,11 +132,14 @@ def mhdRead(fname,fallBackMode = False):
     imr.Update()
 
     im = imr.GetOutput()
+
     rows, cols, z = im.GetDimensions()
     sc = im.GetPointData().GetScalars()
     a = vtk_to_numpy(sc)
-    print "Using VTK to read MHD image of size: rows: %d, cols: %d, layers: %d" % (rows,cols,z)
-    return a.reshape(z, cols, rows) 
+    a = a.reshape(z, cols, rows) 
+    a = a.swapaxes(1,2)
+    print "Using VTK to read MHD image of size: cols: %d, rows: %d, layers: %d" % (rows,cols,z)
+    return a    
 
 
 def mhdWrite(imStack,fname):
@@ -144,7 +148,7 @@ def mhdWrite(imStack,fname):
   imStack - is the image stack volume ndarray
   fname - is the absolute path to the mhd file.
   """
-
+  imStack = np.swapaxes(imStack,1,2)
   out = mhd_write_raw_file(imStack,fname)
   if out==False:
     return False
@@ -185,11 +189,11 @@ def mhdRead_fallback(fname):
     print "Can not find the data file as the key 'elementdatafile' does not exist in the MHD file"
     return False
 
-  return mhd_read_raw_file(info)
+  return mhd_read_raw_file(fname,info)
 
 
 
-def mhd_read_raw_file(header):
+def mhd_read_raw_file(fname,header):
   """
   Raw .raw file associated with the MHD header file
   CAUTION: this may not adhere to MHD specs! Report bugs to author.
@@ -245,8 +249,8 @@ def mhd_read_raw_file(header):
     return False
 
 
-
-  rawFname = header['elementdatafile']
+  pathToFile = lasHelp.stripTrailingFileFromPath(fname)
+  rawFname = os.path.join(pathToFile,header['elementdatafile'])
   with  open(rawFname,'rb') as fid:
     data = fid.read()
     
@@ -255,7 +259,7 @@ def mhd_read_raw_file(header):
   fmt = endian + str(int(np.prod(dimSize))) + formatType
   pix = np.asarray(struct.unpack(fmt, data))
   
-  return pix.reshape((dimSize[2],dimSize[1],dimSize[0]))
+  return pix.reshape((dimSize[2],dimSize[1],dimSize[0])).swapaxes(1,2)
 
 
 def mhd_write_raw_file(imStack,fname,info=None):
@@ -439,7 +443,7 @@ def nrrdRead(fname):
 
   import nrrd 
   (data,header) = nrrd.read(fname)
-  return data
+  return data.swapaxes(1,2)
 
 
 def nrrdHeaderRead(fname):

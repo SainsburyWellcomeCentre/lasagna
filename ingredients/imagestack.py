@@ -50,6 +50,7 @@ class imagestack(lasagna_ingredient):
         self.histPenCustomColor = False
         self.histBrushCustomColor = False
 
+        self.histogram = self.calcHistogram()
 
     def setColorMap(self,cmap=''):
         """
@@ -74,6 +75,16 @@ class imagestack(lasagna_ingredient):
         lut = map.getLookupTable(0.0, 1.0, nVal+1)
 
         return lut
+
+
+    def calcHistogram(self):
+        """
+        Calculate the histogram and store results in a variable
+        """
+        y,x = np.histogram(self._data, bins=500)
+        x=x[0:-1] #chop off last value
+
+        return {'x':x, 'y':y}
 
 
     def histBrushColor(self):
@@ -112,12 +123,23 @@ class imagestack(lasagna_ingredient):
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
         """
+
         data = self.data(axisToPlot)
+
+        if data.shape[0]-1 < sliceToPlot:
+            pyqtObject.setVisible(False)
+            sliceToPlot = data.shape[0]-1
+        elif sliceToPlot<0:
+            pyqtObject.setVisible(False)
+            sliceToPlot = 0
+        else:
+            pyqtObject.setVisible(True)
+
         pyqtObject.setImage(
                         data[sliceToPlot], 
                         levels=self.minMax, 
                         compositionMode=self.compositionMode,
-                        lut=self.setColorMap(self.lut)
+                        lut=self.setColorMap(self.lut),
                         )
 
 
@@ -223,6 +245,7 @@ class imagestack(lasagna_ingredient):
     #Alpha is set from a 0-100 range and is returned as a usually (0-255)
     def get_alpha(self):
         return int(self.maxColMapValue * (self._alpha/100.0))
+
     def set_alpha(self,value):
         self._alpha = value
     alpha = property(get_alpha,set_alpha)

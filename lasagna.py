@@ -54,17 +54,19 @@ import nrrd
 #Parse command-line input arguments
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-D", help="Load demo images", action="store_true")
+parser.add_argument("-D", help="Load demo images", action="store_true") #store true makes it zero by default
 parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
 parser.add_argument("-S", nargs='+', help="file names of sparse points file(s) to load")
 parser.add_argument("-L", nargs='+', help="file names of lines file(s) to load")
+parser.add_argument("-T", nargs='+', help="file names of tree file(s) to load")
+parser.add_argument("-C", help="start a ipython console", action='store_true')
 parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
-
 
 pluginToStart = args.P
 sparsePointsToLoad = args.S
 linesToLoad = args.L
+treesToLoad = args.T
 
 #Either load the demo stacks or a user-specified stacks
 if args.D==True:
@@ -189,6 +191,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             'updateMainWindowOnMouseMove_End'   : [],
             'changeImageStackColorMap_Slot_End' : [],
             'deleteLayerStack_Slot_End'     :   [],
+            'axisClicked'                   :   [],
         }
 
 
@@ -257,6 +260,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #add the z-points spinboxes to a list to make them indexable
         self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
+
+        #create a slot to force a re-draw of the screen when the spinbox value changes
+        self.view1Z_spinBox.valueChanged.connect(self.viewZ_spinBoxes_slot)
+        self.view2Z_spinBox.valueChanged.connect(self.viewZ_spinBoxes_slot)
+        self.view3Z_spinBox.valueChanged.connect(self.viewZ_spinBoxes_slot)
 
         #Axis tab stuff
         #TODO: set up as one slot that receives an argument telling it which axis ratio was changed
@@ -361,7 +369,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.plugins[pluginName] = pluginClass.plugin
 
 
-    def runHook(self,hookArray):
+    def runHook(self,hookArray, *args):
         """
         loops through list of functions and runs them
         """
@@ -374,7 +382,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     print "Skipping empty hook in hook list"
                     continue
                 else:
-                     thisHook()
+                     thisHook(*args)
             except:
                 print  "Error running plugin method " + str(thisHook) 
                 raise
@@ -515,6 +523,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             #NOTE: tried the lambda approach but it always assigns the last file name to the list to all signals
             #      http://stackoverflow.com/questions/940555/pyqt-sending-parameter-to-slot-when-connecting-to-a-signal
 
+
     def loadRecentFileSlot(self):
         """
         load a file from recently opened list
@@ -585,9 +594,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredient name or type         
         """
         ingredientInstance.removePlotItem() #remove from axes
-        self.ingredientList.remove(ingredientInstance) 
+        self.ingredientList.remove(ingredientInstance) #Remove ingredient from the list of ingredients
         ingredientInstance.removeFromList() #remove ingredient from the list with which it is associated        
         self.selectedStackName() #Ensures something is highlighted
+
+        #TODO: The following two lines fail to clear the image data from RAM. Somehow there are other references to the object...
+        ingredientInstance._data = None 
+        del(ingredientInstance) 
+        
+        self.initialiseAxes() 
 
 
     def removeIngredientByName(self,objectName):
@@ -640,7 +655,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Return a list of ingredient objectNames
         """
         ingredientNames = [] 
-        for thisIngredient in ingredientList:
+        for thisIngredient in self.ingredientList:
             ingredientNames.append(thisIngredient.objectName)
 
         return ingredientNames
@@ -705,7 +720,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Initial display of images in axes and also update other parts of the GUI. 
         """
+
         if self.stacksInTreeList()==False:
+            self.plotImageStackHistogram() #wipes the histogram
             return
 
         #show default images (snap to middle layer of each axis)
@@ -722,7 +739,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.plotImageStackHistogram()
 
-        #TODO: turn into list by making the axisRatioLineEdits a list
         for ii in range(len(self.axisRatioLineEdits)):
             self.axes2D[ii].view.setAspectLocked(True, float(self.axisRatioLineEdits[ii].text()))
         
@@ -750,6 +766,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # Slots for points tab
     # In each case, we set the values of the currently selected ingredient using the spinbox value
     # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
+    def viewZ_spinBoxes_slot(self):
+        self.initialiseAxes()
+        
     def markerSymbol_comboBox_slot(self,index):
         symbol = str(self.markerSymbol_comboBox.currentText())
         ingredient = self.returnIngredientByName(self.selectedPointsName())
@@ -788,8 +807,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         rgb = [col.toRgb().red(), col.toRgb().green(), col.toRgb().blue()]
         ingredient.color =rgb
         self.initialiseAxes()
-
-
 
     def selectedPointsName(self):
         """
@@ -943,6 +960,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.statusBar.showMessage(self.statusBarText)
 
+    def axisClicked(self, event):
+        axisID=self.sender().axisID
+        self.runHook(self.hooks['axisClicked'], self.axes2D[axisID])
 
     def updateMainWindowOnMouseMove(self,axis):
         """
@@ -966,14 +986,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Plot the image stack histogram in a PlotWidget to the left of the three image views.
         This function is called when the plot is first set up and also when the log Y
         checkbox is checked or unchecked
+
+        also see: self.initialiseAxes
         """
-        img = lasHelp.findPyQtGraphObjectNameInPlotWidget(self.axes2D[0].view,self.selectedStackName())
-        if img==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
+
+        ing = self.returnIngredientByName(self.selectedStackName())
+        if ing==False: #TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
             self.intensityHistogram.clear()
             return
 
-        x,y = img.getHistogram()
-      
+        x=ing.histogram['x']
+        y=ing.histogram['y']
+        
         #Plot the histogram
         if self.logYcheckBox.isChecked():
             y=np.log10(y+0.1)
@@ -1184,11 +1208,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.updateMainWindowOnMouseMove(self.axes2D[axisID])
 
 
-
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None):
+def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None, embedConsole=False):
     app = QtGui.QApplication([])
 
     tasty = lasagna()
@@ -1205,13 +1226,16 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
             print "Loading " + thisFname
             tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
 
-
     if not linesToLoad==None:
         for thisFname in linesToLoad:
             print "Loading " + thisFname
             tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
     
-
+    if not treesToLoad==None:
+        for thisFname in treesToLoad:
+            print "Loading " + thisFname
+            tasty.loadActions['tree_reader'].showLoadDialog(thisFname)
+  
     tasty.initialiseAxes()
 
     if pluginToStart != None:
@@ -1230,8 +1254,17 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
         thisProxy.axisID=ii #this is picked up the mouseMoved slot
         proxies.append(thisProxy)
 
+        thisProxy=pg.SignalProxy(tasty.axes2D[ii].view.getViewBox().mouseClicked, rateLimit=30, slot=tasty.axisClicked)
+        thisProxy.axisID=ii #this is picked up the mouseMoved slot
+        proxies.append(thisProxy)
+
+    if embedConsole:
+        from IPython import embed
+        embed()
+
     sys.exit(app.exec_())
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(imStackFnamesToLoad=imStackFnamesToLoad, sparsePointsToLoad=sparsePointsToLoad, linesToLoad=linesToLoad, pluginToStart=pluginToStart)
+    main(imStackFnamesToLoad=imStackFnamesToLoad, sparsePointsToLoad=sparsePointsToLoad, linesToLoad=linesToLoad,
+         pluginToStart=pluginToStart, embedConsole=args.C)

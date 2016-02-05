@@ -1,9 +1,16 @@
 """
 This class overlays lines on top of the image stacks. 
-Unlike the sparsepoints ingredient, multiple lines associated 
-with the same ingredient will likely have to be different plot 
-items. See: 
-https://groups.google.com/forum/?fromgroups=#!topic/pyqtgraph/h0PNUV2ToKg
+This class loads csv files with columns in the format:
+line series, z, x, y
+
+line series is a scalar. All points within the same line series
+are joined by lines. Different line series are not joined but all
+line series from the same CSV file are part of the same ingredient
+(and the same plot item) and are rendered with the same colours, etc. 
+
+Instances of lines are created by line_reader_plugin. It is 
+line_reader_plugin that creates the menu entry in the file menu, 
+loads the data from the csv file, and calles lines.py 
 """
 
 from __future__ import division
@@ -21,7 +28,6 @@ class lines(lasagna_ingredient):
                                         pgObject='PlotCurveItem'
                                         )
 
-        
         #Choose symbols from preferences file. 
         #TODO: remove symbol stuff if we indeed will get rid of this here
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
@@ -72,9 +78,10 @@ class lines(lasagna_ingredient):
             print "lines.py not proceeding because pyqtObject is false"             
             return
 
-        if isinstance(self.raw_data(),list):
-            if len(self.raw_data()) == 0 or self.raw_data() == False:
-                return
+        # check if there is data. Use `is False` because np.array == False returns an array
+        if self.data() is False or len(self.data()) == 0:
+            pyqtObject.setData([],[]) # make sure there is no left data on plot
+            return
 
         #Ensure our z dimension is a whole number
         z = np.round(self._data[:,axisToPlot])
@@ -96,7 +103,9 @@ class lines(lasagna_ingredient):
                                 pen=pg.mkPen(color=self.symbolBrush(), width=self.lineWidth), 
                                 antialias=True,
                                 connect="finite")
-
+            pyqtObject.setVisible(True)
+        else:
+            pyqtObject.setVisible(False)
 
     def addToList(self):
         """

@@ -18,6 +18,7 @@ from lasagna_plugin import lasagna_plugin
 import numpy as np
 from PyQt4 import QtGui
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
+from tree import importData
 
 
 class loaderClass(lasagna_plugin):
@@ -25,7 +26,7 @@ class loaderClass(lasagna_plugin):
         super(loaderClass,self).__init__(lasagna)
 
         self.lasagna = lasagna
-        self.objectName = 'lines_reader'
+        self.objectName = 'tree_reader'
         self.kind = 'lines'
 
         #Construct the QActions and other stuff required to integrate the load dialog into the menu
@@ -33,18 +34,36 @@ class loaderClass(lasagna_plugin):
 
         #Add an icon to the action
         iconLoadOverlay = QtGui.QIcon()
-        iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/lines_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/tree_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.loadAction.setIcon(iconLoadOverlay)
 
 
         #Insert the action into the menu
-        self.loadAction.setObjectName("linesRead")
+        self.loadAction.setObjectName("treeRead")
         self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
-        self.loadAction.setText("Lines read")
+        self.loadAction.setText("Tree read")
 
         self.loadAction.triggered.connect(self.showLoadDialog) #Link the action to the slot
 
 
+    def dataFromPath(self,tree,path):
+        """
+        Get the data from the tree given a path.
+        """
+
+        z=[]
+        x=[]
+        y=[]
+
+        for thisNode in path:
+            if thisNode==0:
+                continue
+            z.append(tree.nodes[thisNode].data['z'])
+            x.append(tree.nodes[thisNode].data['x'])
+            y.append(tree.nodes[thisNode].data['y'])
+
+
+        return (z,x,y)
 
  #Slots follow
     def showLoadDialog(self,fname=None):
@@ -61,12 +80,28 @@ class loaderClass(lasagna_plugin):
 
         if os.path.isfile(fname): 
             with open(str(fname),'r') as fid:
-                contents = fid.read()
-    
 
-            # a list of strings with each string being one line from the file
+                #import the tree 
+                dataTree = importData(fname,headerLine=['id','parent','z','x','y'])
+                #We now have an array of unique paths (segments)
+                paths=[]
+                for thisSegment in dataTree.findSegments():
+                    paths.append(thisSegment)
+
+
+                ii=0
+                asList=[] #list of list data (one item per node)
+                for thisPath in paths:
+                    data = self.dataFromPath(dataTree,thisPath)
+                    for jj in range(len(data[0])):
+                        tmp = [ii,data[0][jj],data[1][jj],data[2][jj]]
+                        tmp = [float(x) for x in tmp] #convert to floats
+                        asList.append(tmp)
+                    ii += 1
+
+
+
             # add nans between lineseries
-            asList = contents.split('\n')
             data=[]
             lastLineSeries=None
             n=0
@@ -74,18 +109,19 @@ class loaderClass(lasagna_plugin):
                 if len(asList[ii])==0:
                     continue
 
-                thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
+                thisLine = asList[ii]
                 if lastLineSeries==None:
-                    lastLineSeries=thisLineAsFloats[0]
+                    lastLineSeries=thisLine[0]
 
-                if lastLineSeries != thisLineAsFloats[0]:
+                if lastLineSeries != thisLine[0]:
                     n+=1
                     data.append([np.nan, np.nan, np.nan])
 
-                lastLineSeries=thisLineAsFloats[0]
-                data.append(thisLineAsFloats[1:])
+                lastLineSeries=thisLine[0]
+                data.append(thisLine[1:])
 
 
+            #print data         
             objName=fname.split(os.path.sep)[-1]
             self.lasagna.addIngredient(objectName=objName, 
                         kind=self.kind,

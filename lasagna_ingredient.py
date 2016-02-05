@@ -20,8 +20,6 @@ class lasagna_ingredient(object):
         self.pgObjectConstructionArgs = pgObjectConstructionArgs #The pyqtgrao item is created with these arguments
 
 
-
-
     def fname(self):
         """
         Strip the absolute path and return only the file name as as a string
@@ -52,7 +50,7 @@ class lasagna_ingredient(object):
 
     def addToList(self):
     	"""
-    	Add this ingredients list items to the QStandardModel (model) associated with its QTreeView
+    	Add this ingredient's list items to the QStandardModel (model) associated with its QTreeView
     	then highlight it when it's added.
     	"""
     	self.model.appendRow(self.modelItems)
@@ -60,6 +58,9 @@ class lasagna_ingredient(object):
 
 
     def removeFromList(self):
+        """
+        Remove ingredient from the UI list with which it is associated  
+        """
     	items = self.model.findItems(self.objectName)
     	self.model.removeRow(items[0].row())
 
