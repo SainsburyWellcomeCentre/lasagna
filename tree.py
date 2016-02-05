@@ -218,7 +218,7 @@ class Tree(object):
         return nodesThatAreBranches
 
 
-    def findSegments(self,linkSegments=1,nodeID=0,segments=[]):
+    def findSegments(self,linkSegments=1,nodeID=0,segments=()):
         """ 
         Return a list containing all unique segments of the tree
 
@@ -233,11 +233,6 @@ class Tree(object):
         else:
             thisPath = []
 
-        #If nodeID is zero then this is the first call and we've not started
-        #to call recursively
-        if nodeID==0:
-            segments=[] #we have to wipe this here
-
         if isinstance(nodeID,int):
             nodeID = [nodeID]
 
@@ -246,7 +241,7 @@ class Tree(object):
             thisPath.append(nodeID[0])
             nodeID = self.nodes[nodeID[0]].children
             
-        segments.append(thisPath) #Store this segment
+        segments = segments + (thisPath,) #Store this segment
 
         #Go into the branches with a recursive call
         for thisNode in nodeID:
