@@ -11,7 +11,7 @@ import yaml   #Preferences are stored in a YAML file
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
+def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False,verbose=False):
     """
     Searches a PyQtGraph PlotWidget for an plot object (i.e. something added with .addItem)
     with name "itemName"
@@ -31,6 +31,9 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
     so you can't feed it the GUI root object and expect an answer. It returns *ONLY* the 
     first found item.
     """
+
+    if verbose:
+        print "findPyQtGraphObjectNameInPlotWidget - looking for object %s in PlotWidget %s" % (itemName,str(PlotWidget))
 
     if regex==True:
         import re
@@ -59,7 +62,6 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
             if thisItem.objectName == itemName:
                 return thisItem
 
-    verbose=False
     if verbose:
         print "Failed to find %s in PlotWidget" %  itemName
     return False

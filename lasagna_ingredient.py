@@ -1,5 +1,5 @@
 """
-Ingredients inherit from this class
+Ingredients inherit this class
 """
 
 import os
@@ -17,7 +17,7 @@ class lasagna_ingredient(object):
 
         self.enable     = enable            #Item is plotted if enable is True. Hidden if enable is False
         self.pgObject   = pgObject          #The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
-        self.pgObjectConstructionArgs = pgObjectConstructionArgs #The pyqtgrao item is created with these arguments
+        self.pgObjectConstructionArgs = pgObjectConstructionArgs #The pyqtgraph item is created with these arguments
 
 
     def fname(self):

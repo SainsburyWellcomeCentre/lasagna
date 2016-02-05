@@ -8,7 +8,7 @@ Defines a tree and a node class as well as functions for importing data
 import os.path
 import dataTypeFromString
 
-def importData(fname, displayTree=False, colSep=',', headerLine=False):
+def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=False):
     """
     Import tree data from a CSV (text) file or list. 
 
@@ -31,7 +31,13 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
     headerLine - if True, the first line is stripped off and considered to be the column headings.
                 headerLine can also be a CSV string or a list that defines the column headings. Must have the
                 same number of columns as the rest of the file.
+    verbose - prints diagnositic info to screen if true
     """
+
+
+
+    if verbose:
+        print "tree.importData importing file %s" % fname
 
     #Error check
     if isinstance(fname,str):
@@ -83,6 +89,9 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
 
         theseData.append(dataCol) 
         data.append(theseData)
+
+    if verbose:
+        print "tree.importData read %d rows of data from %s" % (len(data),fname)
 
 
     #Build tree

@@ -79,9 +79,9 @@ class lines(lasagna_ingredient):
             print "lines.py not proceeding because pyqtObject is false"             
             return
 
-        # check if there is data. Use `is False` because np.array == False returns an array
+        # check if there are data on the plot. Use `is False` because np.array == False returns an array
         if self.data() is False or len(self.data()) == 0:
-            pyqtObject.setData([],[]) # make sure there is no left data on plot
+            pyqtObject.setData([],[]) # make sure there are no data left on the plot
             return
 
         #Ensure our z dimension is a whole number
@@ -100,7 +100,6 @@ class lines(lasagna_ingredient):
         data[z>toLayer,:] = np.nan
 
         #If we have only NaNs we should not plot. 
-
         if np.all(np.isnan(data))==False:
             pyqtObject.setData(x=data[:,0], y=data[:,1], 
                                 pen=pg.mkPen(color=self.symbolBrush(), width=self.lineWidth), 

@@ -65,7 +65,8 @@ class loaderClass(lasagna_plugin):
 
         return (z,x,y)
 
- #Slots follow
+
+    #Slots follow
     def showLoadDialog(self,fname=None):
         """
         This slot brings up the load dialog and retrieves the file name.
@@ -73,6 +74,9 @@ class loaderClass(lasagna_plugin):
         If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
         """
+
+        verbose = False 
+
         if fname == None or fname == False:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
     
@@ -83,8 +87,11 @@ class loaderClass(lasagna_plugin):
             with open(str(fname),'r') as fid:
 
                 #import the tree 
+                if verbose:
+                    print "tree_reader_plugin.showLoadDialog - importing %s" % fname
 
-                dataTree = importData(fname,headerLine=['id','parent','z','x','y'])
+                dataTree = importData(fname,headerLine=['id','parent','z','x','y'],verbose=verbose)
+
                 #We now have an array of unique paths (segments)
                 paths=[]
                 for thisSegment in dataTree.findSegments():
@@ -122,6 +129,9 @@ class loaderClass(lasagna_plugin):
                 lastLineSeries=thisLine[0]
                 data.append(thisLine[1:])
 
+
+            if verbose:
+                print "Divided tree into %d segments" % n
 
             #print data         
             objName=fname.split(os.path.sep)[-1]
