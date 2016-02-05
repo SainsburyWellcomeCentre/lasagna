@@ -8,7 +8,7 @@ Defines a tree and a node class as well as functions for importing data
 import os.path
 import dataTypeFromString
 
-def importData(fname, displayTree=False, colSep=',', headerLine=False):
+def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=False):
     """
     Import tree data from a CSV (text) file or list. 
 
@@ -31,7 +31,13 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
     headerLine - if True, the first line is stripped off and considered to be the column headings.
                 headerLine can also be a CSV string or a list that defines the column headings. Must have the
                 same number of columns as the rest of the file.
+    verbose - prints diagnositic info to screen if true
     """
+
+
+
+    if verbose:
+        print "tree.importData importing file %s" % fname
 
     #Error check
     if isinstance(fname,str):
@@ -83,6 +89,9 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
 
         theseData.append(dataCol) 
         data.append(theseData)
+
+    if verbose:
+        print "tree.importData read %d rows of data from %s" % (len(data),fname)
 
 
     #Build tree
@@ -224,6 +233,11 @@ class Tree(object):
         else:
             thisPath = []
 
+        #If nodeID is zero then this is the first call and we've not started
+        #to call recursively
+        if nodeID==0:
+            segments=[] #we have to wipe this here
+
         if isinstance(nodeID,int):
             nodeID = [nodeID]
 
@@ -232,9 +246,7 @@ class Tree(object):
             thisPath.append(nodeID[0])
             nodeID = self.nodes[nodeID[0]].children
             
-
-        #Store this segment
-        segments.append(thisPath)
+        segments.append(thisPath) #Store this segment
 
         #Go into the branches with a recursive call
         for thisNode in nodeID:

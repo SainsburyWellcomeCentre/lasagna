@@ -117,6 +117,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #We will maintain a list of classes of loaded items that can be added to plots
         self.ingredientList = [] 
 
+        #Set up GUI based on preferences 
+        #TODO: is it best to do this here? some settings are set in lines.py and so we're not being consistent
+        self.view1Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[0])
+        self.view2Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[1])
+        self.view3Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[2])
+        self.lineWidth_spinBox.setValue(lasHelp.readPreference('defaultLineWidth'))
 
         #set up axes 
         #Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them
@@ -562,7 +568,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredients are classes that are defined in the ingredients package
         """
 
-        print "\nlasanga.addIngredient - Adding ingredient " + objectName
+        print "\nlasanga.addIngredient - Adding " + kind + " ingredient: " + objectName
 
         if len(kind)==0:
             print "ERROR: no ingredient kind specified"
@@ -1218,22 +1224,22 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     #Data from command line input if the user specified this
     if not imStackFnamesToLoad==None:
         for thisFname in imStackFnamesToLoad:
-            print "Loading " + thisFname
+            print "Loading stack " + thisFname
             tasty.loadImageStack(thisFname)
 
     if not sparsePointsToLoad==None:
         for thisFname in sparsePointsToLoad:
-            print "Loading " + thisFname
+            print "Loading points " + thisFname
             tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
 
     if not linesToLoad==None:
         for thisFname in linesToLoad:
-            print "Loading " + thisFname
+            print "Loading lines " + thisFname
             tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
     
     if not treesToLoad==None:
         for thisFname in treesToLoad:
-            print "Loading " + thisFname
+            print "Loading tree " + thisFname
             tasty.loadActions['tree_reader'].showLoadDialog(thisFname)
   
     tasty.initialiseAxes()

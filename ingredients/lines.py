@@ -20,6 +20,7 @@ import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
+import warnings #to disable some annoying NaN-related warnings
 
 
 class lines(lasagna_ingredient):
@@ -29,7 +30,7 @@ class lines(lasagna_ingredient):
                                         )
 
         #Choose symbols from preferences file. 
-        #TODO: remove symbol stuff if we indeed will get rid of this here
+        #TODO: read symbols from GUI
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
         self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
         self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
@@ -78,9 +79,9 @@ class lines(lasagna_ingredient):
             print "lines.py not proceeding because pyqtObject is false"             
             return
 
-        # check if there is data. Use `is False` because np.array == False returns an array
+        # check if there are data on the plot. Use `is False` because np.array == False returns an array
         if self.data() is False or len(self.data()) == 0:
-            pyqtObject.setData([],[]) # make sure there is no left data on plot
+            pyqtObject.setData([],[]) # make sure there are no data left on the plot
             return
 
         #Ensure our z dimension is a whole number
@@ -94,6 +95,7 @@ class lines(lasagna_ingredient):
         toLayer = sliceToPlot+zRange
 
         #Now filter the data list by this Z range. Points that will not be plotted are replaced with nan
+        warnings.simplefilter(action = "ignore", category = RuntimeWarning) #To block weird run-time warnings that aren't of interest produced by the following two lines
         data[z<fromLayer,:] = np.nan
         data[z>toLayer,:] = np.nan
 
