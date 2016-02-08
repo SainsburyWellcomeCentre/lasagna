@@ -101,7 +101,7 @@ class projection2D():
         print "%d items after remove call" % len(self.view.items())
 
 
-    def addItemsToPlotWidget(self,ingredients=[]):
+    def addItemsToPlotWidget(self,ingredients):
         """
         Add all ingredients in list to the PlotWidget as items
         """
