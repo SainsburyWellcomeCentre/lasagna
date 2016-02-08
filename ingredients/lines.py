@@ -32,10 +32,10 @@ class lines(lasagna_ingredient):
         #Choose symbols from preferences file. 
         #TODO: read symbols from GUI
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
-        self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
         self.color = lasHelp.readPreference('colorOrder')[0]
-        self.lineWidth = lasHelp.readPreference('defaultLineWidth')
+        self.symbolSize = int(self.parent.markerSize_spinBox.value())
+        self.alpha = int(self.parent.markerAlpha_spinBox.value())
+        self.lineWidth = int(self.parent.lineWidth_spinBox.value())
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
         name = QtGui.QStandardItem(objectName)

@@ -20,9 +20,9 @@ class sparsepoints(lasagna_ingredient):
         
         #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
-        self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
         self.color = lasHelp.readPreference('colorOrder')[0]
+        self.symbolSize =  int(self.parent.markerSize_spinBox.value())
+        self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = None #Not used right now
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
