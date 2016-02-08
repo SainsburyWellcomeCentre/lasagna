@@ -384,7 +384,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         for thisHook in hookArray:
             try:
-                if thisHook == None:
+                if thisHook is None:
                     print "Skipping empty hook in hook list"
                     continue
                 else:
@@ -467,7 +467,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
         fname = self.showFileLoadDialog(fileFilter=fileFilter) #TODO: this way the recently loaded files are updated before we succesfully loaded
-        if fname == None:
+        if fname is None:
             return
 
         if os.path.isfile(fname): 
@@ -736,10 +736,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #initialize cross hair
         if self.showCrossHairs:
-            if self.crossHairVLine==None:
+            if self.crossHairVLine is None:
                 self.crossHairVLine = pg.InfiniteLine(pen=(220,200,0,180),angle=90, movable=False)
                 self.crossHairVLine.objectName = 'crossHairVLine'
-            if self.crossHairHLine==None:
+            if self.crossHairHLine is None:
                 self.crossHairHLine = pg.InfiniteLine(pen=(220,200,0,180),angle=0, movable=False)
                 self.crossHairHLine.objectName = 'crossHairHLine'
 
@@ -1222,22 +1222,22 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     tasty.app = app
 
     #Data from command line input if the user specified this
-    if not imStackFnamesToLoad==None:
+    if not imStackFnamesToLoad is None:
         for thisFname in imStackFnamesToLoad:
             print "Loading stack " + thisFname
             tasty.loadImageStack(thisFname)
 
-    if not sparsePointsToLoad==None:
+    if not sparsePointsToLoad is None:
         for thisFname in sparsePointsToLoad:
             print "Loading points " + thisFname
             tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
 
-    if not linesToLoad==None:
+    if not linesToLoad is None:
         for thisFname in linesToLoad:
             print "Loading lines " + thisFname
             tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
     
-    if not treesToLoad==None:
+    if not treesToLoad is None:
         for thisFname in treesToLoad:
             print "Loading tree " + thisFname
             tasty.loadActions['tree_reader'].showLoadDialog(thisFname)

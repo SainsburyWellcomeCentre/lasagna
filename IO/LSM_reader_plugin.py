@@ -40,7 +40,7 @@ class loaderClass(lasagna_plugin):
         """
         
         fname = self.lasagna.showFileLoadDialog(fileFilter="LSM (*.lsm)")
-        if fname == None:
+        if fname is None:
             return
 
         colorOrder = lasHelp.readPreference('colorOrder')

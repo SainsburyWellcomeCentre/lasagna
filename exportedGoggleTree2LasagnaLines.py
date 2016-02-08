@@ -44,7 +44,7 @@ doPlot = args.p
 quiet = args.q
 
 
-if fname == None:
+if fname is None:
     print "Please supply a file name to convert. e.g.:\nexportedGoggleTree2LasagnaLines.py -f myFile.csv\n"
     sys.exit(0)
 
