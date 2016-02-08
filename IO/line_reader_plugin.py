@@ -67,6 +67,13 @@ class loaderClass(lasagna_plugin):
             # a list of strings with each string being one line from the file
             # add nans between lineseries
             asList = contents.split('\n')
+
+            #Check that all rows have a length of 4, since this is what a line series needs
+            expectedCols = 4 
+            if not all(len(x) == expectedCols  for x in asList):
+                print "Lines data file %s appears corrupt" % fname
+                return 
+
             data=[]
             lastLineSeries=None
             n=0

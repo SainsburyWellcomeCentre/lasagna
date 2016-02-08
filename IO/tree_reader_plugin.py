@@ -91,6 +91,9 @@ class loaderClass(lasagna_plugin):
                     print "tree_reader_plugin.showLoadDialog - importing %s" % fname
 
                 dataTree = importData(fname,headerLine=['id','parent','z','x','y'],verbose=verbose)
+                if not dataTree:
+                    print "No data loaded from %s" % fname
+                    return
 
                 #We now have an array of unique paths (segments)
                 paths=[]
