@@ -118,12 +118,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.ingredientList = [] 
 
         #Set up GUI based on preferences 
-        #TODO: is it best to do this here? some settings are set in lines.py and so we're not being consistent
         self.view1Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[0])
         self.view2Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[1])
         self.view3Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[2])
+        self.markerSize_spinBox.setValue(lasHelp.readPreference('defaultSymbolSize'))
         self.lineWidth_spinBox.setValue(lasHelp.readPreference('defaultLineWidth'))
-
+        self.markerAlpha_spinBox.setValue(lasHelp.readPreference('defaultSymbolOpacity'))
+ 
         #set up axes 
         #Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them
         self.axisRatioLineEdits = [self.axisRatioLineEdit_1,self.axisRatioLineEdit_2,self.axisRatioLineEdit_3]
