@@ -367,7 +367,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         Breaks out of the search loop if the area is found and propagates the value back through
         the recursive function calls
         """
-        if nodeID==None:
+        if nodeID is None:
             nodeID = self.rootNode
         
         children = thisTree[nodeID].children

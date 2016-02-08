@@ -371,7 +371,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         Remove parameter from parameter list
         """
-        if currentRow==None:
+        if currentRow is None:
             currentRow = self.paramListView.currentIndex().row()
         
         if currentRow<0:

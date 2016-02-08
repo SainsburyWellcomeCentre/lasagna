@@ -52,7 +52,7 @@ class lasagna_viewBox(pg.ViewBox):
         across different axes
         """
       
-        if len(self.linkedAxis)==None:
+        if len(self.linkedAxis) is None:
             return
 
         #Not zoom if the user right-drags, because this messes up stuff. Let's just do all zooming with the wheel
@@ -167,19 +167,19 @@ class lasagna_viewBox(pg.ViewBox):
                     if self.linkedAxis[thisViewBox]['linkZoom']==True: 
                         #Centre with the appropriate axes to avoid the views translating in horrible ways during zooming
                         #I don't know why I also need to call my centerOn() method, but at least this works
-                        if self.linkedAxis[thisViewBox]['linkX']=='x' and self.linkedAxis[thisViewBox]['linkY']==None :
+                        if self.linkedAxis[thisViewBox]['linkX']=='x' and self.linkedAxis[thisViewBox]['linkY'] is None :
                             thisViewBox.scaleBy(s,x=center.x())
                             self.centreOn(thisViewBox,x=center.x())
 
-                        if self.linkedAxis[thisViewBox]['linkY']=='y' and self.linkedAxis[thisViewBox]['linkX']==None :
+                        if self.linkedAxis[thisViewBox]['linkY']=='y' and self.linkedAxis[thisViewBox]['linkX'] is None :
                             thisViewBox.scaleBy(s,y=center.y())
                             self.centreOn(thisViewBox,y=center.y())
 
-                        if self.linkedAxis[thisViewBox]['linkX']=='y' and self.linkedAxis[thisViewBox]['linkY']==None : 
+                        if self.linkedAxis[thisViewBox]['linkX']=='y' and self.linkedAxis[thisViewBox]['linkY'] is None : 
                             thisViewBox.scaleBy(s,y=center.x())
                             self.centreOn(thisViewBox,y=center.x())
 
-                        if self.linkedAxis[thisViewBox]['linkY']=='x' and self.linkedAxis[thisViewBox]['linkX']==None : 
+                        if self.linkedAxis[thisViewBox]['linkY']=='x' and self.linkedAxis[thisViewBox]['linkX'] is None : 
                             thisViewBox.scaleBy(s,x=center.y())
                             self.centreOn(thisViewBox,x=center.y())
 

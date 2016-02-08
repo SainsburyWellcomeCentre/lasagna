@@ -77,10 +77,10 @@ class loaderClass(lasagna_plugin):
 
         verbose = False 
 
-        if fname == None or fname == False:
+        if fname is None or not fname:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
     
-        if fname == None or fname == False:
+        if fname is None or not fname:
             return
 
         if os.path.isfile(fname): 
@@ -119,7 +119,7 @@ class loaderClass(lasagna_plugin):
                     continue
 
                 thisLine = asList[ii]
-                if lastLineSeries==None:
+                if lastLineSeries is None:
                     lastLineSeries=thisLine[0]
 
                 if lastLineSeries != thisLine[0]:

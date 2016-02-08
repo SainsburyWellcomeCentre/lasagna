@@ -32,7 +32,7 @@ def convertString(string):
 	"""
 
 	dataType = dataTypeFromString(string)
-	if dataType == None:
+	if dataType is None:
 		return string
 	else:
 		return dataType(string)

@@ -183,7 +183,7 @@ class projection2D():
                 #      a list of items and axes in the ingredient? I don't like that.
 
                 #Got to the middle of the stack
-                if sliceToPlot == None or resetToMiddleLayer:
+                if sliceToPlot is None or resetToMiddleLayer:
                     stacks = self.lasagna.returnIngredientByType('imagestack')
                     numSlices = [] 
                     [numSlices.append(thisStack.data(self.axisToPlot).shape[0]) for thisStack in stacks]
