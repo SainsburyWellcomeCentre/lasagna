@@ -862,7 +862,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Runs when the user selects one of the points ingredients in the list
         """
-
         if len(self.ingredientList)==0:
             return
 
@@ -871,6 +870,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not ingredient:
             return
 
+        #Assign GUI values based on what is stored in the ingredient
+        self.markerSize_spinBox.setValue(ingredient.symbolSize)
+        self.markerAlpha_spinBox.setValue(ingredient.alpha)
+        self.lineWidth_spinBox.setValue(ingredient.lineWidth)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for axis tab
