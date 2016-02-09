@@ -50,11 +50,9 @@ class lines(lasagna_ingredient):
         self.modelItems=name
         self.model = self.parent.points_Model
 
-
         self.addToList()
 
 
-       
     def data(self,axisToPlot=0):
         """
         lines data are an n by 3 array where each row defines the location

@@ -17,7 +17,7 @@ class sparsepoints(lasagna_ingredient):
                                         pgObject='ScatterPlotItem'
                                         )
 
-        
+
         #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
         self.color = lasHelp.readPreference('colorOrder')[0]
@@ -37,8 +37,6 @@ class sparsepoints(lasagna_ingredient):
         #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
         self.modelItems=name
         self.model = self.parent.points_Model
-
-
 
         self.addToList()
 

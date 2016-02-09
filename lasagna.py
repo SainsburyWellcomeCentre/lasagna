@@ -247,10 +247,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenuStacks)
         #self.imageStackLayers_TreeView.setColumnWidth(0,200)
 
-        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.imageStackLayers_TreeView_slot) 
+        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.imageStackLayers_TreeView_slot) #Runs when an image stack ingredient is selected
 
 
-        #Points tab stuff
+        #Points tab stuff. (The points tab deals with sparse data types like points, lines, and trees)
         self.points_Model = QtGui.QStandardItemModel(self.points_TreeView)
         labels = QtCore.QStringList("Name") 
         self.points_Model.setHorizontalHeaderLabels(labels)
@@ -264,6 +264,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)        
         self.markerColor_pushButton.released.connect(self.markerColor_pushButton_slot)
         self.lineWidth_spinBox.valueChanged.connect(self.lineWidth_spinBox_slot)        
+
+        QtCore.QObject.connect(self.points_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.pointsLayers_TreeView_slot) #Runs when a points ingredient is selected
 
         #add the z-points spinboxes to a list to make them indexable
         self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
@@ -769,6 +771,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.returnIngredientByName(ingredient).alpha = int(value)
         self.initialiseAxes()
 
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for points tab
     # In each case, we set the values of the currently selected ingredient using the spinbox value
@@ -834,7 +837,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     #The remaining methods for this tab are involved in building a context menu on right-click
-    def layersMenuPoints(self,position): 
+    def layersMenuPoints(self,position):         
+        """
+        Defines a pop-up menu that appears when the user right-clicks on a points ingredient 
+        in the points QTreeView
+        """
         menu = QtGui.QMenu()
 
         action = QtGui.QAction("Delete",self)
@@ -844,11 +851,25 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     def deleteLayerPoints_Slot(self):
+        """
+        Remove a points ingredient and list item
+        """
         objName =  self.selectedPointsName()
         self.removeIngredientByName(objName)
         print "removed " + objName
 
+    def pointsLayers_TreeView_slot(self):
+        """
+        Runs when the user selects one of the points ingredients in the list
+        """
 
+        if len(self.ingredientList)==0:
+            return
+
+        name = self.selectedPointsName() 
+        ingredient = self.returnIngredientByName(name)
+        if not ingredient:
+            return
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1145,8 +1166,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         name = self.selectedStackName() 
-        ingredient = self.returnIngredientByName(self.selectedStackName())
-        if ingredient==False:
+        ingredient = self.returnIngredientByName(name)
+        if not ingredient:
             return
 
         self.imageAlpha_horizontalSlider.setValue(ingredient._alpha) #see also: imageAlpha_horizontalSlider_slot
