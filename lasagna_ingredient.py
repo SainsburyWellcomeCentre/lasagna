@@ -73,13 +73,13 @@ class lasagna_ingredient(object):
     	colorName = colorName.lower()
 
     	colorDict = {
-    				'gray'	: 	[nVal,nVal,nVal,alpha],
-    				'red'	: 	[nVal, 0 , 0 ,alpha],
-        			'green'	:	[ 0 ,nVal, 0 ,alpha],
-					'blue'	:	[ 0 , 0 ,nVal,alpha],
-        			'magenta':	[nVal, 0 ,nVal,alpha],
-			        'cyan'	:	[ 0 ,nVal,nVal,alpha], 
-        			'yellow':	[nVal,nVal, 0 ,alpha]
+    				'gray'      : 	[nVal,nVal,nVal,alpha],
+    				'red'   	: 	[nVal, 0  , 0  ,alpha],
+        			'green'	    :	[ 0  ,nVal, 0  ,alpha],
+					'blue'	    :	[ 0  , 0  ,nVal,alpha],
+        			'magenta'   :	[nVal, 0  ,nVal,alpha],
+			        'cyan'	    :	[ 0  ,nVal,nVal,alpha], 
+        			'yellow'    :	[nVal,nVal, 0  ,alpha]
         			}
 
         if colorDict.has_key(colorName):

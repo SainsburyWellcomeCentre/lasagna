@@ -222,8 +222,8 @@ class projection2D():
         ingredients - lasagna.ingredients
         slicesToPlot - a tuple of length 2 that defines which slices to plot for the Y and X linked axes
         """
-        #self.updatePlotItems_2D(ingredients)  #TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
-                                              # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
+        #self.updatePlotItems_2D(ingredients)  # TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
+                                               # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
         self.linkedYprojection.updatePlotItems_2D(ingredients,slicesToPlot[0])
         self.linkedXprojection.updatePlotItems_2D(ingredients,slicesToPlot[1])
 

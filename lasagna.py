@@ -237,6 +237,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         #Image tab stuff
+        #ImageStack QTreeView (see lasagna_ingredient.addToList for where the model is updated upon ingredient addition)
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageAlpha_horizontalSlider.valueChanged.connect(self.imageAlpha_horizontalSlider_slot)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
@@ -251,12 +252,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         #Points tab stuff. (The points tab deals with sparse data types like points, lines, and trees)
+        #Points QTreeView (see lasagna_ingredient.addToList for where the model is updated upon ingredient addition)
         self.points_Model = QtGui.QStandardItemModel(self.points_TreeView)
         labels = QtCore.QStringList("Name") 
         self.points_Model.setHorizontalHeaderLabels(labels)
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.points_TreeView.customContextMenuRequested.connect(self.layersMenuPoints)
+
+        QtCore.QObject.connect(self.points_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.pointsLayers_TreeView_slot) #Runs when a points ingredient is selected
+
+        #Settings boxes, etc, for the points (sparse data) ingredients
         [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')] #populate with markers
         self.markerSymbol_comboBox.activated.connect(self.markerSymbol_comboBox_slot)
         self.markerSize_spinBox.valueChanged.connect(self.markerSize_spinBox_slot)
@@ -264,8 +270,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)        
         self.markerColor_pushButton.released.connect(self.markerColor_pushButton_slot)
         self.lineWidth_spinBox.valueChanged.connect(self.lineWidth_spinBox_slot)        
-
-        QtCore.QObject.connect(self.points_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.pointsLayers_TreeView_slot) #Runs when a points ingredient is selected
 
         #add the z-points spinboxes to a list to make them indexable
         self.viewZ_spinBoxes = [self.view1Z_spinBox, self.view2Z_spinBox, self.view3Z_spinBox]
@@ -571,13 +575,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredients are classes that are defined in the ingredients package
         """
 
-        print "\nlasanga.addIngredient - Adding " + kind + " ingredient: " + objectName
+        print "\nlasanga.addIngredient - Adding %s ingredient: %s" % (kind,objectName)
 
         if len(kind)==0:
-            print "ERROR: no ingredient kind specified"
+            print "ERROR: no ingredient kind %s is defined by Lasagna" % (kind)
             return
 
-        #Do not attempt to add an ingredient if its class is not defined
+        #Do not attempt to add an ingredient if it's class is not defined
         if not hasattr(ingredients,kind):
             print "ERROR: ingredients module has no class '%s'" % kind
             return
