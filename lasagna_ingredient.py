@@ -4,6 +4,7 @@ Ingredients inherit this class
 
 import os
 import pyqtgraph as pg
+from PyQt4 import QtGui, QtCore
 
 class lasagna_ingredient(object):
     def __init__(self, parent, data, fnameAbsPath='', enable=True, objectName='',pgObject='', pgObjectConstructionArgs=dict()):
@@ -19,6 +20,7 @@ class lasagna_ingredient(object):
         self.pgObject   = pgObject          #The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
         self.pgObjectConstructionArgs = pgObjectConstructionArgs #The pyqtgraph item is created with these arguments
 
+        self.color = None                   #The ingredient color (e.g. colour of the stack or lines or points)
 
     def fname(self):
         """
@@ -53,6 +55,7 @@ class lasagna_ingredient(object):
     	Add this ingredient's list items to the QStandardModel (model) associated with its QTreeView
     	then highlight it when it's added.
     	"""
+        self.setRowColor()
     	self.model.appendRow(self.modelItems)
     	self.model.parent().setCurrentIndex(self.modelItems.index()) #Parent is, for example, a QTreeView
 
@@ -63,6 +66,25 @@ class lasagna_ingredient(object):
         """
     	items = self.model.findItems(self.objectName)
     	self.model.removeRow(items[0].row())
+
+
+    def setRowColor(self):
+        """
+        Set the color of this ingredient row based upon its stored color
+        """
+        if self.color is None or not hasattr(self,'modelItems'):
+            return
+
+        if isinstance(self.color,str):
+            color=self.colorName2value(self.color)
+        else:
+            color = self.color
+
+        Basil = QtGui.QBrush()
+        Basil.setColor(QtGui.QColor(color[0],color[1],color[2]))
+        Basil.setStyle(QtCore.Qt.BrushStyle(1))
+
+        self.modelItems.setBackground(Basil)
 
 
     def colorName2value(self,colorName,nVal=255,alpha=255):
