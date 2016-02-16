@@ -31,7 +31,6 @@ class loaderClass(lasagna_plugin):
         iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.loadAction.setIcon(iconLoadOverlay)
 
-
         #Insert the action into the menu
         self.loadAction.setObjectName("sparsePointRead")
         self.lasagna.menuLoad_ingredient.addAction(self.loadAction)

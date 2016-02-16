@@ -164,7 +164,7 @@ def defaultPreferences():
             'symbolOrder' : ['o','s','t','d','+'],
             'defaultLineWidth' : 2,
             'defaultSymbolOpacity' : 200,
-            'defaultSymbolSize' : 1,
+            'defaultSymbolSize' : 8,
             'hideZoomResetButtonOnImageAxes' : True,
             'hideAxes' : True,
             }

@@ -83,7 +83,7 @@ class sparsepoints(lasagna_ingredient):
 
         #Add points, making points further from the current
         #layer less prominent 
-        #TODO: make how this settable by the user via YAML or UI elements
+        #TODO: make this settable by the user via the YAML or UI elements
         dataToAdd = []
         for ii in range(len(data)):
 
@@ -109,7 +109,6 @@ class sparsepoints(lasagna_ingredient):
         pyqtObject.setData(dataToAdd)
      
 
-
     def addToList(self):
         """
         Add to list and then set UI elements
@@ -117,7 +116,6 @@ class sparsepoints(lasagna_ingredient):
         super(sparsepoints,self).addToList()
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
-
             
 
     def symbolBrush(self,alpha=False):

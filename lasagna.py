@@ -875,9 +875,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         #Assign GUI values based on what is stored in the ingredient
-        self.markerSize_spinBox.setValue(ingredient.symbolSize)
-        self.markerAlpha_spinBox.setValue(ingredient.alpha)
-        self.lineWidth_spinBox.setValue(ingredient.lineWidth)
+        if isinstance(ingredient.symbolSize,int):
+            self.markerSize_spinBox.setValue(ingredient.symbolSize)
+        if isinstance(ingredient.alpha,int):
+            self.markerAlpha_spinBox.setValue(ingredient.alpha)
+        if isinstance(ingredient.lineWidth,int):
+            self.lineWidth_spinBox.setValue(ingredient.lineWidth)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for axis tab
