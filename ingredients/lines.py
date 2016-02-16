@@ -21,7 +21,9 @@ from  lasagna_ingredient import lasagna_ingredient
 from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
 import warnings #to disable some annoying NaN-related warnings
-
+from matplotlib import cm
+from numpy import linspace
+from random import shuffle
 
 class lines(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
@@ -32,7 +34,6 @@ class lines(lasagna_ingredient):
         #Choose symbols from preferences file. 
         #TODO: read symbols from GUI
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.color = [250,0,0]
         self.symbolSize = int(self.parent.markerSize_spinBox.value())
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = int(self.parent.lineWidth_spinBox.value())
@@ -51,6 +52,14 @@ class lines(lasagna_ingredient):
         self.model = self.parent.points_Model
 
         self.addToList()
+
+        #Set the colour of the object based on how many items are already present
+        thisNumber = self.parent.points_Model.rowCount()-1
+        number_of_colors = 6
+        cm_subsection = linspace(0, 1, number_of_colors) 
+        colors = [ cm.jet(x) for x in cm_subsection ]
+        color = colors[thisNumber]
+        self.color = [color[0]*255, color[1]*255, color[2]*255]
 
 
     def data(self,axisToPlot=0):

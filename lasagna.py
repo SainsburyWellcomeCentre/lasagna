@@ -1125,6 +1125,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.initialiseAxes()
         self.runHook(self.hooks['changeImageStackColorMap_Slot_End'])
 
+
     def deleteLayerStack_Slot(self):
         """
         Remove an imagestack ingredient and list item
@@ -1133,7 +1134,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeIngredientByName(objName)
         print "removed " + objName
         self.runHook(self.hooks['deleteLayerStack_Slot_End'])
-
 
 
     def stacksInTreeList(self):

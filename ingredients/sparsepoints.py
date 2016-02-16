@@ -9,6 +9,9 @@ import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
+from matplotlib import cm
+from numpy import linspace
+
 
 
 class sparsepoints(lasagna_ingredient):
@@ -20,7 +23,6 @@ class sparsepoints(lasagna_ingredient):
 
         #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.color = [250,0,0]
         self.symbolSize =  int(self.parent.markerSize_spinBox.value())
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = None #Not used right now
@@ -40,8 +42,15 @@ class sparsepoints(lasagna_ingredient):
 
         self.addToList()
 
+        #Set the colour of the object based on how many items are already present
+        thisNumber = self.parent.points_Model.rowCount()-1
+        number_of_colors = 6
+        cm_subsection = linspace(0, 1, number_of_colors) 
+        colors = [ cm.jet(x) for x in cm_subsection ]
+        color = colors[thisNumber]
+        self.color = [color[0]*255, color[1]*255, color[2]*255]
 
-       
+
     def data(self,axisToPlot=0):
         """
         Sparse point data are an n by 3 array where each row defines the location
