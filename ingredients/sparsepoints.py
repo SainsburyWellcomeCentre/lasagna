@@ -20,7 +20,7 @@ class sparsepoints(lasagna_ingredient):
 
         #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.color = lasHelp.readPreference('colorOrder')[0]
+        self.color = [250,0,0]
         self.symbolSize =  int(self.parent.markerSize_spinBox.value())
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = None #Not used right now
@@ -125,12 +125,10 @@ class sparsepoints(lasagna_ingredient):
         if alpha==False:
             alpha=self.alpha
 
-        if isinstance(self.color,str):
-            return tuple(self.colorName2value(self.color, alpha=alpha))
-        elif isinstance(self.color,list):
+        if isinstance(self.color,list):
             return tuple(self.color + [alpha])
         else:
-            print "sparsepoints.color can not cope with type " + type(self.color)
+            print "sparsepoints.color can not cope with type " + str(type(self.color))
 
 
     #---------------------------------------------------------------

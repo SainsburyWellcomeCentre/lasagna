@@ -72,41 +72,17 @@ class lasagna_ingredient(object):
         """
         Set the color of this ingredient row based upon its stored color
         """
+
         if self.color is None or not hasattr(self,'modelItems'):
             return
 
-        if isinstance(self.color,str):
-            color=self.colorName2value(self.color)
-        else:
-            color = self.color
+        if not isinstance(self.color,list):
+           print "** lasagna_ingredient -- can not set color"
+           return
+
 
         Basil = QtGui.QBrush()
-        Basil.setColor(QtGui.QColor(color[0],color[1],color[2]))
+        Basil.setColor(QtGui.QColor(self.color[0],self.color[1],self.color[2]))
         Basil.setStyle(QtCore.Qt.BrushStyle(1))
 
         self.modelItems.setBackground(Basil)
-
-
-    def colorName2value(self,colorName,nVal=255,alpha=255):
-    	"""
-    	Input is a color name, output is an RGBalpha vector.
-    	nVal is the maximum intensity value
-    	"""
-    	colorName = colorName.lower()
-
-    	colorDict = {
-    				'gray'      : 	[nVal,nVal,nVal,alpha],
-    				'red'   	: 	[nVal, 0  , 0  ,alpha],
-        			'green'	    :	[ 0  ,nVal, 0  ,alpha],
-					'blue'	    :	[ 0  , 0  ,nVal,alpha],
-        			'magenta'   :	[nVal, 0  ,nVal,alpha],
-			        'cyan'	    :	[ 0  ,nVal,nVal,alpha], 
-        			'yellow'    :	[nVal,nVal, 0  ,alpha]
-        			}
-
-        if colorDict.has_key(colorName):
-        	return colorDict[colorName]
-        else:
-            print "no pre-defined colormap %s. reverting to gray " % colorName 
-            return colorDict['gray']
-

@@ -32,7 +32,7 @@ class lines(lasagna_ingredient):
         #Choose symbols from preferences file. 
         #TODO: read symbols from GUI
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.color = lasHelp.readPreference('colorOrder')[0]
+        self.color = [250,0,0]
         self.symbolSize = int(self.parent.markerSize_spinBox.value())
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = int(self.parent.lineWidth_spinBox.value())
@@ -118,12 +118,10 @@ class lines(lasagna_ingredient):
 
 
     def symbolBrush(self):
-        if isinstance(self.color,str):
-            return tuple(self.colorName2value(self.color, alpha=self.alpha))
-        elif isinstance(self.color,list):
+        if isinstance(self.color,list):
             return tuple(self.color + [self.alpha])
         else:
-            print "lines.color can not cope with type " + type(self.color)
+            print "lines.color can not cope with type " + str(type(self.color))
 
 
     #---------------------------------------------------------------
