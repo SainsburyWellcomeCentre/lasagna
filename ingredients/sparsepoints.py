@@ -154,6 +154,7 @@ class sparsepoints(lasagna_ingredient):
         return self._color
     def set_color(self,color):
         self._color = color
+        self.setRowColor()
     color = property(get_color,set_color)
 
 

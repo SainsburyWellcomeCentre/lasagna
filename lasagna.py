@@ -862,9 +862,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeIngredientByName(objName)
         print "removed " + objName
 
+
     def pointsLayers_TreeView_slot(self):
         """
-        Runs when the user selects one of the points ingredients in the list
+        Runs when the user selects one of the points ingredients in the list.
         """
         if len(self.ingredientList)==0:
             return
@@ -881,6 +882,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.markerAlpha_spinBox.setValue(ingredient.alpha)
         if isinstance(ingredient.lineWidth,int):
             self.lineWidth_spinBox.setValue(ingredient.lineWidth)
+
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for axis tab

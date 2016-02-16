@@ -107,6 +107,7 @@ class lines(lasagna_ingredient):
         else:
             pyqtObject.setVisible(False)
 
+
     def addToList(self):
         """
         Add to list and then set UI elements
@@ -115,7 +116,6 @@ class lines(lasagna_ingredient):
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
 
-            
 
     def symbolBrush(self):
         if isinstance(self.color,str):
