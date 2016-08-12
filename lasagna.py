@@ -530,7 +530,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Updates the list of recently opened files
         """
         recentlyLoadedFiles = lasHelp.readPreference('recentlyLoadedFiles')
-        print "RUNNING RECENTLYOPENEDFILES" #TODO: REMOVE
+
         #Remove existing actions if present
         if len(self.recentLoadActions)>0 and len(recentlyLoadedFiles)>0:
             for thisAction in self.recentLoadActions:
@@ -538,7 +538,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.recentLoadActions = []
 
         for thisFile in recentlyLoadedFiles:
-            print thisFile #TODO: REMOVE
             self.recentLoadActions.append(self.menuOpen_recent.addAction(thisFile)) #add action to list
             self.recentLoadActions[-1].triggered.connect(self.loadRecentFileSlot) #link it to a slot
             #NOTE: tried the lambda approach but it always assigns the last file name to the list to all signals
