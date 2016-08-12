@@ -248,7 +248,7 @@ def preferenceWriter(preferenceName,newValue,prefFName=getLasagnaPrefFile()):
     Overwrite a single key "preferenceName" in self.preferences with the value "newValue"
     Saves updates dictionary to the preferences file
     """
-    print preferenceName
+    print "Writing preference data for: %s\n" % preferenceName
     preferences = loadAllPreferences(prefFName)
     if preferences.has_key(preferenceName):
         preferences[preferenceName] = newValue
