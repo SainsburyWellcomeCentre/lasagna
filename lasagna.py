@@ -118,12 +118,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.ingredientList = [] 
 
         #Set up GUI based on preferences 
-        #TODO: is it best to do this here? some settings are set in lines.py and so we're not being consistent
         self.view1Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[0])
         self.view2Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[1])
         self.view3Z_spinBox.setValue(lasHelp.readPreference('defaultPointZSpread')[2])
+        self.markerSize_spinBox.setValue(lasHelp.readPreference('defaultSymbolSize'))
         self.lineWidth_spinBox.setValue(lasHelp.readPreference('defaultLineWidth'))
-
+        self.markerAlpha_spinBox.setValue(lasHelp.readPreference('defaultSymbolOpacity'))
+ 
         #set up axes 
         #Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them
         self.axisRatioLineEdits = [self.axisRatioLineEdit_1,self.axisRatioLineEdit_2,self.axisRatioLineEdit_3]
@@ -236,6 +237,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         #Image tab stuff
+        #ImageStack QTreeView (see lasagna_ingredient.addToList for where the model is updated upon ingredient addition)
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageAlpha_horizontalSlider.valueChanged.connect(self.imageAlpha_horizontalSlider_slot)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
@@ -246,16 +248,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenuStacks)
         #self.imageStackLayers_TreeView.setColumnWidth(0,200)
 
-        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.imageStackLayers_TreeView_slot) 
+        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.imageStackLayers_TreeView_slot) #Runs when an image stack ingredient is selected
 
 
-        #Points tab stuff
+        #Points tab stuff. (The points tab deals with sparse data types like points, lines, and trees)
+        #Points QTreeView (see lasagna_ingredient.addToList for where the model is updated upon ingredient addition)
         self.points_Model = QtGui.QStandardItemModel(self.points_TreeView)
         labels = QtCore.QStringList("Name") 
         self.points_Model.setHorizontalHeaderLabels(labels)
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.points_TreeView.customContextMenuRequested.connect(self.layersMenuPoints)
+
+        QtCore.QObject.connect(self.points_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.pointsLayers_TreeView_slot) #Runs when a points ingredient is selected
+
+        #Settings boxes, etc, for the points (sparse data) ingredients
         [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')] #populate with markers
         self.markerSymbol_comboBox.activated.connect(self.markerSymbol_comboBox_slot)
         self.markerSize_spinBox.valueChanged.connect(self.markerSize_spinBox_slot)
@@ -497,11 +504,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         #Keep a track of the last loaded files
         recentlyLoaded = lasHelp.readPreference('recentlyLoadedFiles')
         n = lasHelp.readPreference('numRecentFiles')
+
+
+        #Add to start of list
+        recentlyLoaded.reverse()
         recentlyLoaded.append(fname)
-        recentlyLoaded = list(set(recentlyLoaded)) #get remove repeats (i.e. keep only unique values)
+        recentlyLoaded.reverse()
 
         while len(recentlyLoaded)>n:
             recentlyLoaded.pop(-1)
+
+        #TODO: list will no longer have the most recent item first
+        recentlyLoaded = list(set(recentlyLoaded)) #get remove repeats (i.e. keep only unique values)
 
         lasHelp.preferenceWriter('recentlyLoadedFiles',recentlyLoaded)
         self.updateRecentlyOpenedFiles()
@@ -516,7 +530,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Updates the list of recently opened files
         """
         recentlyLoadedFiles = lasHelp.readPreference('recentlyLoadedFiles')
-
+        print "RUNNING RECENTLYOPENEDFILES" #TODO: REMOVE
         #Remove existing actions if present
         if len(self.recentLoadActions)>0 and len(recentlyLoadedFiles)>0:
             for thisAction in self.recentLoadActions:
@@ -524,6 +538,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.recentLoadActions = []
 
         for thisFile in recentlyLoadedFiles:
+            print thisFile #TODO: REMOVE
             self.recentLoadActions.append(self.menuOpen_recent.addAction(thisFile)) #add action to list
             self.recentLoadActions[-1].triggered.connect(self.loadRecentFileSlot) #link it to a slot
             #NOTE: tried the lambda approach but it always assigns the last file name to the list to all signals
@@ -568,13 +583,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredients are classes that are defined in the ingredients package
         """
 
-        print "\nlasanga.addIngredient - Adding " + kind + " ingredient: " + objectName
+        print "\nlasanga.addIngredient - Adding %s ingredient: %s" % (kind,objectName)
 
         if len(kind)==0:
-            print "ERROR: no ingredient kind specified"
+            print "ERROR: no ingredient kind %s is defined by Lasagna" % (kind)
             return
 
-        #Do not attempt to add an ingredient if its class is not defined
+        #Do not attempt to add an ingredient if it's class is not defined
         if not hasattr(ingredients,kind):
             print "ERROR: ingredients module has no class '%s'" % kind
             return
@@ -768,6 +783,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.returnIngredientByName(ingredient).alpha = int(value)
         self.initialiseAxes()
 
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for points tab
     # In each case, we set the values of the currently selected ingredient using the spinbox value
@@ -833,7 +849,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     #The remaining methods for this tab are involved in building a context menu on right-click
-    def layersMenuPoints(self,position): 
+    def layersMenuPoints(self,position):         
+        """
+        Defines a pop-up menu that appears when the user right-clicks on a points ingredient 
+        in the points QTreeView
+        """
         menu = QtGui.QMenu()
 
         action = QtGui.QAction("Delete",self)
@@ -843,11 +863,33 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     def deleteLayerPoints_Slot(self):
+        """
+        Remove a points ingredient and list item
+        """
         objName =  self.selectedPointsName()
         self.removeIngredientByName(objName)
         print "removed " + objName
 
 
+    def pointsLayers_TreeView_slot(self):
+        """
+        Runs when the user selects one of the points ingredients in the list.
+        """
+        if len(self.ingredientList)==0:
+            return
+
+        name = self.selectedPointsName() 
+        ingredient = self.returnIngredientByName(name)
+        if not ingredient:
+            return
+
+        #Assign GUI values based on what is stored in the ingredient
+        if isinstance(ingredient.symbolSize,int):
+            self.markerSize_spinBox.setValue(ingredient.symbolSize)
+        if isinstance(ingredient.alpha,int):
+            self.markerAlpha_spinBox.setValue(ingredient.alpha)
+        if isinstance(ingredient.lineWidth,int):
+            self.lineWidth_spinBox.setValue(ingredient.lineWidth)
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1091,6 +1133,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.initialiseAxes()
         self.runHook(self.hooks['changeImageStackColorMap_Slot_End'])
 
+
     def deleteLayerStack_Slot(self):
         """
         Remove an imagestack ingredient and list item
@@ -1099,7 +1142,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeIngredientByName(objName)
         print "removed " + objName
         self.runHook(self.hooks['deleteLayerStack_Slot_End'])
-
 
 
     def stacksInTreeList(self):
@@ -1144,8 +1186,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         name = self.selectedStackName() 
-        ingredient = self.returnIngredientByName(self.selectedStackName())
-        if ingredient==False:
+        ingredient = self.returnIngredientByName(name)
+        if not ingredient:
             return
 
         self.imageAlpha_horizontalSlider.setValue(ingredient._alpha) #see also: imageAlpha_horizontalSlider_slot

@@ -9,6 +9,9 @@ import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
+from matplotlib import cm
+from numpy import linspace
+
 
 
 class sparsepoints(lasagna_ingredient):
@@ -17,12 +20,11 @@ class sparsepoints(lasagna_ingredient):
                                         pgObject='ScatterPlotItem'
                                         )
 
-        
+
         #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
-        self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
-        self.color = lasHelp.readPreference('colorOrder')[0]
+        self.symbolSize =  int(self.parent.markerSize_spinBox.value())
+        self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = None #Not used right now
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
@@ -38,12 +40,17 @@ class sparsepoints(lasagna_ingredient):
         self.modelItems=name
         self.model = self.parent.points_Model
 
-
-
         self.addToList()
 
+        #Set the colour of the object based on how many items are already present
+        thisNumber = self.parent.points_Model.rowCount()-1
+        number_of_colors = 6
+        cm_subsection = linspace(0, 1, number_of_colors) 
+        colors = [ cm.jet(x) for x in cm_subsection ]
+        color = colors[thisNumber]
+        self.color = [color[0]*255, color[1]*255, color[2]*255]
 
-       
+
     def data(self,axisToPlot=0):
         """
         Sparse point data are an n by 3 array where each row defines the location
@@ -85,7 +92,7 @@ class sparsepoints(lasagna_ingredient):
 
         #Add points, making points further from the current
         #layer less prominent 
-        #TODO: make how this settable by the user via YAML or UI elements
+        #TODO: make this settable by the user via the YAML or UI elements
         dataToAdd = []
         for ii in range(len(data)):
 
@@ -111,7 +118,6 @@ class sparsepoints(lasagna_ingredient):
         pyqtObject.setData(dataToAdd)
      
 
-
     def addToList(self):
         """
         Add to list and then set UI elements
@@ -119,7 +125,6 @@ class sparsepoints(lasagna_ingredient):
         super(sparsepoints,self).addToList()
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
-
             
 
     def symbolBrush(self,alpha=False):
@@ -129,12 +134,10 @@ class sparsepoints(lasagna_ingredient):
         if alpha==False:
             alpha=self.alpha
 
-        if isinstance(self.color,str):
-            return tuple(self.colorName2value(self.color, alpha=alpha))
-        elif isinstance(self.color,list):
+        if isinstance(self.color,list):
             return tuple(self.color + [alpha])
         else:
-            print "sparsepoints.color can not cope with type " + type(self.color)
+            print "sparsepoints.color can not cope with type " + str(type(self.color))
 
 
     #---------------------------------------------------------------
@@ -158,6 +161,7 @@ class sparsepoints(lasagna_ingredient):
         return self._color
     def set_color(self,color):
         self._color = color
+        self.setRowColor()
     color = property(get_color,set_color)
 
 

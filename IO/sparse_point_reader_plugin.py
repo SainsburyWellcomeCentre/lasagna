@@ -1,12 +1,14 @@
 
 """
 Read sparse points from a text file.
+
+The expected format of the sparse points file:
 The text file containing the sparse points should be in the form:
 z_position,x_position,y_position\n
 z_position,x_position,y_position\n
 ...
 
-No header. 
+No header corresponding to column names. 
 """
 
 import os
@@ -30,7 +32,6 @@ class loaderClass(lasagna_plugin):
         iconLoadOverlay = QtGui.QIcon()
         iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.loadAction.setIcon(iconLoadOverlay)
-
 
         #Insert the action into the menu
         self.loadAction.setObjectName("sparsePointRead")

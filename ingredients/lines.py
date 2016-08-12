@@ -21,7 +21,9 @@ from  lasagna_ingredient import lasagna_ingredient
 from PyQt4 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
 import warnings #to disable some annoying NaN-related warnings
-
+from matplotlib import cm
+from numpy import linspace
+from random import shuffle
 
 class lines(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):
@@ -32,10 +34,9 @@ class lines(lasagna_ingredient):
         #Choose symbols from preferences file. 
         #TODO: read symbols from GUI
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.symbolSize = lasHelp.readPreference('defaultSymbolSize')
-        self.alpha = lasHelp.readPreference('defaultSymbolOpacity')
-        self.color = lasHelp.readPreference('colorOrder')[0]
-        self.lineWidth = lasHelp.readPreference('defaultLineWidth')
+        self.symbolSize = int(self.parent.markerSize_spinBox.value())
+        self.alpha = int(self.parent.markerAlpha_spinBox.value())
+        self.lineWidth = int(self.parent.lineWidth_spinBox.value())
 
         #Add to the imageStackLayers_model which is associated with the points QTreeView
         name = QtGui.QStandardItem(objectName)
@@ -50,11 +51,17 @@ class lines(lasagna_ingredient):
         self.modelItems=name
         self.model = self.parent.points_Model
 
-
         self.addToList()
 
+        #Set the colour of the object based on how many items are already present
+        thisNumber = self.parent.points_Model.rowCount()-1
+        number_of_colors = 6
+        cm_subsection = linspace(0, 1, number_of_colors) 
+        colors = [ cm.jet(x) for x in cm_subsection ]
+        color = colors[thisNumber]
+        self.color = [color[0]*255, color[1]*255, color[2]*255]
 
-       
+
     def data(self,axisToPlot=0):
         """
         lines data are an n by 3 array where each row defines the location
@@ -109,6 +116,7 @@ class lines(lasagna_ingredient):
         else:
             pyqtObject.setVisible(False)
 
+
     def addToList(self):
         """
         Add to list and then set UI elements
@@ -117,15 +125,12 @@ class lines(lasagna_ingredient):
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
 
-            
 
     def symbolBrush(self):
-        if isinstance(self.color,str):
-            return tuple(self.colorName2value(self.color, alpha=self.alpha))
-        elif isinstance(self.color,list):
+        if isinstance(self.color,list):
             return tuple(self.color + [self.alpha])
         else:
-            print "lines.color can not cope with type " + type(self.color)
+            print "lines.color can not cope with type " + str(type(self.color))
 
 
     #---------------------------------------------------------------
@@ -149,6 +154,7 @@ class lines(lasagna_ingredient):
         return self._color
     def set_color(self,color):
         self._color = color
+        self.setRowColor()
     color = property(get_color,set_color)
 
 

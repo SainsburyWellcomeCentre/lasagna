@@ -72,11 +72,14 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
             continue
 
         dataLine = line.split(colSep)
+        if len(header) !=len(dataLine):
+            print "\nTree file appears corrupt! header length is %d but data line length is %d.\ntree.importData is aborting.\n" % (len(header),len(dataLine))
+            return False
+
         theseData = map(int,dataLine[0:2]) #add index and parent to the first two columns
 
         #Add data to the third column. Either as a list or as a dictionary (if header names were provided)
         if header != False: #add as dictionary
-            assert len(header)==len(dataLine)
             dataCol = dict()
 
             for ii in range(len(header)-2):

@@ -4,6 +4,7 @@ Ingredients inherit this class
 
 import os
 import pyqtgraph as pg
+from PyQt4 import QtGui, QtCore
 
 class lasagna_ingredient(object):
     def __init__(self, parent, data, fnameAbsPath='', enable=True, objectName='',pgObject='', pgObjectConstructionArgs=dict()):
@@ -19,6 +20,7 @@ class lasagna_ingredient(object):
         self.pgObject   = pgObject          #The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
         self.pgObjectConstructionArgs = pgObjectConstructionArgs #The pyqtgraph item is created with these arguments
 
+        self.color = None                   #The ingredient color (e.g. colour of the stack or lines or points)
 
     def fname(self):
         """
@@ -53,6 +55,7 @@ class lasagna_ingredient(object):
     	Add this ingredient's list items to the QStandardModel (model) associated with its QTreeView
     	then highlight it when it's added.
     	"""
+        self.setRowColor()
     	self.model.appendRow(self.modelItems)
     	self.model.parent().setCurrentIndex(self.modelItems.index()) #Parent is, for example, a QTreeView
 
@@ -65,26 +68,21 @@ class lasagna_ingredient(object):
     	self.model.removeRow(items[0].row())
 
 
-    def colorName2value(self,colorName,nVal=255,alpha=255):
-    	"""
-    	Input is a color name, output is an RGBalpha vector.
-    	nVal is the maximum intensity value
-    	"""
-    	colorName = colorName.lower()
+    def setRowColor(self):
+        """
+        Set the color of this ingredient row based upon its stored color
+        """
 
-    	colorDict = {
-    				'gray'	: 	[nVal,nVal,nVal,alpha],
-    				'red'	: 	[nVal, 0 , 0 ,alpha],
-        			'green'	:	[ 0 ,nVal, 0 ,alpha],
-					'blue'	:	[ 0 , 0 ,nVal,alpha],
-        			'magenta':	[nVal, 0 ,nVal,alpha],
-			        'cyan'	:	[ 0 ,nVal,nVal,alpha], 
-        			'yellow':	[nVal,nVal, 0 ,alpha]
-        			}
+        if self.color is None or not hasattr(self,'modelItems'):
+            return
 
-        if colorDict.has_key(colorName):
-        	return colorDict[colorName]
-        else:
-            print "no pre-defined colormap %s. reverting to gray " % colorName 
-            return colorDict['gray']
+        if not isinstance(self.color,list):
+           print "** lasagna_ingredient -- can not set color"
+           return
 
+
+        Basil = QtGui.QBrush()
+        Basil.setColor(QtGui.QColor(self.color[0],self.color[1],self.color[2]))
+        Basil.setStyle(QtCore.Qt.BrushStyle(1))
+
+        self.modelItems.setBackground(Basil)
