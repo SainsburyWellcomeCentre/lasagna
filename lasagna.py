@@ -1,12 +1,9 @@
-#!/usr/bin/python
+#!⁠⁠⁠⁠/usr/bin/env python2
+
 
 """
 Show coronal, transverse and saggital plots in different panels
 
-Example usage:
-threeSubPlots.py myImage.tiff myImage2.tiff
-threeSubPlots.py myImage.mhd myImage2.mhd
-threeSubPlots.py myImage.tiff myImage2.mhd
 
 Depends on:
 vtk
