@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-This function accepts a csv file produced by exportGogglePoints.m
+This function accepts a csv file produced by aratools.utils.exportGogglePoints.m
 Each row of the csv file produced by that function is in this format:
 nodeId,parentID,z position,x position,y position
 
