@@ -18,17 +18,17 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
 
     Inputs:
     PlotWidget - an instance of a PyQtGraph plot widget
-    itemName - a string defining the .objectName to search for in PlotWidget.
+    itemName - a string defining the .objectName to search for in PlotWidget. 
     regex - if True the itemName is treated as a regular expression. [False by default]
 
     Outputs:
     Returns the instance of the object bearing the chosen name. Returns None if no
-    object was found.
+    object was found. 
 
     Notes:
     The user must assign a sensible name to every created plot item. Added objects will
     by default have a blank object name. This function does not do a recursive search,
-    so you can't feed it the GUI root object and expect an answer. It returns *ONLY* the
+    so you can't feed it the GUI root object and expect an answer. It returns *ONLY* the 
     first found item.
     """
 
@@ -105,7 +105,7 @@ def absPathToLasagna():
 
 def getLasagna_prefDir():
     """
-    Returns the path to lasagna preferences directory.
+    Returns the path to lasagna preferences directory. 
     If it does not exist it creates it and then returns the path
     """
     prefDir = getHomeDir() +'.lasagna'
@@ -125,8 +125,8 @@ def getLasagna_prefDir():
 def getLasagnaPrefFile():
     """
     Returns the location of the main lasagna preferences file.
-    It does not matter if the file does not exist, since it will be
-    created on demand by other functions.
+    It does not matter if the file does not exist, since it will be 
+    created on demand by other functions. 
     """
     return getLasagna_prefDir() + 'lasagna_prefs.yml'
 
@@ -136,8 +136,8 @@ def getLasagnaPrefFile():
 
 
 
- #     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- #   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ #     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+ #   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # Functions that handle preferences
 def defaultPreferences():
@@ -146,17 +146,17 @@ def defaultPreferences():
     Return a dictionary containing the default lasagna preferences. This is necessary
     in case a particular preference is missing or the preferences file is missing.
     """
-
+    
     return {
             'lastLoadDir' : getHomeDir(),           #The directory from which we last loaded data
             'numRecentFiles' : 5,                   #The number of recently loaded file names to store
             'recentlyLoadedFiles' : [],             #A list containing the last "numRecentFiles" file names
             'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
-            'pluginPaths' : [absPathToLasagna()+'tutorialPlugins',
-                             absPathToLasagna()+'registrationPlugins',
+            'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', 
+                             absPathToLasagna()+'registrationPlugins', 
                              absPathToLasagna()+'ARA'], #must be asbolute paths
             'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
-            'showCrossHairs' : True,                 #Whether or not to show the cross hairs
+            'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
             'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
             'symbolOrder' : ['o','s','t','d','+'],
             'defaultLineWidth' : 2,
@@ -167,8 +167,8 @@ def defaultPreferences():
             }
 
  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- #   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- #     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ #   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ #     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 
 
 
@@ -176,17 +176,15 @@ def defaultPreferences():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Functions that handle preferences
 """
-The following plugin functions by default expect the name and path of the preferences file to be the
-main lasagna preferences file. However, this can be over-ridden so that indiviual plugins can have
-their own preferences files and still use these functions.
+The following plugin functions by default expect the name and path of the preferences file to be the 
+main lasagna preferences file. However, this can be over-ridden so that indiviual plugins can have 
+their own preferences files and still use these functions. 
 """
 
-def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPreferences(),
-                       defaultMissingPrefs=False):
+def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPreferences()):
     """
     Load the preferences YAML file. If the file is missing, we create it using the default
     preferences defined above. Preferences are returned as a dictionary.
-    if defaultMissingPrefs populate prefs absent in loaded file with default
     """
     #print "loading from pref file %s" % prefFName
     #Generate a default preferences file if no preferences file exists
@@ -197,26 +195,22 @@ def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPrefere
         print "Created default preferences file in " + prefFName
 
     #Load preferences YAML file as a dictionary
-    with file(prefFName, 'r') as stream:
-        prefs= yaml.load(stream)
-    if defaultMissingPrefs:
-        defaultPref.update(prefs)
-        prefs=defaultPref
-    return prefs
+    with file(prefFName, 'r') as stream: 
+        return yaml.load(stream)
 
 
 
 def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=getLasagnaPrefFile()):
     """
     Read preferences with key "preferenceName" from YAML file prefFName on disk.
-    If the key is absent, call defaultPreferences and search for the key. If it
+    If the key is abstent, call defaultPreferences and search for the key. If it
     is present, add to preferences file and return the value. If absent, raise a
-    warning and return None. The caller function needs to decide what to do with
-    the None.
+    warning and return None. The caller function needs to decide what to do with 
+    the None. 
     """
-
+    
     #TODO: need some sort of check as to whether the preference value is valid
-
+    
     #Check on disk
     preferences = loadAllPreferences(prefFName)
     if preferences.has_key(preferenceName):
