@@ -475,30 +475,23 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  
     #Code to handle generic file loading, dialogs, etc
-    def showFileLoadDialog(self, fileFilter="All files (*)", singleFile=True):
+    def showFileLoadDialog(self, fileFilter="All files (*)" ):
         """
         Bring up the file load dialog. Return the file name. Update the last used path. 
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
-        if singleFile:
-            sgl_fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
-                                                      fileFilter)
-            sgl_fname = str(sgl_fname)
-            if len(sgl_fname) == 0:
-                return None
-            fname=sgl_fname
-        else:
-            fname = QtGui.QFileDialog.getOpenFileNames(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
-                                                        fileFilter)
-            sgl_fname = str(fname[0]) # take one of the file to get path and add to history
+        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
+        fname = str(fname)
+        if len(fname) == 0:
+            return None
 
         #Update last loaded directory 
-        lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(sgl_fname))
+        lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fname))
 
         #Keep a track of the last loaded files
         recentlyLoaded = lasHelp.readPreference('recentlyLoadedFiles')
         n = lasHelp.readPreference('numRecentFiles')
-        recentlyLoaded.append(sgl_fname)
+        recentlyLoaded.append(fname)
         recentlyLoaded = list(set(recentlyLoaded)) #get remove repeats (i.e. keep only unique values)
 
         while len(recentlyLoaded)>n:
