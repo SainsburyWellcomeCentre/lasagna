@@ -62,10 +62,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
         item = self.listWidget.takeItem(indice)
         self.listWidget.insertItem(indice-1,item)
         self.listWidget.setCurrentRow(indice-1)
-        # if self.update_checkBox.isChecked():
-        #     for axis in self.lasagna.axes2D:
-        #         axis.updatePlotItems_2D(self.lasagna.ingredientList,
-        #                                 sliceToPlot=int(item.text().split(' ')[1]))
 
     def move_down(self):
         indice = [i.row() for i in self.listWidget.selectedIndexes()]
@@ -81,20 +77,31 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
         item = self.listWidget.takeItem(indice)
         self.listWidget.insertItem(indice+1,item)
         self.listWidget.setCurrentRow(indice+1)
-        # if self.update_checkBox.isChecked():
-        #     for axis in self.lasagna.axes2D:
-        #         axis.updatePlotItems_2D(self.lasagna.ingredientList,
-        #                                 sliceToPlot=int(item.text().split(' ')[1]))
 
-    def update_plot(self):
-        item = self.listWidget.selectedItems()
-        if not len(item):
+    def update_plot(self, current=None, previous=None):
+        """Update the drawn slice
+
+        Current and Previous are arguments sent by currentItemChanged. If they are none
+        just take the first (and only) selected item
+        """
+        # update only if the box is checked
+        if not self.update_checkBox.isChecked():
             return
-        item = item[0]
-        if self.update_checkBox.isChecked():
-            for axis in self.lasagna.axes2D:
-                axis.updatePlotItems_2D(self.lasagna.ingredientList,
-                                        sliceToPlot=int(item.text().split(' ')[1]))
+
+        if current is None:
+            # we have no items provided, just take what is selected
+            item = self.listWidget.selectedItems()
+            if not len(item):
+                # nothing is selected, return
+                return
+            item = item[0]
+        else:
+            # we have an item, ignore the previous, use the current
+            item = current
+
+        for axis in self.lasagna.axes2D:
+            axis.updatePlotItems_2D(self.lasagna.ingredientList,
+                                    sliceToPlot=int(item.text().split(' ')[1]))
 
 
     def doit(self):
