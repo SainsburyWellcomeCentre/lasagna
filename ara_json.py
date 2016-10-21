@@ -33,7 +33,7 @@ def importData(fname,verbose=False):
 
 
 def tree_flatten(obj,flattened=''):
-    if obj[u'parent_structure_id']==None:
+    if obj[u'parent_structure_id'] is None:
         obj[u'parent_structure_id']=0
 
     flattened = flattened+"{id}|{parent_id}|{atlas_id}|{acronym}|{name}|{color}\n".format( 

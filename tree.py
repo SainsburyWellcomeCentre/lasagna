@@ -8,7 +8,7 @@ Defines a tree and a node class as well as functions for importing data
 import os.path
 import dataTypeFromString
 
-def importData(fname, displayTree=False, colSep=',', headerLine=False):
+def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=False):
     """
     Import tree data from a CSV (text) file or list. 
 
@@ -31,7 +31,13 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
     headerLine - if True, the first line is stripped off and considered to be the column headings.
                 headerLine can also be a CSV string or a list that defines the column headings. Must have the
                 same number of columns as the rest of the file.
+    verbose - prints diagnositic info to screen if true
     """
+
+
+
+    if verbose:
+        print "tree.importData importing file %s" % fname
 
     #Error check
     if isinstance(fname,str):
@@ -66,11 +72,14 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
             continue
 
         dataLine = line.split(colSep)
+        if len(header) !=len(dataLine):
+            print "\nTree file appears corrupt! header length is %d but data line length is %d.\ntree.importData is aborting.\n" % (len(header),len(dataLine))
+            return False
+
         theseData = map(int,dataLine[0:2]) #add index and parent to the first two columns
 
         #Add data to the third column. Either as a list or as a dictionary (if header names were provided)
         if header != False: #add as dictionary
-            assert len(header)==len(dataLine)
             dataCol = dict()
 
             for ii in range(len(header)-2):
@@ -83,6 +92,9 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False):
 
         theseData.append(dataCol) 
         data.append(theseData)
+
+    if verbose:
+        print "tree.importData read %d rows of data from %s" % (len(data),fname)
 
 
     #Build tree
@@ -209,7 +221,7 @@ class Tree(object):
         return nodesThatAreBranches
 
 
-    def findSegments(self,linkSegments=1,nodeID=0,segments=[]):
+    def findSegments(self,linkSegments=1,nodeID=0,segments=()):
         """ 
         Return a list containing all unique segments of the tree
 
@@ -232,9 +244,7 @@ class Tree(object):
             thisPath.append(nodeID[0])
             nodeID = self.nodes[nodeID[0]].children
             
-
-        #Store this segment
-        segments.append(thisPath)
+        segments = segments + (thisPath,) #Store this segment
 
         #Go into the branches with a recursive call
         for thisNode in nodeID:

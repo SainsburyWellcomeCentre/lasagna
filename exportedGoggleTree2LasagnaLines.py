@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-This function accepts a csv file produced by exportGogglePoints.m
+This function accepts a csv file produced by aratools.utils.exportGogglePoints.m
 Each row of the csv file produced by that function is in this format:
 nodeId,parentID,z position,x position,y position
 
@@ -44,7 +44,7 @@ doPlot = args.p
 quiet = args.q
 
 
-if fname == None:
+if fname is None:
     print "Please supply a file name to convert. e.g.:\nexportedGoggleTree2LasagnaLines.py -f myFile.csv\n"
     sys.exit(0)
 

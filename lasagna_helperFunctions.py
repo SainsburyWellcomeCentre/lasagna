@@ -11,7 +11,7 @@ import yaml   #Preferences are stored in a YAML file
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
+def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False,verbose=False):
     """
     Searches a PyQtGraph PlotWidget for an plot object (i.e. something added with .addItem)
     with name "itemName"
@@ -31,6 +31,9 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
     so you can't feed it the GUI root object and expect an answer. It returns *ONLY* the 
     first found item.
     """
+
+    if verbose:
+        print "findPyQtGraphObjectNameInPlotWidget - looking for object %s in PlotWidget %s" % (itemName,str(PlotWidget))
 
     if regex==True:
         import re
@@ -59,7 +62,6 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False):
             if thisItem.objectName == itemName:
                 return thisItem
 
-    verbose=False
     if verbose:
         print "Failed to find %s in PlotWidget" %  itemName
     return False
@@ -155,13 +157,14 @@ def defaultPreferences():
             'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', 
                              absPathToLasagna()+'registrationPlugins', 
                              absPathToLasagna()+'ARA'], #must be asbolute paths
-            'defaultAxisRatios' : [1,2,0.5],        #The default axis ratios
+            'defaultAxisRatios' : [1,2,0.5],         #The default axis ratios
+            'defaultPointZSpread' : [5,5,3],         #The range of layers over which points or lines are visible
             'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
             'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
             'symbolOrder' : ['o','s','t','d','+'],
             'defaultLineWidth' : 2,
-            'defaultSymbolOpacity' : 180,
-            'defaultSymbolSize' : 10,
+            'defaultSymbolOpacity' : 200,
+            'defaultSymbolSize' : 8,
             'hideZoomResetButtonOnImageAxes' : True,
             'hideAxes' : True,
             }
@@ -245,7 +248,7 @@ def preferenceWriter(preferenceName,newValue,prefFName=getLasagnaPrefFile()):
     Overwrite a single key "preferenceName" in self.preferences with the value "newValue"
     Saves updates dictionary to the preferences file
     """
-    print preferenceName
+    print "Writing preference data for: %s\n" % preferenceName
     preferences = loadAllPreferences(prefFName)
     if preferences.has_key(preferenceName):
         preferences[preferenceName] = newValue

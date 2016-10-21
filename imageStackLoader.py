@@ -271,7 +271,7 @@ def mhd_write_raw_file(imStack,fname,info=None):
         If info is missing, we read the data from the mhd file
   """
 
-  if info==None:
+  if info is None:
     info=mhd_read_header_file(fname)
 
   #Get the name of the raw file and check it exists
@@ -315,14 +315,14 @@ def mhd_read_header_file(fname):
       continue
 
     m=re.match('\A(\w+)',line)
-    if m == None:
+    if m is None:
       continue
 
     key = m.groups()[0].lower() #This is the data key
 
     #Now we get the data
     m=re.match('\A\w+ *= * (.*) *',line)
-    if m == None:
+    if m is None:
       print "Can not get data for key %s" % key
       continue
 

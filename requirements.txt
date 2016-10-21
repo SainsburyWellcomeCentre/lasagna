@@ -1,0 +1,9 @@
+numpy
+scipy
+libtiff
+tifffile
+pynrrd
+vtk
+pyqtgraph
+pyyaml
+scikit-image

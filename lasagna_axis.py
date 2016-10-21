@@ -54,11 +54,12 @@ class projection2D():
         producing an item using information in the ingredient properties.
         """
         verbose=False
-        if verbose:
-            print "\nlasagna_axis.addItemToPlotWidget adds item " + ingredient.objectName
-        
+
         _thisItem = ( getattr(pg,ingredient.pgObject)(**ingredient.pgObjectConstructionArgs) )
         _thisItem.objectName = ingredient.objectName
+
+        if verbose:
+            print "\nlasagna_axis.addItemToPlotWidget adds item " + ingredient.objectName + " as: " + str(_thisItem)
 
         self.view.addItem(_thisItem)
         self.items.append(_thisItem)
@@ -100,7 +101,7 @@ class projection2D():
         print "%d items after remove call" % len(self.view.items())
 
 
-    def addItemsToPlotWidget(self,ingredients=[]):
+    def addItemsToPlotWidget(self,ingredients):
         """
         Add all ingredients in list to the PlotWidget as items
         """
@@ -170,6 +171,7 @@ class projection2D():
         Update all plot items on axis, redrawing so everything associated with a specified 
         slice (sliceToPlot) is shown. This is done based upon a list of ingredients
         """
+        verbose=False 
 
         # loop through all plot items searching for imagestack items (these need to be plotted first)
         for thisIngredient in ingredientsList:
@@ -181,7 +183,7 @@ class projection2D():
                 #      a list of items and axes in the ingredient? I don't like that.
 
                 #Got to the middle of the stack
-                if sliceToPlot == None or resetToMiddleLayer:
+                if sliceToPlot is None or resetToMiddleLayer:
                     stacks = self.lasagna.returnIngredientByType('imagestack')
                     numSlices = [] 
                     [numSlices.append(thisStack.data(self.axisToPlot).shape[0]) for thisStack in stacks]
@@ -191,8 +193,11 @@ class projection2D():
 
                 self.currentSlice = sliceToPlot
 
+                if verbose:
+                    print "lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName
+
                 thisIngredient.plotIngredient(
-                                            pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
+                                            pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName,verbose=verbose), 
                                             axisToPlot=self.axisToPlot, 
                                             sliceToPlot=self.currentSlice
                                             )
@@ -203,9 +208,13 @@ class projection2D():
         # loop through all plot items searching for non-image items (these need to be overlaid on top of the image)
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: 
-                thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName), 
+                if verbose:
+                    print "lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName
+
+                thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName,verbose=verbose), 
                                               axisToPlot=self.axisToPlot, 
-                                              sliceToPlot=self.currentSlice)
+                                              sliceToPlot=self.currentSlice
+                                              )
 
     def updateDisplayedSlices_2D(self, ingredients, slicesToPlot):
         """
@@ -213,8 +222,8 @@ class projection2D():
         ingredients - lasagna.ingredients
         slicesToPlot - a tuple of length 2 that defines which slices to plot for the Y and X linked axes
         """
-        #self.updatePlotItems_2D(ingredients)  #TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
-                                              # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
+        #self.updatePlotItems_2D(ingredients)  # TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
+                                               # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
         self.linkedYprojection.updatePlotItems_2D(ingredients,slicesToPlot[0])
         self.linkedXprojection.updatePlotItems_2D(ingredients,slicesToPlot[1])
 

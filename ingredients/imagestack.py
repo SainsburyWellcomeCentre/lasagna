@@ -77,6 +77,31 @@ class imagestack(lasagna_ingredient):
         return lut
 
 
+    def colorName2value(self,colorName,nVal=255,alpha=255):
+        """
+        Converts a colour map name to an RGBa vector
+        colorName is a color name, output is an RGBalpha vector.
+        nVal is the maximum intensity value
+        """
+        colorName = colorName.lower()
+
+        colorDict = {
+                    'gray'      :   [nVal,nVal,nVal,alpha],
+                    'red'       :   [nVal, 0  , 0  ,alpha],
+                    'green'     :   [ 0  ,nVal, 0  ,alpha],
+                    'blue'      :   [ 0  , 0  ,nVal,alpha],
+                    'magenta'   :   [nVal, 0  ,nVal,alpha],
+                    'cyan'      :   [ 0  ,nVal,nVal,alpha], 
+                    'yellow'    :   [nVal,nVal, 0  ,alpha]
+                    }
+
+        if colorDict.has_key(colorName):
+            return colorDict[colorName]
+        else:
+            print "no pre-defined colormap %s. reverting to gray " % colorName 
+            return colorDict['gray']
+
+
     def calcHistogram(self):
         """
         Calculate the histogram and store results in a variable
