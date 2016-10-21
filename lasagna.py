@@ -1120,6 +1120,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         action = QtGui.QAction("Delete",self)
         action.triggered.connect(self.deleteLayerStack_Slot)
         menu.addAction(action)
+        action = QtGui.QAction("Save",self)
+        action.triggered.connect(self.saveLayerStack_Slot)
+        menu.addAction(action)
         menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
 
 
@@ -1143,6 +1146,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         print "removed " + objName
         self.runHook(self.hooks['deleteLayerStack_Slot_End'])
 
+    def saveLayerStack_Slot(self):
+        """call stack save method"""
+        objName =  self.selectedStackName()
+        ingr = self.returnIngredientByName(objName)
+        if hasattr(ingr, 'save'):
+            ingr.save()
+        else:
+            print 'no save method for %s'%objName
 
     def stacksInTreeList(self):
         """
