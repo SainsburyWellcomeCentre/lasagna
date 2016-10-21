@@ -137,16 +137,6 @@ class sparsepoints(lasagna_ingredient):
             print "sparsepoints.color can not cope with type " + type(self.color)
 
 
-    def save(self, path=None):
-        if path is None:
-            path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s'%self.objectName)
-        if not path:
-            return
-        with open(path, 'w') as F:
-            for c in self.raw_data():
-                F.write(','.join(['%s'%i for i in c])+'\n')
-        print '%s saved as %s'%(self.objectName, path)
-
     #---------------------------------------------------------------
     #Getters and setters
 

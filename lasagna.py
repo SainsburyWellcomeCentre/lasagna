@@ -833,20 +833,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         action = QtGui.QAction("Delete",self)
         action.triggered.connect(self.deleteLayerPoints_Slot)
         menu.addAction(action)
-        action = QtGui.QAction("Save",self)
-        action.triggered.connect(self.saveLayerPoints_Slot)
-        menu.addAction(action)
-
         menu.exec_(self.points_TreeView.viewport().mapToGlobal(position))
 
-    def saveLayerPoints_Slot(self):
-        """call ingredient save method if any"""
-        objName =  self.selectedPointsName()
-        ingr = self.returnIngredientByName(objName)
-        if hasattr(ingr, 'save'):
-            ingr.save()
-        else:
-            print 'no save method for %s'%objName
 
     def deleteLayerPoints_Slot(self):
         objName =  self.selectedPointsName()
