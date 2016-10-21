@@ -34,6 +34,15 @@ def loadStack(fname):
   else:
     print "\n\n*" + fname + " NOT LOADED. DATA TYPE NOT KNOWN\n\n"
 
+def saveStack(fname, data, format='tif'):
+  """Save the image data
+  Works only for tif for now
+  """
+  format = format.lower().strip().strip('.')
+  if format in ['tif', 'tiff']:
+    saveTiffStack(fname, data)
+  else:
+    raise NotImplementedError
 
 def imageFilter():
   """
@@ -104,7 +113,13 @@ def loadTiffStack(fname,useLibTiff=False):
   print "read image of size: cols: %d, rows: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
   return im
 
-
+def saveTiffStack(fname, data, useLibTiff = False):
+    """Save data in file fname
+    """
+    if useLibTiff:
+        raise NotImplementedError
+    from tifffile import imsave
+    imsave(fname, data.swapaxes(1,2))
 
 #-------------------------------------------------------------------------------------------
 #   *MHD handling methods*
