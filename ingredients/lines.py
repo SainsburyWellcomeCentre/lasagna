@@ -158,8 +158,7 @@ class lines(lasagna_ingredient):
 
     def save(self, path=None):
         if path is None:
-            path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s'%self.objectName,
-                                                     self.objectName)
+            path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s'%self.objectName)
         if not path:
             return
         line_series= 0
