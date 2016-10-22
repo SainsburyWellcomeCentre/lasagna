@@ -120,7 +120,7 @@ class imagestack(lasagna_ingredient):
             return self.histBrushCustomColor
 
         cMap = self.setColorMap(self.lut)
-        return cMap[round(len(cMap)/2),:]
+        return cMap[int(round(len(cMap)/2)),:]
 
 
     def histPenColor(self):
