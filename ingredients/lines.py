@@ -54,9 +54,9 @@ class lines(lasagna_ingredient):
         self.addToList()
 
         #Set the colour of the object based on how many items are already present
-        thisNumber = self.parent.points_Model.rowCount()-1
         number_of_colors = 6
-        cm_subsection = linspace(0, 1, number_of_colors) 
+        thisNumber = (self.parent.points_Model.rowCount() - 1) % number_of_colors
+        cm_subsection = linspace(0, 1, number_of_colors)
         colors = [ cm.jet(x) for x in cm_subsection ]
         color = colors[thisNumber]
         self.color = [color[0]*255, color[1]*255, color[2]*255]
