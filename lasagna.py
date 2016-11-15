@@ -533,27 +533,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         recentlyLoadedFiles = lasHelp.readPreference('recentlyLoadedFiles')
 
-<<<<<<< HEAD
-        # Remove existing actions if present
-        if len(self.recentLoadActions) > 0 and len(recentlyLoadedFiles) > 0:
-=======
+
         #Remove existing actions if present
         if len(self.recentLoadActions)>0 and len(recentlyLoadedFiles)>0:
->>>>>>> development
             for thisAction in self.recentLoadActions:
                 self.menuOpen_recent.removeAction(thisAction)
             self.recentLoadActions = []
 
         for thisFile in recentlyLoadedFiles:
-<<<<<<< HEAD
-            self.recentLoadActions.append(self.menuOpen_recent.addAction(thisFile))  # add action to list
-            self.recentLoadActions[-1].triggered.connect(self.loadRecentFileSlot)  # link it to a slot
-            # NOTE: tried the lambda approach but it always assigns the last file name to the list to all signals
-=======
             self.recentLoadActions.append(self.menuOpen_recent.addAction(thisFile)) #add action to list
             self.recentLoadActions[-1].triggered.connect(self.loadRecentFileSlot) #link it to a slot
             #NOTE: tried the lambda approach but it always assigns the last file name to the list to all signals
->>>>>>> development
             #      http://stackoverflow.com/questions/940555/pyqt-sending-parameter-to-slot-when-connecting-to-a-signal
 
 
