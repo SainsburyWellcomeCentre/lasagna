@@ -8,6 +8,7 @@ import os
 from PyQt4 import QtGui, QtCore
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
+from imageStackLoader import saveStack
 
 class imagestack(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName='', minMax=None, lut='gray'):
@@ -261,7 +262,13 @@ class imagestack(lasagna_ingredient):
                 self.parent.ingredientList[0].lut='gray'
                 self.parent.initialiseAxes()
 
-
+    def save(self, path=None):
+        if path is None:
+            path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s' % self.objectName)
+        if not path:
+            return
+        saveStack(path, self.raw_data())
+        print '%s saved as %s' % (self.objectName, path)
 
 
     #---------------------------------------------------------------

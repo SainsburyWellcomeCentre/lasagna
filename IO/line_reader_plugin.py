@@ -68,20 +68,20 @@ class loaderClass(lasagna_plugin):
             # add nans between lineseries
             asList = contents.split('\n')
 
-            #Check that all rows have a length of 4, since this is what a line series needs
-            expectedCols = 4 
-            if not all(len(x) == expectedCols  for x in asList):
-                print "Lines data file %s appears corrupt" % fname
-                return 
-
             data=[]
             lastLineSeries=None
             n=0
+            expectedCols = 4 
             for ii in range(len(asList)):
                 if len(asList[ii])==0:
                     continue
 
                 thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
+                if not len(thisLineAsFloats)==expectedCols:
+                    #Check that all rows have a length of 4, since this is what a line series needs
+                    print "Lines data file %s appears corrupt" % fname
+                    return                     
+
                 if lastLineSeries is None:
                     lastLineSeries=thisLineAsFloats[0]
 
