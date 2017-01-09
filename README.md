@@ -14,14 +14,14 @@ the [website](http://raacampbell.github.io/lasagna).
 
 
 ## Installation ##
-Lasagna runs on Python 2.7, PyQt4, and uses PyQtGraph for the plotting and requires the following modules:
+Lasagna runs on Python 3, PyQt4, and uses PyQtGraph for the plotting and requires the following modules:
 
 * tifffile [for importing LSM files]
-* vtk [optional, for faster import of MHD files]
+* vtk [optional, for faster import of MHD files but doesn't work in Python 3]
 * PyLibTiff
 * pynrrd
 * numpy
-* pyqtgraph 0.9.10
+* pyqtgraph >0.10.0
 * yaml [and pyyaml]
 * Scipy [optional - ARA explorer]
 * Scikit-Image [optional - ARA explorer]
