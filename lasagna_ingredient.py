@@ -9,7 +9,7 @@ from PyQt4 import QtGui, QtCore
 class lasagna_ingredient(object):
     def __init__(self, parent, data, fnameAbsPath='', enable=True, objectName='',pgObject='', pgObjectConstructionArgs=dict()):
 
-    	self.parent		= parent
+        self.parent		= parent
         self._data     	= data              #The raw data for this ingredient go here.
 
         self.objectName = objectName        #The name of the object TODO: decide exactly what this will be
@@ -37,35 +37,35 @@ class lasagna_ingredient(object):
 
 
     def addToPlots(self):
-    	"""
+        """
     	Show ingredient on plots by adding the plot item to all 2D axes so that it becomes available for plotting
     	"""
         [axis.addItemToPlotWidget(self) for axis in self.parent.axes2D]
 
 
     def removePlotItem(self):
-    	"""
+        """
     	Remove ingredient from plots by removing the plot item from all 2D axes so that it becomes unavailable for plotting
     	"""
         [axis.removeItemFromPlotWidget(self.objectName) for axis in self.parent.axes2D]
 
 
     def addToList(self):
-    	"""
+        """
     	Add this ingredient's list items to the QStandardModel (model) associated with its QTreeView
     	then highlight it when it's added.
     	"""
         self.setRowColor()
-    	self.model.appendRow(self.modelItems)
-    	self.model.parent().setCurrentIndex(self.modelItems.index()) #Parent is, for example, a QTreeView
+        self.model.appendRow(self.modelItems)
+        self.model.parent().setCurrentIndex(self.modelItems.index()) #Parent is, for example, a QTreeView
 
 
     def removeFromList(self):
         """
         Remove ingredient from the UI list with which it is associated  
         """
-    	items = self.model.findItems(self.objectName)
-    	self.model.removeRow(items[0].row())
+        items = self.model.findItems(self.objectName)
+        self.model.removeRow(items[0].row())
 
 
     def setRowColor(self):
@@ -77,7 +77,7 @@ class lasagna_ingredient(object):
             return
 
         if not isinstance(self.color,list):
-           print "** lasagna_ingredient -- can not set color"
+           print("** lasagna_ingredient -- can not set color")
            return
 
 

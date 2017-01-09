@@ -41,7 +41,7 @@ class lasagna_plugin(object):
         self.attachHooks()
 
         if self.verbose:
-            print "Ran %s constructor" % self.__module__
+            print("Ran %s constructor" % self.__module__)
 
 
     """
@@ -69,15 +69,15 @@ class lasagna_plugin(object):
 
             if regexp.match(thisProperty):              
                 hookName =regexp.findall(thisProperty)[0]
-                print hookName
-                if self.lasagna.hooks.has_key(hookName):
+                print(hookName)
+                if hookName in self.lasagna.hooks:
                     #attach the hook by adding to dictionary
                     self.lasagna.hooks[hookName].append(getattr(self, thisProperty))
                     if self.verbose:
-                        print "Linking " + thisProperty + " to " + hookName
+                        print("Linking " + thisProperty + " to " + hookName)
                 else:
                     if self.verbose:
-                        print "No hook " + hookName + " found in lasagna.hooks for method " + thisProperty
+                        print("No hook " + hookName + " found in lasagna.hooks for method " + thisProperty)
 
     
     def detachHooks(self):
@@ -88,8 +88,8 @@ class lasagna_plugin(object):
         pluginName = self.__class__.__name__
         regexp = re.compile('.*' + pluginName + '.*')
         if self.verbose:
-            print "Unlinking hooks for plugin '%s'" % pluginName
-        for thisHookList in self.lasagna.hooks.keys():
+            print("Unlinking hooks for plugin '%s'" % pluginName)
+        for thisHookList in list(self.lasagna.hooks.keys()):
             if len(thisHookList)==0:
                 continue
 
@@ -101,7 +101,7 @@ class lasagna_plugin(object):
                 if regexp.match(str(thisHook)):
                     self.lasagna.hooks[thisHookList].remove(thisHook)
                     if self.verbose:
-                        print "Removed hook '%s'"  % str(thisHook)
+                        print("Removed hook '%s'"  % str(thisHook))
 
 
 

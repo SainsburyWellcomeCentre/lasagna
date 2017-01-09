@@ -1,1 +1,1 @@
-import coreFunctions
+from . import coreFunctions

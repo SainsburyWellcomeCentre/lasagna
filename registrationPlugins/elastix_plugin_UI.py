@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'elastix_plugin.ui'
 #
-# Created: Fri Sep  4 16:32:38 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -56,7 +55,6 @@ class Ui_elastixMain(object):
         self.layoutWidget.setGeometry(QtCore.QRect(10, 40, 801, 31))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.layoutWidget)
-        self.horizontalLayout_2.setMargin(0)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.loadMoving = QtGui.QPushButton(self.layoutWidget)
         self.loadMoving.setEnabled(False)
@@ -79,7 +77,6 @@ class Ui_elastixMain(object):
         self.layoutWidget1.setGeometry(QtCore.QRect(11, 11, 801, 26))
         self.layoutWidget1.setObjectName(_fromUtf8("layoutWidget1"))
         self.horizontalLayout = QtGui.QHBoxLayout(self.layoutWidget1)
-        self.horizontalLayout.setMargin(0)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.loadFixed = QtGui.QPushButton(self.layoutWidget1)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
@@ -101,7 +98,6 @@ class Ui_elastixMain(object):
         self.layoutWidget2.setGeometry(QtCore.QRect(0, 80, 811, 141))
         self.layoutWidget2.setObjectName(_fromUtf8("layoutWidget2"))
         self.horizontalLayout_5 = QtGui.QHBoxLayout(self.layoutWidget2)
-        self.horizontalLayout_5.setMargin(0)
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
         spacerItem2 = QtGui.QSpacerItem(13, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem2)
@@ -112,7 +108,6 @@ class Ui_elastixMain(object):
         self.layoutWidget3.setGeometry(QtCore.QRect(20, 30, 65, 82))
         self.layoutWidget3.setObjectName(_fromUtf8("layoutWidget3"))
         self.verticalLayout = QtGui.QVBoxLayout(self.layoutWidget3)
-        self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.flipAxis1 = QtGui.QPushButton(self.layoutWidget3)
         self.flipAxis1.setEnabled(False)
@@ -136,7 +131,6 @@ class Ui_elastixMain(object):
         self.layoutWidget4.setGeometry(QtCore.QRect(20, 30, 65, 82))
         self.layoutWidget4.setObjectName(_fromUtf8("layoutWidget4"))
         self.verticalLayout_2 = QtGui.QVBoxLayout(self.layoutWidget4)
-        self.verticalLayout_2.setMargin(0)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.rotAxis1 = QtGui.QPushButton(self.layoutWidget4)
         self.rotAxis1.setEnabled(False)
@@ -160,7 +154,6 @@ class Ui_elastixMain(object):
         self.layoutWidget_2.setGeometry(QtCore.QRect(20, 30, 70, 82))
         self.layoutWidget_2.setObjectName(_fromUtf8("layoutWidget_2"))
         self.verticalLayout_3 = QtGui.QVBoxLayout(self.layoutWidget_2)
-        self.verticalLayout_3.setMargin(0)
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.swapAxis1_2 = QtGui.QPushButton(self.layoutWidget_2)
         self.swapAxis1_2.setEnabled(False)

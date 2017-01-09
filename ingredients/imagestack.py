@@ -2,7 +2,7 @@
 This class defines the basic imagestack and instructs lasagna as to how to handle image stacks.
 """
 
-from __future__ import division
+
 import numpy as np
 import os
 from PyQt4 import QtGui, QtCore
@@ -64,7 +64,7 @@ class imagestack(lasagna_ingredient):
 
         validCmaps = ['gray','red','green','blue']
         if len(cmap)==0:
-            print "valid color maps are gray, red, and green"
+            print("valid color maps are gray, red, and green")
             return
 
 
@@ -96,10 +96,10 @@ class imagestack(lasagna_ingredient):
                     'yellow'    :   [nVal,nVal, 0  ,alpha]
                     }
 
-        if colorDict.has_key(colorName):
+        if colorName in colorDict:
             return colorDict[colorName]
         else:
-            print "no pre-defined colormap %s. reverting to gray " % colorName 
+            print(("no pre-defined colormap %s. reverting to gray " % colorName)) 
             return colorDict['gray']
 
 
@@ -219,7 +219,7 @@ class imagestack(lasagna_ingredient):
         Flip the data along axisToFlip. 
         """
         if isinstance(axisToFlip,int)==False:
-            print "imagestack.flipDataAlongAxis - axisToFlip must be an integer"
+            print("imagestack.flipDataAlongAxis - axisToFlip must be an integer")
             return
 
         if axisToFlip==0:
@@ -229,7 +229,7 @@ class imagestack(lasagna_ingredient):
         elif axisToFlip==2:
             self._data = self._data[:,:,::-1]            
         else:
-            print "Can not flip axis %d" % axisToFlip
+            print(("Can not flip axis %d" % axisToFlip))
 
 
     def rotateAlongDimension(self,axisToRotate):
@@ -237,7 +237,7 @@ class imagestack(lasagna_ingredient):
         Rotate the image stack 90 degrees counter-clockwise along the axis "axisToRotate"
         """
         if axisToRotate>2 or axisToRotate<0:
-            print "imagestack.rotateAlongDimension can not rotate along axis %d" % axisToRotate            
+            print(("imagestack.rotateAlongDimension can not rotate along axis %d" % axisToRotate))            
             return
 
         self._data = np.swapaxes(self._data,2,axisToRotate)
@@ -250,7 +250,7 @@ class imagestack(lasagna_ingredient):
         Swap axes ax1 and ax2
         """
         if ax1>2 or ax1<0 or ax2>2 or ax2<0:
-            print "Axes to swap out of range. "
+            print("Axes to swap out of range. ")
             return
 
         self._data = np.swapaxes(self._data,ax1,ax2)
@@ -268,7 +268,7 @@ class imagestack(lasagna_ingredient):
         if not path:
             return
         saveStack(path, self.raw_data())
-        print '%s saved as %s' % (self.objectName, path)
+        print(('%s saved as %s' % (self.objectName, path)))
 
 
     #---------------------------------------------------------------

@@ -24,7 +24,7 @@ class projection2D():
         self.linkedYprojection=None
 
 
-        print "Creating axis at " + str(thisPlotWidget.objectName())
+        print("Creating axis at " + str(thisPlotWidget.objectName()))
         self.view = thisPlotWidget #This should target the axes to a particular plot widget
 
         if lasHelp.readPreference('hideZoomResetButtonOnImageAxes')==True:
@@ -59,7 +59,7 @@ class projection2D():
         _thisItem.objectName = ingredient.objectName
 
         if verbose:
-            print "\nlasagna_axis.addItemToPlotWidget adds item " + ingredient.objectName + " as: " + str(_thisItem)
+            print("\nlasagna_axis.addItemToPlotWidget adds item " + ingredient.objectName + " as: " + str(_thisItem))
 
         self.view.addItem(_thisItem)
         self.items.append(_thisItem)
@@ -74,7 +74,7 @@ class projection2D():
 
         "item" is either a string defining an objectName or the object itself
         """
-        items=self.view.items()
+        items=list(self.view.items())
         nItemsBefore = len(items) #to determine if an item was removed
         if isinstance(item,str):
             removed=False
@@ -83,22 +83,22 @@ class projection2D():
                         self.view.removeItem(thisItem)
                         removed=True
             if removed==False:
-                print "lasagna_axis.removeItemFromPlotWidget failed to remove item defined by string " + item
+                print("lasagna_axis.removeItemFromPlotWidget failed to remove item defined by string " + item)
         else: #it should be an image item
             self.view.removeItem(item)
 
         #Optionally return True of False depending on whether the removal was successful
-        nItemsAfter = len(self.view.items())
+        nItemsAfter = len(list(self.view.items()))
 
         if nItemsAfter<nItemsBefore:
             return True
         elif nItemsAfter==nItemsBefore:
             return False
         else:
-            print '** removeItemFromPlotWidget: %d items before removal and %d after removal **' % (nItemsBefore,nItemsAfter)
+            print('** removeItemFromPlotWidget: %d items before removal and %d after removal **' % (nItemsBefore,nItemsAfter))
             return False
 
-        print "%d items after remove call" % len(self.view.items())
+        print("%d items after remove call" % len(list(self.view.items())))
 
 
     def addItemsToPlotWidget(self,ingredients):
@@ -125,9 +125,9 @@ class projection2D():
         Print a list of all named items actually *added* in the PlotWidget
         """
         n=1
-        for thisItem in self.view.items():
+        for thisItem in list(self.view.items()):
             if hasattr(thisItem,'objectName') and isinstance(thisItem.objectName,str):
-                print "object %s: %s" % (n,thisItem.objectName)
+                print("object %s: %s" % (n,thisItem.objectName))
             n=n+1
 
 
@@ -137,7 +137,7 @@ class projection2D():
         because of the way we generally add objects, there *should* never be 
         multiple objects with the same name
         """
-        for thisItem in self.view.items():
+        for thisItem in list(self.view.items()):
             if hasattr(thisItem,'objectName') and isinstance(thisItem.objectName,str):
                 if thisItem.objectName == objName:
                     return thisItem
@@ -150,7 +150,7 @@ class projection2D():
         Examples include: ImageItem, ViewBox, PlotItem, AxisItem and LabelItem
         """
         itemList = [] 
-        for thisItem in self.view.items():
+        for thisItem in list(self.view.items()):
             if thisItem.__module__.endswith(itemType):
                 itemList.append(thisItem)
 
@@ -162,7 +162,7 @@ class projection2D():
         Hides an item from the PlotWidget. If you want to delete an item
         outright then use removeItemFromPlotWidget.
         """
-        print "NEED TO WRITE lasagna.axis.hideItem()"
+        print("NEED TO WRITE lasagna.axis.hideItem()")
         return
 
 
@@ -188,13 +188,13 @@ class projection2D():
                     numSlices = [] 
                     [numSlices.append(thisStack.data(self.axisToPlot).shape[0]) for thisStack in stacks]
                     numSlices = max(numSlices)
-                    sliceToPlot=numSlices/2
+                    sliceToPlot=numSlices//2
 
 
                 self.currentSlice = sliceToPlot
 
                 if verbose:
-                    print "lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName
+                    print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName)
 
                 thisIngredient.plotIngredient(
                                             pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName,verbose=verbose), 
@@ -209,7 +209,7 @@ class projection2D():
         for thisIngredient in ingredientsList:
             if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: 
                 if verbose:
-                    print "lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName
+                    print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName)
 
                 thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,thisIngredient.objectName,verbose=verbose), 
                                               axisToPlot=self.axisToPlot, 
@@ -250,7 +250,8 @@ class projection2D():
         """
         Handle the wheel action that allows the user to move through stack layers
         """
-        self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=self.currentSlice + self.view.getViewBox().progressBy)
+
+        self.updatePlotItems_2D(self.lasagna.ingredientList,sliceToPlot=round(self.currentSlice + self.view.getViewBox().progressBy)) #round creates an int that supresses a warning in p3
 
 
 

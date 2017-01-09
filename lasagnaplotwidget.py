@@ -8,6 +8,6 @@ from lasagna_viewBox import lasagna_viewBox
 class LasagnaPlotWidget(PlotWidget):
 
     def __init__(self, *args, **kwargs):
-        if not 'viewBox' in kwargs.keys():
+        if not 'viewBox' in list(kwargs.keys()):
             kwargs['viewBox']=lasagna_viewBox()
         super(LasagnaPlotWidget,self).__init__(*args, **kwargs)

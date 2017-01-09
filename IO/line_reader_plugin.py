@@ -79,7 +79,7 @@ class loaderClass(lasagna_plugin):
                 thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
                 if not len(thisLineAsFloats)==expectedCols:
                     #Check that all rows have a length of 4, since this is what a line series needs
-                    print "Lines data file %s appears corrupt" % fname
+                    print("Lines data file %s appears corrupt" % fname)
                     return                     
 
                 if lastLineSeries is None:

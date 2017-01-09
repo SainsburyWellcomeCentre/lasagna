@@ -121,14 +121,14 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         
         verbose=False
         if verbose:
-            print "Mouse is in %d,%d,%d and image size is %d,%d,%d" % (pos[0],pos[1],pos[2],imShape[0],imShape[1],imShape[2])
+            print("Mouse is in %d,%d,%d and image size is %d,%d,%d" % (pos[0],pos[1],pos[2],imShape[0],imShape[1],imShape[2]))
 
         #Detect if the mouse is outside of the atlas
         value=0
         for ii in range(len(imShape)):
             if pos[ii]<0 or pos[ii]>=imShape[ii]:
                 if verbose:
-                    print "NOT IN RANGE: pos: %d shape %d" % (pos[ii], imShape[ii])
+                    print("NOT IN RANGE: pos: %d shape %d" % (pos[ii], imShape[ii]))
                 thisArea='outside image area'
                 value=-1
                 break

@@ -88,11 +88,11 @@ class loaderClass(lasagna_plugin):
 
                 #import the tree 
                 if verbose:
-                    print "tree_reader_plugin.showLoadDialog - importing %s" % fname
+                    print("tree_reader_plugin.showLoadDialog - importing %s" % fname)
 
                 dataTree = importData(fname,headerLine=['id','parent','z','x','y'],verbose=verbose)
                 if not dataTree:
-                    print "No data loaded from %s" % fname
+                    print("No data loaded from %s" % fname)
                     return
 
                 #We now have an array of unique paths (segments)
@@ -134,7 +134,7 @@ class loaderClass(lasagna_plugin):
 
 
             if verbose:
-                print "Divided tree into %d segments" % n
+                print("Divided tree into %d segments" % n)
 
             #print data         
             objName=fname.split(os.path.sep)[-1]

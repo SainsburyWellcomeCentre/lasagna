@@ -46,8 +46,8 @@ class loaderClass(lasagna_plugin):
         colorOrder = lasHelp.readPreference('colorOrder')
         if os.path.isfile(fname): 
             im=tifffile.imread(str(fname)) 
-            print "Found LSM stack with dimensions:"
-            print im.shape
+            print("Found LSM stack with dimensions:")
+            print(im.shape)
             for ii in range(im.shape[2]):
                 stack=im[0,:,ii,:,:]
 
@@ -59,7 +59,7 @@ class loaderClass(lasagna_plugin):
                            )
                 self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots                
 
-                print "Adding '%s' layer" % colorOrder[ii]
+                print("Adding '%s' layer" % colorOrder[ii])
                 self.lasagna.returnIngredientByName(objName).lut=colorOrder[ii]
 
 

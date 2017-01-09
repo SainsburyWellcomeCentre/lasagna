@@ -35,8 +35,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             self.deleteLater()
             return
         else:
-            print "Using transformix binary at " + which('transformix')
-            print "Using elastix binary at " + which('elastix')
+            print("Using transformix binary at " + which('transformix'))
+            print("Using elastix binary at " + which('elastix'))
 
 
         #re-define some default properties that were originally defined in lasagna_plugin
@@ -109,7 +109,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         else:
             self.inputImagePath = ''
             #TODO: make an alert box for this case
-            print "that file does not exits"
+            print("that file does not exits")
         
         self.checkIfReadyToRun()
         lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fnameToChoose))
@@ -131,7 +131,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         else:
             self.transformPath = ''
             #TODO: make an alert box for this case
-            print "that file does not exits"
+            print("that file does not exits")
 
 
         self.checkIfReadyToRun()
@@ -161,12 +161,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         """
 
         if len (self.transformixCommand)==0:
-            print "transformix command is empty"
+            print("transformix command is empty")
             return False
 
         #Run command (non-blocking in the background)
         cmd = self.transformixCommand
-        print "Running:\n" + cmd
+        print("Running:\n" + cmd)
 
         #Pipe everything to /dev/null if that's an option
         if os.name == 'posix' or os.name == 'mac':
@@ -201,11 +201,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
                 continue
 
             if self.lookForStringInFile(pathToLog, 'Errors occurred'):
-                print "FAILED"
+                print("FAILED")
                 running = False
 
             if self.lookForStringInFile(pathToLog, 'Elapsed time'):
-                print "FINISHED!"
+                print("FINISHED!")
                 success=True
                 running = False
 
@@ -238,7 +238,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
         #Find the result image format
         pathToLog = os.path.join(self.outputDirPath,self.transformixLogName)
         if not os.path.exists(pathToLog):
-            print "Can not find " + pathToLog
+            print("Can not find " + pathToLog)
             return False
 
         fileExtension = ''
@@ -251,14 +251,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
                         fileExtension = g[0]
 
         if len(fileExtension)==0:
-            print "could not determine result file type from transformix log file"
+            print("could not determine result file type from transformix log file")
             return False
 
         #build the image name
         fileName = os.path.join(self.outputDirPath,'result') + '.' + fileExtension
 
         if not os.path.exists(fileName):
-            print "Can not find " + fileName
+            print("Can not find " + fileName)
 
         self.lasagna.loadImageStack(fileName)
         self.lasagna.initialiseAxes()

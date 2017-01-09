@@ -47,7 +47,7 @@ class plugin(lasagna_plugin):
         stackName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString()
         firstLayer = self.lasagna.returnIngredientByName(stackName)
         if firstLayer == False:
-            print "No image layers loaded"
+            print("No image layers loaded")
             return
 
         imShape = firstLayer.data().shape

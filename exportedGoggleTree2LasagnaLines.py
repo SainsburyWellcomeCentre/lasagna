@@ -45,14 +45,14 @@ quiet = args.q
 
 
 if fname is None:
-    print "Please supply a file name to convert. e.g.:\nexportedGoggleTree2LasagnaLines.py -f myFile.csv\n"
+    print("Please supply a file name to convert. e.g.:\nexportedGoggleTree2LasagnaLines.py -f myFile.csv\n")
     sys.exit(0)
 
 
 
 #Get the data out of the tree
 if os.path.exists(fname) == False:
-    print 'Can not find ' + fname
+    print('Can not find ' + fname)
     sys.exit(0)
 
 
@@ -88,7 +88,7 @@ if not quiet:
     for thisPath in paths:
         data = dataFromPath(dataTree,thisPath)
         for jj in range(len(data[0])):
-            print "%d,%d,%d,%d" % (ii,data[0][jj],data[1][jj],data[2][jj])
+            print("%d,%d,%d,%d" % (ii,data[0][jj],data[1][jj],data[2][jj]))
         ii += 1
 
 

@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'transformix_plugin.ui'
 #
-# Created: Mon Sep  7 11:29:36 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -59,7 +58,6 @@ class Ui_transformix_plugin(object):
         self.layoutWidget.setGeometry(QtCore.QRect(10, 20, 801, 26))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.horizontalLayout = QtGui.QHBoxLayout(self.layoutWidget)
-        self.horizontalLayout.setMargin(0)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.chooseStack_pushButton = QtGui.QPushButton(self.layoutWidget)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
@@ -81,7 +79,6 @@ class Ui_transformix_plugin(object):
         self.layoutWidget_2.setGeometry(QtCore.QRect(10, 50, 801, 26))
         self.layoutWidget_2.setObjectName(_fromUtf8("layoutWidget_2"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.layoutWidget_2)
-        self.horizontalLayout_2.setMargin(0)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.chooseTransform_pushButton = QtGui.QPushButton(self.layoutWidget_2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)

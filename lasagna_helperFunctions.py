@@ -33,23 +33,23 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False,verbose=
     """
 
     if verbose:
-        print "findPyQtGraphObjectNameInPlotWidget - looking for object %s in PlotWidget %s" % (itemName,str(PlotWidget))
+        print("findPyQtGraphObjectNameInPlotWidget - looking for object %s in PlotWidget %s" % (itemName,str(PlotWidget)))
 
     if regex==True:
         import re
 
     if not hasattr(PlotWidget, 'getPlotItem'):
-        print "findPyQtGraphObjectNameInPlotWidget finds no attribute getPlotItem"
+        print("findPyQtGraphObjectNameInPlotWidget finds no attribute getPlotItem")
         return False
 
     pltItem = PlotWidget.getPlotItem()
 
     if not hasattr(pltItem,'items'):
-        print "findPyQtGraphObjectNameInPlotWidget finds no attribute 'items'"
+        print("findPyQtGraphObjectNameInPlotWidget finds no attribute 'items'")
         return False
 
     if len(pltItem.items)==0:
-        print "findPyQtGraphObjectNameInPlotWidget finds no items in list"
+        print("findPyQtGraphObjectNameInPlotWidget finds no items in list")
         return False
 
 
@@ -63,7 +63,7 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False,verbose=
                 return thisItem
 
     if verbose:
-        print "Failed to find %s in PlotWidget" %  itemName
+        print("Failed to find %s in PlotWidget" %  itemName)
     return False
 
 
@@ -88,7 +88,10 @@ def stripTrailingFileFromPath(thisPath):
     Given a path (e.g. '/home/user/myImage.tiff') strip the file name and return the rest of the path
     """
     thisPath = os.path.split(thisPath)
-    thisPath = string.join(thisPath[:-1],os.path.sep)
+
+    thisPath = str(thisPath[0])
+    thisPath += os.path.sep
+
     if thisPath[-1] != os.path.sep:
         thisPath = thisPath + os.path.sep
 
@@ -192,13 +195,13 @@ def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPrefere
     #print "loading from pref file %s" % prefFName
     #Generate a default preferences file if no preferences file exists
     if os.path.exists(prefFName) == False:
-        print "PREF FILE"
-        print prefFName
+        print("PREF FILE")
+        print(prefFName)
         writeAllPreferences(defaultPref,prefFName=prefFName)
-        print "Created default preferences file in " + prefFName
+        print("Created default preferences file in " + prefFName)
 
     #Load preferences YAML file as a dictionary
-    with file(prefFName, 'r') as stream: 
+    with open(prefFName, 'r') as stream: 
         return yaml.load(stream)
 
 
@@ -216,19 +219,19 @@ def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=ge
     
     #Check on disk
     preferences = loadAllPreferences(prefFName)
-    if preferences.has_key(preferenceName):
+    if preferenceName in preferences:
         return preferences[preferenceName]
     else:
-        print "Did not find preference %s on disk. Looking in defaultPreferencesa" % preferenceName
+        print("Did not find preference %s on disk. Looking in defaultPreferencesa" % preferenceName)
 
     #Check in default preferences and to file and return if so
     preferences = defaultPreferences()
-    if preferences.has_key(preferenceName):
+    if preferenceName in preferences:
         value = preferences[preferenceName]
         preferenceWriter(preferenceName,value,prefFName)
         return value
     else:
-        print "Did not find preference %s in default preferences" % preferenceName
+        print("Did not find preference %s in default preferences" % preferenceName)
 
 
 def writeAllPreferences(preferences,prefFName=getLasagnaPrefFile()):
@@ -239,7 +242,7 @@ def writeAllPreferences(preferences,prefFName=getLasagnaPrefFile()):
     assert isinstance(preferences,dict)
 
     #TODO: check ability to write to the file before proceeding
-    with file(prefFName, 'w') as stream:
+    with open(prefFName, 'w') as stream:
         yaml.dump(preferences, stream)
 
 
@@ -248,12 +251,12 @@ def preferenceWriter(preferenceName,newValue,prefFName=getLasagnaPrefFile()):
     Overwrite a single key "preferenceName" in self.preferences with the value "newValue"
     Saves updates dictionary to the preferences file
     """
-    print "Writing preference data for: %s\n" % preferenceName
+    print("Writing preference data for: %s\n" % preferenceName)
     preferences = loadAllPreferences(prefFName)
-    if preferences.has_key(preferenceName):
+    if preferenceName in preferences:
         preferences[preferenceName] = newValue
     else:
-        print "Adding missing preference %s to preferences file" % preferenceName
+        print("Adding missing preference %s to preferences file" % preferenceName)
         preferences[preferenceName] = newValue
 
     writeAllPreferences(preferences,prefFName)

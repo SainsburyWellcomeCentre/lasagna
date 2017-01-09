@@ -72,7 +72,7 @@ class lasagna_viewBox(pg.ViewBox):
         pg.ViewBox.mouseDragEvent(self,ev,axis)
 
         #the following is use dby lasagna_axis.updateDisplayedSlices_2D to link the views
-        for thisView in self.linkedAxis.keys():
+        for thisView in list(self.linkedAxis.keys()):
             #Get the current view center in x and y
             vr = self.targetRect()
 

@@ -5,7 +5,7 @@ modifying and extending volVis without having to touch
 the main lasagna.py file and without bloating it much.
 """
 
-from __future__ import division
+
 import numpy as np
 
 

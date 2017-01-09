@@ -123,7 +123,7 @@ class loaderClass(lasagna_plugin):
                         if thisRow[3]==thisIndex:
                             tmp.append(thisRow[:3])
 
-                    print "Adding point series %d with %d points" % (thisIndex,len(tmp))
+                    print("Adding point series %d with %d points" % (thisIndex,len(tmp)))
 
                     # Create an ingredient with the same name as the file name 
                     objName = "%s #%d" % (fname.split(os.path.sep)[-1],thisIndex)
@@ -142,7 +142,7 @@ class loaderClass(lasagna_plugin):
 
 
             else:
-                print("Point series has %d columns. Only 3 or 4 columns are supported" % len(data[1]))
+                print(("Point series has %d columns. Only 3 or 4 columns are supported" % len(data[1])))
 
 
         else:

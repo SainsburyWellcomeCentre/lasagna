@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python3
 
 
 """
@@ -43,8 +43,8 @@ from alert import alert                    # Class used to bring up a warning bo
 # application on the Mac with py2app
 import json, ara_json, tree  # For handling ARA labels files
 import lasagna_plugin  # Needed here to build a standalone version
-import tifffile  # Used to load tiff and LSM files
-import nrrd
+#import tifffile  # Used to load tiff and LSM files
+#import nrrd
 
 
 
@@ -68,7 +68,7 @@ treesToLoad = args.T
 # Either load the demo stacks or a user-specified stacks
 if args.D == True:
     import tempfile
-    import urllib
+    import urllib.request, urllib.parse, urllib.error
 
     imStackFnamesToLoad = [tempfile.gettempdir()+os.path.sep+'reference.tiff',
               tempfile.gettempdir()+os.path.sep+'sample.tiff']
@@ -77,8 +77,8 @@ if args.D == True:
     for fname in imStackFnamesToLoad:
         if not os.path.exists(fname):
             url = loadUrl + fname.split(os.path.sep)[-1]
-            print 'Downloading %s to %s' % (url,fname)
-            urllib.urlretrieve(url,fname)
+            print(('Downloading %s to %s' % (url,fname)))
+            urllib.request.urlretrieve(url,fname)
 
 else:
     imStackFnamesToLoad = args.im
@@ -128,10 +128,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.graphicsViews = [self.graphicsView_1, self.graphicsView_2, self.graphicsView_3]  # These are the graphics_views from the UI file
         self.axes2D=[]
-        print ""
+        print("")
         for ii in range(len(self.graphicsViews)):
             self.axes2D.append(lasagna_axis.projection2D(self.graphicsViews[ii], self, axisRatio=float(self.axisRatioLineEdits[ii].text()), axisToPlot=ii))
-        print ""
+        print("")
 
 
 
@@ -208,11 +208,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         IO_Paths.append(builtInIOPath)
         IO_Paths = list(set(IO_Paths))        #remove duplicate paths
 
-        print "Adding IO module paths to Python path"
+        print("Adding IO module paths to Python path")
         IO_plugins, IO_pluginPaths = pluginHandler.findPlugins(IO_Paths)
         for p in IO_Paths:
             sys.path.append(p) # append to system path
-            print p
+            print(p)
 
         # Add *load actions* to the Load ingredients sub-menu and add loader modules here
         # TODO: currently we only have code to handle load actions as no save actions are available
@@ -222,9 +222,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             IOclass, IOname = pluginHandler.getPluginInstanceFromFileName(thisIOmodule,attributeToImport='loaderClass')
             thisInstance = IOclass(self)
             self.loadActions[thisInstance.objectName] = thisInstance
-            print "Added %s to load menu as object name %s" % (thisIOmodule, thisInstance.objectName)
+            print(("Added %s to load menu as object name %s" % (thisIOmodule, thisInstance.objectName)))
 
-        print ""
+        print("")
 
         # Link other menu signals to slots
         self.actionOpen.triggered.connect(self.showStackLoadDialog)
@@ -243,7 +243,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageAlpha_horizontalSlider.valueChanged.connect(self.imageAlpha_horizontalSlider_slot)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
-        labels = QtCore.QStringList("Name")
+        #labels = QtCore.QStringList("Name")
+        labels = str("Name")
         self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
         self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -256,7 +257,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Points tab stuff. (The points tab deals with sparse data types like points, lines, and trees)
         # Points QTreeView (see lasagna_ingredient.addToList for where the model is updated upon ingredient addition)
         self.points_Model = QtGui.QStandardItemModel(self.points_TreeView)
-        labels = QtCore.QStringList("Name")
+        labels = str("Name")
         self.points_Model.setHorizontalHeaderLabels(labels)
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -299,10 +300,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         pluginPaths = lasHelp.readPreference('pluginPaths')
 
         plugins, pluginPaths = pluginHandler.findPlugins(pluginPaths)
-        print "Adding plugin paths to Python path:"
+        print("Adding plugin paths to Python path:")
         self.pluginSubMenus = {}
         for p in pluginPaths:  # print plugin paths to screen, add to path, add as sub-dir names in Plugins menu
-            print p
+            print(p)
             sys.path.append(p)
             dirName = p.split(os.path.sep)[-1]
             self.pluginSubMenus[dirName] = QtGui.QMenu(self.menuPlugins)
@@ -313,7 +314,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         # 2. Add each plugin to a dictionary where the keys are plugin name and values are instances of the plugin.
-        print ""
+        print("")
         self.plugins = {} # A dictionary where keys are plugin names and values are plugin classes or plugin instances
         self.pluginActions = {} # A dictionary where keys are plugin names and values are QActions associated with a plugin
         for thisPlugin in plugins:
@@ -325,11 +326,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             dirName = os.path.dirname(pluginClass.__file__).split(os.path.sep)[-1]
 
             # create instance of the plugin object and add to the self.plugins dictionary
-            print "Creating reference to class " + pluginName +  ".plugin"
+            print(("Creating reference to class " + pluginName +  ".plugin"))
             self.plugins[pluginName] = pluginClass.plugin
 
             # create an action associated with the plugin and add to the self.pluginActions dictionary
-            print "Creating menu QAction for " + pluginName
+            print(("Creating menu QAction for " + pluginName))
             self.pluginActions[pluginName] = QtGui.QAction(pluginName, self)
             self.pluginActions[pluginName].setObjectName(pluginName)
             self.pluginActions[pluginName].setCheckable(True)  # so we have a checkbox next to the menu entry
@@ -338,7 +339,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.pluginActions[pluginName].triggered.connect(self.startStopPlugin)  # Connect this action's signal to the slot
 
 
-        print ""
+        print("")
 
 
         self.statusBar.showMessage("Initialised")
@@ -366,15 +367,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
     def startPlugin(self,pluginName):
-        print "Starting " + pluginName
+        print(("Starting " + pluginName))
         self.plugins[pluginName] = self.plugins[pluginName](self)  # Create an instance of the plugin object
 
     def stopPlugin(self, pluginName):
-        print "Stopping " + pluginName
+        print(("Stopping " + pluginName))
         try:
             self.plugins[pluginName].closePlugin()  # tidy up the plugin
         except:
-            print "failed to properly close plugin " + pluginName
+            print(("failed to properly close plugin " + pluginName))
 
         # delete the plugin instance and replace it in the dictionary with a reference (that what it is?) to the class
         # NOTE: plugins with a window do not run the following code when the window is closed. They should, however,
@@ -394,12 +395,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         for thisHook in hookArray:
             try:
                 if thisHook is None:
-                    print "Skipping empty hook in hook list"
+                    print("Skipping empty hook in hook list")
                     continue
                 else:
                      thisHook(*args)
             except:
-                print  "Error running plugin method " + str(thisHook)
+                print(("Error running plugin method " + str(thisHook)))
                 raise
 
 
@@ -414,11 +415,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         if not os.path.isfile(fnameToLoad):
             msg = 'Unable to find ' + fnameToLoad
-            print msg
+            print(msg)
             self.statusBar.showMessage(msg)
             return False
 
-        print "Loading image stack " + fnameToLoad
+        print(("Loading image stack " + fnameToLoad))
 
         # TODO: The axis swap likely shouldn't be hard-coded here
         loadedImageStack = imageStackLoader.loadStack(fnameToLoad)
@@ -562,7 +563,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Neatly shut down the GUI
         """
         # Loop through and shut plugins.
-        for thisPlugin in self.pluginActions.keys():
+        for thisPlugin in list(self.pluginActions.keys()):
             if self.pluginActions[thisPlugin].isChecked():
                 if not self.plugins[thisPlugin].confirmOnClose:  # TODO: handle cases where plugins want confirmation to close
                     self.stopPlugin(thisPlugin)
@@ -585,15 +586,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         ingredients are classes that are defined in the ingredients package
         """
 
-        print "\nlasanga.addIngredient - Adding %s ingredient: %s" % (kind, objectName)
+        print(("\nlasanga.addIngredient - Adding %s ingredient: %s" % (kind, objectName)))
 
         if len(kind)==0:
-            print "ERROR: no ingredient kind %s is defined by Lasagna" % (kind)
+            print(("ERROR: no ingredient kind %s is defined by Lasagna" % (kind)))
             return
 
         # Do not attempt to add an ingredient if it's class is not defined
         if not hasattr(ingredients,kind):
-            print "ERROR: ingredients module has no class '%s'" % kind
+            print(("ERROR: ingredients module has no class '%s'" % kind))
             return
 
         # If an ingredient with this object name is already present we delete it
@@ -636,20 +637,20 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         verbose = False
         if len(self.ingredientList)==0:
             if verbose:
-                print "lasagna.removeIngredientByType finds no ingredients in list!"
+                print("lasagna.removeIngredientByType finds no ingredients in list!")
             return
 
         removedIngredient=False
         for thisIngredient in self.ingredientList[:]:
             if thisIngredient.objectName == objectName:
                 if verbose:
-                    print 'Removing ingredient ' + objectName
+                    print(('Removing ingredient ' + objectName))
                 self.removeIngredient(thisIngredient)
                 self.selectedStackName() # Ensures something is highlighted
                 removedIngredient=True
 
         if removedIngredient == False & verbose==True:
-            print "** Failed to remove ingredient %s **" % objectName
+            print(("** Failed to remove ingredient %s **" % objectName))
             return False
 
         return True
@@ -662,13 +663,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         verbose = False
         if len(self.ingredientList)==0:
             if verbose:
-                print "removeIngredientByType finds no ingredients in list!"
+                print("removeIngredientByType finds no ingredients in list!")
             return
 
         for thisIngredient in self.ingredientList[:]:
             if thisIngredient.__module__.endswith(ingredientType):  # TODO: fix this so we look for it by instance not name
                 if verbose:
-                    print 'Removing ingredient ' + thisIngredient.objectName
+                    print(('Removing ingredient ' + thisIngredient.objectName))
                 self.selectedStackName() # Ensures something is highlighted
                 self.removeIngredient(thisIngredient)
 
@@ -691,7 +692,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         verbose = False
         if len(self.ingredientList)==0:
             if verbose:
-                print "returnIngredientByType finds no ingredients in list!"
+                print("returnIngredientByType finds no ingredients in list!")
             return False
 
         returnedIngredients=[]
@@ -701,7 +702,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
 
         if verbose and len(returnedIngredients)==0:
-            print "returnIngredientByType finds no ingredients with type " + ingredientType
+            print(("returnIngredientByType finds no ingredients with type " + ingredientType))
             return False
         else:
             return returnedIngredients
@@ -715,7 +716,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         verbose = False
         if len(self.ingredientList)==0:
             if verbose:
-                print "returnIngredientByName finds no ingredients in list!"
+                print("returnIngredientByName finds no ingredients in list!")
             return False
 
         for thisIngredient in self.ingredientList:
@@ -723,7 +724,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 return thisIngredient
 
         if verbose:
-            print "returnIngredientByName finds no ingredient called " + objectName
+            print(("returnIngredientByName finds no ingredient called " + objectName))
         return False
 
 
@@ -837,17 +838,17 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Return the name of the selected points ingredient. If none are selected, returns the first in the list
         """
         if self.points_Model.rowCount()==0:
-            print "lasagna.selectedPointsName finds no image stacks in list"
+            print("lasagna.selectedPointsName finds no image stacks in list")
             return False
 
         # Highlight the first row if nothing is selected (which shouldn't ever happen)
         if len(self.points_TreeView.selectedIndexes())==0:
             firstItem  = self.points_Model.index(0,0)
             self.points_TreeView.setCurrentIndex(firstItem)
-            print "lasagna.selectedStackName forced highlighting of first image stack"
+            print("lasagna.selectedStackName forced highlighting of first image stack")
 
 
-        return str(self.points_TreeView.selectedIndexes()[0].data().toString())
+        return self.points_TreeView.selectedIndexes()[0].data()
 
 
     # The remaining methods for this tab are involved in building a context menu on right-click
@@ -870,7 +871,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         objName = self.selectedPointsName()
         self.removeIngredientByName(objName)
-        print "removed " + objName
+        print(("removed " + objName))
 
 
     def pointsLayers_TreeView_slot(self):
@@ -1145,7 +1146,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         objName = self.selectedStackName()
         self.removeIngredientByName(objName)
-        print "removed " + objName
+        print(("removed " + objName))
         self.runHook(self.hooks['deleteLayerStack_Slot_End'])
 
     def saveLayerStack_Slot(self):
@@ -1155,7 +1156,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if hasattr(ingr, 'save'):
             ingr.save()
         else:
-            print 'no save method for %s'%objName
+            print(('no save method for %s'%objName))
 
     def stacksInTreeList(self):
         """
@@ -1164,7 +1165,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         stacks=[]
         for ii in range(self.imageStackLayers_Model.rowCount()):
-            stackName = self.imageStackLayers_Model.index(ii, 0).data().toString()
+            stackName = self.imageStackLayers_Model.index(ii, 0).data()
             stacks.append(stackName)
 
         if len(stacks)>0:
@@ -1178,16 +1179,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Return the name of the selected image stack. If no stack selected, returns the first stack in the list.
         """
         if self.imageStackLayers_Model.rowCount()==0:
-            print "lasagna.selectedStackName finds no image stacks in list"
+            print("lasagna.selectedStackName finds no image stacks in list")
             return False
 
         # Highlight the first row if nothing is selected (which shouldn't ever happen)
         if len(self.imageStackLayers_TreeView.selectedIndexes())==0:
             firstItem  = self.imageStackLayers_Model.index(0,0)
             self.imageStackLayers_TreeView.setCurrentIndex(firstItem)
-            print "lasagna.selectedStackName forced highlighting of first image stack"
+            print("lasagna.selectedStackName forced highlighting of first image stack")
 
-        return str( self.imageStackLayers_TreeView.selectedIndexes()[0].data().toString() )
+        return self.imageStackLayers_TreeView.selectedIndexes()[0].data()
 
 
     def imageStackLayers_TreeView_slot(self):
@@ -1279,32 +1280,32 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     # Data from command line input if the user specified this
     if not imStackFnamesToLoad is None:
         for thisFname in imStackFnamesToLoad:
-            print "Loading stack " + thisFname
+            print(("Loading stack " + thisFname))
             tasty.loadImageStack(thisFname)
 
     if not sparsePointsToLoad is None:
         for thisFname in sparsePointsToLoad:
-            print "Loading points " + thisFname
+            print(("Loading points " + thisFname))
             tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
 
     if not linesToLoad is None:
         for thisFname in linesToLoad:
-            print "Loading lines " + thisFname
+            print(("Loading lines " + thisFname))
             tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
 
     if not treesToLoad is None:
         for thisFname in treesToLoad:
-            print "Loading tree " + thisFname
+            print(("Loading tree " + thisFname))
             tasty.loadActions['tree_reader'].showLoadDialog(thisFname)
 
     tasty.initialiseAxes()
 
     if pluginToStart != None:
-        if tasty.plugins.has_key(pluginToStart):
+        if pluginToStart in tasty.plugins:
             tasty.startPlugin(pluginToStart)
             tasty.pluginActions[pluginToStart].setChecked(True)
         else:
-            print "No plugin '%s': not starting" % pluginToStart
+            print(("No plugin '%s': not starting" % pluginToStart))
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Link slots to signals
