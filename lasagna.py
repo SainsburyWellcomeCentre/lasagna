@@ -173,6 +173,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.mousePositionInStack = []  # A list defining voxel (Z,X,Y) in which the mouse cursor is currently positioned [see mouseMoved()]
         self.statusBarText = None
 
+        #Ensure that the menu on OS X appears the same as in Linux and Windows
+        self.menuBar.setNativeMenuBar(False)
+
+
         # Lists of functions that are used as hooks for plugins to modify the behavior of built-in methods.
         # Hooks are named using the following convention: <lasagnaMethodName_[Start|End]>
         # So:
@@ -218,7 +222,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # TODO: currently we only have code to handle load actions as no save actions are available
         self.loadActions = {}  # actions must be attached to the lasagna object or they won't function
         for thisIOmodule in IO_plugins:
-
             IOclass, IOname = pluginHandler.getPluginInstanceFromFileName(thisIOmodule,attributeToImport='loaderClass')
             thisInstance = IOclass(self)
             self.loadActions[thisInstance.objectName] = thisInstance
@@ -259,7 +262,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.points_TreeView.customContextMenuRequested.connect(self.layersMenuPoints)
-
         self.points_TreeView.selectionModel().selectionChanged[QtCore.QItemSelection, QtCore.QItemSelection].connect(self.pointsLayers_TreeView_slot)
 
         # Settings boxes, etc, for the points (sparse data) ingredients
@@ -308,8 +310,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.pluginSubMenus[dirName].setTitle(dirName)
             self.menuPlugins.addAction(self.pluginSubMenus[dirName].menuAction())
 
-
-
         # 2. Add each plugin to a dictionary where the keys are plugin name and values are instances of the plugin.
         print("")
         self.plugins = {} # A dictionary where keys are plugin names and values are plugin classes or plugin instances
@@ -334,7 +334,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             self.pluginSubMenus[dirName].addAction(self.pluginActions[pluginName])  # add action to the correct plugins sub-menu
             self.pluginActions[pluginName].triggered.connect(self.startStopPlugin)  # Connect this action's signal to the slot
-
 
         print("")
 
@@ -843,7 +842,6 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             firstItem  = self.points_Model.index(0,0)
             self.points_TreeView.setCurrentIndex(firstItem)
             print("lasagna.selectedStackName forced highlighting of first image stack")
-
 
         return self.points_TreeView.selectedIndexes()[0].data()
 
