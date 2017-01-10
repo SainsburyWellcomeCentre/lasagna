@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'elastix_plugin.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.7.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -41,6 +41,7 @@ class Ui_elastixMain(object):
         self.layoutWidget.setGeometry(QtCore.QRect(10, 40, 801, 31))
         self.layoutWidget.setObjectName("layoutWidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.layoutWidget)
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.loadMoving = QtWidgets.QPushButton(self.layoutWidget)
         self.loadMoving.setEnabled(False)
@@ -60,9 +61,10 @@ class Ui_elastixMain(object):
         spacerItem = QtWidgets.QSpacerItem(328, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
         self.layoutWidget1 = QtWidgets.QWidget(self.tabLoad)
-        self.layoutWidget1.setGeometry(QtCore.QRect(11, 11, 801, 26))
+        self.layoutWidget1.setGeometry(QtCore.QRect(11, 11, 801, 29))
         self.layoutWidget1.setObjectName("layoutWidget1")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget1)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.loadFixed = QtWidgets.QPushButton(self.layoutWidget1)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -84,6 +86,7 @@ class Ui_elastixMain(object):
         self.layoutWidget2.setGeometry(QtCore.QRect(0, 80, 811, 141))
         self.layoutWidget2.setObjectName("layoutWidget2")
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.layoutWidget2)
+        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         spacerItem2 = QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem2)
@@ -91,9 +94,10 @@ class Ui_elastixMain(object):
         self.groupBox.setMinimumSize(QtCore.QSize(101, 0))
         self.groupBox.setObjectName("groupBox")
         self.layoutWidget3 = QtWidgets.QWidget(self.groupBox)
-        self.layoutWidget3.setGeometry(QtCore.QRect(20, 30, 65, 82))
+        self.layoutWidget3.setGeometry(QtCore.QRect(20, 30, 87, 95))
         self.layoutWidget3.setObjectName("layoutWidget3")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.layoutWidget3)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.flipAxis1 = QtWidgets.QPushButton(self.layoutWidget3)
         self.flipAxis1.setEnabled(False)
@@ -114,9 +118,10 @@ class Ui_elastixMain(object):
         self.groupBox_2.setMinimumSize(QtCore.QSize(101, 0))
         self.groupBox_2.setObjectName("groupBox_2")
         self.layoutWidget4 = QtWidgets.QWidget(self.groupBox_2)
-        self.layoutWidget4.setGeometry(QtCore.QRect(20, 30, 65, 82))
+        self.layoutWidget4.setGeometry(QtCore.QRect(20, 30, 87, 95))
         self.layoutWidget4.setObjectName("layoutWidget4")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.layoutWidget4)
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.rotAxis1 = QtWidgets.QPushButton(self.layoutWidget4)
         self.rotAxis1.setEnabled(False)
@@ -137,9 +142,10 @@ class Ui_elastixMain(object):
         self.groupBox_3.setMinimumSize(QtCore.QSize(101, 0))
         self.groupBox_3.setObjectName("groupBox_3")
         self.layoutWidget_2 = QtWidgets.QWidget(self.groupBox_3)
-        self.layoutWidget_2.setGeometry(QtCore.QRect(20, 30, 70, 82))
+        self.layoutWidget_2.setGeometry(QtCore.QRect(20, 30, 87, 95))
         self.layoutWidget_2.setObjectName("layoutWidget_2")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.layoutWidget_2)
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.swapAxis1_2 = QtWidgets.QPushButton(self.layoutWidget_2)
         self.swapAxis1_2.setEnabled(False)

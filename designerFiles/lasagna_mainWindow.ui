@@ -89,7 +89,7 @@
      <x>0</x>
      <y>0</y>
      <width>1002</width>
-     <height>27</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -129,8 +129,8 @@
   <widget class="QDockWidget" name="mainDockWidget">
    <property name="minimumSize">
     <size>
-     <width>331</width>
-     <height>587</height>
+     <width>338</width>
+     <height>590</height>
     </size>
    </property>
    <property name="features">
@@ -144,7 +144,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="imageSettingsTab">
         <attribute name="title">
@@ -903,7 +903,7 @@
             <x>20</x>
             <y>20</y>
             <width>43</width>
-            <height>92</height>
+            <height>95</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
