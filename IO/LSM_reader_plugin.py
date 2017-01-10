@@ -5,7 +5,7 @@ Load an LSM stack into Lasagna
 import os
 from lasagna_plugin import lasagna_plugin
 import tifffile
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
 
 class loaderClass(lasagna_plugin):

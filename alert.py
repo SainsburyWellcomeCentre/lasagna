@@ -8,7 +8,7 @@ We can't rely on the user watching the console for messages.
 #e.g.  QMessageBox.information(None,"Hello!","Something went wrong )
 
 import alert_UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 
 class alert(alert_UI.Ui_alertBox,QtGui.QWidget):

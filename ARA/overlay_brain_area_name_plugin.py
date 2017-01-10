@@ -12,7 +12,7 @@ from alert import alert
 import imageStackLoader
 
 #For the UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import area_namer_UI
 
 #For handling the labels files

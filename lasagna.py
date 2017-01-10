@@ -20,8 +20,8 @@ __license__ = "GPL v3"
 __maintainer__ = "Rob Campbell"
 
 
-
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 import numpy as np
 import sys
@@ -243,27 +243,24 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageAlpha_horizontalSlider.valueChanged.connect(self.imageAlpha_horizontalSlider_slot)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
-        #labels = QtCore.QStringList("Name")
-        labels = str("Name")
-        self.imageStackLayers_Model.setHorizontalHeaderLabels(labels)
+        self.imageStackLayers_Model.setHorizontalHeaderLabels(["Name"])
         self.imageStackLayers_TreeView.setModel(self.imageStackLayers_Model)
         self.imageStackLayers_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.imageStackLayers_TreeView.customContextMenuRequested.connect(self.layersMenuStacks)
         # self.imageStackLayers_TreeView.setColumnWidth(0,200)
 
-        QtCore.QObject.connect(self.imageStackLayers_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.imageStackLayers_TreeView_slot) # Runs when an image stack ingredient is selected
+        self.imageStackLayers_TreeView.selectionModel().selectionChanged[QtCore.QItemSelection, QtCore.QItemSelection].connect(self.imageStackLayers_TreeView_slot)
 
 
         # Points tab stuff. (The points tab deals with sparse data types like points, lines, and trees)
         # Points QTreeView (see lasagna_ingredient.addToList for where the model is updated upon ingredient addition)
         self.points_Model = QtGui.QStandardItemModel(self.points_TreeView)
-        labels = str("Name")
-        self.points_Model.setHorizontalHeaderLabels(labels)
+        self.points_Model.setHorizontalHeaderLabels(["Name"])
         self.points_TreeView.setModel(self.points_Model)
         self.points_TreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.points_TreeView.customContextMenuRequested.connect(self.layersMenuPoints)
 
-        QtCore.QObject.connect(self.points_TreeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.pointsLayers_TreeView_slot)  # Runs when a points ingredient is selected
+        self.points_TreeView.selectionModel().selectionChanged[QtCore.QItemSelection, QtCore.QItemSelection].connect(self.pointsLayers_TreeView_slot)
 
         # Settings boxes, etc, for the points (sparse data) ingredients
         [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasHelp.readPreference('symbolOrder')]  # populate with markers
@@ -496,7 +493,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Bring up the file load dialog. Return the file name. Update the last used path.
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
-        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
+        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)[0]
         fname = str(fname)
         if len(fname) == 0:
             return None
@@ -568,7 +565,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 if not self.plugins[thisPlugin].confirmOnClose:  # TODO: handle cases where plugins want confirmation to close
                     self.stopPlugin(thisPlugin)
 
-        QtGui.qApp.quit()
+        qApp.quit()
         sys.exit(0) # without this we get a big horrible error report on the Mac
 
     def closeEvent(self, event):

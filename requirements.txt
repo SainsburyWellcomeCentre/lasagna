@@ -1,9 +1,9 @@
+pyqt5
 numpy
-scipy
-libtiff
 tifffile
 pynrrd
-vtk
 pyqtgraph
 pyyaml
+sip
 scikit-image
+scipy

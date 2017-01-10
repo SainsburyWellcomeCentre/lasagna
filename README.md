@@ -14,7 +14,7 @@ the [website](http://raacampbell.github.io/lasagna).
 
 
 ## Installation ##
-Lasagna runs on Python 3, PyQt4, and uses PyQtGraph for the plotting and requires the following modules:
+Lasagna runs on Python 3, PyQt5, and uses PyQtGraph for the plotting and requires the following modules:
 
 * tifffile [for importing LSM files]
 * vtk [optional, for faster import of MHD files but doesn't work in Python 3]
@@ -25,7 +25,7 @@ Lasagna runs on Python 3, PyQt4, and uses PyQtGraph for the plotting and require
 * yaml [and pyyaml]
 * Scipy [optional - ARA explorer]
 * Scikit-Image [optional - ARA explorer]
-* PyQt4
+* PyQt5
 * SIP
 
 On Linux you can install everything but PyQt and SIP by running:

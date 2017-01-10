@@ -6,9 +6,10 @@ of one or more linked axes
 
 
 import pyqtgraph as pg
+from PyQt5.QtWidgets import *
 import numpy as np
 import pyqtgraph.functions as fn
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 import platform
 class lasagna_viewBox(pg.ViewBox):
     mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal

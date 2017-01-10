@@ -10,7 +10,7 @@ This information is then displayed on the screen.
 
 from lasagna_plugin import lasagna_plugin
 import infoBox_UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import sys
 
 class plugin(lasagna_plugin, QtGui.QWidget, infoBox_UI.Ui_infoBox): #must inherit lasagna_plugin first

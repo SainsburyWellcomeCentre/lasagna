@@ -5,7 +5,7 @@ This class defines the basic imagestack and instructs lasagna as to how to handl
 
 import numpy as np
 import os
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from imageStackLoader import saveStack

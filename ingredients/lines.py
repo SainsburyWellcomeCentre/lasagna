@@ -18,7 +18,7 @@ import numpy as np
 import os
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
 import warnings #to disable some annoying NaN-related warnings
 from matplotlib import cm

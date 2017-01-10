@@ -6,7 +6,7 @@ mouse cursor is at.
 
 from lasagna_plugin import lasagna_plugin
 import cross_section_plot_UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import sys
 
 

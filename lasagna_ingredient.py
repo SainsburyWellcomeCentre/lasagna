@@ -4,7 +4,7 @@ Ingredients inherit this class
 
 import os
 import pyqtgraph as pg
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 class lasagna_ingredient(object):
     def __init__(self, parent, data, fnameAbsPath='', enable=True, objectName='',pgObject='', pgObjectConstructionArgs=dict()):

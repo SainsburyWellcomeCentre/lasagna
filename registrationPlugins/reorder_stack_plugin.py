@@ -5,7 +5,7 @@ A simple plugin just to change the order of the slices
 from lasagna_plugin import lasagna_plugin
 import reorder_stack_UI
 import selectstack_UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import sys
 import numpy as np
 

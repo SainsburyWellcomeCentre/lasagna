@@ -8,7 +8,8 @@ plugin under construction
 
 """
 
-import lasagna_helperFunctions as lasHelp 
+import lasagna_helperFunctions as lasHelp
+from PyQt5.QtWidgets import *
 from lasagna_plugin import lasagna_plugin
 import numpy as np
 import pyqtgraph as pg
@@ -16,7 +17,7 @@ import os.path
 from alert import alert
 
 #For the UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import ara_explorer_UI
 
 #For contour drawing
@@ -66,7 +67,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.brainArea_treeView.setModel(self.brainArea_itemModel)
 
         #Link the selections in the tree view to a slot in order to allow highlighting of the selected area
-        QtCore.QObject.connect(self.brainArea_treeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.highlightSelectedAreaFromList) 
+        self.brainArea_treeView.selectionModel().selectionChanged[QtCore.QItemSelection, QtCore.QItemSelection].connect(self.highlightSelectedAreaFromList)
 
 
         #Link signals to slots
