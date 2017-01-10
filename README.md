@@ -32,7 +32,8 @@ Lasagna runs on Python 3, PyQt5, and uses PyQtGraph for the plotting and require
 
 
 
-On Linux you should be able to install everything but `tifffile` and `vtk` by running:
+On Linux you can install most of the above via your package manager (but maybe your version of PyQtGraph is old). 
+If you wish, you can instead change to the Lasagna directory and run:
 
 ```
 pip3 install -r requirements.txt --user --upgrade
@@ -40,6 +41,7 @@ pip3 install -r requirements.txt --user --upgrade
 
 This command installs the dependencies in your home folder and if any are already installed in the system path it looks for newer versions and installs those. 
 It does not install `vtk`, which currently seems not to be supported by Python 3. 
+If you run into problems try installing the dependencies separately as for the Mac (below).
 For other platforms, please see [here](http://raacampbell.github.io/lasagna/installation.html)
 
 On Mac you will first need to Install [HomeBrew](http://brew.sh/)
@@ -51,21 +53,24 @@ On Mac you will first need to Install [HomeBrew](http://brew.sh/)
 The install Python 3 and a couple of other packages without which you won't be able to install the rest of the dependencies:
 
 ```
-brew install freetype  pkg-config python3
+brew install freetype pkg-config python3
 ```
 
-Now you can install using
+Now you can install the dependencies in requirements.txt using:
 ```
-pip3 install -r requirements.txt
+pip3 install numpy
+pip3 install matplotlib
+...
 ```
 
-We aren't installing in your use directory because you'll be using the brew install location, which doesn't require admin rights and doesn't interfere with the system Python install. 
+Strange failures occur if you try to install from the dependency file directly but individually the installs do work. 
+
 
 
 
 
 ## Setup ##
-After the first run, Lasagna creates a preferenes file in the ```.lasagna``` hidden directory in your home directory. 
+After the first run, Lasagna creates a preferences file in the ```.lasagna``` hidden directory in your home directory. 
 You may need to edit this file to make Lasagna aware of its built in-plugins. i.e. edit the pluginPaths preference. 
 This step isn't user-friendly, sorry.
 
