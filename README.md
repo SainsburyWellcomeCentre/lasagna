@@ -32,15 +32,21 @@ Lasagna runs on Python 3, PyQt5, and uses PyQtGraph for the plotting and require
 
 
 
-On Linux you can install most of the above via your package manager (but maybe your version of PyQtGraph is old). 
-If you wish, you can instead change to the Lasagna directory and run:
+On Linux you can install most of the above via your package manager
+with the remaining packages being installed via `pip3` (`cd` to Lasagna
+directory to run the `pip3` install line) :
 
 ```
-pip3 install -r requirements.txt --user --upgrade
+apt-get install python3 python3-pip python3-pyqt5 python3-numpy python3-matplotlib
+python3-scipy python3-sip
+pip3 install -r requirements.txt --user
 ```
 
-This command installs the dependencies in your home folder and if any are already installed in the system path it looks for newer versions and installs those. 
-It does not install `vtk`, which currently seems not to be supported by Python 3. 
+This command installs the dependencies in your home folder.
+If you add the `--upgrade` flag, `pip3` will also install newer
+vesions of packages already in the system path.
+
+There is currently no `vtk` support in Python 3. 
 If you run into problems try installing the dependencies separately as for the Mac (below).
 For other platforms, please see [here](http://raacampbell.github.io/lasagna/installation.html)
 
