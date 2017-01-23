@@ -377,7 +377,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if currentRow<0:
             print("Can not remove row %d" % currentRow)
 
-        paramFile = str(self.paramItemModel.index(currentRow,0).data().toString())
+        paramFile = str(self.paramItemModel.index(currentRow,0).data()
 
         #Remove from list view
         self.paramItemModel.removeRows(currentRow,1)
@@ -417,7 +417,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             #Build the parameter string that will be added to the command
             for ii in range(self.paramItemModel.rowCount()):
-                paramFile = self.paramItemModel.index(ii,0).data().toString()
+                paramFile = self.paramItemModel.index(ii,0).data()
                 cmd_str = "%s -p %s%s%s " % (cmd_str,outputDir,os.path.sep,paramFile)
 
 
@@ -428,7 +428,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Refresh the parameter file list combobox on Tab 3
         self.comboBoxParam.clear()
         for ii in range(self.paramItemModel.rowCount()):
-            paramFile = self.paramItemModel.index(ii,0).data().toString()
+            paramFile = self.paramItemModel.index(ii,0).data()
             paramFile = paramFile.split(os.path.sep)[-1] #Only the file name since we'll be saving to a different location
             self.comboBoxParam.addItem(paramFile)
 
@@ -441,7 +441,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if self.comboBoxParam.count()>0 and os.path.exists(self.outputDir_label.text()) and os.path.exists(self.elastix_cmd['m']) and os.path.exists(self.elastix_cmd['f']):
             #Can all param files in the temporary directory be found?
             for ii in range(self.paramItemModel.rowCount()):
-                paramFile = str(self.paramItemModel.index(ii,0).data().toString())
+                paramFile = str(self.paramItemModel.index(ii,0).data()
                 if os.path.exists(self.tmpParamFiles[paramFile])==False:
                     return #Don't proceed if we can't find the parameter file
 
@@ -458,7 +458,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         into the text box on Tab 3
         """
 
-        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data().toString())
+        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data()
         fname = self.tmpParamFiles[selectedFname]
 
         if os.path.exists(fname)==False:
@@ -507,7 +507,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Move files
         outputDir = self.absToRelPath(self.outputDir_label.text())
         for ii in range(self.paramItemModel.rowCount()):
-            paramFile = str(self.paramItemModel.index(ii,0).data().toString())
+            paramFile = str(self.paramItemModel.index(ii,0).data()
             tempLocation = self.tmpParamFiles[paramFile]
             destinationLocation = outputDir + os.path.sep + paramFile
             print("moving %s to %s" % (tempLocation,destinationLocation))
@@ -565,7 +565,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 
                 #remove from list view
                 for thisRow in range(self.runningAnalysesItemModel.rowCount()):
-                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data().toString())
+                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data()
                     if dirName == thisDir:
                         self.runningAnalysesItemModel.removeRows(thisRow,1)            
                         break
@@ -627,7 +627,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         else:
             selectedIndex = selectedIndex[0] #in case there are multiple selections, select the first one
 
-        imageFname = str(selectedIndex.data().toString())
+        imageFname = str(selectedIndex.data()
 
 
         #Show the image if the highlighted overlay radio button is enabled

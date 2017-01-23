@@ -355,10 +355,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             child_item = QtGui.QStandardItem(thisTree[child].data['name'])
             child_item.setData(child) #Store index. Can be retrieved by: child_item.data().toInt()[0] NOT USING THIS RIGHT NOW
             parent.appendRow(child_item)
-            #print child_item
-            #Print the details associated with the QStandardItemObject
-            #print "%d. %s is a %s and has index %s" % (child_item.data().toInt()[0], child_item.data().toString(),str(child_item), str(child_item.index()))
-
             self.addAreaDataToTreeView(thisTree, child, child_item)
 
 
@@ -401,7 +397,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             treeIndex = index.model().item(index.row(),index.column()).data().toInt()[0] 
             print("treeIndex (%d,%d): %d" % (index.row(),index.column(),treeIndex))
         else: #so we do it the stupid way from the reee
-            areaName = index.data().toString()
+            areaName = index.data()
             treeIndex = self.AreaName2NodeID(self.data['labels'],areaName)
 
         if treeIndex != None:
