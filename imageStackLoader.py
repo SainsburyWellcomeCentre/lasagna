@@ -260,6 +260,21 @@ def mhd_read_raw_file(fname,header):
   else:
       formatType = False
 
+  #If we couldn't find it, look in the ElenentType field
+  if formatType == False:
+    if 'elementtype' in header:
+      datatype = header['elementtype'].lower()
+
+      if datatype == 'met_short':
+        formatType = 'h'
+      else:
+        formatType = False
+
+    else:
+      formatType = False
+
+
+
   if formatType == False:
     print("\nCan not find data format type in MHD file. **CONTACT AUTHOR**\n")
     return False
