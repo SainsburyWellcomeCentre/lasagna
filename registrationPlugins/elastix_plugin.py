@@ -373,11 +373,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         if currentRow is None:
             currentRow = self.paramListView.currentIndex().row()
-        
+
         if currentRow<0:
             print("Can not remove row %d" % currentRow)
 
-        paramFile = str(self.paramItemModel.index(currentRow,0).data()
+        paramFile = str(self.paramItemModel.index(currentRow,0).data())
 
         #Remove from list view
         self.paramItemModel.removeRows(currentRow,1)
@@ -407,7 +407,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         cmd_str = 'elastix -m %s -f %s ' % (self.elastix_cmd['m'], 
                                         self.elastix_cmd['f'])
 
-    
         #If the output directory exists, add it to the command along with any parameter files 
         #TODO: paths become absolute if we didn't call Lasagna from within the registration path. 
         #      could cd somewhere then run in order to make paths suck less
@@ -441,7 +440,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if self.comboBoxParam.count()>0 and os.path.exists(self.outputDir_label.text()) and os.path.exists(self.elastix_cmd['m']) and os.path.exists(self.elastix_cmd['f']):
             #Can all param files in the temporary directory be found?
             for ii in range(self.paramItemModel.rowCount()):
-                paramFile = str(self.paramItemModel.index(ii,0).data()
+                paramFile = str(self.paramItemModel.index(ii,0).data())
                 if os.path.exists(self.tmpParamFiles[paramFile])==False:
                     return #Don't proceed if we can't find the parameter file
 
@@ -458,7 +457,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         into the text box on Tab 3
         """
 
-        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data()
+        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data())
         fname = self.tmpParamFiles[selectedFname]
 
         if os.path.exists(fname)==False:
@@ -507,7 +506,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Move files
         outputDir = self.absToRelPath(self.outputDir_label.text())
         for ii in range(self.paramItemModel.rowCount()):
-            paramFile = str(self.paramItemModel.index(ii,0).data()
+            paramFile = str(self.paramItemModel.index(ii,0).data())
             tempLocation = self.tmpParamFiles[paramFile]
             destinationLocation = outputDir + os.path.sep + paramFile
             print("moving %s to %s" % (tempLocation,destinationLocation))
@@ -565,7 +564,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                 
                 #remove from list view
                 for thisRow in range(self.runningAnalysesItemModel.rowCount()):
-                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data()
+                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data())
                     if dirName == thisDir:
                         self.runningAnalysesItemModel.removeRows(thisRow,1)            
                         break
@@ -583,7 +582,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                             self.resultsItemModel.appendRow(item)
                         else:
                             print("Result item '%s' already exists. Over-writing." % resultFname)
-        
+
                         print("Loading " + resultFname)
                         self.lasagna.loadImageStack(resultFname)
                         #Get the data from this ingredient. Store it. Then wipe the ingredient
@@ -595,7 +594,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
                         print("Image loading complete")
 
-            
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -627,7 +625,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         else:
             selectedIndex = selectedIndex[0] #in case there are multiple selections, select the first one
 
-        imageFname = str(selectedIndex.data()
+        imageFname = str(selectedIndex.data())
 
 
         #Show the image if the highlighted overlay radio button is enabled
