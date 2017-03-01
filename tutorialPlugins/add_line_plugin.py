@@ -4,7 +4,7 @@ Creates a plugin that can add lines and points on the image manually
 
 from lasagna_plugin import lasagna_plugin
 import add_line_UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import sys
 import numpy as np
 
@@ -58,7 +58,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine): #must inher
     def hook_axisClicked(self, axis):
         pos = self.lasagna.mousePositionInStack
         if not len(pos):
-            print 'Load an image first'
+            print('Load an image first')
             return
         elif len(pos) != 3:
             raise ValueError('I expect 3D coordinates. What\'s that:'%pos)
@@ -75,7 +75,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine): #must inher
             self.items[(item_id, i)] = newItem
             self.tableWidget.setItem(n_pts-1,i+1,newItem)
         self.update_current_line()
-        print pos
+        print(pos)
 
     def add_line(self):
         """Add the current line and points to lasagna and start a new line"""
@@ -141,14 +141,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine): #must inher
         # The *args catches whatever connected slot might send (deg for deg_spinBox.valueChanged
         #         for instance)
 
-        if kwargs.has_key('coords'):
+        if 'coords' in kwargs:
             coords=kwargs['coords']
         else:
             coords = self.get_points_coord()
 
         deg = self.deg_spinBox.value()
         if len(coords) <= deg:
-            print "Need at least %i points to fit"%(deg+1)
+            print("Need at least %i points to fit"%(deg+1))
             self.fit={}
             return
         coefs_x = np.polyfit(coords[:,1], coords[:,2], deg)

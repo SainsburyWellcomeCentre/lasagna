@@ -42,32 +42,32 @@ def convertString(string):
 if __name__ == '__main__':
 	#testing code
 	if dataTypeFromString('32423') != int:
-		print 'failed int test 1'
+		print('failed int test 1')
 
 	if dataTypeFromString('3') != int:
-		print 'failed int test 2'
+		print('failed int test 2')
 
 	if dataTypeFromString('3.0') != float:
-		print 'failed float test 1'
+		print('failed float test 1')
 
 	if dataTypeFromString('33342.0234') != float:
-		print 'failed float test 2'
+		print('failed float test 2')
 
 	if dataTypeFromString('33342F.0234') != str:
-		print 'failed str test 1'
+		print('failed str test 1')
 
 	if dataTypeFromString('aardvark') != str:
-		print 'failed str test 2'
+		print('failed str test 2')
 
 	if dataTypeFromString('AardvarK') != str:
-		print 'failed str test 3'
+		print('failed str test 3')
 
 	if dataTypeFromString('1.2.3') != str:
-		print 'failed str test 4'
+		print('failed str test 4')
 
 
 	#try some conversions
 	conversions = ['123','1','1.1','1.2.2','hello']
 	for c in conversions:
 		converted=convertString(c)
-		print "converted %s as %s" % (c,str(type(converted)))
+		print("converted %s as %s" % (c,str(type(converted))))

@@ -16,7 +16,7 @@ All points bearing the same lineseries_id are grouped into the same list.
 import os
 from lasagna_plugin import lasagna_plugin
 import numpy as np
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
 from tree import importData
 
@@ -88,11 +88,11 @@ class loaderClass(lasagna_plugin):
 
                 #import the tree 
                 if verbose:
-                    print "tree_reader_plugin.showLoadDialog - importing %s" % fname
+                    print("tree_reader_plugin.showLoadDialog - importing %s" % fname)
 
                 dataTree = importData(fname,headerLine=['id','parent','z','x','y'],verbose=verbose)
                 if not dataTree:
-                    print "No data loaded from %s" % fname
+                    print("No data loaded from %s" % fname)
                     return
 
                 #We now have an array of unique paths (segments)
@@ -134,7 +134,7 @@ class loaderClass(lasagna_plugin):
 
 
             if verbose:
-                print "Divided tree into %d segments" % n
+                print("Divided tree into %d segments" % n)
 
             #print data         
             objName=fname.split(os.path.sep)[-1]

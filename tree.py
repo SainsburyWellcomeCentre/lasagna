@@ -3,7 +3,7 @@ Module to handle tree data.
 Defines a tree and a node class as well as functions for importing data
 """
 
-(_ROOT, _DEPTH, _WIDTH) = range(3) #Used by classes to navigate the tree
+(_ROOT, _DEPTH, _WIDTH) = list(range(3)) #Used by classes to navigate the tree
 
 import os.path
 import dataTypeFromString
@@ -37,12 +37,12 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
 
 
     if verbose:
-        print "tree.importData importing file %s" % fname
+        print("tree.importData importing file %s" % fname)
 
     #Error check
     if isinstance(fname,str):
         if os.path.exists(fname)==False:
-            print "Can not find file " + fname
+            print("Can not find file " + fname)
             return
 
         #Read in data
@@ -73,10 +73,10 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
 
         dataLine = line.split(colSep)
         if len(header) !=len(dataLine):
-            print "\nTree file appears corrupt! header length is %d but data line length is %d.\ntree.importData is aborting.\n" % (len(header),len(dataLine))
+            print("\nTree file appears corrupt! header length is %d but data line length is %d.\ntree.importData is aborting.\n" % (len(header),len(dataLine)))
             return False
 
-        theseData = map(int,dataLine[0:2]) #add index and parent to the first two columns
+        theseData = list(map(int,dataLine[0:2])) #add index and parent to the first two columns
 
         #Add data to the third column. Either as a list or as a dictionary (if header names were provided)
         if header != False: #add as dictionary
@@ -94,7 +94,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
         data.append(theseData)
 
     if verbose:
-        print "tree.importData read %d rows of data from %s" % (len(data),fname)
+        print("tree.importData read %d rows of data from %s" % (len(data),fname))
 
 
     #Build tree
@@ -110,7 +110,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
         tree.display(0)
 
         for nodeID in tree.traverse(0):
-            print "%s - %s" % (nodeID, tree[nodeID].data)
+            print("%s - %s" % (nodeID, tree[nodeID].data))
 
     return tree
 
@@ -150,9 +150,9 @@ class Tree(object):
         """
         children = self[identifier].children
         if depth == _ROOT:
-            print("{0}".format(identifier))
+            print(("{0}".format(identifier)))
         else:
-            print("    "*depth, "{0}".format(identifier))
+            print(("    "*depth, "{0}".format(identifier)))
 
         depth += 1
         for child in children:
@@ -333,9 +333,9 @@ if __name__ == '__main__':
 
     from tree import Tree
 
-    (_ROOT, _DEPTH, _WIDTH) = range(3)
+    (_ROOT, _DEPTH, _WIDTH) = list(range(3))
 
-    print "\n\n   --------- Tree of life --------- \n"
+    print("\n\n   --------- Tree of life --------- \n")
     treeOfLife = Tree()
 
     treeOfLife.add_node("Life")  # root node
@@ -368,16 +368,16 @@ if __name__ == '__main__':
     treeOfLife["Mammals"].data = 'they have udders'
 
 
-    print "List of nodes:"
-    print treeOfLife.nodes.keys()
-    print ""
+    print("List of nodes:")
+    print(list(treeOfLife.nodes.keys()))
+    print("")
 
-    print "Children of node 'Vertebrates'"
-    print treeOfLife.nodes['Vertebrates'].children
-    print ""
+    print("Children of node 'Vertebrates'")
+    print(treeOfLife.nodes['Vertebrates'].children)
+    print("")
 
 
-    print treeOfLife.display('Life')
+    print(treeOfLife.display('Life'))
 
 
     print("\n***** Depth-first *****")
@@ -390,19 +390,19 @@ if __name__ == '__main__':
     
     print("\n***** Width-first of all data in vertebrates *****")
     for nodeID in treeOfLife.traverse("Vertebrates", mode=_WIDTH):
-        print "%s - %s" % (nodeID, treeOfLife[nodeID].data)
+        print("%s - %s" % (nodeID, treeOfLife[nodeID].data))
 
-    print "\nLeaves:"
-    print treeOfLife.findLeaves('Life')
+    print("\nLeaves:")
+    print(treeOfLife.findLeaves('Life'))
 
-    print "\nBranches:"
-    print treeOfLife.findBranches('Life')
+    print("\nBranches:")
+    print(treeOfLife.findBranches('Life'))
 
-    print "\nPath to root from Fish:"
-    print treeOfLife.pathToRoot('Fish')
+    print("\nPath to root from Fish:")
+    print(treeOfLife.pathToRoot('Fish'))
 
     # - - - - - - -
-    print "\n\n   --------- Tree of Fibonacci numbers --------- \n"
+    print("\n\n   --------- Tree of Fibonacci numbers --------- \n")
     treeOfN = Tree()
 
     treeOfN.add_node(1)  # root node

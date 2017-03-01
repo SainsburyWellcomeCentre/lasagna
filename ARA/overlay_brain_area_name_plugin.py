@@ -12,7 +12,7 @@ from alert import alert
 import imageStackLoader
 
 #For the UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import area_namer_UI
 
 #For handling the labels files
@@ -75,16 +75,16 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         for path in self.prefs['ara_paths']:
 
             if not os.path.exists(path):
-                print "%s does not exist. skipping" % path 
+                print("%s does not exist. skipping" % path) 
                 continue
 
             filesInPath = os.listdir(path) 
             if len(filesInPath)==0:
-                print "No files in %s . skipping" % path 
+                print("No files in %s . skipping" % path) 
                 continue
 
             pths = dict(atlas='', labels='')
-            print "\n %d. Looking for files in directory %s" % (n,path)
+            print("\n %d. Looking for files in directory %s" % (n,path))
             n += 1
 
             files = os.listdir(path)
@@ -95,18 +95,18 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
                     if thisFile.endswith('raw'):
                         continue
                     pths['atlas'] = os.path.join(path,thisFile)
-                    print "Adding atlas file %s" % thisFile
+                    print("Adding atlas file %s" % thisFile)
                     break 
 
             for thisFile in files:
                 if thisFile.startswith(self.labelsFileName):
                     pths['labels'] = os.path.join(path,thisFile)
-                    print "Adding labels file %s" % thisFile
+                    print("Adding labels file %s" % thisFile)
                     break 
 
 
             if len(pths['atlas'])==0 | len(pths['labels'])==0 :
-                print 'Skipping empty empty paths entry'
+                print('Skipping empty empty paths entry')
                 continue
 
 
@@ -117,8 +117,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
             atlasDirName = path.split(os.path.sep)[-1]
 
             #skip if a file with this name already exists
-            if self.paths.has_key(atlasDirName):
-                print "Skipping as a directory called %s is already in the list" % atlasDirName
+            if atlasDirName in self.paths:
+                print("Skipping as a directory called %s is already in the list" % atlasDirName)
                 continue
 
 
@@ -128,7 +128,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
 
 
         #blank line
-        print ""
+        print("")
 
         #If we have no paths to ARAs by the end of this, issue an error alertbox and quit
         if len(self.paths)==0:
@@ -170,7 +170,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         #is the current loaded atlas present
         atlasName= self.data['currentlyLoadedAtlasName']
         if self.lasagna.returnIngredientByName(atlasName)==False:
-            print "The current atlas has been removed by the user. Closing the ARA explorer plugin"
+            print("The current atlas has been removed by the user. Closing the ARA explorer plugin")
             self.closePlugin()
 
    

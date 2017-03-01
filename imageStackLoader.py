@@ -5,7 +5,7 @@ Read MHD stacks (using the vtk library) or TIFF stacks
 https://github.com/raacampbell13/lasagna
 """
 
-from __future__ import division
+
 import re
 import os
 import struct 
@@ -32,7 +32,7 @@ def loadStack(fname):
   elif fname.lower().endswith('.nrrd') or fname.lower().endswith('.nrd'):
     return nrrdRead(fname)
   else:
-    print "\n\n*" + fname + " NOT LOADED. DATA TYPE NOT KNOWN\n\n"
+    print("\n\n*" + fname + " NOT LOADED. DATA TYPE NOT KNOWN\n\n")
 
 def saveStack(fname, data, format='tif'):
   """Save the image data
@@ -93,7 +93,7 @@ def loadTiffStack(fname,useLibTiff=False):
 
   """
   if not os.path.exists(fname):
-    print "imageStackLoader.loadTiffStack can not find %s" % fname
+    print("imageStackLoader.loadTiffStack can not find %s" % fname)
     return
 
   purePython = True
@@ -102,15 +102,15 @@ def loadTiffStack(fname,useLibTiff=False):
     import numpy as np
     tiff = TIFFfile(fname)
     samples, sample_names = tiff.get_samples() #we should have just one
-    print "Loading:\n" + tiff.get_info() + " with libtiff\n"
+    print("Loading:\n" + tiff.get_info() + " with libtiff\n")
     im = np.asarray(samples[0])
   else:
-    print "Loading:\n" + fname + " with tifffile\n"
+    print("Loading:\n" + fname + " with tifffile\n")
     from tifffile import imread 
     im = imread(fname)
 
   im=im.swapaxes(1,2) 
-  print "read image of size: cols: %d, rows: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0])
+  print("read image of size: cols: %d, rows: %d, layers: %d" % (im.shape[1],im.shape[2],im.shape[0]))
   return im
 
 def saveTiffStack(fname, data, useLibTiff = False):
@@ -128,14 +128,15 @@ def mhdRead(fname,fallBackMode = False):
   Read an MHD file using either VTK (if available) or the slower-built in reader
   if fallBackMode is true we force use of the built-in reader
   """
+
   if fallBackMode == False: 
     #Attempt to load vtk
     try:
       imp.find_module('vtk')
-      import vtk
+      import vtk #Seems not exist currently for Python 3 (Jan 2017)
       from vtk.util.numpy_support import vtk_to_numpy
     except ImportError:
-      print "Failed to find VTK. Falling back to built in (but slower) MHD reader"
+      print("Failed to find VTK. Falling back to built in (but slower) MHD reader")
       fallBackMode = True
 
   if fallBackMode:
@@ -153,7 +154,7 @@ def mhdRead(fname,fallBackMode = False):
     a = vtk_to_numpy(sc)
     a = a.reshape(z, cols, rows) 
     a = a.swapaxes(1,2)
-    print "Using VTK to read MHD image of size: cols: %d, rows: %d, layers: %d" % (rows,cols,z)
+    print("Using VTK to read MHD image of size: cols: %d, rows: %d, layers: %d" % (rows,cols,z))
     return a    
 
 
@@ -171,7 +172,7 @@ def mhdWrite(imStack,fname):
     info=out
 
   #Write the mhd header file, as it may have been modified
-  print "Saving image of size %s" % str(imStack.shape)
+  print("Saving image of size %s" % str(imStack.shape))
   mhd_write_header_file(fname,info)
   return True
 
@@ -185,23 +186,23 @@ def mhdRead_fallback(fname):
   """
 
   if os.path.exists(fname) == False:
-    print "mha_read can not find file %s" % fname
+    print("mha_read can not find file %s" % fname)
     return False
   else:
     info = mhd_read_header_file(fname)
     if len(info)==0:
-      print "No data extracted from header file"
+      print("No data extracted from header file")
       return False
 
 
-  if info.has_key('dimsize') == False:
-    print "Can not find dimension size information in MHD file. Not importing data"
+  if ('dimsize' in info) == False:
+    print("Can not find dimension size information in MHD file. Not importing data")
     return False
 
 
   #read the raw file
-  if info.has_key('elementdatafile') == False:
-    print "Can not find the data file as the key 'elementdatafile' does not exist in the MHD file"
+  if ('elementdatafile' in info) == False:
+    print("Can not find the data file as the key 'elementdatafile' does not exist in the MHD file")
     return False
 
   return mhd_read_raw_file(fname,info)
@@ -214,13 +215,13 @@ def mhd_read_raw_file(fname,header):
   CAUTION: this may not adhere to MHD specs! Report bugs to author.
   """
 
-  if header.has_key('headersize'):
+  if 'headersize' in header:
     if header['headersize']>0:
-      print "\n\n **MHD reader can not currently cope with header information in .raw file. Contact the author** \n\n"
+      print("\n\n **MHD reader can not currently cope with header information in .raw file. Contact the author** \n\n")
       return False
 
   #Set the endian type correctly
-  if header.has_key('byteorder'):
+  if 'byteorder' in header:
     if header['byteorder'].lower == 'true' :
       endian = '>' #big endian
     else:
@@ -230,7 +231,7 @@ def mhd_read_raw_file(fname,header):
 
 
   #Set the data type correctly 
-  if header.has_key('datatype'):
+  if 'datatype' in header:
     datatype = header['datatype'].lower()
 
     if datatype == 'float':
@@ -259,12 +260,29 @@ def mhd_read_raw_file(fname,header):
   else:
       formatType = False
 
+  #If we couldn't find it, look in the ElenentType field
   if formatType == False:
-    print "\nCan not find data format type in MHD file. **CONTACT AUTHOR**\n"
+    if 'elementtype' in header:
+      datatype = header['elementtype'].lower()
+
+      if datatype == 'met_short':
+        formatType = 'h'
+      else:
+        formatType = False
+
+    else:
+      formatType = False
+
+
+
+  if formatType == False:
+    print("\nCan not find data format type in MHD file. **CONTACT AUTHOR**\n")
     return False
 
 
-  pathToFile = lasHelp.stripTrailingFileFromPath(fname)
+  pathToFile = lasHelp.stripTrailingFileFromPath(fname) 
+  print(header['elementdatafile'])   #TODO: CLEAN THIS SHIT
+
   rawFname = os.path.join(pathToFile,header['elementdatafile'])
   with  open(rawFname,'rb') as fid:
     data = fid.read()
@@ -273,7 +291,10 @@ def mhd_read_raw_file(fname,header):
   #from: http://stackoverflow.com/questions/26542345/reading-data-from-a-16-bit-unsigned-big-endian-raw-image-file-in-python
   fmt = endian + str(int(np.prod(dimSize))) + formatType
   pix = np.asarray(struct.unpack(fmt, data))
-  
+
+  #Round it to keep python 3 happy 
+  dimSize = [round(d) for d in dimSize]
+
   return pix.reshape((dimSize[2],dimSize[1],dimSize[0])).swapaxes(1,2)
 
 
@@ -294,7 +315,7 @@ def mhd_write_raw_file(imStack,fname,info=None):
   pathToRaw = path + os.path.sep + info['elementdatafile']
 
   if not os.path.exists(pathToRaw):
-    print "Unable to find raw file at %s. Aborting mhd_write_raw_file" % pathToRaw
+    print("Unable to find raw file at %s. Aborting mhd_write_raw_file" % pathToRaw)
     return False
 
 
@@ -307,7 +328,7 @@ def mhd_write_raw_file(imStack,fname,info=None):
       fid.write( bytearray(imStack.ravel()) )
     return info
   except IOError:
-    print "Failed to write raw file in mhd_write_raw_file"
+    print("Failed to write raw file in mhd_write_raw_file")
     return False
 
 
@@ -338,11 +359,11 @@ def mhd_read_header_file(fname):
     #Now we get the data
     m=re.match('\A\w+ *= * (.*) *',line)
     if m is None:
-      print "Can not get data for key %s" % key
+      print("Can not get data for key %s" % key)
       continue
 
     if len(m.groups())>1:
-      print "multiple matches found during mhd_read_header_file. skipping " + key
+      print("multiple matches found during mhd_read_header_file. skipping " + key)
       continue
 
     #If we're here, we found reasonable data
@@ -377,31 +398,31 @@ def mhd_write_header_file(fname,info):
   """
 
   fileStr = '' #Build a string that we will write to a file
-  if info.has_key('ndims'):
+  if 'ndims' in info:
     fileStr = fileStr + ('NDims = %d\n' % info['ndims'])
 
-  if info.has_key('datatype'):
+  if 'datatype' in info:
     fileStr = fileStr + ('DataType = %s\n' % info['datatype'])
 
-  if info.has_key('dimsize'):
-    numbers = ' '.join(map(str,(map(int,info['dimsize'])))) #convert a list of floats into a space separated series of ints
+  if 'dimsize' in info:
+    numbers = ' '.join(map(str,(list(map(int,info['dimsize']))))) #convert a list of floats into a space separated series of ints
     fileStr = fileStr + ('DimSize = %s\n' % numbers)
 
-  if info.has_key('elementsize'):
-    numbers = ' '.join(map(str,(map(int,info['elementsize'])))) 
+  if 'elementsize' in info:
+    numbers = ' '.join(map(str,(list(map(int,info['elementsize']))))) 
     fileStr = fileStr + ('ElementSize = %s\n' % numbers)
 
-  if info.has_key('elementspacing'):
-    numbers = ' '.join(map(str,(map(int,info['elementspacing'])))) 
+  if 'elementspacing' in info:
+    numbers = ' '.join(map(str,(list(map(int,info['elementspacing']))))) 
     fileStr = fileStr + ('ElementSpacing = %s\n' % numbers)
 
-  if info.has_key('elementtype'):
+  if 'elementtype' in info:
     fileStr = fileStr + ('ElementType = %s\n' % info['elementtype'])
   
-  if info.has_key('elementbyteordermsb'):
+  if 'elementbyteordermsb' in info:
     fileStr = fileStr + ('ElementByteOrderMSB = %s\n' % str(info['elementbyteordermsb']))
 
-  if info.has_key('elementdatafile'):
+  if 'elementdatafile' in info:
     fileStr = fileStr + ('ElementDataFile = %s\n' % info['elementdatafile'])
 
 
@@ -415,7 +436,7 @@ def mhd_getRatios(fname):
   Get relative axis ratios from MHD file defined by fname
   """
   if not os.path.exists(fname):
-    print "imageStackLoader.mhd_getRatios can not find %s" % fname
+    print("imageStackLoader.mhd_getRatios can not find %s" % fname)
     return
     
   try:
@@ -431,15 +452,15 @@ def mhd_getRatios(fname):
   except ImportError:
     #If the vtk module fails, we try to read the spacing using the built-in reader
     info = mhd_read_header_file(fname)
-    if info.has_key('elementspacing'):
+    if 'elementspacing' in info:
       spacing = info['elementspacing']
     else:
-      print "Failed to find spacing info in MHA file. Using default axis length values"      
+      print("Failed to find spacing info in MHA file. Using default axis length values")      
       return lasHelp.readPreference('defaultAxisRatios') #defaults
 
 
   if len(spacing)==0: 
-    print "Failed to find spacing valid spacing info in MHA file. Using default axis length values"      
+    print("Failed to find spacing valid spacing info in MHA file. Using default axis length values")      
     return lasHelp.readPreference('defaultAxisRatios') #defaults
   
   return spacingToRatio(spacing)  
@@ -453,7 +474,7 @@ def nrrdRead(fname):
   Read NRRD file
   """
   if not os.path.exists(fname):
-    print "imageStackLoader.nrrdRead can not find %s" % fname
+    print("imageStackLoader.nrrdRead can not find %s" % fname)
     return
 
   import nrrd 
@@ -466,7 +487,7 @@ def nrrdHeaderRead(fname):
   Read NRRD header
   """
   if not os.path.exists(fname):
-    print "imageStackLoader.nrrdHeaderRead can not find %s" % fname
+    print("imageStackLoader.nrrdHeaderRead can not find %s" % fname)
     return
 
   import nrrd
@@ -481,7 +502,7 @@ def nrrd_getRatios(fname):
   Get the aspect ratios from the NRRD file
   """
   if not os.path.exists(fname):
-    print "imageStackLoader.nrrd_getRatios can not find %s" % fname
+    print("imageStackLoader.nrrd_getRatios can not find %s" % fname)
     return
 
   header = nrrdHeaderRead(fname)

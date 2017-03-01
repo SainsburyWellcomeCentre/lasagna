@@ -2,12 +2,12 @@
 This class overlays points on top of the image stacks. 
 """
 
-from __future__ import division
+
 import numpy as np
 import os
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
 from matplotlib import cm
 from numpy import linspace
@@ -137,7 +137,7 @@ class sparsepoints(lasagna_ingredient):
         if isinstance(self.color,list):
             return tuple(self.color + [alpha])
         else:
-            print "sparsepoints.color can not cope with type " + str(type(self.color))
+            print(("sparsepoints.color can not cope with type " + str(type(self.color))))
 
 
     #---------------------------------------------------------------

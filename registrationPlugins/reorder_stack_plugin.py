@@ -5,7 +5,7 @@ A simple plugin just to change the order of the slices
 from lasagna_plugin import lasagna_plugin
 import reorder_stack_UI
 import selectstack_UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import sys
 import numpy as np
 
@@ -51,13 +51,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
 
         indice = [i.row() for i in self.listWidget.selectedIndexes()]
         if not len(indice):
-            print 'Select a slice to move it'
+            print('Select a slice to move it')
             return
         elif len(indice) != 1:
             raise IOError('Should not accept multiple selection. Change UI')
         indice = indice[0]
         if indice==0:
-            print 'already first'
+            print('already first')
             return
         item = self.listWidget.takeItem(indice)
         self.listWidget.insertItem(indice-1,item)
@@ -66,13 +66,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
     def move_down(self):
         indice = [i.row() for i in self.listWidget.selectedIndexes()]
         if not len(indice):
-            print 'Select a slice to move it'
+            print('Select a slice to move it')
             return
         elif len(indice) != 1:
             raise IOError('Should not accept multiple selection. Change UI')
         indice = indice[0]
         if indice== self.listWidget.count()-1:
-            print 'already last'
+            print('already last')
             return
         item = self.listWidget.takeItem(indice)
         self.listWidget.insertItem(indice+1,item)
@@ -109,12 +109,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
         dlg = SelectStack(self, stk_list)
         results = dlg.exec_()
         if not results:
-            print 'Cancel'
+            print('Cancel')
             return
         values = dlg.getValues()
 
         if not len(values):
-            print 'Nothing selected, do nothing'
+            print('Nothing selected, do nothing')
             return
 
         order =  [self.listWidget.item(i) for i in range(self.listWidget.count())]

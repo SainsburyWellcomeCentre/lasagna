@@ -8,7 +8,8 @@ plugin under construction
 
 """
 
-import lasagna_helperFunctions as lasHelp 
+import lasagna_helperFunctions as lasHelp
+from PyQt5.QtWidgets import *
 from lasagna_plugin import lasagna_plugin
 import numpy as np
 import pyqtgraph as pg
@@ -16,7 +17,7 @@ import os.path
 from alert import alert
 
 #For the UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import ara_explorer_UI
 
 #For contour drawing
@@ -53,7 +54,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
         #Warn and quit if there are no paths
         if len(self.prefs['ara_paths'])==0:
-           self.warnAndQuit('Please fill in preferences file at<br>%s<br><a href="http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
+           self.warnAndQuit('Please fill in preferences file at<br>%s<br><a href="http://raacampbell.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
            return
 
         #Set up the UI
@@ -66,7 +67,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         self.brainArea_treeView.setModel(self.brainArea_itemModel)
 
         #Link the selections in the tree view to a slot in order to allow highlighting of the selected area
-        QtCore.QObject.connect(self.brainArea_treeView.selectionModel(), QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"), self.highlightSelectedAreaFromList) 
+        self.brainArea_treeView.selectionModel().selectionChanged[QtCore.QItemSelection, QtCore.QItemSelection].connect(self.highlightSelectedAreaFromList)
 
 
         #Link signals to slots
@@ -83,16 +84,16 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         for path in self.prefs['ara_paths']:
 
             if not os.path.exists(path):
-                print "%s does not exist. skipping" % path 
+                print("%s does not exist. skipping" % path) 
                 continue
 
             filesInPath = os.listdir(path) 
             if len(filesInPath)==0:
-                print "No files in %s . skipping" % path 
+                print("No files in %s . skipping" % path) 
                 continue
 
             pths = dict(atlas='', labels='', template='')
-            print "\n %d. Looking for files in directory %s" % (n,path)
+            print("\n %d. Looking for files in directory %s" % (n,path))
             n += 1
 
             files = os.listdir(path)
@@ -103,13 +104,13 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
                     if thisFile.endswith('raw'):
                         continue
                     pths['atlas'] = os.path.join(path,thisFile)
-                    print "Adding atlas file %s" % thisFile
+                    print("Adding atlas file %s" % thisFile)
                     break 
 
             for thisFile in files:
                 if thisFile.startswith(self.labelsFileName):
                     pths['labels'] = os.path.join(path,thisFile)
-                    print "Adding labels file %s" % thisFile
+                    print("Adding labels file %s" % thisFile)
                     break 
 
             for thisFile in files:
@@ -117,12 +118,12 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
                     if thisFile.endswith('raw'):
                         continue
                     pths['template'] = os.path.join(path,thisFile)
-                    print "Adding template file %s" % thisFile
+                    print("Adding template file %s" % thisFile)
                     break 
 
 
             if len(pths['atlas'])==0 | len(pths['labels'])==0 :
-                print 'Skipping empty empty paths entry'
+                print('Skipping empty empty paths entry')
                 continue
 
 
@@ -133,8 +134,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             atlasDirName = path.split(os.path.sep)[-1]
 
             #skip if a file with this name already exists
-            if self.paths.has_key(atlasDirName):
-                print "Skipping as a directory called %s is already in the list" % atlasDirName
+            if atlasDirName in self.paths:
+                print("Skipping as a directory called %s is already in the list" % atlasDirName)
                 continue
 
 
@@ -144,11 +145,11 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
 
         #blank line
-        print ""
+        print("")
 
         #If we have no paths to ARAs by the end of this, issue an error alertbox and quit
         if len(self.paths)==0:
-           self.warnAndQuit('Found no valid paths is preferences file at<br>%s.<br>SEE <a href="http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
+           self.warnAndQuit('Found no valid paths is preferences file at<br>%s.<br>SEE <a href="http://raacampbell.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
            return
 
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
@@ -158,7 +159,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
         currentlySelectedARA = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
         if self.prefs['loadFirstAtlasOnStartup']:
-            print "Auto-Loading " +  currentlySelectedARA
+            print("Auto-Loading " +  currentlySelectedARA)
             self.loadARA(currentlySelectedARA)
             self.load_pushButton.setEnabled(False) #disable because the current selection has now been loaded
 
@@ -187,7 +188,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         ingredient = self.lasagna.returnIngredientByName(atlasLayerName)
 
         if ingredient == False:
-            print "ARA_explorer_plugin.hook_updateStatusBar_End Failed to find imageStack named %s" % atlasLayerName
+            print("ARA_explorer_plugin.hook_updateStatusBar_End Failed to find imageStack named %s" % atlasLayerName)
             return
 
         imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
@@ -207,7 +208,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         #is the current loaded atlas present
         atlasName= self.data['currentlyLoadedAtlasName']
         if self.lasagna.returnIngredientByName(atlasName)==False:
-            print "The current atlas has been removed by the user. Closing the ARA explorer plugin"
+            print("The current atlas has been removed by the user. Closing the ARA explorer plugin")
             self.closePlugin()
 
    
@@ -354,10 +355,6 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             child_item = QtGui.QStandardItem(thisTree[child].data['name'])
             child_item.setData(child) #Store index. Can be retrieved by: child_item.data().toInt()[0] NOT USING THIS RIGHT NOW
             parent.appendRow(child_item)
-            #print child_item
-            #Print the details associated with the QStandardItemObject
-            #print "%d. %s is a %s and has index %s" % (child_item.data().toInt()[0], child_item.data().toString(),str(child_item), str(child_item.index()))
-
             self.addAreaDataToTreeView(thisTree, child, child_item)
 
 
@@ -398,9 +395,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         if getFromModel:
             #The following row and column indexes are also correct, but index.model() is the root model and this is wrong.
             treeIndex = index.model().item(index.row(),index.column()).data().toInt()[0] 
-            print "treeIndex (%d,%d): %d" % (index.row(),index.column(),treeIndex)
+            print("treeIndex (%d,%d): %d" % (index.row(),index.column(),treeIndex))
         else: #so we do it the stupid way from the reee
-            areaName = index.data().toString()
+            areaName = index.data()
             treeIndex = self.AreaName2NodeID(self.data['labels'],areaName)
 
         if treeIndex != None:

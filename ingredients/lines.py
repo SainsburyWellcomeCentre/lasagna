@@ -13,12 +13,12 @@ line_reader_plugin that creates the menu entry in the file menu,
 loads the data from the csv file, and calles lines.py 
 """
 
-from __future__ import division
+
 import numpy as np
 import os
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
 import warnings #to disable some annoying NaN-related warnings
 from matplotlib import cm
@@ -83,7 +83,7 @@ class lines(lasagna_ingredient):
         onto the object with which it is associated
         """
         if pyqtObject==False:
-            print "lines.py not proceeding because pyqtObject is false"             
+            print("lines.py not proceeding because pyqtObject is false")             
             return
 
         # check if there are data on the plot. Use `is False` because np.array == False returns an array
@@ -130,7 +130,7 @@ class lines(lasagna_ingredient):
         if isinstance(self.color,list):
             return tuple(self.color + [self.alpha])
         else:
-            print "lines.color can not cope with type " + str(type(self.color))
+            print(("lines.color can not cope with type " + str(type(self.color))))
 
 
     #---------------------------------------------------------------

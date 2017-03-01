@@ -44,10 +44,10 @@ class plugin(lasagna_plugin):
         """
         Generate random data spanning the extent of the first image stack
         """
-        stackName = self.lasagna.imageStackLayers_Model.index(0,0).data().toString()
+        stackName = self.lasagna.imageStackLayers_Model.index(0,0).data()
         firstLayer = self.lasagna.returnIngredientByName(stackName)
         if firstLayer == False:
-            print "No image layers loaded"
+            print("No image layers loaded")
             return
 
         imShape = firstLayer.data().shape

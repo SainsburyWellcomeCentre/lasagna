@@ -8,7 +8,7 @@ Rob Campbell
 
 from lasagna_plugin import lasagna_plugin
 import elastix_plugin_UI
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import sys
 import os
 import tempfile
@@ -32,7 +32,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             self.deleteLater()
             return
         else:
-            print "Using elastix binary at " + which('elastix')
+            print("Using elastix binary at " + which('elastix'))
 
 
         #re-define some default properties that were originally defined in lasagna_plugin
@@ -235,10 +235,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         Flips the moving stack along the defined axis
         """
-        print "Flipping axis %d of moving stack" % (axisToFlip+1)
+        print("Flipping axis %d of moving stack" % (axisToFlip+1))
         movingName = self.movingStackName.text()
         if self.lasagna.returnIngredientByName(movingName) == False:
-            print "Failed to flip moving image"
+            print("Failed to flip moving image")
             return
 
         self.lasagna.returnIngredientByName(movingName).flipAlongAxis(axisToFlip)
@@ -250,10 +250,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         Rotates the moving stack along the defined axis
         """
-        print "Rotating axis %d of moving stack" % (axisToRotate+1)
+        print("Rotating axis %d of moving stack" % (axisToRotate+1))
         movingName = self.movingStackName.text()
         if self.lasagna.returnIngredientByName(movingName)==False:
-            print "Failed to rotate moving image"
+            print("Failed to rotate moving image")
             return
 
         self.lasagna.returnIngredientByName(movingName).rotateAlongDimension(axisToRotate)
@@ -265,10 +265,10 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         Swaps the moving stack axes along the defined dimensions
         """
-        print "Swapping moving stack axes %d and %d" % (ax1+1,ax2+1)
+        print("Swapping moving stack axes %d and %d" % (ax1+1,ax2+1))
         movingName = self.movingStackName.text()
         if self.lasagna.returnIngredientByName(movingName)==False:
-            print "Failed to swap moving image axes"
+            print("Failed to swap moving image axes")
             return
 
         self.lasagna.returnIngredientByName(movingName).swapAxes(ax1,ax2)
@@ -287,7 +287,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         movingName = self.movingStackName.text()
         imStack = self.lasagna.returnIngredientByName(movingName).raw_data()
         
-        print "Saving..."
+        print("Saving...")
 
         origButtonText = self.saveModifiedMovingStack.text()
         self.saveModifiedMovingStack.setText('SAVING') #TODO: bug - this text does not appear
@@ -296,9 +296,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         
         if returnVal:
             self.saveModifiedMovingStack.setEnabled(False)
-            print "Saved"
+            print("Saved")
         else:
-            print "Save failed"
+            print("Save failed")
         
         self.saveModifiedMovingStack.setText(origButtonText)
 
@@ -373,18 +373,18 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         """
         if currentRow is None:
             currentRow = self.paramListView.currentIndex().row()
-        
-        if currentRow<0:
-            print "Can not remove row %d" % currentRow
 
-        paramFile = str(self.paramItemModel.index(currentRow,0).data().toString())
+        if currentRow<0:
+            print("Can not remove row %d" % currentRow)
+
+        paramFile = str(self.paramItemModel.index(currentRow,0).data())
 
         #Remove from list view
         self.paramItemModel.removeRows(currentRow,1)
 
 
         #remove from dictionary
-        print "removing " + paramFile
+        print("removing " + paramFile)
         del self.tmpParamFiles[paramFile]
 
         self.updateWidgets_slot()
@@ -407,7 +407,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         cmd_str = 'elastix -m %s -f %s ' % (self.elastix_cmd['m'], 
                                         self.elastix_cmd['f'])
 
-    
         #If the output directory exists, add it to the command along with any parameter files 
         #TODO: paths become absolute if we didn't call Lasagna from within the registration path. 
         #      could cd somewhere then run in order to make paths suck less
@@ -417,7 +416,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
 
             #Build the parameter string that will be added to the command
             for ii in range(self.paramItemModel.rowCount()):
-                paramFile = self.paramItemModel.index(ii,0).data().toString()
+                paramFile = self.paramItemModel.index(ii,0).data()
                 cmd_str = "%s -p %s%s%s " % (cmd_str,outputDir,os.path.sep,paramFile)
 
 
@@ -428,7 +427,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Refresh the parameter file list combobox on Tab 3
         self.comboBoxParam.clear()
         for ii in range(self.paramItemModel.rowCount()):
-            paramFile = self.paramItemModel.index(ii,0).data().toString()
+            paramFile = self.paramItemModel.index(ii,0).data()
             paramFile = paramFile.split(os.path.sep)[-1] #Only the file name since we'll be saving to a different location
             self.comboBoxParam.addItem(paramFile)
 
@@ -441,7 +440,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if self.comboBoxParam.count()>0 and os.path.exists(self.outputDir_label.text()) and os.path.exists(self.elastix_cmd['m']) and os.path.exists(self.elastix_cmd['f']):
             #Can all param files in the temporary directory be found?
             for ii in range(self.paramItemModel.rowCount()):
-                paramFile = str(self.paramItemModel.index(ii,0).data().toString())
+                paramFile = str(self.paramItemModel.index(ii,0).data())
                 if os.path.exists(self.tmpParamFiles[paramFile])==False:
                     return #Don't proceed if we can't find the parameter file
 
@@ -458,11 +457,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         into the text box on Tab 3
         """
 
-        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data().toString())
+        selectedFname=str(self.paramItemModel.index(indexToLoad,0).data())
         fname = self.tmpParamFiles[selectedFname]
 
         if os.path.exists(fname)==False:
-            print fname + " does not exist"
+            print(fname + " does not exist")
             return
 
         with open(fname,'r') as fid:
@@ -480,13 +479,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         if len(currentFname)==0:
             return
 
-        if not self.tmpParamFiles.has_key(currentFname):
-            print "plainTextEditParam_slot no key %s" % currentFname
+        if currentFname not in self.tmpParamFiles:
+            print("plainTextEditParam_slot no key %s" % currentFname)
             return
 
         fname = self.tmpParamFiles[currentFname]
         if os.path.exists(fname)==False:
-            print "Failed to find temporary file at " + fname
+            print("Failed to find temporary file at " + fname)
             return
 
         with open(fname,'w') as fid:
@@ -507,16 +506,16 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         #Move files
         outputDir = self.absToRelPath(self.outputDir_label.text())
         for ii in range(self.paramItemModel.rowCount()):
-            paramFile = str(self.paramItemModel.index(ii,0).data().toString())
+            paramFile = str(self.paramItemModel.index(ii,0).data())
             tempLocation = self.tmpParamFiles[paramFile]
             destinationLocation = outputDir + os.path.sep + paramFile
-            print "moving %s to %s" % (tempLocation,destinationLocation)
+            print("moving %s to %s" % (tempLocation,destinationLocation))
             shutil.move(tempLocation,destinationLocation)
 
 
         #Run command (non-blocking in the background)
         cmd = str(self.labelCommandText.text())
-        print "Running:\n" + cmd
+        print("Running:\n" + cmd)
 
         #Pipe everything to /dev/null if that's an option
         if os.name == 'posix' or os.name == 'mac':
@@ -560,12 +559,12 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
             logName = thisDir + os.path.sep + self.elastixLogName
 
             if self.lookForStringInFile(logName,'Total time elapsed: '):                
-                print "%s is finished." % thisDir
+                print("%s is finished." % thisDir)
                 self.listofDirectoriesWithRunningAnalyses.remove(thisDir)
                 
                 #remove from list view
                 for thisRow in range(self.runningAnalysesItemModel.rowCount()):
-                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data().toString())
+                    dirName = str(self.runningAnalysesItemModel.index(thisRow,0).data())
                     if dirName == thisDir:
                         self.runningAnalysesItemModel.removeRows(thisRow,1)            
                         break
@@ -582,9 +581,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                             item.setEditable(False)
                             self.resultsItemModel.appendRow(item)
                         else:
-                            print "Result item '%s' already exists. Over-writing." % resultFname
-        
-                        print "Loading " + resultFname
+                            print("Result item '%s' already exists. Over-writing." % resultFname)
+
+                        print("Loading " + resultFname)
                         self.lasagna.loadImageStack(resultFname)
                         #Get the data from this ingredient. Store it. Then wipe the ingredient
                         thisIngredient = self.lasagna.ingredientList[-1]
@@ -593,9 +592,8 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
                         self.lasagna.removeIngredientByName(thisIngredient.objectName)
 
 
-                        print "Image loading complete"
+                        print("Image loading complete")
 
-            
 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -627,29 +625,29 @@ class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain): #
         else:
             selectedIndex = selectedIndex[0] #in case there are multiple selections, select the first one
 
-        imageFname = str(selectedIndex.data().toString())
+        imageFname = str(selectedIndex.data())
 
 
         #Show the image if the highlighted overlay radio button is enabled
         if self.showHighlightedResult_radioButton.isChecked()==True:
             if moving.fnameAbsPath == imageFname:
                 if verbose:
-                    print "Skipping. Unchanged."
+                    print("Skipping. Unchanged.")
                 return
 
             moving.changeData(imageData=self.resultImages_Dict[imageFname], imageAbsPath=imageFname)
             if verbose:
-                print "switched to overlay " + imageFname
+                print("switched to overlay " + imageFname)
 
         elif self.showOriginalMovingImage_radioButton.isChecked()==True:
             if moving.fnameAbsPath ==  self.originalMovingFname:
                 if verbose:
-                    print "Skipping. Unchanged."
+                    print("Skipping. Unchanged.")
                 return
 
             moving.changeData(imageData=self.originalMovingImage, imageAbsPath=self.originalMovingFname)
             if verbose:
-                print "switched to original overlay"
+                print("switched to original overlay")
 
         self.lasagna.initialiseAxes()
 

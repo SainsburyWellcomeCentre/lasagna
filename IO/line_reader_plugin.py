@@ -16,7 +16,7 @@ All points bearing the same lineseries_id are grouped into the same list.
 import os
 from lasagna_plugin import lasagna_plugin
 import numpy as np
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
 
 
@@ -79,7 +79,7 @@ class loaderClass(lasagna_plugin):
                 thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
                 if not len(thisLineAsFloats)==expectedCols:
                     #Check that all rows have a length of 4, since this is what a line series needs
-                    print "Lines data file %s appears corrupt" % fname
+                    print("Lines data file %s appears corrupt" % fname)
                     return                     
 
                 if lastLineSeries is None:

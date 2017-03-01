@@ -13,11 +13,11 @@ def importData(fname,verbose=False):
 
     #Error check
     if os.path.exists(fname)==False:
-        print "Can not find file " + fname
+        print("Can not find file " + fname)
         return
 
     if fname.lower().endswith('json')==False:
-        print "Data should be a JSON file"
+        print("Data should be a JSON file")
         return
 
     #Build tree
@@ -25,7 +25,7 @@ def importData(fname,verbose=False):
         obj = json.load(f)        
 
 
-    flattenedTree = tree_flatten(obj[u'msg'][0])
+    flattenedTree = tree_flatten(obj['msg'][0])
     colNames = 'id|parent|atlas_id|acronym|name|color'
     return (flattenedTree,colNames)
 
@@ -33,16 +33,16 @@ def importData(fname,verbose=False):
 
 
 def tree_flatten(obj,flattened=''):
-    if obj[u'parent_structure_id'] is None:
-        obj[u'parent_structure_id']=0
+    if obj['parent_structure_id'] is None:
+        obj['parent_structure_id']=0
 
     flattened = flattened+"{id}|{parent_id}|{atlas_id}|{acronym}|{name}|{color}\n".format( 
-            id=obj[u'id'],
-            parent_id=obj[u'parent_structure_id'],
-            atlas_id=obj[u'atlas_id'],
-            acronym=obj[u'acronym'],
-            name=obj[u'name'],
-            color=obj[u'color_hex_triplet'])
+            id=obj['id'],
+            parent_id=obj['parent_structure_id'],
+            atlas_id=obj['atlas_id'],
+            acronym=obj['acronym'],
+            name=obj['name'],
+            color=obj['color_hex_triplet'])
 
     for child in obj.get('children',[]):
         flattened = tree_flatten(child,  flattened=flattened)
@@ -68,6 +68,6 @@ if __name__ == '__main__':
         tree.importData(flattened.split('\n'),colSep='|',displayTree=True,headerLine=colNames)
 
     else:
-        print flattened
+        print(flattened)
 
 

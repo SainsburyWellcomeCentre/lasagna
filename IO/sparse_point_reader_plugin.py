@@ -32,7 +32,7 @@ image and have their properties changed together.
 import os
 from lasagna_plugin import lasagna_plugin
 import numpy as np
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
 
 
@@ -123,7 +123,7 @@ class loaderClass(lasagna_plugin):
                         if thisRow[3]==thisIndex:
                             tmp.append(thisRow[:3])
 
-                    print "Adding point series %d with %d points" % (thisIndex,len(tmp))
+                    print("Adding point series %d with %d points" % (thisIndex,len(tmp)))
 
                     # Create an ingredient with the same name as the file name 
                     objName = "%s #%d" % (fname.split(os.path.sep)[-1],thisIndex)
@@ -142,7 +142,7 @@ class loaderClass(lasagna_plugin):
 
 
             else:
-                print("Point series has %d columns. Only 3 or 4 columns are supported" % len(data[1]))
+                print(("Point series has %d columns. Only 3 or 4 columns are supported" % len(data[1])))
 
 
         else:

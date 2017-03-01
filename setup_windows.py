@@ -46,7 +46,7 @@ build_options = dict(
 	
 	)
 
-print "BUILDING IN " + py2exe_options['dist_dir']
+print("BUILDING IN " + py2exe_options['dist_dir'])
 setup (
 	console=['lasagna.py'],
 	options={'py2exe': py2exe_options, 'build': build_options},
@@ -55,5 +55,5 @@ setup (
 #	data_files=data_files
 	)
 
-print "BUILT IN " + py2exe_options['dist_dir']
+print("BUILT IN " + py2exe_options['dist_dir'])
 
