@@ -47,7 +47,7 @@ If you add the `--upgrade` flag, `pip3` will also install newer
 vesions of packages already in the system path.
 
 There is currently no `vtk` support in Python 3. 
-If you run into problems try installing the dependencies separately as for the Mac (below).
+If you run into problems try installing the dependencies separately (see below).
 For other platforms, please see [here](http://raacampbell.github.io/lasagna/installation.html)
 
 On Mac you will first need to Install [HomeBrew](http://brew.sh/)
@@ -63,15 +63,16 @@ brew install freetype pkg-config python3
 ```
 
 Now you can install the dependencies in requirements.txt using:
+``
+pip3 install -r requirements.txt --user
+``
+
+If for some reason this fails, try installing the dependencies seperately:
 ```
 pip3 install numpy
 pip3 install matplotlib
 ...
 ```
-
-Strange failures occur if you try to install from the dependency file directly but individually the installs do work. 
-
-
 
 
 
