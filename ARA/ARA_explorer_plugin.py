@@ -149,7 +149,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
         #If we have no paths to ARAs by the end of this, issue an error alertbox and quit
         if len(self.paths)==0:
-           self.warnAndQuit('Found no valid paths is preferences file at<br>%s.<br>SEE <a href="http://raacampbell.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
+           self.warnAndQuit('Found no valid paths in preferences file at<br>%s.<br>SEE <a href="http://raacampbell.github.io/lasagna/ara_explorer_plugin.html">http://raacampbell.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
            return
 
         self.lasagna.removeIngredientByType('imagestack') #remove all image stacks
