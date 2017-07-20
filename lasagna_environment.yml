@@ -1,0 +1,16 @@
+name: lasagna_py3
+dependencies:
+ - python=3
+ - pyqt=5
+ - numpy
+ - tifffile
+ - pyqtgraph
+ - pyyaml
+ - sip
+ - scikit-image
+ - scipy
+ - matplotlib
+ - ipython
+ - vtk
+ - pip:
+     - pynrrd
