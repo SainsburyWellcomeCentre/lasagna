@@ -31,6 +31,8 @@ image and have their properties changed together.
 
 import os
 from lasagna_plugin import lasagna_plugin
+from elastix_io import read_pts_file
+
 import numpy as np
 from PyQt5 import QtGui
 import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
@@ -59,9 +61,8 @@ class loaderClass(lasagna_plugin):
         self.loadAction.triggered.connect(self.showLoadDialog) #Link the action to the slot
 
 
-
- #Slots follow
-    def showLoadDialog(self,fname=None):
+    # Slots follow
+    def showLoadDialog(self, fname=None):
         """
         This slot brings up the load dialog and retrieves the file name.
         If a filename is provided then this is loaded and no dialog is brought up.
@@ -69,25 +70,28 @@ class loaderClass(lasagna_plugin):
 
         """
         
-        if fname is None or fname == False:
-            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
+        if fname is None or fname is False:
+            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts)")
 
-        if fname is None or fname == False:
+        if fname is None or fname is False:
             return
 
+        if os.path.isfile(fname):
+            if fname.endswith('.pts'):
+                data, roi_type = read_pts_file(fname)
+                if roi_type == 'point':
+                    print('!!! WARNING points are set in real world coordinates. I assume a pixel size of 1')
+            else:
+                with open(str(fname), 'r') as fid:
+                    contents = fid.read()
 
-        if os.path.isfile(fname): 
-            with open(str(fname),'r') as fid:
-                contents = fid.read()
-    
-
-            # a list of strings with each string being one line from the file
-            asList = contents.split('\n')
-            data=[]
-            for ii in range(len(asList)):
-                if len(asList[ii])==0:
-                    continue
-                data.append([float(x) for x in asList[ii].split(',')])
+                # a list of strings with each string being one line from the file
+                asList = contents.split('\n')
+                data=[]
+                for ii in range(len(asList)):
+                    if len(asList[ii]) == 0:
+                        continue
+                    data.append([float(x) for x in asList[ii].split(',')])
 
             # A point series should be a list of lists where each list has a length of 3,
             # corresponding to the position of each point in 3D space. However, point
@@ -98,15 +102,13 @@ class loaderClass(lasagna_plugin):
             if len(data[1]) == 3:
                 # Create an ingredient with the same name as the file name 
                 objName=fname.split(os.path.sep)[-1]
-                self.lasagna.addIngredient(objectName=objName, 
-                            kind=self.kind, 
-                            data=np.asarray(data), 
-                            fname=fname
-                            )
-
+                self.lasagna.addIngredient(objectName=objName,
+                                           kind=self.kind,
+                                           data=np.asarray(data),
+                                           fname=fname
+                                           )
                 # Add this ingredient to all three plots
                 self.lasagna.returnIngredientByName(objName).addToPlots() 
-
                 # Update the plots
                 self.lasagna.initialiseAxes()
 
