@@ -224,7 +224,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         if fnameToLoad==False:       
             fileFilter="Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
             fnameToLoad = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
-            fnameToLoad = str(fnameToLoad)
+            fnameToLoad = str(fnameToLoad[0])  # tuple with filter as 2nd value
 
         #re-load labels        
         selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
@@ -234,7 +234,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         #load the selected atlas (without displaying it)
         self.data['atlas'] = imageStackLoader.loadStack(fnameToLoad)
 
-        self.data['currentlyLoadedAtlasName'] =  fnameToLoad.split(os.path.sep)[-1]
+        self.data['currentlyLoadedAtlasName'] = fnameToLoad.split(os.path.sep)[-1]
 
 
     def statusBarName_checkBox_slot(self):
