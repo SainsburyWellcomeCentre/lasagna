@@ -2,6 +2,7 @@
 Functions to read and write
 """
 import os
+import yaml
 
 
 def read_pts_file(file_name):
@@ -104,4 +105,43 @@ def read_vv_txt_landmarks(path2file):
                 line_data = line_data.split(' ')
                 assert(len(line_data) == 6)
                 data.append([line_data[i] for i in [2, 0, 1]])  # reorder in lasagna Z,X,Y system
+    return data
+
+def read_masiv_roi(path2file):
+    """ Read a masiv roi file
+
+    :param path2file: path to the masiv file
+    :return roi_coords: a list of list with 4 elements (X,Y,Z, cell type)
+    """
+
+    roi_coords = []
+    with open(path2file, 'r') as in_file:
+        data = yaml.load(in_file)
+        for ctype, pts_prop in data.items():
+            # keep only cell type with at least one point
+            if not 'markers' in pts_prop:
+                continue
+            coords = pts_prop['markers']
+            for i, c in enumerate(coords):
+                roi_coords.append([c['x'], c['y'], c['z'], int(ctype[4:])])
+    return roi_coords
+
+def read_lasagna_pts(fname):
+    """ Read default lasagna pts format
+
+    It is just a list of space separated coordinante
+
+    :param fname: path to file (usually .pts)
+    :return data: a list of coordinates
+    """
+    with open(str(fname), 'r') as fid:
+        contents = fid.read()
+
+    # a list of strings with each string being one line from the file
+    asList = contents.split('\n')
+    data = []
+    for ii in range(len(asList)):
+        if len(asList[ii]) == 0:
+            continue
+        data.append([float(x) for x in asList[ii].split(',')])
     return data

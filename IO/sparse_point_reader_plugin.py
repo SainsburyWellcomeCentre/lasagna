@@ -31,10 +31,10 @@ image and have their properties changed together.
 
 
 import os
-from lasagna_plugin import lasagna_plugin
-from elastix_io import read_pts_file
 import numpy as np
 from PyQt5 import QtGui
+from lasagna_plugin import lasagna_plugin
+from sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
 
 
 class loaderClass(lasagna_plugin):
@@ -70,7 +70,7 @@ class loaderClass(lasagna_plugin):
         """
         
         if fname is None or fname is False:
-            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts)")
+            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)")
 
         if fname is None or fname is False:
             return
@@ -80,18 +80,12 @@ class loaderClass(lasagna_plugin):
                 data, roi_type = read_pts_file(fname)
                 if roi_type == 'point':
                     print('!!! WARNING points are set in real world coordinates. I assume a pixel size of 1')
+            elif fname.endswith('.yml'):
+                data = read_masiv_roi(fname)
+                # re-order in lasagna order Z X Y
+                data = [[d[2], d[0], d[1], d[3]] for d in data]
             else:
-                with open(str(fname), 'r') as fid:
-                    contents = fid.read()
-
-                # a list of strings with each string being one line from the file
-                asList = contents.split('\n')
-                data = []
-                for ii in range(len(asList)):
-                    if len(asList[ii]) == 0:
-                        continue
-                    data.append([float(x) for x in asList[ii].split(',')])
-
+                data = read_lasagna_pts(fname)
             # A point series should be a list of lists where each list has a length of 3,
             # corresponding to the position of each point in 3D space. However, point
             # series could also have a length of 4. If this is the case, the fourth 

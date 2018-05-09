@@ -492,7 +492,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Bring up the file load dialog. Return the file name. Update the last used path.
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
-        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)[0]
+        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
+                                                  fileFilter)[0]
         fname = str(fname)
         if len(fname) == 0:
             return None
