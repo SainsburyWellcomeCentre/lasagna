@@ -21,35 +21,34 @@ class sparsepoints(lasagna_ingredient):
                                         )
 
 
-        #Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
+        # Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
         self.symbol = lasHelp.readPreference('symbolOrder')[0]
-        self.symbolSize =  int(self.parent.markerSize_spinBox.value())
+        self.symbolSize = int(self.parent.markerSize_spinBox.value())
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
-        self.lineWidth = None #Not used right now
+        self.lineWidth = None # Not used right now
 
-        #Add to the imageStackLayers_model which is associated with the points QTreeView
+        # Add to the imageStackLayers_model which is associated with the points QTreeView
         name = QtGui.QStandardItem(objectName)
         name.setEditable(False)
 
-        #Add checkbox
+        # Add checkbox
         thing = QtGui.QStandardItem()
         thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
         thing.setCheckState(QtCore.Qt.Checked)
 
-        #self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
-        self.modelItems=name
+        # self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
+        self.modelItems = name
         self.model = self.parent.points_Model
 
         self.addToList()
 
-        #Set the colour of the object based on how many items are already present
+        # Set the colour of the object based on how many items are already present
         number_of_colors = 6
-        thisNumber = (self.parent.points_Model.rowCount()-1)%number_of_colors
+        thisNumber = (self.parent.points_Model.rowCount()-1) % number_of_colors
         cm_subsection = linspace(0, 1, number_of_colors)
-        colors = [ cm.jet(x) for x in cm_subsection ]
+        colors = [cm.jet(x) for x in cm_subsection]
         color = colors[thisNumber]
         self.color = [color[0]*255, color[1]*255, color[2]*255]
-
 
     def data(self,axisToPlot=0):
         """
@@ -116,7 +115,6 @@ class sparsepoints(lasagna_ingredient):
                     )
 
         pyqtObject.setData(dataToAdd)
-     
 
     def addToList(self):
         """
@@ -125,9 +123,8 @@ class sparsepoints(lasagna_ingredient):
         super(sparsepoints,self).addToList()
         self.parent.markerSize_spinBox.setValue(self.symbolSize)
         self.parent.markerAlpha_spinBox.setValue(self.alpha)
-            
 
-    def symbolBrush(self,alpha=False):
+    def symbolBrush(self, alpha=False):
         """
         Returns an RGB + opacity tuple 
         """
@@ -139,15 +136,29 @@ class sparsepoints(lasagna_ingredient):
         else:
             print(("sparsepoints.color can not cope with type " + str(type(self.color))))
 
+    def save(self, path=None):
+        """Save sparse point in "pts" format (basic coordinates, space separated)"""
+        if path is None:
+            path, _ = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save %s' % self.objectName,
+                                                        self.objectName)
+            # getSaveFileName also returns the selected filter "All file (*)" for instance.
+            # Ignore the second output
+        if not path:
+            return
+        with open(path, 'w') as F:
+            for c in self.raw_data():
+                F.write(','.join(['%s' % i for i in c]) + '\n')
+        print('%s saved as %s' % (self.objectName, path))
 
-    #---------------------------------------------------------------
-    #Getters and setters
+    # ---------------------------------------------------------------
+    # Getters and setters
 
     def get_symbolSize(self):
         return self._symbolSize
-    def set_symbolSize(self,symbolSize):
+
+    def set_symbolSize(self, symbolSize):
         self._symbolSize = symbolSize
-    symbolSize = property(get_symbolSize,set_symbolSize)
+    symbolSize = property(get_symbolSize, set_symbolSize)
 
 
     def get_symbol(self):
