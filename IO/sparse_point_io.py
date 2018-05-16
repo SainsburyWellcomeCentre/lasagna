@@ -107,6 +107,7 @@ def read_vv_txt_landmarks(path2file):
                 data.append([line_data[i] for i in [2, 0, 1]])  # reorder in lasagna Z,X,Y system
     return data
 
+
 def read_masiv_roi(path2file):
     """ Read a masiv roi file
 
@@ -125,6 +126,7 @@ def read_masiv_roi(path2file):
             for i, c in enumerate(coords):
                 roi_coords.append([c['x'], c['y'], c['z'], int(ctype[4:])])
     return roi_coords
+
 
 def read_lasagna_pts(fname):
     """ Read default lasagna pts format
