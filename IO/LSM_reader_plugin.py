@@ -52,11 +52,11 @@ class loaderClass(lasagna_plugin):
                 stack=im[0,:,ii,:,:]
 
                 objName="layer_%d" % (ii+1)
-                self.lasagna.addIngredient(objectName=objName, 
-                           kind='imagestack', 
-                           data=stack, 
-                           fname=fname
-                           )
+                self.lasagna.addIngredient(object_name=objName,
+                                           kind='imagestack',
+                                           data=stack,
+                                           fname=fname
+                                           )
                 self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots                
 
                 print("Adding '%s' layer" % colorOrder[ii])

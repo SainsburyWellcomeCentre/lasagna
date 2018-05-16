@@ -31,13 +31,13 @@ class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine): #must inher
         self.id_count=0
         #add a sparsepoints ingredient
         self.ptsName = 'addLine_currentLine'
-        self.lasagna.addIngredient(objectName=self.ptsName,
+        self.lasagna.addIngredient(object_name=self.ptsName,
                                    kind='sparsepoints',
                                    data=[])
         self.lasagna.returnIngredientByName(self.ptsName).addToPlots() #Add item to all three 2D plots
         #add a line ingredient
         self.lineName = 'addLine_fit_currentLine'
-        self.lasagna.addIngredient(objectName=self.lineName,
+        self.lasagna.addIngredient(object_name=self.lineName,
                                    kind='lines',
                                    data=[])
         self.lasagna.returnIngredientByName(self.lineName).addToPlots() #Add item to all three 2D plots
@@ -81,7 +81,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine): #must inher
         """Add the current line and points to lasagna and start a new line"""
 
         ptsName = '%s_pts'%self.name_lineEdit.text()
-        self.lasagna.addIngredient(objectName=ptsName,
+        self.lasagna.addIngredient(object_name=ptsName,
                                    kind='sparsepoints',
                                    data=self.get_points_coord())
         self.lasagna.returnIngredientByName(ptsName).addToPlots() #Add i
@@ -89,7 +89,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine): #must inher
         if len(self.fit):
             data = self.fit['fit_coords']
             lineName = '%s_fit'%self.name_lineEdit.text()
-            self.lasagna.addIngredient(objectName=lineName,
+            self.lasagna.addIngredient(object_name=lineName,
                                        kind='lines',
                                        data=data)
             self.lasagna.returnIngredientByName(lineName).addToPlots() #Add item to all three 2D plots

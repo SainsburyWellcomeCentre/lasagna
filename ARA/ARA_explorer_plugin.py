@@ -165,9 +165,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
         #Make a lines ingredient that will house the contours for the currently selected area.
         self.contourName = 'aracontour'
-        self.lasagna.addIngredient(objectName=self.contourName, 
-                                kind='lines', 
-                                data=[])
+        self.lasagna.addIngredient(object_name=self.contourName,
+                                   kind='lines',
+                                   data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
         # End of constructor
 

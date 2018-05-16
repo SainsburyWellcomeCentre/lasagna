@@ -31,8 +31,8 @@ class plugin(lasagna_plugin):
 
         #add a sparsepoints ingredient
         self.objName = 'tutePoints'
-        self.lasagna.addIngredient(objectName=self.objName , 
-                                   kind='sparsepoints' ,
+        self.lasagna.addIngredient(object_name=self.objName,
+                                   kind='sparsepoints',
                                    data=self.generateRandomData())
 
         self.lasagna.returnIngredientByName(self.objName).addToPlots() #Add item to all three 2D plots

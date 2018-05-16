@@ -6,7 +6,7 @@ This class overlays points on top of the image stacks.
 import numpy as np
 import os
 import pyqtgraph as pg
-from  lasagna_ingredient import lasagna_ingredient 
+from lasagna_ingredient import lasagna_ingredient
 from PyQt5 import QtGui, QtCore
 import lasagna_helperFunctions as lasHelp
 from matplotlib import cm

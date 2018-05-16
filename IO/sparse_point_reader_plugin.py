@@ -95,7 +95,7 @@ class loaderClass(lasagna_plugin):
             if len(data[0]) == 3:
                 # Create an ingredient with the same name as the file name 
                 objName = fname.split(os.path.sep)[-1]
-                self.lasagna.addIngredient(objectName=objName,
+                self.lasagna.addIngredient(object_name=objName,
                                            kind=self.kind,
                                            data=np.asarray(data),
                                            fname=fname
@@ -123,7 +123,7 @@ class loaderClass(lasagna_plugin):
                     # Create an ingredient with the same name as the file name 
                     objName = "%s #%d" % (fname.split(os.path.sep)[-1],thisIndex)
 
-                    self.lasagna.addIngredient(objectName=objName,
+                    self.lasagna.addIngredient(object_name=objName,
                                                kind=self.kind,
                                                data=np.asarray(tmp),
                                                fname=fname
