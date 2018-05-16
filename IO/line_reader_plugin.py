@@ -50,7 +50,9 @@ class loaderClass(lasagna_plugin):
         If the file name is valid, it loads the base stack using the load method.
         """
         if fname is None or not fname:
-            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)")
+            fnames = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)", multifile=True)
+            for fname in fnames:
+                self.showLoadDialog(fname)
 
         if fname is None or not fname:
             return

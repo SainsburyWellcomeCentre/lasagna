@@ -465,41 +465,48 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     # -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
     # Code to handle generic file loading, dialogs, etc
-    def showFileLoadDialog(self, fileFilter="All files (*)"):
+    def showFileLoadDialog(self, fileFilter="All files (*)", multifile=False):
         """
         Bring up the file load dialog. Return the file name. Update the last used path.
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
-        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
-                                                  fileFilter)[0]
-        fname = str(fname)
-        if len(fname) == 0:
+        if multifile:
+            fnames = QtGui.QFileDialog.getOpenFileNames(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
+                                                        fileFilter)[0]
+        else:
+            fnames = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
+                                                       fileFilter)[0]
+        fnames = [str(fname) for fname in fnames]
+        if len(fnames) == 0:
             return None
 
         # Update last loaded directory
-        lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fname))
+        for fname in fnames:
+            lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fname))
 
-        # Keep a track of the last loaded files
-        recentlyLoaded = lasHelp.readPreference('recentlyLoadedFiles')
-        n = lasHelp.readPreference('numRecentFiles')
+            # Keep a track of the last loaded files
+            recentlyLoaded = lasHelp.readPreference('recentlyLoadedFiles')
+            n = lasHelp.readPreference('numRecentFiles')
 
-        # Add to start of list
-        recentlyLoaded.reverse()
-        recentlyLoaded.append(fname)
-        recentlyLoaded.reverse()
+            # Add to start of list
+            recentlyLoaded.reverse()
+            recentlyLoaded.append(fname)
+            recentlyLoaded.reverse()
 
-        while len(recentlyLoaded) > n:
-            recentlyLoaded.pop(-1)
+            while len(recentlyLoaded) > n:
+                recentlyLoaded.pop(-1)
 
-        # TODO: list will no longer have the most recent item first
-        recentlyLoaded = list(set(recentlyLoaded))  # get remove repeats (i.e. keep only unique values)
+            # TODO: list will no longer have the most recent item first
+            recentlyLoaded = list(set(recentlyLoaded))  # get remove repeats (i.e. keep only unique values)
 
-        lasHelp.preferenceWriter('recentlyLoadedFiles', recentlyLoaded)
-        self.updateRecentlyOpenedFiles()
+            lasHelp.preferenceWriter('recentlyLoadedFiles', recentlyLoaded)
+            self.updateRecentlyOpenedFiles()
 
-        self.runHook(self.hooks['showFileLoadDialog_End'])
-
-        return fname
+            self.runHook(self.hooks['showFileLoadDialog_End'])
+        if multifile:
+            return fnames
+        else:
+            return fnames[0]
 
     def updateRecentlyOpenedFiles(self):
         """
