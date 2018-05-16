@@ -69,13 +69,12 @@ class loaderClass(lasagna_plugin):
 
         """
         
-        if fname is None or fname is False:
+        if fname is None or not fname:
             fnames = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)", multifile=True)
+            if fnames is None or not fnames:
+                return
             for fname in fnames:
                 self.showLoadDialog(fname)
-
-        if fname is None or fname is False:
-            return
 
         if os.path.isfile(fname):
             if fname.endswith('.pts'):

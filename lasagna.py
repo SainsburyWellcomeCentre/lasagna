@@ -473,10 +473,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if multifile:
             fnames = QtGui.QFileDialog.getOpenFileNames(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
                                                         fileFilter)[0]
+            fnames = [str(fname) for fname in fnames]
         else:
             fnames = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'),
                                                        fileFilter)[0]
-        fnames = [str(fname) for fname in fnames]
+            fnames = [str(fnames)]
+
         if len(fnames) == 0:
             return None
 
