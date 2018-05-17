@@ -92,9 +92,9 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         """
         Add the line ingredient for ARA contour 
         """
-        self.lasagna.addIngredient(objectName=self.contourName, 
-                                kind='lines', 
-                                data=[])
+        self.lasagna.addIngredient(object_name=self.contourName,
+                                   kind='lines',
+                                   data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots() #Add item to all three 2D plots
 
 

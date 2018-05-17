@@ -138,11 +138,11 @@ class loaderClass(lasagna_plugin):
 
             #print data         
             objName=fname.split(os.path.sep)[-1]
-            self.lasagna.addIngredient(objectName=objName, 
-                        kind=self.kind,
-                        data=np.asarray(data), 
-                        fname=fname,
-                        )
+            self.lasagna.addIngredient(object_name=objName,
+                                       kind=self.kind,
+                                       data=np.asarray(data),
+                                       fname=fname,
+                                       )
 
             self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots
             self.lasagna.initialiseAxes()

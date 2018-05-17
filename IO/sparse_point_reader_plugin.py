@@ -69,11 +69,12 @@ class loaderClass(lasagna_plugin):
 
         """
         
-        if fname is None or fname is False:
-            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)")
-
-        if fname is None or fname is False:
-            return
+        if fname is None or not fname:
+            fnames = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)", multifile=True)
+            if fnames is None or not fnames:
+                return
+            for fname in fnames:
+                self.showLoadDialog(fname)
 
         if os.path.isfile(fname):
             if fname.endswith('.pts'):
@@ -95,7 +96,7 @@ class loaderClass(lasagna_plugin):
             if len(data[0]) == 3:
                 # Create an ingredient with the same name as the file name 
                 objName = fname.split(os.path.sep)[-1]
-                self.lasagna.addIngredient(objectName=objName,
+                self.lasagna.addIngredient(object_name=objName,
                                            kind=self.kind,
                                            data=np.asarray(data),
                                            fname=fname
@@ -123,7 +124,7 @@ class loaderClass(lasagna_plugin):
                     # Create an ingredient with the same name as the file name 
                     objName = "%s #%d" % (fname.split(os.path.sep)[-1],thisIndex)
 
-                    self.lasagna.addIngredient(objectName=objName,
+                    self.lasagna.addIngredient(object_name=objName,
                                                kind=self.kind,
                                                data=np.asarray(tmp),
                                                fname=fname
