@@ -20,29 +20,22 @@ __license__ = "GPL v3"
 __maintainer__ = "Rob Campbell"
 
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 import numpy as np
 import sys
-import signal
 import os.path
 
 
 # lasagna modules
-import ingredients                         # A set of classes for handling loaded data
+from lasagna import ingredients, lasagna_mainWindow, lasagna_axis
+from lasagna import lasagna_helperFunctions as lasHelp
 import imageStackLoader                    # To load TIFF and MHD files
-import lasagna_axis                        # The class that runs the axes
-import imageProcessing                     # A potentially temporary module that houses general-purpose image processing code
 import pluginHandler                       # Deals with finding plugins in the path, etc
-import lasagna_mainWindow                  # Derived from designer .ui files built by pyuic
-import lasagna_helperFunctions as lasHelp  # Module the provides a variety of import functions (e.g. preference file handling)
-from alert import alert                    # Class used to bring up a warning box
 
 # The following imports are made here in order to ensure Lasagna builds as a standlone
 # application on the Mac with py2app
-import json, ara_json, tree  # For handling ARA labels files
-import lasagna_plugin  # Needed here to build a standalone version
 #import tifffile  # Used to load tiff and LSM files
 #import nrrd
 
@@ -590,7 +583,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return
 
         # Do not attempt to add an ingredient if it's class is not defined
-        if not hasattr(ingredients,kind):
+        if not hasattr(ingredients, kind):
             print(("ERROR: ingredients module has no class '%s'" % kind))
             return
 

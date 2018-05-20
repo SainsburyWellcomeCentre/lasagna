@@ -3,23 +3,20 @@
 Overlays brain area onto a registered sample brain without overlaying the atlas.
 """
 
-import lasagna_helperFunctions as lasHelp 
+from lasagna import lasagna_helperFunctions as lasHelp
 from lasagna_plugin import lasagna_plugin
 import numpy as np
-import pyqtgraph as pg
 import os.path
 from alert import alert
 import imageStackLoader
 
 #For the UI
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui
 import area_namer_UI
 
 #For handling the labels files
-import ara_json, tree
 
 #For contour drawing
-from skimage import measure
 
 from ARA_plotter import ARA_plotter
 

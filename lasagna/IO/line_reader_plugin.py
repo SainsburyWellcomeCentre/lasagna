@@ -17,7 +17,6 @@ import os
 from lasagna_plugin import lasagna_plugin
 import numpy as np
 from PyQt5 import QtGui
-import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
 
 
 class loaderClass(lasagna_plugin):

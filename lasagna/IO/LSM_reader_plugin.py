@@ -6,7 +6,8 @@ import os
 from lasagna_plugin import lasagna_plugin
 import tifffile
 from PyQt5 import QtGui
-import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
+from lasagna import lasagna_helperFunctions as lasHelp
+
 
 class loaderClass(lasagna_plugin):
     def __init__(self,lasagna):

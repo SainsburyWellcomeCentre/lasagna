@@ -9,14 +9,11 @@ Rob Campbell
 from lasagna_plugin import lasagna_plugin
 import transformix_plugin_UI
 from PyQt5 import QtGui, QtCore
-import sys
 import os
-import tempfile
 from which import which #To test if binaries exist in system path
 import subprocess #To run the transformix binary
-import shutil 
 import re
-import lasagna_helperFunctions as lasHelp
+from lasagna import lasagna_helperFunctions as lasHelp
 import time
 
 class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin): #must inherit lasagna_plugin first

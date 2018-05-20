@@ -4,12 +4,9 @@ Creates a plugin that can add lines and points on the image manually
 
 from lasagna_plugin import lasagna_plugin
 import add_line_UI
-from PyQt5 import QtGui, QtCore
-import sys
+from PyQt5 import QtGui
 import numpy as np
 
-
-import lasagna_helperFunctions            # A potentially temporary module that houses general-purpose helper functions
 
 class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine): #must inherit lasagna_plugin first
 

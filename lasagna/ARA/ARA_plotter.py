@@ -4,18 +4,12 @@ This class handles the overlay of highlights and the brain area name in the stat
 This enables more than one plugin to use these features.
 """
 
-
-import lasagna_helperFunctions as lasHelp 
 import numpy as np
 import pyqtgraph as pg
-import os.path
-
-
-
-
 
 #For handling the labels files
-import ara_json, tree
+import ara_json
+from lasagna import tree
 
 #For contour drawing
 from skimage import measure
@@ -49,7 +43,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
 
         if fname.lower().endswith('.csv'):
             colSep = self.guessFileSep(fname)
-            return tree.importData(fname,colSep=colSep, headerLine=True)
+            return tree.importData(fname, colSep=colSep, headerLine=True)
 
         if fname.lower().endswith('.json'):
             (flattened,colNames) = ara_json.importData(fname)

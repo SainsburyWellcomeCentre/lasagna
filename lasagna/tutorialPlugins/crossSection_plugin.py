@@ -6,11 +6,10 @@ mouse cursor is at.
 
 from lasagna_plugin import lasagna_plugin
 import cross_section_plot_UI
-from PyQt5 import QtGui, QtCore
-import sys
+from PyQt5 import QtGui
 
+from lasagna import lasagna_helperFunctions
 
-import lasagna_helperFunctions            # A potentially temporary module that houses general-purpose helper functions
 
 class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #must inherit lasagna_plugin first
 
@@ -49,7 +48,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): 
 
         #Get the base image from this widget
         selectedStackName = self.lasagna.selectedStackName()
-        ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName=selectedStackName,regex=True)
+        ImageItem = lasagna_helperFunctions.findPyQtGraphObjectNameInPlotWidget(PlotWidget, itemName=selectedStackName, regex=True)
         if ImageItem==False:
             return
 

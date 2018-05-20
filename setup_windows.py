@@ -48,7 +48,7 @@ build_options = dict(
 
 print("BUILDING IN " + py2exe_options['dist_dir'])
 setup (
-	console=['lasagna.py'],
+	console=['main.py'],
 	options={'py2exe': py2exe_options, 'build': build_options},
 	zipfile = None,
 	
