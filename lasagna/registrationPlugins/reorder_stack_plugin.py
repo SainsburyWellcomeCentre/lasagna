@@ -5,12 +5,8 @@ A simple plugin just to change the order of the slices
 from lasagna_plugin import lasagna_plugin
 import reorder_stack_UI
 import selectstack_UI
-from PyQt5 import QtGui, QtCore
-import sys
-import numpy as np
+from PyQt5 import QtGui
 
-
-import lasagna_helperFunctions            # A potentially temporary module that houses general-purpose helper functions
 
 class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #must inherit lasagna_plugin first
 

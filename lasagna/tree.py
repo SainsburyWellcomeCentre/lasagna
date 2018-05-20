@@ -331,7 +331,7 @@ class Node(object):
 #Generate an example if run from the command line
 if __name__ == '__main__':
 
-    from tree import Tree
+    from lasagna.tree import Tree
 
     (_ROOT, _DEPTH, _WIDTH) = list(range(3))
 

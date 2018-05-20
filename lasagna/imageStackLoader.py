@@ -11,7 +11,7 @@ import os
 import struct 
 import numpy as np
 import imp #to look for the presence of a module. Python 3 will require importlib
-import lasagna_helperFunctions as lasHelp 
+from lasagna import lasagna_helperFunctions as lasHelp
 
 
 #-------------------------------------------------------------------------------------------

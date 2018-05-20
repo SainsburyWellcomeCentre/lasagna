@@ -2,9 +2,11 @@
 this file describes a class that handles the axis behavior for the lasagna viewer
 """
 
-import lasagna_helperFunctions as lasHelp
 import pyqtgraph as pg
-import ingredients
+
+from lasagna import lasagna_helperFunctions as lasHelp
+from lasagna.ingredients.imagestack import imagestack as lasagna_imagestack
+
 
 class projection2D():
 
@@ -175,7 +177,7 @@ class projection2D():
 
         # loop through all plot items searching for imagestack items (these need to be plotted first)
         for thisIngredient in ingredientsList:
-            if isinstance(thisIngredient, ingredients.imagestack.imagestack):
+            if isinstance(thisIngredient, lasagna_imagestack):
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                 #TODO: AXIS need some way of linking the ingredient to the plot item but keeping in mind 
                 #      that this same object needs to be plotted in different axes, each of which has its own
@@ -207,7 +209,7 @@ class projection2D():
 
         # loop through all plot items searching for non-image items (these need to be overlaid on top of the image)
         for thisIngredient in ingredientsList:
-            if isinstance(thisIngredient, ingredients.imagestack.imagestack)==False: 
+            if isinstance(thisIngredient, lasagna_imagestack)==False:
                 if verbose:
                     print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName)
 

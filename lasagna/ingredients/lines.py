@@ -15,15 +15,14 @@ loads the data from the csv file, and calles lines.py
 
 
 import numpy as np
-import os
 import pyqtgraph as pg
 from  lasagna_ingredient import lasagna_ingredient 
 from PyQt5 import QtGui, QtCore
-import lasagna_helperFunctions as lasHelp
+from lasagna import lasagna_helperFunctions as lasHelp
 import warnings #to disable some annoying NaN-related warnings
 from matplotlib import cm
 from numpy import linspace
-from random import shuffle
+
 
 class lines(lasagna_ingredient):
     def __init__(self, parent=None, data=None, fnameAbsPath='', enable=True, objectName=''):

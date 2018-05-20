@@ -6,7 +6,9 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, Qt
+from PyQt5.QtGui import QColor
+
 
 class Ui_lasagna_mainWindow(object):
     def setupUi(self, lasagna_mainWindow):

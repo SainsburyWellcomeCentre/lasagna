@@ -2,7 +2,7 @@
 Standalone core image processing functions that do not
 need to be part of the volVis object. This facilitates
 modifying and extending volVis without having to touch 
-the main lasagna.py file and without bloating it much.
+the main main.py file and without bloating it much.
 """
 
 

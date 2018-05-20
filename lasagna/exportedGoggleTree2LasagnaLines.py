@@ -28,7 +28,7 @@ exportedGoggleTree2LasagnaLines.py -f ./ingredients/exampleTreeDump.csv  > /tmp/
 
 import sys
 import os
-from tree import Tree, importData
+from lasagna.tree import importData
 
 #Parse command-line input arguments
 import argparse
@@ -100,8 +100,6 @@ if not doPlot:
 
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
-import numpy as np
-
 
 #Set up the window
 app = QtGui.QApplication([])

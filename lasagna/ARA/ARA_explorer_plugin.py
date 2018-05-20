@@ -8,11 +8,8 @@ plugin under construction
 
 """
 
-import lasagna_helperFunctions as lasHelp
-from PyQt5.QtWidgets import *
+from lasagna import lasagna_helperFunctions as lasHelp
 from lasagna_plugin import lasagna_plugin
-import numpy as np
-import pyqtgraph as pg
 import os.path
 from alert import alert
 
@@ -21,7 +18,6 @@ from PyQt5 import QtGui, QtCore
 import ara_explorer_UI
 
 #For contour drawing
-from skimage import measure
 
 from ARA_plotter import ARA_plotter
 

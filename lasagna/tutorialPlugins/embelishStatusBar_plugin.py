@@ -20,7 +20,7 @@ class plugin(lasagna_plugin):
     """
     Define a special "hook_XXX" method. This method is run at the end of lasagna.updateStatusBar()
     right before the message is actually displayed. In general, hooks should be in the form
-    hook_[lasagna method name_[Start|End] Search lasagna.py for methods that have hooks.
+    hook_[lasagna method name_[Start|End] Search main.py for methods that have hooks.
     """
 
     def hook_updateStatusBar_End(self):
