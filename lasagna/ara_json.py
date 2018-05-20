@@ -6,28 +6,27 @@ Dumps ARA JSON as a flattened file that we can feed into our tree reader
 """
 
 
-def importData(fname,verbose=False):
+def importData(fname, verbose=False):
     """
     Import from ARA JSON
     """
 
-    #Error check
-    if os.path.exists(fname)==False:
+    # Error check
+    if not os.path.exists(fname):
         print("Can not find file " + fname)
         return
 
-    if fname.lower().endswith('json')==False:
+    if not fname.lower().endswith('json'):
         print("Data should be a JSON file")
         return
 
-    #Build tree
+    # Build tree
     with open(fname) as f:
-        obj = json.load(f)        
+        obj = json.load(f)
 
-
-    flattenedTree = tree_flatten(obj['msg'][0])
-    colNames = 'id|parent|atlas_id|acronym|name|color'
-    return (flattenedTree,colNames)
+    flattened_tree = tree_flatten(obj['msg'][0])
+    col_names = 'id|parent|atlas_id|acronym|name|color'
+    return flattened_tree, col_names
 
 
 

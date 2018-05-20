@@ -7,11 +7,11 @@ Helper functions for lasagna. Functions in this file are involved in the followi
 
 import os
 import string
-import yaml   #Preferences are stored in a YAML file
+import yaml   # Preferences are stored in a YAML file
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False,verbose=False):
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+def findPyQtGraphObjectNameInPlotWidget(PlotWidget, itemName, regex=False, verbose=False):
     """
     Searches a PyQtGraph PlotWidget for an plot object (i.e. something added with .addItem)
     with name "itemName"
@@ -35,7 +35,7 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False,verbose=
     if verbose:
         print("findPyQtGraphObjectNameInPlotWidget - looking for object %s in PlotWidget %s" % (itemName,str(PlotWidget)))
 
-    if regex==True:
+    if regex:
         import re
 
     if not hasattr(PlotWidget, 'getPlotItem'):
@@ -44,30 +44,29 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget,itemName,regex=False,verbose=
 
     pltItem = PlotWidget.getPlotItem()
 
-    if not hasattr(pltItem,'items'):
+    if not hasattr(pltItem, 'items'):
         print("findPyQtGraphObjectNameInPlotWidget finds no attribute 'items'")
         return False
 
-    if len(pltItem.items)==0:
+    if not pltItem.items:
         print("findPyQtGraphObjectNameInPlotWidget finds no items in list")
         return False
 
-
-    if regex == True:
+    if regex:
         for thisItem in pltItem.items:
-            if re.search(itemName,thisItem.objectName):
-               return thisItem
+            if re.search(itemName, thisItem.objectName):
+                return thisItem
     else:
         for thisItem in pltItem.items:
             if thisItem.objectName == itemName:
                 return thisItem
 
     if verbose:
-        print("Failed to find %s in PlotWidget" %  itemName)
+        print("Failed to find {} in PlotWidget".format(itemName))
     return False
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Functions that find and define paths for handling plugins and preferences
 def getHomeDir():
     """
@@ -107,7 +106,6 @@ def absPathToLasagna():
     return stripTrailingFileFromPath(os.path.abspath(__file__))
 
 
-
 def getLasagna_prefDir():
     """
     Returns the path to lasagna preferences directory. 
@@ -136,15 +134,10 @@ def getLasagnaPrefFile():
     return getLasagna_prefDir() + 'lasagna_prefs.yml'
 
 
-
-
-
-
-
- #     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
- #   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
- # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- # Functions that handle preferences
+#     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Functions that handle preferences
 def defaultPreferences():
     """
     ** These are the default preferences **
@@ -153,60 +146,56 @@ def defaultPreferences():
     """
     
     return {
-            'lastLoadDir' : getHomeDir(),           #The directory from which we last loaded data
-            'numRecentFiles' : 5,                   #The number of recently loaded file names to store
-            'recentlyLoadedFiles' : [],             #A list containing the last "numRecentFiles" file names
-            'IO_modulePaths' : [absPathToLasagna()+'IO'], #must be asbolute paths
-            'pluginPaths' : [absPathToLasagna()+'tutorialPlugins', 
-                             absPathToLasagna()+'registrationPlugins', 
-                             absPathToLasagna()+'ARA'], #must be asbolute paths
-            'defaultAxisRatios' : [1,2,0.5],         #The default axis ratios
-            'defaultPointZSpread' : [5,5,3],         #The range of layers over which points or lines are visible
-            'showCrossHairs' : True,                 #Whether or not to show the cross hairs 
-            'colorOrder' : ['red','green','blue','magenta','cyan','yellow','gray'], #The order in which colors appear by default (see imagestack class)
-            'symbolOrder' : ['o','s','t','d','+'],
-            'defaultLineWidth' : 2,
-            'defaultSymbolOpacity' : 200,
-            'defaultSymbolSize' : 8,
-            'hideZoomResetButtonOnImageAxes' : True,
-            'hideAxes' : True,
+            'lastLoadDir': getHomeDir(),           # The directory from which we last loaded data
+            'numRecentFiles': 5,                   # The number of recently loaded file names to store
+            'recentlyLoadedFiles': [],             # A list containing the last "numRecentFiles" file names
+            'IO_modulePaths': [absPathToLasagna()+'IO'],  # must be asbolute paths
+            'pluginPaths': [absPathToLasagna()+'tutorialPlugins',
+                            absPathToLasagna()+'registrationPlugins',
+                            absPathToLasagna()+'ARA'],  # must be asbolute paths
+            'defaultAxisRatios': [1, 2, 0.5],         # The default axis ratios
+            'defaultPointZSpread': [5, 5, 3],         # The range of layers over which points or lines are visible
+            'showCrossHairs': True,                 # Whether or not to show the cross hairs
+            'colorOrder': ['red', 'green', 'blue', 'magenta', 'cyan', 'yellow', 'gray'],  # The order in which colors appear by default (see imagestack class)
+            'symbolOrder': ['o', 's', 't', 'd', '+'],
+            'defaultLineWidth': 2,
+            'defaultSymbolOpacity': 200,
+            'defaultSymbolSize': 8,
+            'hideZoomResetButtonOnImageAxes': True,
+            'hideAxes': True,
             }
 
- # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- #   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
- #     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Functions that handle preferences
 """
 The following plugin functions by default expect the name and path of the preferences file to be the 
 main lasagna preferences file. However, this can be over-ridden so that indiviual plugins can have 
 their own preferences files and still use these functions. 
 """
-
-def loadAllPreferences(prefFName=getLasagnaPrefFile(),defaultPref=defaultPreferences()):
+def loadAllPreferences(prefFName=getLasagnaPrefFile(), defaultPref=defaultPreferences()):
     """
     Load the preferences YAML file. If the file is missing, we create it using the default
     preferences defined above. Preferences are returned as a dictionary.
     """
-    #print "loading from pref file %s" % prefFName
-    #Generate a default preferences file if no preferences file exists
-    if os.path.exists(prefFName) == False:
+    # print "loading from pref file %s" % prefFName
+    # Generate a default preferences file if no preferences file exists
+    if not os.path.exists(prefFName):
         print("PREF FILE")
         print(prefFName)
         writeAllPreferences(defaultPref,prefFName=prefFName)
         print("Created default preferences file in " + prefFName)
 
-    #Load preferences YAML file as a dictionary
+    # Load preferences YAML file as a dictionary
     with open(prefFName, 'r') as stream: 
         return yaml.load(stream)
 
 
-
-def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=getLasagnaPrefFile()):
+def readPreference(preferenceName, prefFName=getLasagnaPrefFile(), preferences=getLasagnaPrefFile()):
     """
     Read preferences with key "preferenceName" from YAML file prefFName on disk.
     If the key is abstent, call defaultPreferences and search for the key. If it
@@ -215,38 +204,38 @@ def readPreference(preferenceName,prefFName=getLasagnaPrefFile(), preferences=ge
     the None. 
     """
     
-    #TODO: need some sort of check as to whether the preference value is valid
+    # TODO: need some sort of check as to whether the preference value is valid
     
-    #Check on disk
+    # Check on disk
     preferences = loadAllPreferences(prefFName)
     if preferenceName in preferences:
         return preferences[preferenceName]
     else:
         print("Did not find preference %s on disk. Looking in defaultPreferencesa" % preferenceName)
 
-    #Check in default preferences and to file and return if so
+    # Check in default preferences and to file and return if so
     preferences = defaultPreferences()
     if preferenceName in preferences:
         value = preferences[preferenceName]
-        preferenceWriter(preferenceName,value,prefFName)
+        preferenceWriter(preferenceName, value, prefFName)
         return value
     else:
         print("Did not find preference %s in default preferences" % preferenceName)
 
 
-def writeAllPreferences(preferences,prefFName=getLasagnaPrefFile()):
+def writeAllPreferences(preferences, prefFName=getLasagnaPrefFile()):
     """
     Save the dictionary "preferences" as a YAML file in the .lasagna directory located in the 
     user's home directory. 
     """
-    assert isinstance(preferences,dict)
+    assert isinstance(preferences, dict)
 
-    #TODO: check ability to write to the file before proceeding
+    # TODO: check ability to write to the file before proceeding
     with open(prefFName, 'w') as stream:
         yaml.dump(preferences, stream)
 
 
-def preferenceWriter(preferenceName,newValue,prefFName=getLasagnaPrefFile()):
+def preferenceWriter(preferenceName, newValue, prefFName=getLasagnaPrefFile()):
     """
     Overwrite a single key "preferenceName" in self.preferences with the value "newValue"
     Saves updates dictionary to the preferences file
@@ -259,4 +248,4 @@ def preferenceWriter(preferenceName,newValue,prefFName=getLasagnaPrefFile()):
         print("Adding missing preference %s to preferences file" % preferenceName)
         preferences[preferenceName] = newValue
 
-    writeAllPreferences(preferences,prefFName)
+    writeAllPreferences(preferences, prefFName)

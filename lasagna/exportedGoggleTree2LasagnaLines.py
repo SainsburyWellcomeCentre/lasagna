@@ -24,13 +24,11 @@ exportedGoggleTree2LasagnaLines.py -f ./ingredients/exampleTreeDump.csv  > /tmp/
 """
 
 
-
-
 import sys
 import os
 from lasagna.tree import importData
 
-#Parse command-line input arguments
+# Parse command-line input arguments
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", help="File name to load")
@@ -49,62 +47,56 @@ if fname is None:
     sys.exit(0)
 
 
-
-#Get the data out of the tree
-if os.path.exists(fname) == False:
+# Get the data out of the tree
+if not os.path.exists(fname):
     print('Can not find ' + fname)
     sys.exit(0)
 
 
 dataTree = importData(fname,headerLine=['id','parent','z','x','y']) 
 
-#Get the unique segments of each tree
-paths=[]
+# Get the unique segments of each tree
+paths = []
 for thisSegment in dataTree.findSegments():
     paths.append(thisSegment)
 
 
-def dataFromPath(tree,path):
+def dataFromPath(tree, path):
     """
     Get the data from the tree given a path.
     """
-    x=[]
-    y=[]
-    z=[]
+    x = []
+    y = []
+    z = []
     for thisNode in path:
-        if thisNode==0:
+        if thisNode == 0:
             continue
         z.append(tree.nodes[thisNode].data['z'])
         x.append(tree.nodes[thisNode].data['x'])
         y.append(tree.nodes[thisNode].data['y'])
+    return z, x, y
 
 
-    return (z,x,y)
-
-
-#Show paths in standard output
+# Show paths in standard output
 if not quiet:
-    ii=0
-    for thisPath in paths:
-        data = dataFromPath(dataTree,thisPath)
-        for jj in range(len(data[0])):
-            print("%d,%d,%d,%d" % (ii,data[0][jj],data[1][jj],data[2][jj]))
-        ii += 1
+    for i, thisPath in enumerate(paths):
+        data = dataFromPath(dataTree, thisPath)
+        for j in range(len(data[0])):
+            print("%d,%d,%d,%d" % (i, data[0][j], data[1][j], data[2][j]))
 
 
-
-#-------------------------------------------------
-#Optionally plot
+# -------------------------------------------------
+# Optionally plot
 if not doPlot:
     sys.exit(0)
 
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 
-#Set up the window
+# Set up the window
 app = QtGui.QApplication([])
 mw = QtGui.QMainWindow()
-mw.resize(800,800)
+mw.resize(800, 800)
 
 view = pg.GraphicsLayoutWidget()  # GraphicsView with GraphicsLayout inserted by default
 mw.setCentralWidget(view)
@@ -112,42 +104,39 @@ mw.show()
 mw.setWindowTitle('Neurite Tree')
 
 
-#view 1
+# view 1
 w1 = view.addPlot()
 pathItem = []
 for thisPath in paths:
-    pathItem.append( pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)) )
-    data = dataFromPath(dataTree,thisPath);
+    pathItem.append( pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
+    data = dataFromPath(dataTree, thisPath)
     pathItem[-1].setData(x=data[0], y=data[1])
     w1.addItem(pathItem[-1])
 
 
-#view 2
+# view 2
 w2 = view.addPlot()
 pathItem = []
 for thisPath in paths:
-    pathItem.append( pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)) )
-    data = dataFromPath(dataTree,thisPath)
+    pathItem.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
+    data = dataFromPath(dataTree, thisPath)
     pathItem[-1].setData(x=data[0], y=data[2])
     w2.addItem(pathItem[-1])
 
 
-#view 3
+# view 3
 view.nextRow()
 w3 = view.addPlot()
 pathItem = []
 for thisPath in paths:
-    pathItem.append( pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)) )
-    data = dataFromPath(dataTree,thisPath)
+    pathItem.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
+    data = dataFromPath(dataTree, thisPath)
     pathItem[-1].setData(x=data[1], y=data[2])
     w3.addItem(pathItem[-1])
 
 
-
-## Start Qt event loop unless running in interactive mode.
+# Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
-
-
