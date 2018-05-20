@@ -2,11 +2,13 @@
 Module to handle tree data. 
 Defines a tree and a node class as well as functions for importing data
 """
-
-(_ROOT, _DEPTH, _WIDTH) = list(range(3)) #Used by classes to navigate the tree
-
 import os.path
-import dataTypeFromString
+
+from lasagna import dataTypeFromString
+
+
+(_ROOT, _DEPTH, _WIDTH) = list(range(3))  # Used by classes to navigate the tree
+
 
 def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=False):
     """

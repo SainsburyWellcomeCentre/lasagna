@@ -3,7 +3,7 @@ A simple subclass of PlotWidget to add a lasagna viewbox in Qt Designer
 """
 
 from pyqtgraph import PlotWidget
-from lasagna_viewBox import lasagna_viewBox
+from lasagna.lasagna_viewBox import lasagna_viewBox
 
 class LasagnaPlotWidget(PlotWidget):
 

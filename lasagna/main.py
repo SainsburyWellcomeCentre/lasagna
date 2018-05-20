@@ -31,8 +31,8 @@ import os.path
 # lasagna modules
 from lasagna import ingredients, lasagna_mainWindow, lasagna_axis
 from lasagna import lasagna_helperFunctions as lasHelp
-import imageStackLoader                    # To load TIFF and MHD files
-import pluginHandler                       # Deals with finding plugins in the path, etc
+from lasagna import imageStackLoader                    # To load TIFF and MHD files
+from lasagna import pluginHandler                       # Deals with finding plugins in the path, etc
 
 # The following imports are made here in order to ensure Lasagna builds as a standlone
 # application on the Mac with py2app
