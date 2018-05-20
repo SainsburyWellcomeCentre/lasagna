@@ -35,79 +35,68 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
                 same number of columns as the rest of the file.
     verbose - prints diagnositic info to screen if true
     """
-
-
-
     if verbose:
         print("tree.importData importing file %s" % fname)
 
-    #Error check
-    if isinstance(fname,str):
-        if os.path.exists(fname)==False:
+    # Error check
+    if isinstance(fname, str):
+        if not os.path.exists(fname):
             print("Can not find file " + fname)
             return
-
-        #Read in data
-        fid = open(fname,'r')
+        # Read in data
+        fid = open(fname, 'r')
         contents = fid.read().split('\n')
         fid.close()
+    elif isinstance(fname, list):
+        contents = fname  # assume that fname is data rather than a file name
 
-    elif isinstance(fname,list):
-        contents=fname #assume that fname is data rather than a file name
-
-
-    #Get header data if present
-    if headerLine==True:
+    # Get header data if present
+    if headerLine:
         header = contents.pop(0)
         header = header.rstrip('\n').split(colSep)
-    elif isinstance(headerLine,str):
+    elif isinstance(headerLine, str):
         header = headerLine.rstrip('\n').split(colSep)
-    elif isinstance(headerLine,list):
+    elif isinstance(headerLine, list):
         header = headerLine
     else:
         header = False
 
-
     data = []
     for line in contents:
-        if len(line)==0:
+        if not line:
             continue
 
         dataLine = line.split(colSep)
-        if len(header) !=len(dataLine):
-            print("\nTree file appears corrupt! header length is %d but data line length is %d.\ntree.importData is aborting.\n" % (len(header),len(dataLine)))
+        if len(header) != len(dataLine):
+            print("\nTree file appears corrupt! header length is %d but data line length is %d."
+                  "\ntree.importData is aborting.\n" % (len(header), len(dataLine)))
             return False
 
-        theseData = list(map(int,dataLine[0:2])) #add index and parent to the first two columns
+        theseData = list(map(int, dataLine[0:2]))  # add index and parent to the first two columns
 
-        #Add data to the third column. Either as a list or as a dictionary (if header names were provided)
-        if header != False: #add as dictionary
+        # Add data to the third column. Either as a list or as a dictionary (if header names were provided)
+        if header:  # add as dictionary
             dataCol = dict()
-
-            for ii in range(len(header)-2):
-                ii+=2
-                dataCol[header[ii]]=dataTypeFromString.convertString(dataLine[ii])
-
+            for i in range(len(header)-2):
+                i += 2
+                dataCol[header[i]] = dataTypeFromString.convertString(dataLine[i])
         else:
-            dataCol = dataLine[2:] #add as list of strings
-
+            dataCol = dataLine[2:]  # add as list of strings
 
         theseData.append(dataCol) 
         data.append(theseData)
 
     if verbose:
-        print("tree.importData read %d rows of data from %s" % (len(data),fname))
+        print("tree.importData read %d rows of data from %s" % (len(data), fname))
 
-
-    #Build tree
+    # Build tree
     tree = Tree()
     tree.add_node(0)
     for thisNode in data:
-        tree.add_node(thisNode[0],thisNode[1])
+        tree.add_node(thisNode[0], thisNode[1])
         tree[thisNode[0]].data = thisNode[2]
 
-
-    #Optionally dump the tree to screen (unlikely to be useful for large trees)
+    # Optionally dump the tree to screen (unlikely to be useful for large trees)
     if displayTree:
         tree.display(0)
 
@@ -115,12 +104,6 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
             print("%s - %s" % (nodeID, tree[nodeID].data))
 
     return tree
-
-
-
-
-
-
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -137,7 +120,7 @@ class Tree(object):
         return self.__nodes
 
     def add_node(self, identifier, parent=None):
-        node = Node(identifier,parent=parent)
+        node = Node(identifier, parent=parent)
         self[identifier] = node
 
         if parent is not None:
@@ -145,7 +128,7 @@ class Tree(object):
 
         return node
 
-    #TODO: replace with  __repr__(self): ?
+    # TODO: replace with  __repr__(self): ?
     def display(self, identifier, depth=_ROOT):
         """
         Very (very) simple tree display
@@ -160,14 +143,13 @@ class Tree(object):
         for child in children:
             self.display(child, depth)  # recursive call
 
-
     def traverse(self, identifier, mode=_DEPTH):
         """
         traverse the tree in depth first or width first modes
         using a yield-based generator
         """
         # Python generator using yield
-        yield identifier #return the root of this list
+        yield identifier  # return the root of this list
         queue = self[identifier].children
         while queue:
             yield queue[0]
@@ -177,25 +159,23 @@ class Tree(object):
             elif mode == _WIDTH:
                 queue = queue[1:] + expansion  # width-first
 
-
-    def isLeaf(self,identifier):
+    def isLeaf(self, identifier):
         """
         Is the node indexed by 'identifier' a leaf?
         returns True or False
         """
-        n=0
+        n = 0
         for nodeID in self.traverse(identifier):
             n += 1
-            if n>1:
+            if n > 1:
                 break
 
-        if n==1:
+        if n == 1:
             return True
         else:
             return False
 
-
-    def findLeaves(self,fromNode=0):
+    def findLeaves(self, fromNode=0):
         """
         Returns a list of nodes that are leaves, searching from 
         the node "fromNode". To find all leaves, fromNode should 
@@ -208,8 +188,7 @@ class Tree(object):
 
         return nodesThatAreLeaves
 
-
-    def findBranches(self,fromNode=0):
+    def findBranches(self, fromNode=0):
         """
         Is the node indexed by 'identifier' a branch?
         A branch is defined as a node with more than two children
@@ -222,8 +201,7 @@ class Tree(object):
 
         return nodesThatAreBranches
 
-
-    def findSegments(self,linkSegments=1,nodeID=0,segments=()):
+    def findSegments(self, linkSegments=1, nodeID=0, segments=()):
         """ 
         Return a list containing all unique segments of the tree
 
@@ -231,29 +209,28 @@ class Tree(object):
         it possible to plot the data without gaps appearing. This is the default. 
         If linksegments is 0, then the no duplicate points are returned.
         """
-        #print "Calling find segments with nodeID %d" % nodeID
+        # print "Calling find segments with nodeID %d" % nodeID
 
-        if linkSegments and nodeID>0:
+        if linkSegments and nodeID > 0:
             thisPath = [self.nodes[nodeID].parent]
         else:
             thisPath = []
 
-        if isinstance(nodeID,int):
+        if isinstance(nodeID, int):
             nodeID = [nodeID]
 
-        while len(nodeID)==1:
-            #print "appending node %d" % nodeID[0]
+        while len(nodeID) == 1:
+            # print "appending node %d" % nodeID[0]
             thisPath.append(nodeID[0])
             nodeID = self.nodes[nodeID[0]].children
             
-        segments = segments + (thisPath,) #Store this segment
+        segments = segments + (thisPath,)  # Store this segment
 
-        #Go into the branches with a recursive call
+        # Go into the branches with a recursive call
         for thisNode in nodeID:
-            segments=self.findSegments(linkSegments,thisNode,segments)
+            segments = self.findSegments(linkSegments, thisNode, segments)
 
         return segments
-
 
     def pathToRoot(self, fromNode):
         """
@@ -263,23 +240,18 @@ class Tree(object):
         trivial and quick. No nee to exhaustively search the tree for the 
         fastest path.
         """
-        currentNode=fromNode
+        currentNode = fromNode
         path = [fromNode]
-        while self.nodes[currentNode].parent != None:
+        while self.nodes[currentNode].parent is not None:
             path.append(self.nodes[currentNode].parent)
             currentNode = self.nodes[currentNode].parent
-
         return path
-
 
     def __getitem__(self, key):
         return self.__nodes[key]
 
-
     def __setitem__(self, key, item):
         self.__nodes[key] = item
-
-
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -290,7 +262,7 @@ class Node(object):
     def __init__(self, identifier, data=None, parent=None):
         self.__identifier = identifier
         self.__children = []
-        self.__data = data #The node's data payload. Can be anything.
+        self.__data = data  # The node's data payload. Can be anything.
         self.parent = parent
 
     @property
@@ -298,7 +270,7 @@ class Node(object):
         return self.__data
 
     @data.setter
-    def data(self,value):
+    def data(self, value):
         self.__data = value
     
     @property
@@ -318,23 +290,13 @@ class Node(object):
         A branch is defined as a node with more than two children
         returns True or False
         """
-
-        if len(self.children) > 1:
-            return True
-        else:
-            return False
-
-
-
-
+        return len(self.children) > 1
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#Generate an example if run from the command line
+# Generate an example if run from the command line
 if __name__ == '__main__':
-
     from lasagna.tree import Tree
-
     (_ROOT, _DEPTH, _WIDTH) = list(range(3))
 
     print("\n\n   --------- Tree of life --------- \n")
@@ -350,25 +312,23 @@ if __name__ == '__main__':
     treeOfLife.add_node("Mosses", "Plants")
     treeOfLife.add_node("Ferns", "Plants")
     treeOfLife.add_node("Animals", "Eukaryotes")
-    treeOfLife.add_node("Sponges","Animals")
-    treeOfLife.add_node("Flatworms","Animals")
-    treeOfLife.add_node("Arthropods","Animals")
-    treeOfLife.add_node("Insects","Arthropods")
-    treeOfLife.add_node("Crustaceans","Arthropods")
-    treeOfLife.add_node("Vertebrates","Animals")
-    treeOfLife.add_node("Fish","Vertebrates")
-    treeOfLife.add_node("Amphibians","Vertebrates")
-    treeOfLife.add_node("Reptiles","Vertebrates")
-    treeOfLife.add_node("Mammals","Vertebrates")
+    treeOfLife.add_node("Sponges", "Animals")
+    treeOfLife.add_node("Flatworms", "Animals")
+    treeOfLife.add_node("Arthropods", "Animals")
+    treeOfLife.add_node("Insects", "Arthropods")
+    treeOfLife.add_node("Crustaceans", "Arthropods")
+    treeOfLife.add_node("Vertebrates", "Animals")
+    treeOfLife.add_node("Fish", "Vertebrates")
+    treeOfLife.add_node("Amphibians", "Vertebrates")
+    treeOfLife.add_node("Reptiles", "Vertebrates")
+    treeOfLife.add_node("Mammals", "Vertebrates")
 
-
-    #Add some data to the vertebrates
+    # Add some data to the vertebrates
     treeOfLife["Vertebrates"].data = 'they have backbones'
     treeOfLife["Fish"].data = 'they swim'
     treeOfLife["Amphibians"].data = 'they croak'
     treeOfLife["Reptiles"].data = 'they stick to walls'
     treeOfLife["Mammals"].data = 'they have udders'
-
 
     print("List of nodes:")
     print(list(treeOfLife.nodes.keys()))
@@ -378,9 +338,7 @@ if __name__ == '__main__':
     print(treeOfLife.nodes['Vertebrates'].children)
     print("")
 
-
     print(treeOfLife.display('Life'))
-
 
     print("\n***** Depth-first *****")
     for nodeID in treeOfLife.traverse("Life"):
@@ -408,11 +366,11 @@ if __name__ == '__main__':
     treeOfN = Tree()
 
     treeOfN.add_node(1)  # root node
-    treeOfN.add_node(2,1)
-    treeOfN.add_node(3,2)
-    treeOfN.add_node(5,3)
-    treeOfN.add_node(8,5)
-    treeOfN.add_node(13,8)
-    treeOfN.add_node(21,13)
+    treeOfN.add_node(2, 1)
+    treeOfN.add_node(3, 2)
+    treeOfN.add_node(5, 3)
+    treeOfN.add_node(8, 5)
+    treeOfN.add_node(13, 8)
+    treeOfN.add_node(21, 13)
 
     treeOfN.display(1)

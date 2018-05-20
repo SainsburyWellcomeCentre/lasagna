@@ -4,22 +4,22 @@ Brings up an alert message to warn the user when something significant has happe
 We can't rely on the user watching the console for messages. 
 """
 
-#TODO: maybe neater to just replace with a QMessageBox
-#e.g.  QMessageBox.information(None,"Hello!","Something went wrong )
+# TODO: maybe neater to just replace with a QMessageBox
+# e.g.  QMessageBox.information(None, "Hello!", "Something went wrong")
 
 from lasagna import alert_UI
 from PyQt5 import QtGui, QtCore
 
 
-class alert(alert_UI.Ui_alertBox,QtGui.QWidget):
+class alert(alert_UI.Ui_alertBox, QtGui.QWidget):
 
-    def __init__(self,lasagna,alertText="Alert!"):        
-        super(alert,self).__init__() 
+    def __init__(self, lasagna, alertText="Alert!"):
+        super(alert, self).__init__()
 
         self.alertText = alertText
         self.lasagna = lasagna
 
-        #Create widgets defined in the designer file
+        # Create widgets defined in the designer file
         self.setupUi(self)
         self.center()
         self.show()
@@ -28,11 +28,8 @@ class alert(alert_UI.Ui_alertBox,QtGui.QWidget):
 
         self.closeButton.released.connect(self.closeAlertBox)
 
-
-
     def closeAlertBox(self):
         self.close()    
-
 
     def center(self):
         """
