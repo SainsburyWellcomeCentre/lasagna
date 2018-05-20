@@ -59,4 +59,4 @@ class Ui_alertBox(object):
         alertBox.setWindowTitle(_translate("alertBox", "Lasagna Alert"))
         self.closeButton.setText(_translate("alertBox", "&Close"))
 
-import mainWindow_rc
+from lasagna import mainWindow_rc

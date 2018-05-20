@@ -587,6 +587,7 @@ class Ui_lasagna_mainWindow(object):
         self.actionNone.setText(_translate("lasagna_mainWindow", "none"))
         self.actionOpen_2.setText(_translate("lasagna_mainWindow", "Open"))
 
-from lasagnaplotwidget import LasagnaPlotWidget
+
 from pyqtgraph import PlotWidget
-import mainWindow_rc
+from lasagna.lasagnaplotwidget import LasagnaPlotWidget
+from lasagna import mainWindow_rc
