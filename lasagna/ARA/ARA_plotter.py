@@ -6,13 +6,12 @@ This enables more than one plugin to use these features.
 
 import numpy as np
 import pyqtgraph as pg
-
 # For contour drawing
 from skimage import measure
 
-# For handling the labels files
-from lasagna import ara_json
 from lasagna import tree
+# For handling the labels files
+from lasagna.ARA import ara_json
 
 
 class ARA_plotter(object):  # must inherit lasagna_plugin first
