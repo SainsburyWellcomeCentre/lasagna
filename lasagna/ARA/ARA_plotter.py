@@ -43,7 +43,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
 
         if fname.lower().endswith('.csv'):
             colSep = self.guessFileSep(fname)
-            return tree.importData(fname, colSep=colSep, headerLine=True)
+            return tree.importData(fname, colSep=colSep)
 
         if fname.lower().endswith('.json'):
             (flattened,colNames) = ara_json.importData(fname)

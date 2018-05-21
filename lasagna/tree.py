@@ -10,7 +10,7 @@ from lasagna import dataTypeFromString
 (_ROOT, _DEPTH, _WIDTH) = list(range(3))  # Used by classes to navigate the tree
 
 
-def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=False):
+def importData(fname, displayTree=False, colSep=',', headerLine=None, verbose=False):
     """
     Import tree data from a CSV (text) file or list. 
 
@@ -51,7 +51,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=False, verbose=F
         contents = fname  # assume that fname is data rather than a file name
 
     # Get header data if present
-    if headerLine:
+    if headerLine is None:
         header = contents.pop(0)
         header = header.rstrip('\n').split(colSep)
     elif isinstance(headerLine, str):
