@@ -14,15 +14,15 @@ All points bearing the same lineseries_id are grouped into the same list.
 """
 
 import os
-from lasagna_plugin import lasagna_plugin
+from lasagna.lasagna_plugin import lasagna_plugin
 import numpy as np
 from PyQt5 import QtGui
 from lasagna.tree import importData
 
 
 class loaderClass(lasagna_plugin):
-    def __init__(self,lasagna):
-        super(loaderClass,self).__init__(lasagna)
+    def __init__(self, lasagna):
+        super(loaderClass, self).__init__(lasagna)
 
         self.lasagna = lasagna
         self.objectName = 'tree_reader'
