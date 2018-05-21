@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_ara_explorer(object):
     def setupUi(self, ara_explorer):
         ara_explorer.setObjectName("ara_explorer")

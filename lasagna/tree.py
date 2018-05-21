@@ -43,10 +43,8 @@ def importData(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
         if not os.path.exists(fname):
             print("Can not find file " + fname)
             return
-        # Read in data
-        fid = open(fname, 'r')
-        contents = fid.read().split('\n')
-        fid.close()
+        with (fname, 'r') as fid:  # Read in data
+            contents = fid.read().split('\n')
     elif isinstance(fname, list):
         contents = fname  # assume that fname is data rather than a file name
 

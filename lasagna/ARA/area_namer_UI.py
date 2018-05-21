@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_area_namer(object):
     def setupUi(self, area_namer):
         area_namer.setObjectName("area_namer")
