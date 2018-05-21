@@ -96,10 +96,8 @@ def loadTiffStack(fname, useLibTiff=False):
         print("imageStackLoader.loadTiffStack can not find %s" % fname)
         return
 
-    purePython = True
     if useLibTiff:
         from libtiff import TIFFfile
-        import numpy as np
         tiff = TIFFfile(fname)
         samples, sample_names = tiff.get_samples()  # we should have just one
         print("Loading:\n" + tiff.get_info() + " with libtiff\n")
@@ -234,63 +232,63 @@ def mhd_read_raw_file(fname, header):
         datatype = header['datatype'].lower()
 
         if datatype == 'float':
-            formatType = 'f'
+            format_type = 'f'
         elif datatype == 'double':
-            formatType = 'd'
+            format_type = 'd'
         elif datatype == 'long':
-            formatType = 'l'
+            format_type = 'l'
         elif datatype == 'ulong':
-            formatType = 'L'
+            format_type = 'L'
         elif datatype == 'char':
-            formatType = 'c'
+            format_type = 'c'
         elif datatype == 'uchar':
-            formatType = 'B'
+            format_type = 'B'
         elif datatype == 'short':
-            formatType = 'h'
+            format_type = 'h'
         elif datatype == 'ushort':
-            formatType = 'H'
+            format_type = 'H'
         elif datatype == 'int':
-            formatType = 'i'
+            format_type = 'i'
         elif datatype == 'uint':
-            formatType = 'I'
+            format_type = 'I'
         else:
-            formatType = False
+            format_type = False
 
     else:
-        formatType = False
+        format_type = False
 
     # If we couldn't find it, look in the ElenentType field
-    if formatType == False:
+    if not format_type:
         if 'elementtype' in header:
             datatype = header['elementtype'].lower()
 
             if datatype == 'met_short':
-                formatType = 'h'
+                format_type = 'h'
             else:
-                formatType = False
+                format_type = False
     else:
-      formatType = False
+        format_type = False
 
-    if formatType == False:
+    if not format_type:
         print("\nCan not find data format type in MHD file. **CONTACT AUTHOR**\n")
         return False
 
-    pathToFile = lasHelp.stripTrailingFileFromPath(fname)
+    path_to_file = lasHelp.stripTrailingFileFromPath(fname)
     print(header['elementdatafile'])   # TODO: CLEAN THIS SHIT
 
-    rawFname = os.path.join(pathToFile, header['elementdatafile'])
+    rawFname = os.path.join(path_to_file, header['elementdatafile'])
     with open(rawFname, 'rb') as fid:
         data = fid.read()
     
-    dimSize = header['dimsize']
+    dim_size = header['dimsize']
     # from: http://stackoverflow.com/questions/26542345/reading-data-from-a-16-bit-unsigned-big-endian-raw-image-file-in-python
-    fmt = endian + str(int(np.prod(dimSize))) + formatType
+    fmt = endian + str(int(np.prod(dim_size))) + format_type
     pix = np.asarray(struct.unpack(fmt, data))
 
     # Round it to keep python 3 happy
-    dimSize = [round(d) for d in dimSize]
+    dim_size = [round(d) for d in dim_size]
 
-    return pix.reshape((dimSize[2], dimSize[1], dimSize[0])).swapaxes(1, 2)
+    return pix.reshape((dim_size[2], dim_size[1], dim_size[0])).swapaxes(1, 2)
 
 
 def mhd_write_raw_file(imStack, fname, info=None):
@@ -307,10 +305,10 @@ def mhd_write_raw_file(imStack, fname, info=None):
 
     # Get the name of the raw file and check it exists
     path = os.path.dirname(fname)
-    pathToRaw = path + os.path.sep + info['elementdatafile']
+    path_to_raw = path + os.path.sep + info['elementdatafile']
 
-    if not os.path.exists(pathToRaw):
-        print("Unable to find raw file at {}. Aborting mhd_write_raw_file".format(pathToRaw))
+    if not os.path.exists(path_to_raw):
+        print("Unable to find raw file at {}. Aborting mhd_write_raw_file".format(path_to_raw))
         return False
 
     # replace the stack dimension sizes in the info stack in case the user changed this
@@ -318,7 +316,7 @@ def mhd_write_raw_file(imStack, fname, info=None):
 
     # TODO: the endianness is not set here or defined in the MHD file. Does this matter?
     try:
-        with open(pathToRaw, 'wb') as fid:
+        with open(path_to_raw, 'wb') as fid:
             fid.write(bytearray(imStack.ravel()))
         return info
     except IOError:
@@ -390,37 +388,37 @@ def mhd_write_header_file(fname, info):
     This is a quick and very dirty, *SIMPLE*, mhd header writer. It can only cope with the fields hard-coded described below.
     """
 
-    fileStr = ''  # Build a string that we will write to a file
+    file_str = ''  # Build a string that we will write to a file
     if 'ndims' in info:
-        fileStr = fileStr + ('NDims = %d\n' % info['ndims'])
+        file_str += ('NDims = %d\n' % info['ndims'])
 
     if 'datatype' in info:
-        fileStr = fileStr + ('DataType = %s\n' % info['datatype'])
+        file_str += ('DataType = %s\n' % info['datatype'])
 
     if 'dimsize' in info:
         numbers = ' '.join(map(str, (list(map(int, info['dimsize'])))))  # convert a list of floats into a space separated series of ints
-        fileStr = fileStr + ('DimSize = %s\n' % numbers)
+        file_str += ('DimSize = %s\n' % numbers)
 
     if 'elementsize' in info:
         numbers = ' '.join(map(str, (list(map(int, info['elementsize'])))))
-        fileStr = fileStr + ('ElementSize = %s\n' % numbers)
+        file_str += ('ElementSize = %s\n' % numbers)
 
     if 'elementspacing' in info:
         numbers = ' '.join(map(str, (list(map(int, info['elementspacing'])))))
-        fileStr = fileStr + ('ElementSpacing = %s\n' % numbers)
+        file_str += ('ElementSpacing = %s\n' % numbers)
 
     if 'elementtype' in info:
-        fileStr = fileStr + ('ElementType = %s\n' % info['elementtype'])
+        file_str += ('ElementType = %s\n' % info['elementtype'])
 
     if 'elementbyteordermsb' in info:
-        fileStr = fileStr + ('ElementByteOrderMSB = %s\n' % str(info['elementbyteordermsb']))
+        file_str += ('ElementByteOrderMSB = %s\n' % str(info['elementbyteordermsb']))
 
     if 'elementdatafile' in info:
-        fileStr = fileStr + ('ElementDataFile = %s\n' % info['elementdatafile'])
+        file_str += ('ElementDataFile = %s\n' % info['elementdatafile'])
 
     # If we're here, then hopefully things went well. We write to the file
     with open(fname, 'w') as fid:
-       fid.write(fileStr)
+        fid.write(file_str)
 
 
 def mhd_getRatios(fname):
@@ -468,7 +466,7 @@ def nrrdRead(fname):
         return
 
     import nrrd
-    (data,header) = nrrd.read(fname)
+    data, header = nrrd.read(fname)
     return data.swapaxes(1, 2)
 
 
@@ -496,10 +494,10 @@ def nrrd_getRatios(fname):
         return
 
     header = nrrdHeaderRead(fname)
-    axSizes = header['space directions']
+    ax_sizes = header['space directions']
 
     spacing = []
-    for i in range(len(axSizes)):
-        spacing.append(axSizes[i][i])
+    for i in range(len(ax_sizes)):
+        spacing.append(ax_sizes[i][i])
 
     return spacingToRatio(spacing)

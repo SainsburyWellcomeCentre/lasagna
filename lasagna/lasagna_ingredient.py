@@ -75,8 +75,8 @@ class lasagna_ingredient(object):
             print("** lasagna_ingredient -- can not set color")
             return
 
-        Basil = QtGui.QBrush()
-        Basil.setColor(QtGui.QColor(self.color[0], self.color[1], self.color[2]))
-        Basil.setStyle(QtCore.Qt.BrushStyle(1))
+        basil = QtGui.QBrush()
+        basil.setColor(QtGui.QColor(self.color[0], self.color[1], self.color[2]))
+        basil.setStyle(QtCore.Qt.BrushStyle(1))
 
-        self.modelItems.setBackground(Basil)
+        self.modelItems.setBackground(basil)

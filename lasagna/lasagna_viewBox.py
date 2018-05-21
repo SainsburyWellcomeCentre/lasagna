@@ -28,7 +28,7 @@ class lasagna_viewBox(pg.ViewBox):
             linkZoom  - link self's zoom with the key's zoom (True or False)
         """
         self.linkedAxis = linkedAxis  # A list of ViewBox axes to link to
-        self.controlDrag=False
+        self.controlDrag = False
 
         # TODO: why the hell does the Mac version not require the flip but the Linux version does. What about Win?
         if platform.system() != 'Darwin':

@@ -64,25 +64,24 @@ def importData(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
         if not line:
             continue
 
-        dataLine = line.split(colSep)
-        if len(header) != len(dataLine):
+        data_line = line.split(colSep)
+        if len(header) != len(data_line):
             print("\nTree file appears corrupt! header length is %d but data line length is %d."
-                  "\ntree.importData is aborting.\n" % (len(header), len(dataLine)))
+                  "\ntree.importData is aborting.\n" % (len(header), len(data_line)))
             return False
-
-        theseData = list(map(int, dataLine[0:2]))  # add index and parent to the first two columns
 
         # Add data to the third column. Either as a list or as a dictionary (if header names were provided)
         if header:  # add as dictionary
-            dataCol = dict()
+            data_col = dict()
             for i in range(len(header)-2):
                 i += 2
-                dataCol[header[i]] = dataTypeFromString.convertString(dataLine[i])
+                data_col[header[i]] = dataTypeFromString.convertString(data_line[i])
         else:
-            dataCol = dataLine[2:]  # add as list of strings
+            data_col = data_line[2:]  # add as list of strings
 
-        theseData.append(dataCol) 
-        data.append(theseData)
+        line_data = [int(d) for d in data_line[0:2]]  # add index and parent to the first two columns
+        line_data.append(data_col)
+        data.append(line_data)
 
     if verbose:
         print("tree.importData read %d rows of data from %s" % (len(data), fname))
@@ -97,9 +96,8 @@ def importData(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
     # Optionally dump the tree to screen (unlikely to be useful for large trees)
     if displayTree:
         tree.display(0)
-
-        for nodeID in tree.traverse(0):
-            print("%s - %s" % (nodeID, tree[nodeID].data))
+        for node_id in tree.traverse(0):
+            print("%s - %s" % (node_id, tree[node_id].data))
 
     return tree
 
@@ -179,12 +177,7 @@ class Tree(object):
         the node "fromNode". To find all leaves, fromNode should 
         be the root node.
         """
-        nodesThatAreLeaves = []
-        for nodeID in self.traverse(fromNode):
-            if self.isLeaf(nodeID):
-                nodesThatAreLeaves.append(nodeID)
-
-        return nodesThatAreLeaves
+        return [node_id for node_id in self.traverse(fromNode) if self.isLeaf(node_id)]
 
     def findBranches(self, fromNode=0):
         """
@@ -192,14 +185,9 @@ class Tree(object):
         A branch is defined as a node with more than two children
         To find all branches, fromNode should be the root node.
         """
-        nodesThatAreBranches = []
-        for nodeID in self.traverse(fromNode):
-            if self.nodes[nodeID].isbranch():
-                nodesThatAreBranches.append(nodeID)
+        return [node_id for node_id in self.traverse(fromNode) if self.nodes[node_id].isbranch()]
 
-        return nodesThatAreBranches
-
-    def findSegments(self, linkSegments=1, nodeID=0, segments=()):
+    def findSegments(self, linkSegments=1, nodeID=0, segments=()):  # FIXME: nodeID to node_ids
         """ 
         Return a list containing all unique segments of the tree
 
@@ -210,23 +198,23 @@ class Tree(object):
         # print "Calling find segments with nodeID %d" % nodeID
 
         if linkSegments and nodeID > 0:
-            thisPath = [self.nodes[nodeID].parent]
+            _path = [self.nodes[nodeID].parent]
         else:
-            thisPath = []
+            _path = []
 
         if isinstance(nodeID, int):
             nodeID = [nodeID]
 
         while len(nodeID) == 1:
             # print "appending node %d" % nodeID[0]
-            thisPath.append(nodeID[0])
+            _path.append(nodeID[0])
             nodeID = self.nodes[nodeID[0]].children
             
-        segments = segments + (thisPath,)  # Store this segment
+        segments = segments + (_path,)  # Store this segment
 
         # Go into the branches with a recursive call
-        for thisNode in nodeID:
-            segments = self.findSegments(linkSegments, thisNode, segments)
+        for node in nodeID:
+            segments = self.findSegments(linkSegments, node, segments)
 
         return segments
 
@@ -238,11 +226,11 @@ class Tree(object):
         trivial and quick. No nee to exhaustively search the tree for the 
         fastest path.
         """
-        currentNode = fromNode
+        current_node = fromNode
         path = [fromNode]
-        while self.nodes[currentNode].parent is not None:
-            path.append(self.nodes[currentNode].parent)
-            currentNode = self.nodes[currentNode].parent
+        while self.nodes[current_node].parent is not None:
+            path.append(self.nodes[current_node].parent)
+            current_node = self.nodes[current_node].parent
         return path
 
     def __getitem__(self, key):

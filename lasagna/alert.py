@@ -36,8 +36,8 @@ class alert(alert_UI.Ui_alertBox, QtGui.QWidget):
         Centre window on screen 
         http://stackoverflow.com/questions/20243637/pyqt4-center-window-on-active-screen
         """
-        frameGm = self.frameGeometry()    
+        frame_gm = self.frameGeometry()
         screen = self.lasagna.app.desktop().screenNumber(self.lasagna.app.desktop().cursor().pos())
-        centerPoint = self.lasagna.app.desktop().screenGeometry(screen).center()
-        frameGm.moveCenter(centerPoint)
-        self.move(frameGm.topLeft())
+        center_point = self.lasagna.app.desktop().screenGeometry(screen).center()
+        frame_gm.moveCenter(center_point)
+        self.move(frame_gm.topLeft())

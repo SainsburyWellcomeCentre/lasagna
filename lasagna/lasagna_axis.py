@@ -53,17 +53,16 @@ class projection2D():
         Adds an ingredient to the PlotWidget as an item (i.e. the ingredient manages the process of 
         producing an item using information in the ingredient properties.
         """
-        verbose=False
+        verbose = False
 
-        _thisItem = (getattr(pg, ingredient.pgObject)(**ingredient.pgObjectConstructionArgs))
-        _thisItem.objectName = ingredient.objectName
+        _item = (getattr(pg, ingredient.pgObject)(**ingredient.pgObjectConstructionArgs))
+        _item.objectName = ingredient.objectName
 
         if verbose:
-            print("\nlasagna_axis.addItemToPlotWidget adds item " + ingredient.objectName + " as: " + str(_thisItem))
+            print("\nlasagna_axis.addItemToPlotWidget adds item " + ingredient.objectName + " as: " + str(_item))
 
-        self.view.addItem(_thisItem)
-        self.items.append(_thisItem)
-
+        self.view.addItem(_item)
+        self.items.append(_item)
 
     def removeItemFromPlotWidget(self, item):
         """
@@ -75,12 +74,12 @@ class projection2D():
         "item" is either a string defining an objectName or the object itself
         """
         items = list(self.view.items())
-        nItemsBefore = len(items)  # to determine if an item was removed
+        n_items_before = len(items)  # to determine if an item was removed
         if isinstance(item, str):
             removed = False
-            for thisItem in items:
-                if hasattr(thisItem, 'objectName') and thisItem.objectName == item:
-                        self.view.removeItem(thisItem)
+            for this_item in items:
+                if hasattr(this_item, 'objectName') and this_item.objectName == item:
+                        self.view.removeItem(this_item)
                         removed = True
             if not removed:
                 print("lasagna_axis.removeItemFromPlotWidget failed to remove item defined by string " + item)
@@ -88,14 +87,15 @@ class projection2D():
             self.view.removeItem(item)
 
         # Optionally return True of False depending on whether the removal was successful
-        nItemsAfter = len(list(self.view.items()))
+        n_items_after = len(list(self.view.items()))
 
-        if nItemsAfter < nItemsBefore:
+        if n_items_after < n_items_before:
             return True
-        elif nItemsAfter == nItemsBefore:
+        elif n_items_after == n_items_before:
             return False
         else:
-            print('** removeItemFromPlotWidget: %d items before removal and %d after removal **' % (nItemsBefore, nItemsAfter))
+            print('** removeItemFromPlotWidget: %d items before removal and %d after removal **' % (n_items_before,
+                                                                                                    n_items_after))
             return False
 
         print("%d items after remove call" % len(list(self.view.items())))  # FIXME: unreachable code
@@ -106,7 +106,7 @@ class projection2D():
         """
         if not ingredients:
             return
-        [self.addItemToPlotWidget(thisIngredient) for thisIngredient in ingredients]
+        [self.addItemToPlotWidget(ingredient) for ingredient in ingredients]
 
     def removeAllItemsFromPlotWidget(self, items):
         """
@@ -115,16 +115,16 @@ class projection2D():
         """
         if not items:
             return
-        [self.removeItemFromPlotWidget(thisItem) for thisItem in items]
+        [self.removeItemFromPlotWidget(item) for item in items]
 
     def listNamedItemsInPlotWidget(self):
         """
         Print a list of all named items actually *added* in the PlotWidget
         """
         n = 1
-        for thisItem in list(self.view.items()):
-            if hasattr(thisItem, 'objectName') and isinstance(thisItem.objectName, str):
-                print("object %s: %s" % (n, thisItem.objectName))
+        for item in list(self.view.items()):
+            if hasattr(item, 'objectName') and isinstance(item.objectName, str):
+                print("object %s: %s" % (n, item.objectName))
             n += 1
 
 
@@ -134,10 +134,10 @@ class projection2D():
         because of the way we generally add objects, there *should* never be 
         multiple objects with the same name
         """
-        for thisItem in list(self.view.items()):
-            if hasattr(thisItem, 'objectName') and isinstance(thisItem.objectName, str):
-                if thisItem.objectName == objName:
-                    return thisItem
+        for item in list(self.view.items()):
+            if hasattr(item, 'objectName') and isinstance(item.objectName, str):
+                if item.objectName == objName:
+                    return item
 
     def getPlotItemByType(self, itemType):
         """
@@ -145,12 +145,12 @@ class projection2D():
         itemType should be a string that defines a pyqtgraph item type. 
         Examples include: ImageItem, ViewBox, PlotItem, AxisItem and LabelItem
         """
-        itemList = [] 
-        for thisItem in list(self.view.items()):
-            if thisItem.__module__.endswith(itemType):
-                itemList.append(thisItem)
+        item_list = []
+        for item in list(self.view.items()):
+            if item.__module__.endswith(itemType):
+                item_list.append(item)
 
-        return itemList
+        return item_list
 
     def hideItem(self, item):
         """
@@ -168,8 +168,8 @@ class projection2D():
         verbose = False
 
         # loop through all plot items searching for imagestack items (these need to be plotted first)
-        for thisIngredient in ingredientsList:
-            if isinstance(thisIngredient, lasagna_imagestack):
+        for ingredient in ingredientsList:
+            if isinstance(ingredient, lasagna_imagestack):
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                 #TODO: AXIS need some way of linking the ingredient to the plot item but keeping in mind 
                 #      that this same object needs to be plotted in different axes, each of which has its own
@@ -179,39 +179,40 @@ class projection2D():
                 # Got to the middle of the stack
                 if sliceToPlot is None or resetToMiddleLayer:
                     stacks = self.lasagna.returnIngredientByType('imagestack')
-                    numSlices = [] 
-                    [numSlices.append(thisStack.data(self.axisToPlot).shape[0]) for thisStack in stacks]
-                    numSlices = max(numSlices)
-                    sliceToPlot = numSlices//2
+                    num_slices = []
+                    [num_slices.append(stack.data(self.axisToPlot).shape[0]) for stack in stacks]
+                    num_slices = max(num_slices)
+                    sliceToPlot = num_slices // 2
 
                 self.currentSlice = sliceToPlot
 
                 if verbose:
-                    print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName)
+                    print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + ingredient.objectName)
 
-                thisIngredient.plotIngredient(
-                                            pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,
-                                                                                                   thisIngredient.objectName,
-                                                                                                   verbose=verbose),
-                                            axisToPlot=self.axisToPlot,
-                                            sliceToPlot=self.currentSlice
-                                            )
+                ingredient.plotIngredient(
+                    pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,
+                                                                           ingredient.objectName,
+                                                                           verbose=verbose),
+                    axisToPlot=self.axisToPlot,
+                    sliceToPlot=self.currentSlice
+                )
                 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
         # the image is now displayed
 
         # loop through all plot items searching for non-image items (these need to be overlaid on top of the image)
-        for thisIngredient in ingredientsList:
-            if not isinstance(thisIngredient, lasagna_imagestack):
+        for ingredient in ingredientsList:
+            if not isinstance(ingredient, lasagna_imagestack):
                 if verbose:
-                    print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + thisIngredient.objectName)
+                    print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + ingredient.objectName)
 
-                thisIngredient.plotIngredient(pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,
-                                                                                                     thisIngredient.objectName,
-                                                                                                     verbose=verbose),
-                                              axisToPlot=self.axisToPlot,
-                                              sliceToPlot=self.currentSlice
-                                              )
+                ingredient.plotIngredient(
+                    pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,
+                                                                           ingredient.objectName,
+                                                                           verbose=verbose),
+                    axisToPlot=self.axisToPlot,
+                    sliceToPlot=self.currentSlice
+                )
 
     def updateDisplayedSlices_2D(self, ingredients, slicesToPlot):
         """
@@ -226,11 +227,11 @@ class projection2D():
 
     def getMousePositionInCurrentView(self, pos):
         # TODO: figure out what pos is and where best to put it. Then can integrate this call into updateDisplayedSlices
-        # TODO: Consider not returning X or Y values that fall outside of the image space.
-        mousePoint = self.view.getPlotItem().vb.mapSceneToView(pos)
-        X = int(mousePoint.x())       
-        Y = int(mousePoint.y())
-        return X, Y
+        # TODO: Consider not returning x or y values that fall outside of the image space.
+        mouse_point = self.view.getPlotItem().vb.mapSceneToView(pos)
+        x = int(mouse_point.x())
+        y = int(mouse_point.y())
+        return x, y
 
     def resetAxes(self):
         """

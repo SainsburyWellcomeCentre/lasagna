@@ -6,7 +6,6 @@ Helper functions for lasagna. Functions in this file are involved in the followi
 """
 
 import os
-import string
 import yaml   # Preferences are stored in a YAML file
 
 
@@ -33,7 +32,8 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget, itemName, regex=False, verbo
     """
 
     if verbose:
-        print("findPyQtGraphObjectNameInPlotWidget - looking for object %s in PlotWidget %s" % (itemName,str(PlotWidget)))
+        print("findPyQtGraphObjectNameInPlotWidget - looking for object %s in PlotWidget %s" % (itemName,
+                                                                                                str(PlotWidget)))
 
     if regex:
         import re
@@ -42,24 +42,24 @@ def findPyQtGraphObjectNameInPlotWidget(PlotWidget, itemName, regex=False, verbo
         print("findPyQtGraphObjectNameInPlotWidget finds no attribute getPlotItem")
         return False
 
-    pltItem = PlotWidget.getPlotItem()
+    plot_item = PlotWidget.getPlotItem()
 
-    if not hasattr(pltItem, 'items'):
+    if not hasattr(plot_item, 'items'):
         print("findPyQtGraphObjectNameInPlotWidget finds no attribute 'items'")
         return False
 
-    if not pltItem.items:
+    if not plot_item.items:
         print("findPyQtGraphObjectNameInPlotWidget finds no items in list")
         return False
 
     if regex:
-        for thisItem in pltItem.items:
-            if re.search(itemName, thisItem.objectName):
-                return thisItem
+        for item in plot_item.items:
+            if re.search(itemName, item.objectName):
+                return item
     else:
-        for thisItem in pltItem.items:
-            if thisItem.objectName == itemName:
-                return thisItem
+        for item in plot_item.items:
+            if item.objectName == itemName:
+                return item
 
     if verbose:
         print("Failed to find {} in PlotWidget".format(itemName))
@@ -111,18 +111,18 @@ def getLasagna_prefDir():
     Returns the path to lasagna preferences directory. 
     If it does not exist it creates it and then returns the path
     """
-    prefDir = getHomeDir() +'.lasagna'
-    if not os.path.exists(prefDir):
-        os.makedirs(prefDir)
+    pref_dir = getHomeDir() + '.lasagna'
+    if not os.path.exists(pref_dir):
+        os.makedirs(pref_dir)
 
-    assert os.path.exists(prefDir)
+    assert os.path.exists(pref_dir)
 
     if os.name != "posix":
-        prefDir = prefDir + '\\'
+        pref_dir = pref_dir + '\\'
     else:
-        prefDir = prefDir + '/'
+        pref_dir = pref_dir + '/'
 
-    return prefDir
+    return pref_dir
 
 
 def getLasagnaPrefFile():
@@ -187,7 +187,7 @@ def loadAllPreferences(prefFName=getLasagnaPrefFile(), defaultPref=defaultPrefer
     if not os.path.exists(prefFName):
         print("PREF FILE")
         print(prefFName)
-        writeAllPreferences(defaultPref,prefFName=prefFName)
+        writeAllPreferences(defaultPref, prefFName=prefFName)
         print("Created default preferences file in " + prefFName)
 
     # Load preferences YAML file as a dictionary

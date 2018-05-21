@@ -6,35 +6,34 @@ Module to infer data type from string or convert a string to a data type.
 """
 
 
-def dataTypeFromString(string):
+def dataTypeFromString(input_string):
     """
     Returns the data type which string appears to be: int, float, or str
     """
     # if all integers return int
-    if re.match('^[0-9]+$',string) != None :
+    if re.match('^[0-9]+$', input_string) is not None:
         return int
 
     # if all integers with on . somewhere return float
-    if re.match('^[0-9]+\.[0-9]+$',string) != None :
+    if re.match('^[0-9]+\.[0-9]+$', input_string) is not None:
         return float
 
     # if there is any non-numeric character return string
-    if re.match('.*\D.*',string) != None :
+    if re.match('.*\D.*', input_string) is not None:
         return str
 
     return None
 
 
-def convertString(string):
+def convertString(input_string):
     """
     converts string to float or int (or returns a str) based on the pattern of the string
     """
-
-    dataType = dataTypeFromString(string)
-    if dataType is None:
-        return string
+    data_type = dataTypeFromString(input_string)
+    if data_type is None:
+        return input_string
     else:
-        return dataType(string)
+        return data_type(input_string)
 
 
 if __name__ == '__main__':
@@ -64,7 +63,7 @@ if __name__ == '__main__':
         print('failed str test 4')
 
     # try some conversions
-    conversions = ['123','1','1.1','1.2.2','hello']
+    conversions = ['123', '1', '1.1', '1.2.2', 'hello']
     for c in conversions:
-        converted=convertString(c)
-        print("converted %s as %s" % (c,str(type(converted))))
+        converted = convertString(c)
+        print("converted %s as %s" % (c, str(type(converted))))

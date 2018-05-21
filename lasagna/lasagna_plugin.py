@@ -40,7 +40,6 @@ class lasagna_plugin(object):
         if self.verbose:
             print("Ran %s constructor" % self.__module__)
 
-
     """
     #could not get this to work for some reason [ROB 20/07/15]
     #Destructor
@@ -61,42 +60,41 @@ class lasagna_plugin(object):
         """
         regexp = re.compile('hook_(.*)')
        
-        for thisProperty in dir(self):
-
-            if regexp.match(thisProperty):              
-                hookName =regexp.findall(thisProperty)[0]
-                print(hookName)
-                if hookName in self.lasagna.hooks:
+        for this_property in dir(self):
+            if regexp.match(this_property):
+                hook_name = regexp.findall(this_property)[0]
+                print(hook_name)
+                if hook_name in self.lasagna.hooks:
                     # attach the hook by adding to dictionary
-                    self.lasagna.hooks[hookName].append(getattr(self, thisProperty))
+                    self.lasagna.hooks[hook_name].append(getattr(self, this_property))
                     if self.verbose:
-                        print("Linking " + thisProperty + " to " + hookName)
+                        print("Linking " + this_property + " to " + hook_name)
                 else:
                     if self.verbose:
-                        print("No hook " + hookName + " found in lasagna.hooks for method " + thisProperty)
+                        print("No hook " + hook_name + " found in lasagna.hooks for method " + this_property)
 
     def detachHooks(self):
         """
         Search list of hooks in lasagna for any hooks that might have come from this plugin.
         Remove any that are found. 
         """
-        pluginName = self.__class__.__name__
-        regexp = re.compile('.*' + pluginName + '.*')
+        plugin_name = self.__class__.__name__
+        regexp = re.compile('.*' + plugin_name + '.*')
         if self.verbose:
-            print("Unlinking hooks for plugin '%s'" % pluginName)
-        for thisHookList in list(self.lasagna.hooks.keys()):
-            if not thisHookList:
+            print("Unlinking hooks for plugin '%s'" % plugin_name)
+        for hook_list in list(self.lasagna.hooks.keys()):
+            if not hook_list:
                 continue
 
             # for the unusual [:] see:
             # http://stackoverflow.com/questions/1207406/remove-items-from-a-list-while-iterating-in-python
             # it iterates over a copy of the list
-            for thisHook in self.lasagna.hooks[thisHookList][:]:
-                # print "%d hooks in list %s" % (len(self.lasagna.hooks[thisHookList]), str(thisHookList))
-                if regexp.match(str(thisHook)):
-                    self.lasagna.hooks[thisHookList].remove(thisHook)
+            for hook in self.lasagna.hooks[hook_list][:]:
+                # print "%d hooks in list %s" % (len(self.lasagna.hooks[hook_list]), str(hook_list))
+                if regexp.match(str(hook)):
+                    self.lasagna.hooks[hook_list].remove(hook)
                     if self.verbose:
-                        print("Removed hook '{}'".format(thisHook))
+                        print("Removed hook '{}'".format(hook))
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     def initPlugin(self):

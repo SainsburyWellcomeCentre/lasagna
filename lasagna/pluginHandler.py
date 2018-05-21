@@ -2,8 +2,7 @@
 """
 Methods to handle finding of plugins, etc
 """
-
-from os import path, listdir 
+import os
 
 
 def findPlugins(pluginPaths):
@@ -12,22 +11,26 @@ def findPlugins(pluginPaths):
     """
 
     plugins = []  # This list will contain the names of plugins found in the pluginPaths directory list
-    pluginDirectories = []  # This list will contain the directories that contain valid plugins
+    plugin_directories = []  # This list will contain the directories that contain valid plugins
 
-    for thisPath in pluginPaths:
-        if not path.isdir(thisPath):
-            print("Plugin path " + thisPath + " is not a valid path. SKIPPING")
+    for plugin_folder in pluginPaths:
+        if not os.path.isdir(plugin_folder):
+            print("Plugin path " + plugin_folder + " is not a valid path. SKIPPING")
             continue
 
         # Get all files in the directory that match the plugin file name pattern
-        thesePluginFiles = [f for f in listdir(thisPath) if path.isfile(path.join(thisPath, f)) and f.endswith('_plugin.py')]
-        if not thesePluginFiles:
+        plugin_files = [f for f in os.listdir(plugin_folder) if is_plugin_file(plugin_folder, f)]
+        if not plugin_files:
             continue
 
-        pluginDirectories.append(thisPath)
-        for thisPlugin in thesePluginFiles:
-            plugins.append(thisPlugin)
-    return plugins, pluginDirectories
+        plugin_directories.append(plugin_folder)
+        for plugin in plugin_files:
+            plugins.append(plugin)
+    return plugins, plugin_directories
+
+
+def is_plugin_file(file_path, f):
+    return os.path.isfile(os.path.join(file_path, f)) and f.endswith('_plugin.py')
 
 
 def getPluginInstanceFromFileName(fileName, attributeToImport='plugin'):
@@ -38,12 +41,11 @@ def getPluginInstanceFromFileName(fileName, attributeToImport='plugin'):
     code from: stackoverflow.com/questions/452969/does-python-have-an-equivalent-to-java-class-forname
     """
 
-    parts = fileName.split('.')
-    moduleName = ".".join(parts[:-1])  # trim file extension whilst retaining other dots
-    importedModule = __import__(moduleName)
+    module_name = os.path.splitext(fileName)[0]
+    imported_module = __import__(module_name)
     if attributeToImport is not None:
-        returnedAttribute = getattr(importedModule, attributeToImport)
+        returned_attribute = getattr(imported_module, attributeToImport)
     else:
-        returnedAttribute = importedModule
+        returned_attribute = imported_module
 
-    return returnedAttribute, moduleName  # return the plugin object and optionally the module name
+    return returned_attribute, module_name  # return the plugin object and optionally the module name

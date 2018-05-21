@@ -51,27 +51,27 @@ parser.add_argument("-C", help="start a ipython console", action='store_true')
 parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
 args = parser.parse_args()
 
-pluginToStart = args.P
-sparsePointsToLoad = args.S
-linesToLoad = args.L
-treesToLoad = args.T
+PLUGIN_TO_START = args.P
+SPARSE_POINTS_TO_LOAD = args.S
+LINES_TO_LOAD = args.L
+TREES_TO_LOAD = args.T
 
 # Either load the demo stacks or a user-specified stacks
 if args.D:
     import tempfile
     import urllib.request, urllib.parse, urllib.error
 
-    imStackFnamesToLoad = [tempfile.gettempdir()+os.path.sep+'reference.tiff',
-                           tempfile.gettempdir()+os.path.sep+'sample.tiff']
+    IM_STACK_FNAMES_TO_LOAD = [tempfile.gettempdir() + os.path.sep + 'reference.tiff',
+                               tempfile.gettempdir() + os.path.sep + 'sample.tiff']
 
     loadUrl = 'http://mouse.vision/lasagna/'
-    for fname in imStackFnamesToLoad:
+    for fname in IM_STACK_FNAMES_TO_LOAD:
         if not os.path.exists(fname):
             url = loadUrl + fname.split(os.path.sep)[-1]
             print(('Downloading %s to %s' % (url, fname)))
             urllib.request.urlretrieve(url, fname)
 else:
-    imStackFnamesToLoad = args.im
+    IM_STACK_FNAMES_TO_LOAD = args.im
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -186,26 +186,26 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Handle IO plugins. For instance these are the loaders that handle different data types
         # and different loading actions.
         lasagna_path = os.path.dirname(os.path.realpath(sys.argv[0]))
-        builtInIOPath = os.path.join(lasagna_path, 'IO')
-        IO_Paths = lasHelp.readPreference('IO_modulePaths')  # directories containing IO modules
-        IO_Paths.append(builtInIOPath)
-        IO_Paths = list(set(IO_Paths))  # remove duplicate paths
+        built_in_io_path = os.path.join(lasagna_path, 'IO')
+        io_paths = lasHelp.readPreference('IO_modulePaths')  # directories containing IO modules
+        io_paths.append(built_in_io_path)
+        io_paths = list(set(io_paths))  # remove duplicate paths
 
         print("Adding IO module paths to Python path")
-        IO_plugins, IO_pluginPaths = pluginHandler.findPlugins(IO_Paths)
-        for p in IO_Paths:
+        io_plugins, io_plugin_paths = pluginHandler.findPlugins(io_paths)
+        for p in io_paths:
             sys.path.append(p)  # append to system path
             print(p)
 
         # Add *load actions* to the Load ingredients sub-menu and add loader modules here
         # TODO: currently we only have code to handle load actions as no save actions are available
         self.loadActions = {}  # actions must be attached to the lasagna object or they won't function
-        for thisIOmodule in IO_plugins:
-            IOclass, IOname = pluginHandler.getPluginInstanceFromFileName(thisIOmodule,
-                                                                          attributeToImport='loaderClass')
-            thisInstance = IOclass(self)
-            self.loadActions[thisInstance.objectName] = thisInstance
-            print(("Added %s to load menu as object name %s" % (thisIOmodule, thisInstance.objectName)))
+        for io_module in io_plugins:
+            io_class, io_name = pluginHandler.getPluginInstanceFromFileName(io_module,
+                                                                            attributeToImport='loaderClass')
+            this_instance = io_class(self)
+            self.loadActions[this_instance.objectName] = this_instance
+            print(("Added %s to load menu as object name %s" % (io_module, this_instance.objectName)))
         print("")
 
         # Link other menu signals to slots
@@ -219,7 +219,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Link tabbed view items to slots
 
         # Image tab stuff
-        # ImageStack QTreeView (see lasagna_ingredient.addToList for where the model is updated upon ingredient addition)
+        # ImageStack QTreeView (see lasagna_ingredient.addToList for where the model is updated on ingredient addition)
         self.logYcheckBox.clicked.connect(self.plotImageStackHistogram)
         self.imageAlpha_horizontalSlider.valueChanged.connect(self.imageAlpha_horizontalSlider_slot)
         self.imageStackLayers_Model = QtGui.QStandardItemModel(self.imageStackLayers_TreeView)
@@ -270,43 +270,43 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # Plugins menu and initialisation
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
-        pluginPaths = lasHelp.readPreference('pluginPaths')
+        plugin_paths = lasHelp.readPreference('pluginPaths')
 
-        plugins, pluginPaths = pluginHandler.findPlugins(pluginPaths)
+        plugins, plugin_paths = pluginHandler.findPlugins(plugin_paths)
         print("Adding plugin paths to Python path:")
         self.pluginSubMenus = {}
-        for p in pluginPaths:  # print plugin paths to screen, add to path, add as sub-dir names in Plugins menu
+        for p in plugin_paths:  # print plugin paths to screen, add to path, add as sub-dir names in Plugins menu
             print(p)
             sys.path.append(p)
-            dirName = p.split(os.path.sep)[-1]
-            self.pluginSubMenus[dirName] = QtGui.QMenu(self.menuPlugins)
-            self.pluginSubMenus[dirName].setObjectName(dirName)
-            self.pluginSubMenus[dirName].setTitle(dirName)
-            self.menuPlugins.addAction(self.pluginSubMenus[dirName].menuAction())
+            dir_name = p.split(os.path.sep)[-1]
+            self.pluginSubMenus[dir_name] = QtGui.QMenu(self.menuPlugins)
+            self.pluginSubMenus[dir_name].setObjectName(dir_name)
+            self.pluginSubMenus[dir_name].setTitle(dir_name)
+            self.menuPlugins.addAction(self.pluginSubMenus[dir_name].menuAction())
 
         # 2. Add each plugin to a dictionary where the keys are plugin name and values are instances of the plugin.
         print("")
-        self.plugins = {} # A dictionary where keys are plugin names and values are plugin classes or plugin instances
-        self.pluginActions = {} # A dictionary where keys are plugin names and values are QActions associated with a plugin
-        for thisPlugin in plugins:
+        self.plugins = {}  # A dictionary where keys are plugin names and values are plugin classes or plugin instances
+        self.pluginActions = {}  # A dictionary where keys are plugin names and values are QActions associated with a plugin
+        for plugin in plugins:
             # Get the module name and class
-            pluginClass, pluginName = pluginHandler.getPluginInstanceFromFileName(thisPlugin, None)
+            plugin_class, plugin_name = pluginHandler.getPluginInstanceFromFileName(plugin, None)
 
             # Get the name of the directory in which the plugin resides so we can add it to the right sub-menu
-            dirName = os.path.dirname(pluginClass.__file__).split(os.path.sep)[-1]
+            dir_name = os.path.dirname(plugin_class.__file__).split(os.path.sep)[-1]
 
             # create instance of the plugin object and add to the self.plugins dictionary
-            print(("Creating reference to class " + pluginName + ".plugin"))
-            self.plugins[pluginName] = pluginClass.plugin
+            print(("Creating reference to class " + plugin_name + ".plugin"))
+            self.plugins[plugin_name] = plugin_class.plugin
 
             # create an action associated with the plugin and add to the self.pluginActions dictionary
-            print(("Creating menu QAction for " + pluginName))
-            self.pluginActions[pluginName] = QtGui.QAction(pluginName, self)
-            self.pluginActions[pluginName].setObjectName(pluginName)
-            self.pluginActions[pluginName].setCheckable(True)  # so we have a checkbox next to the menu entry
+            print(("Creating menu QAction for " + plugin_name))
+            self.pluginActions[plugin_name] = QtGui.QAction(plugin_name, self)
+            self.pluginActions[plugin_name].setObjectName(plugin_name)
+            self.pluginActions[plugin_name].setCheckable(True)  # so we have a checkbox next to the menu entry
 
-            self.pluginSubMenus[dirName].addAction(self.pluginActions[pluginName])  # add action to the correct plugins sub-menu
-            self.pluginActions[pluginName].triggered.connect(self.startStopPlugin)  # Connect this action's signal to the slot
+            self.pluginSubMenus[dir_name].addAction(self.pluginActions[plugin_name])  # add action to the correct plugins sub-menu
+            self.pluginActions[plugin_name].triggered.connect(self.startStopPlugin)  # Connect this action's signal to the slot
         print("")
 
         self.statusBar.showMessage("Initialised")
@@ -322,14 +322,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Plugin-related methods
     def startStopPlugin(self):
-        pluginName = str(self.sender().objectName())  # Get the name of the action that sent this signal
+        plugin_name = str(self.sender().objectName())  # Get the name of the action that sent this signal
 
-        if self.pluginActions[pluginName].isChecked():
-           self.startPlugin(pluginName)
+        if self.pluginActions[plugin_name].isChecked():
+           self.startPlugin(plugin_name)
         else:
-            self.stopPlugin(pluginName)
+            self.stopPlugin(plugin_name)
 
-    def startPlugin(self,pluginName):
+    def startPlugin(self, pluginName):
         print(("Starting " + pluginName))
         self.plugins[pluginName] = self.plugins[pluginName](self)  # Create an instance of the plugin object
 
@@ -344,8 +344,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # NOTE: plugins with a window do not run the following code when the window is closed. They should, however,
         # detach hooks (unless the plugin author forgot to do this)
         del(self.plugins[pluginName])
-        pluginClass, pluginName = pluginHandler.getPluginInstanceFromFileName(pluginName+".py", None)
-        self.plugins[pluginName] = pluginClass.plugin
+        plugin_class, pluginName = pluginHandler.getPluginInstanceFromFileName(pluginName+".py", None)
+        self.plugins[pluginName] = plugin_class.plugin
 
     def runHook(self, hookArray, *args):
         """
@@ -354,15 +354,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if len(hookArray) == 0:
             return
 
-        for thisHook in hookArray:
+        for hook in hookArray:
             try:
-                if thisHook is None:
+                if hook is None:
                     print("Skipping empty hook in hook list")
                     continue
                 else:
-                     thisHook(*args)
+                    hook(*args)
             except Exception as err:
-                print("Error running plugin method {}; main error {}".format(thisHook, err))
+                print("Error running plugin method {}; main error {}".format(hook, err))
                 raise
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -382,37 +382,37 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         print(("Loading image stack " + fnameToLoad))
 
         # TODO: The axis swap likely shouldn't be hard-coded here
-        loadedImageStack = imageStackLoader.loadStack(fnameToLoad)
+        loaded_image_stack = imageStackLoader.loadStack(fnameToLoad)
 
-        if len(loadedImageStack) == 0 and not loadedImageStack:
+        if len(loaded_image_stack) == 0 and not loaded_image_stack:
             return False
 
         # Set up default values in tabs
         # It's ok to load images of different sizes but their voxel sizes need to be the same
-        axRatio = imageStackLoader.getVoxelSpacing(fnameToLoad)
-        for ii in range(len(axRatio)):
-            self.axisRatioLineEdits[ii].setText(str(axRatio[ii]))
+        ax_ratio = imageStackLoader.getVoxelSpacing(fnameToLoad)
+        for i in range(len(ax_ratio)):
+            self.axisRatioLineEdits[i].setText(str(ax_ratio[i]))
 
         # Add to the ingredients list
-        objName=fnameToLoad.split(os.path.sep)[-1]
-        self.addIngredient(objectName=objName,
+        obj_name = fnameToLoad.split(os.path.sep)[-1]
+        self.addIngredient(objectName=obj_name,
                            kind='imagestack',
-                           data=loadedImageStack,
+                           data=loaded_image_stack,
                            fname=fnameToLoad)
 
-        self.returnIngredientByName(objName).addToPlots()  # Add item to all three 2D plots
+        self.returnIngredientByName(obj_name).addToPlots()  # Add item to all three 2D plots
 
         # If only one stack is present, we will display it as gray (see imagestack class)
         # if more than one stack has been added, we will colour successive stacks according
         # to the colorOrder preference in the parameter file
         stacks = self.stacksInTreeList()
-        colorOrder = lasHelp.readPreference('colorOrder')
+        color_order = lasHelp.readPreference('colorOrder')
 
         if len(stacks) == 2:
-            self.returnIngredientByName(stacks[0]).lut = colorOrder[0]
-            self.returnIngredientByName(stacks[1]).lut = colorOrder[1]
+            self.returnIngredientByName(stacks[0]).lut = color_order[0]
+            self.returnIngredientByName(stacks[1]).lut = color_order[1]
         elif len(stacks) > 2:
-            self.returnIngredientByName(stacks[len(stacks)-1]).lut = colorOrder[len(stacks)-1]
+            self.returnIngredientByName(stacks[len(stacks)-1]).lut = color_order[len(stacks)-1]
 
         # remove any existing range highlighter on the histogram. We do this because different images
         # will likely have different default ranges
@@ -463,21 +463,21 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         lasHelp.preferenceWriter('lastLoadDir', lasHelp.stripTrailingFileFromPath(fname))
 
         # Keep a track of the last loaded files
-        recentlyLoaded = lasHelp.readPreference('recentlyLoadedFiles')
+        recently_loaded = lasHelp.readPreference('recentlyLoadedFiles')
         n = lasHelp.readPreference('numRecentFiles')
 
         # Add to start of list
-        recentlyLoaded.reverse()
-        recentlyLoaded.append(fname)
-        recentlyLoaded.reverse()
+        recently_loaded.reverse()
+        recently_loaded.append(fname)
+        recently_loaded.reverse()
 
-        while len(recentlyLoaded) > n:
-            recentlyLoaded.pop(-1)
+        while len(recently_loaded) > n:
+            recently_loaded.pop(-1)
 
         # TODO: list will no longer have the most recent item first
-        recentlyLoaded = list(set(recentlyLoaded))  # get remove repeats (i.e. keep only unique values)
+        recently_loaded = list(set(recently_loaded))  # get remove repeats (i.e. keep only unique values)
 
-        lasHelp.preferenceWriter('recentlyLoadedFiles', recentlyLoaded)
+        lasHelp.preferenceWriter('recentlyLoadedFiles', recently_loaded)
         self.updateRecentlyOpenedFiles()
 
         self.runHook(self.hooks['showFileLoadDialog_End'])
@@ -488,16 +488,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Updates the list of recently opened files
         """
-        recentlyLoadedFiles = lasHelp.readPreference('recentlyLoadedFiles')
-
+        recently_loaded_files = lasHelp.readPreference('recentlyLoadedFiles')
 
         # Remove existing actions if present
-        if len(self.recentLoadActions) > 0 and len(recentlyLoadedFiles) > 0:
+        if len(self.recentLoadActions) > 0 and len(recently_loaded_files) > 0:
             for thisAction in self.recentLoadActions:
                 self.menuOpen_recent.removeAction(thisAction)
             self.recentLoadActions = []
 
-        for thisFile in recentlyLoadedFiles:
+        for thisFile in recently_loaded_files:
             self.recentLoadActions.append(self.menuOpen_recent.addAction(thisFile))  # add action to list
             self.recentLoadActions[-1].triggered.connect(self.loadRecentFileSlot)  # link it to a slot
             # NOTE: tried the lambda approach but it always assigns the last file name to the list to all signals
@@ -553,8 +552,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.removeIngredientByName(objectName)
 
         # Get ingredient of this class from the ingredients package
-        ingredientClassObj = getattr(getattr(ingredients, kind), kind) # make an ingredient of type "kind"
-        self.ingredientList.append(ingredientClassObj(
+        ingredient_class_obj = getattr(getattr(ingredients, kind), kind)  # make an ingredient of type "kind"
+        self.ingredientList.append(ingredient_class_obj(
                             parent=self,
                             fnameAbsPath=fname,
                             data=data,
@@ -579,7 +578,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.initialiseAxes()
 
-    def removeIngredientByName(self,objectName):
+    def removeIngredientByName(self, objectName):
         """
         Finds ingredient by name and removes it from the list
         """
@@ -590,16 +589,16 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 print("lasagna.removeIngredientByType finds no ingredients in list!")
             return
 
-        removedIngredient = False
+        removed_ingredient = False
         for thisIngredient in self.ingredientList[:]:
             if thisIngredient.objectName == objectName:
                 if verbose:
                     print(('Removing ingredient ' + objectName))
                 self.removeIngredient(thisIngredient)
-                self.selectedStackName() # Ensures something is highlighted
-                removedIngredient = True
+                self.selectedStackName()  # Ensures something is highlighted
+                removed_ingredient = True
 
-        if not removedIngredient and verbose:
+        if not removed_ingredient and verbose:
             print(("** Failed to remove ingredient %s **" % objectName))
             return False
         return True
@@ -625,11 +624,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Return a list of ingredient objectNames
         """
-        ingredientNames = [] 
+        ingredient_names = []
         for thisIngredient in self.ingredientList:
-            ingredientNames.append(thisIngredient.objectName)
+            ingredient_names.append(thisIngredient.objectName)
 
-        return ingredientNames
+        return ingredient_names
 
     def returnIngredientByType(self, ingredientType):
         """
@@ -641,18 +640,18 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 print("returnIngredientByType finds no ingredients in list!")
             return False
 
-        returnedIngredients = []
+        returned_ingredients = []
         for thisIngredient in self.ingredientList:
             if thisIngredient.__module__.endswith(ingredientType):  # TODO: fix this so we look for it by instance not name
-                returnedIngredients.append(thisIngredient)
+                returned_ingredients.append(thisIngredient)
 
-        if verbose and not returnedIngredients:
+        if verbose and not returned_ingredients:
             print(("returnIngredientByType finds no ingredients with type " + ingredientType))
             return False
         else:
-            return returnedIngredients
+            return returned_ingredients
 
-    def returnIngredientByName(self,objectName):
+    def returnIngredientByName(self, objectName):
         """
         Return a specific ingredient object based upon its object name.
         Returns False if the ingredient was not found
@@ -663,9 +662,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 print("returnIngredientByName finds no ingredients in list!")
             return False
 
-        for thisIngredient in self.ingredientList:
-            if thisIngredient.objectName == objectName:
-                return thisIngredient
+        for ingredient in self.ingredientList:
+            if ingredient.objectName == objectName:
+                return ingredient
 
         if verbose:
             print(("returnIngredientByName finds no ingredient called " + objectName))
@@ -732,7 +731,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def viewZ_spinBoxes_slot(self):
         self.initialiseAxes()
 
-    def markerSymbol_comboBox_slot(self,index):
+    def markerSymbol_comboBox_slot(self, index):
         symbol = str(self.markerSymbol_comboBox.currentText())
         ingredient = self.returnIngredientByName(self.selectedPointsName())
         if not ingredient:
@@ -781,8 +780,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # Highlight the first row if nothing is selected (which shouldn't ever happen)
         if not self.points_TreeView.selectedIndexes():
-            firstItem  = self.points_Model.index(0, 0)
-            self.points_TreeView.setCurrentIndex(firstItem)
+            first_item = self.points_Model.index(0, 0)
+            self.points_TreeView.setCurrentIndex(first_item)
             print("lasagna.selectedStackName forced highlighting of first image stack")
 
         return self.points_TreeView.selectedIndexes()[0].data()
@@ -806,9 +805,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def saveLayerPoints_Slot(self):
         """call ingredient save method if any"""
         obj_name = self.selectedPointsName()
-        ingr = self.returnIngredientByName(obj_name)
-        if hasattr(ingr, 'save'):
-            ingr.save()
+        ingredient = self.returnIngredientByName(obj_name)
+        if hasattr(ingredient, 'save'):
+            ingredient.save()
         else:
             print('no save method for "{}"'.format(obj_name))
 
@@ -816,9 +815,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Remove a points ingredient and list item
         """
-        objName = self.selectedPointsName()
-        self.removeIngredientByName(objName)
-        print(("removed " + objName))
+        obj_name = self.selectedPointsName()
+        self.removeIngredientByName(obj_name)
+        print(("removed " + obj_name))
 
     def pointsLayers_TreeView_slot(self):
         """
@@ -865,11 +864,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Loops through all displayed image stacks and flips the axes
         """
-        imageStacks = self.returnIngredientByType('imagestack')
-        if not imageStacks:
+        image_stacks = self.returnIngredientByType('imagestack')
+        if not image_stacks:
             return
 
-        for thisStack in imageStacks:
+        for thisStack in image_stacks:
             thisStack.flipAlongAxis(axisToFlip)
 
         self.initialiseAxes()
@@ -885,7 +884,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # them from the other two. However, if all three axes are not explicitly removed I've
         # seen peculiar behavior with plugins that query the PlotWidgets. RAAC 21/07/2015
 
-        self.runHook(self.hooks['removeCrossHairs_Start']) # This will be run each time a plot is updated
+        self.runHook(self.hooks['removeCrossHairs_Start'])  # This will be run each time a plot is updated
 
         if not self.showCrossHairs:
             return
@@ -909,7 +908,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.crossHairVLine.setPen(220, 200, 0, 180)
             self.crossHairHLine.setPen(220, 200, 0, 180)
 
-        self.crossHairVLine.setPos(self.mouseX+0.5) # Add 0.5 to add line to middle of pixel
+        self.crossHairVLine.setPos(self.mouseX+0.5)  # Add 0.5 to add line to middle of pixel
         self.crossHairHLine.setPos(self.mouseY+0.5)
 
     def updateStatusBar(self):
@@ -917,41 +916,41 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Update the text on the status bar based on the current mouse position
         """
 
-        X = self.mouseX
-        Y = self.mouseY
+        x = self.mouseX
+        y = self.mouseY
 
         # get pixels under image
-        imageItems = self.axes2D[self.inAxis].getPlotItemByType('ImageItem')
-        pixelValues = []
+        image_items = self.axes2D[self.inAxis].getPlotItemByType('ImageItem')
+        pixel_values = []
 
         # Get the pixel intensity of all displayed image layers under the mouse
         # The following assumes that images have their origin at (0,0)
-        for thisImageItem in imageItems:
-            imShape = thisImageItem.image.shape
+        for thisImageItem in image_items:
+            im_shape = thisImageItem.image.shape
 
-            if X < 0 or Y < 0:
-                pixelValues.append(0)
-            elif X >= imShape[0] or Y >= imShape[1]:
-                pixelValues.append(0)
+            if x < 0 or y < 0:
+                pixel_values.append(0)
+            elif x >= im_shape[0] or y >= im_shape[1]:
+                pixel_values.append(0)
             else:
-                pixelValues.append(thisImageItem.image[X, Y])
+                pixel_values.append(thisImageItem.image[x, y])
 
         # Build a text string to house these values
-        valueStr = ''
-        while pixelValues:
-            valueStr = valueStr + '%d,' % pixelValues.pop()
+        value_str = ''
+        while pixel_values:
+            value_str += '%d,' % pixel_values.pop()
 
-        valueStr = valueStr[:-1]  # Chop off the last character
+        value_str = value_str[:-1]  # Chop off the last character
 
-        self.statusBarText = "X=%d, Y=%d, val=[%s]" % (X, Y, valueStr)
+        self.statusBarText = "X=%d, Y=%d, val=[%s]" % (x, y, value_str)
 
         self.runHook(self.hooks['updateStatusBar_End'])  # Hook goes here to modify or append message
 
         self.statusBar.showMessage(self.statusBarText)
 
     def axisClicked(self, event):
-        axisID = self.sender().axisID
-        self.runHook(self.hooks['axisClicked'], self.axes2D[axisID])
+        axis_id = self.sender().axisID
+        self.runHook(self.hooks['axisClicked'], self.axes2D[axis_id])
 
     def updateMainWindowOnMouseMove(self, axis):
         """
@@ -976,13 +975,13 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         also see: self.initialiseAxes
         """
-        ing = self.returnIngredientByName(self.selectedStackName())
-        if not ing:  # TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
+        ingredient = self.returnIngredientByName(self.selectedStackName())
+        if not ingredient:  # TODO: when the last image stack is deleted there is an error that is caught by this if statement a more elegant solution would be nice
             self.intensityHistogram.clear()
             return
 
-        x = ing.histogram['x']
-        y = ing.histogram['y']
+        x = ingredient.histogram['x']
+        y = ingredient.histogram['y']
 
         # Plot the histogram
         if self.logYcheckBox.isChecked():
@@ -992,11 +991,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.intensityHistogram.clear()
         ingredient = self.returnIngredientByName(self.selectedStackName())  # Get colour of the layer
 
-        brushColor = ingredient.histBrushColor()
-        penColor = ingredient.histPenColor()
+        brush_color = ingredient.histBrushColor()
+        pen_color = ingredient.histPenColor()
 
         # Using stepMode=True causes the plot to draw two lines for each sample but it needs X to be longer than Y by 1
-        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, pen=penColor, brush=brushColor, yMin=0, xMin=0)
+        self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, pen=pen_color, brush=brush_color, yMin=0, xMin=0)
         self.intensityHistogram.showGrid(x=True, y=True, alpha=0.33)
 
         # The object that represents the plotted intensity range is only set up the first time the
@@ -1008,8 +1007,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.plottedIntensityRegionObj.sigRegionChanged.connect(self.updateAxisLevels)  # link signal slot
 
         # Get the plotted range and apply to the region object
-        minMax = self.returnIngredientByName(self.selectedStackName()).minMax
-        self.setIntensityRange(minMax)
+        min_max = self.returnIngredientByName(self.selectedStackName()).minMax
+        self.setIntensityRange(min_max)
 
         # Add to the ViewBox but exclude it from auto-range calculations.
         self.intensityHistogram.addItem(self.plottedIntensityRegionObj, ignoreBounds=True)
@@ -1042,7 +1041,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         menu = QtGui.QMenu()
 
-        changeColorMenu = QtGui.QMenu("Change color", self)
+        change_color_menu = QtGui.QMenu("Change color", self)
 
         # action.triggered.connect(self.changeImageStackColorMap_Slot)
 
@@ -1050,9 +1049,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             action = QtGui.QAction(thisColor, self)
             # action.triggered.connect(lambda: self.changeImageStackColorMap_Slot(thisColor))
             action.triggered.connect(self.changeImageStackColorMap_Slot)
-            changeColorMenu.addAction(action)
+            change_color_menu.addAction(action)
 
-        menu.addAction(changeColorMenu.menuAction())
+        menu.addAction(change_color_menu.menuAction())
 
         action = QtGui.QAction("Delete", self)
         action.triggered.connect(self.deleteLayerStack_Slot)
@@ -1068,8 +1067,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Change the color map of an image stack using methods in the imagestack ingredient
         """
         color = str(self.sender().text())
-        objName = self.selectedStackName()
-        self.returnIngredientByName(objName).lut = color
+        obj_name = self.selectedStackName()
+        self.returnIngredientByName(obj_name).lut = color
         self.initialiseAxes()
         self.runHook(self.hooks['changeImageStackColorMap_Slot_End'])
 
@@ -1078,29 +1077,29 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Remove an imagestack ingredient and list item
         """
-        objName = self.selectedStackName()
-        self.removeIngredientByName(objName)
-        print(("removed " + objName))
+        obj_name = self.selectedStackName()
+        self.removeIngredientByName(obj_name)
+        print(("removed " + obj_name))
         self.runHook(self.hooks['deleteLayerStack_Slot_End'])
 
     def saveLayerStack_Slot(self):
         """call stack save method"""
-        objName = self.selectedStackName()
-        ingr = self.returnIngredientByName(objName)
-        if hasattr(ingr, 'save'):
-            ingr.save()
+        obj_name = self.selectedStackName()
+        ingredient = self.returnIngredientByName(obj_name)
+        if hasattr(ingredient, 'save'):
+            ingredient.save()
         else:
-            print('no save method for {}'.format(objName))
+            print('no save method for {}'.format(obj_name))
 
     def stacksInTreeList(self):
         """
         Goes through the list of image stack layers in the QTreeView list
         and pull out the names.
         """
-        stacks=[]
-        for ii in range(self.imageStackLayers_Model.rowCount()):
-            stackName = self.imageStackLayers_Model.index(ii, 0).data()
-            stacks.append(stackName)
+        stacks = []
+        for i in range(self.imageStackLayers_Model.rowCount()):
+            stack_name = self.imageStackLayers_Model.index(i, 0).data()
+            stacks.append(stack_name)
 
         if stacks:
             return stacks
@@ -1116,9 +1115,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             return False
 
         # Highlight the first row if nothing is selected (which shouldn't ever happen)
-        if len(self.imageStackLayers_TreeView.selectedIndexes()) == 0:
-            firstItem = self.imageStackLayers_Model.index(0, 0)
-            self.imageStackLayers_TreeView.setCurrentIndex(firstItem)
+        if not self.imageStackLayers_TreeView.selectedIndexes():
+            first_item = self.imageStackLayers_Model.index(0, 0)
+            self.imageStackLayers_TreeView.setCurrentIndex(first_item)
             print("lasagna.selectedStackName forced highlighting of first image stack")
 
         return self.imageStackLayers_TreeView.selectedIndexes()[0].data()
@@ -1144,24 +1143,24 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # Slots relating to updating of the axes, etc
     def updateAxisLevels(self):
         # TODO: Decide what to do with minMax. Setting it here by directly manipulating the item seems wrong
-        minX, maxX = self.plottedIntensityRegionObj.getRegion()
+        min_x, max_x = self.plottedIntensityRegionObj.getRegion()
 
         # Get all imagestacks
-        allImageStacks = self.returnIngredientByType('imagestack')
-        if not allImageStacks:
+        all_image_stacks = self.returnIngredientByType('imagestack')
+        if not all_image_stacks:
             return
 
         # Loop through all imagestacks and set their levels in each axis
-        for thisImageStack in allImageStacks:
-            objectName = thisImageStack.objectName
+        for img_stack in all_image_stacks:
+            object_name = img_stack.objectName
 
-            if objectName != self.selectedStackName():  # TODO: LAYERS
+            if object_name != self.selectedStackName():  # TODO: LAYERS
                 continue
 
             for thisAxis in self.axes2D:
-                img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view, objectName)
-                img.setLevels([minX, maxX])  # Sets levels immediately
-                thisImageStack.minMax = [minX, maxX]  # ensures levels stay set during all plot updates that follow
+                img = lasHelp.findPyQtGraphObjectNameInPlotWidget(thisAxis.view, object_name)
+                img.setLevels([min_x, max_x])  # Sets levels immediately
+                img_stack.minMax = [min_x, max_x]  # ensures levels stay set during all plot updates that follow
 
     def mouseMoved(self, evt):
         """
@@ -1170,32 +1169,32 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not self.stacksInTreeList():
             return
 
-        axisID = self.sender().axisID
+        axis_id = self.sender().axisID
 
         pos = evt[0]
         self.removeCrossHairs()
         if not(QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
-            self.axes2D[axisID].view.getViewBox().controlDrag = False
+            self.axes2D[axis_id].view.getViewBox().controlDrag = False
 
-        if self.axes2D[axisID].view.sceneBoundingRect().contains(pos):
+        if self.axes2D[axis_id].view.sceneBoundingRect().contains(pos):
             if self.showCrossHairs:
-                self.axes2D[axisID].view.addItem(self.crossHairVLine, ignoreBounds=True)
-                self.axes2D[axisID].view.addItem(self.crossHairHLine, ignoreBounds=True)
+                self.axes2D[axis_id].view.addItem(self.crossHairVLine, ignoreBounds=True)
+                self.axes2D[axis_id].view.addItem(self.crossHairHLine, ignoreBounds=True)
 
-            (self.mouseX, self.mouseY) = self.axes2D[axisID].getMousePositionInCurrentView(pos)
+            self.mouseX, self.mouseY = self.axes2D[axis_id].getMousePositionInCurrentView(pos)
             # Record the current axis in which the mouse is in and the position of the mouse in the stack
-            self.inAxis = axisID
-            voxelPosition = [self.axes2D[axisID].currentSlice, self.mouseX, self.mouseY]
-            if axisID == 1:
-                voxelPosition = [voxelPosition[1], voxelPosition[0], voxelPosition[2]]
-            elif axisID == 2:
-                voxelPosition = [voxelPosition[2], voxelPosition[1], voxelPosition[0]]
+            self.inAxis = axis_id
+            voxel_position = [self.axes2D[axis_id].currentSlice, self.mouseX, self.mouseY]
+            if axis_id == 1:
+                voxel_position = [voxel_position[1], voxel_position[0], voxel_position[2]]
+            elif axis_id == 2:
+                voxel_position = [voxel_position[2], voxel_position[1], voxel_position[0]]
 
-            self.mousePositionInStack = voxelPosition
+            self.mousePositionInStack = voxel_position
 
-            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[axisID].view.getViewBox().controlDrag:
-                self.axes2D[axisID].updateDisplayedSlices_2D(self.ingredientList, (self.mouseX, self.mouseY))
-            self.updateMainWindowOnMouseMove(self.axes2D[axisID])
+            if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier and self.axes2D[axis_id].view.getViewBox().controlDrag:
+                self.axes2D[axis_id].updateDisplayedSlices_2D(self.ingredientList, (self.mouseX, self.mouseY))
+            self.updateMainWindowOnMouseMove(self.axes2D[axis_id])
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1207,24 +1206,24 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
 
     # Data from command line input if the user specified this
     if imStackFnamesToLoad is not None:
-        for thisFname in imStackFnamesToLoad:
-            print(("Loading stack " + thisFname))
-            tasty.loadImageStack(thisFname)
+        for fname in imStackFnamesToLoad:
+            print(("Loading stack " + fname))
+            tasty.loadImageStack(fname)
 
     if sparsePointsToLoad is not None:
-        for thisFname in sparsePointsToLoad:
-            print(("Loading points " + thisFname))
-            tasty.loadActions['sparse_point_reader'].showLoadDialog(thisFname)
+        for fname in sparsePointsToLoad:
+            print(("Loading points " + fname))
+            tasty.loadActions['sparse_point_reader'].showLoadDialog(fname)
 
     if linesToLoad is not None:
-        for thisFname in linesToLoad:
-            print(("Loading lines " + thisFname))
-            tasty.loadActions['lines_reader'].showLoadDialog(thisFname)
+        for fname in linesToLoad:
+            print(("Loading lines " + fname))
+            tasty.loadActions['lines_reader'].showLoadDialog(fname)
 
-    if treesToLoad is not None:
-        for thisFname in treesToLoad:
-            print(("Loading tree " + thisFname))
-            tasty.loadActions['tree_reader'].showLoadDialog(thisFname)
+    if TREES_TO_LOAD is not None:
+        for fname in TREES_TO_LOAD:
+            print(("Loading tree " + fname))
+            tasty.loadActions['tree_reader'].showLoadDialog(fname)
 
     tasty.initialiseAxes()
 
@@ -1240,13 +1239,13 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
     # connect views to the mouseMoved slot. After connection this runs in the background.
     proxies = []
     for i in range(3):
-        thisProxy = pg.SignalProxy(tasty.axes2D[i].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
-        thisProxy.axisID = i  # this is picked up the mouseMoved slot
-        proxies.append(thisProxy)
+        proxy = pg.SignalProxy(tasty.axes2D[i].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
+        proxy.axisID = i  # this is picked up the mouseMoved slot
+        proxies.append(proxy)
 
-        thisProxy = pg.SignalProxy(tasty.axes2D[i].view.getViewBox().mouseClicked, rateLimit=30, slot=tasty.axisClicked)
-        thisProxy.axisID = i  # this is picked up the mouseMoved slot
-        proxies.append(thisProxy)
+        proxy = pg.SignalProxy(tasty.axes2D[i].view.getViewBox().mouseClicked, rateLimit=30, slot=tasty.axisClicked)
+        proxy.axisID = i  # this is picked up the mouseMoved slot
+        proxies.append(proxy)
 
     if embedConsole:
         from IPython import embed
@@ -1257,5 +1256,5 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
 
 # Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(imStackFnamesToLoad=imStackFnamesToLoad, sparsePointsToLoad=sparsePointsToLoad, linesToLoad=linesToLoad,
-         pluginToStart=pluginToStart, embedConsole=args.C)
+    main(imStackFnamesToLoad=IM_STACK_FNAMES_TO_LOAD, sparsePointsToLoad=SPARSE_POINTS_TO_LOAD, linesToLoad=LINES_TO_LOAD,
+         pluginToStart=PLUGIN_TO_START, embedConsole=args.C)
