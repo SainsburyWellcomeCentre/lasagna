@@ -20,35 +20,49 @@ from lasagna.utils import preferences, path_utils
 #   *General methods*
 # The methods in this section are the ones that are called by by Lasagna or are called by other
 # functions in this module. They determine the correct loader methods, etc, for the file format 
-# so that Lasagna doesn't have to know about this. 
+# so that Lasagna doesn't have to know about this.
 
-def loadStack(fname):
+DATA_TYPES = {
+    'float': 'f',
+    'double': 'd',
+    'long': 'l',
+    'ulong': 'L',
+    'char': 'c',
+    'uchar': 'B',
+    'short': 'h',
+    'ushort': 'H',
+    'int': 'i',
+    'uint': 'I'
+}
+
+
+def load_stack(fname):
     """
-    loadStack determines the data type from the file extension determines what data are to be
+    load_stack determines the data type from the file extension determines what data are to be
     loaded and chooses the approproate function to return the data.
     """
     if fname.lower().endswith('.tif') or fname.lower().endswith('.tiff'):
-        return loadTiffStack(fname)
+        return load_tiff_stack(fname)
     elif fname.lower().endswith('.mhd'):
-        return mhdRead(fname)
+        return mhd_read(fname)
     elif fname.lower().endswith('.nrrd') or fname.lower().endswith('.nrd'):
-        return nrrdRead(fname)
+        return nrrd_read(fname)
     else:
         print("\n\n*{} NOT LOADED. DATA TYPE NOT KNOWN\n\n".format(fname))
 
 
-def saveStack(fname, data, format='tif'):
+def save_stack(fname, data, fmt='tif'):
     """Save the image data
     Works only for tif for now
     """
-    format = format.lower().strip().strip('.')
-    if format in ['tif', 'tiff']:
-        saveTiffStack(fname, data)
+    fmt = fmt.lower().strip().strip('.')
+    if fmt in ('tif', 'tiff'):
+        save_tiff_stack(fname, data)
     else:
         raise NotImplementedError
 
 
-def imageFilter():
+def image_filter():
     """
     Returns a string defining the filter for the Qt Loader dialog.
     As image formats are added (or removed) from this module, this
@@ -57,27 +71,28 @@ def imageFilter():
     return "Images (*.mhd *.tiff *.tif *.nrrd *.nrd)"
 
 
-def getVoxelSpacing(fname, fallBackMode=False):
+def get_voxel_spacing(fname, fall_back_mode=False):
     """
     Attempts to get the voxel spacing in all three dimensions. This allows us to set the axis
     ratios automatically. TODO: Currently this will only work for MHD files, but we may be able
     to swing something for TIFFs (e.g. by creating Icy-like metadata files)
     """
     if fname.lower().endswith('.mhd'):
-        return mhd_getRatios(fname)
+        return mhd_get_ratios(fname)
     if fname.lower().endswith('.nrrd') or fname.lower().endswith('.nrd'):
-        return nrrd_getRatios(fname)
+        return nrrd_get_ratios(fname)
     else:
         return preferences.readPreference('defaultAxisRatios')  # defaults
 
 
-def spacingToRatio(spacing):
+def spacing_to_ratio(spacing):
     """
     Takes a vector of axis spacings and converts it to ratios
     so Lasagna can plot the images correctly
     Expects spacing to have a length of 3
     """
-    assert len(spacing) == 3
+    if len(spacing) != 3:
+        raise ValueError('Spacing should have a length of 3, got {} with length {}'.format(spacing, len(spacing)))
 
     ratios = [0, 0, 0]
     ratios[0] = spacing[0] / spacing[1]
@@ -88,18 +103,20 @@ def spacingToRatio(spacing):
 
 # -------------------------------------------------------------------------------------------
 #   *TIFF handling methods*
-def loadTiffStack(fname, useLibTiff=False):
+def load_tiff_stack(fname, use_lib_tiff=False):
     """
     Read a TIFF stack.
     We're using tifflib by default as, right now, only this works when the application is compile on Windows. [17/08/15]
     Bugs: known to fail with tiffs produced by Icy [23/07/15]
     """
-    if not os.path.exists(fname):
-        print("imageStackLoader.loadTiffStack can not find %s" % fname)
+    if not check_file_exists(fname, 'load_tiff_stack'):
         return
 
-    if useLibTiff:
-        from libtiff import TIFFfile
+    if use_lib_tiff:
+        try:
+            from libtiff import TIFFfile
+        except ImportError:  # Suppresses error in IDE when libtiff not installed
+            raise
         tiff = TIFFfile(fname)
         samples, sample_names = tiff.get_samples()  # we should have just one
         print("Loading:\n" + tiff.get_info() + " with libtiff\n")
@@ -114,10 +131,10 @@ def loadTiffStack(fname, useLibTiff=False):
     return im
 
 
-def saveTiffStack(fname, data, useLibTiff=False):
+def save_tiff_stack(fname, data, use_lib_tiff=False):
     """Save data in file fname
     """
-    if useLibTiff:
+    if use_lib_tiff:
         raise NotImplementedError
     from tifffile import imsave
     imsave(str(fname), data.swapaxes(1, 2))
@@ -125,13 +142,13 @@ def saveTiffStack(fname, data, useLibTiff=False):
 
 # -------------------------------------------------------------------------------------------
 #   *MHD handling methods*
-def mhdRead(fname, fallBackMode=False):
+def mhd_read(fname, fall_back_mode=False):
     """
     Read an MHD file using either VTK (if available) or the slower-built in reader
     if fallBackMode is true we force use of the built-in reader
     """
 
-    if not fallBackMode:
+    if not fall_back_mode:
         # Attempt to load vtk
         try:
             imp.find_module('vtk')
@@ -139,10 +156,10 @@ def mhdRead(fname, fallBackMode=False):
             from vtk.util.numpy_support import vtk_to_numpy
         except ImportError:
             print("Failed to find VTK. Falling back to built in (but slower) MHD reader")
-            fallBackMode = True
+            fall_back_mode = True
 
-    if fallBackMode:
-        return mhdRead_fallback(fname)
+    if fall_back_mode:
+        return mhd_read_fallback(fname)
     else:
         # use VTK
         imr = vtk.vtkMetaImageReader()
@@ -155,40 +172,38 @@ def mhdRead(fname, fallBackMode=False):
         sc = im.GetPointData().GetScalars()
         a = vtk_to_numpy(sc)
         a = a.reshape(z, cols, rows)
-        a = a.swapaxes(1,2)
+        a = a.swapaxes(1, 2)
         print("Using VTK to read MHD image of size: cols: %d, rows: %d, layers: %d" % (rows, cols, z))
         return a
 
 
-def mhdWrite(imStack, fname):
+def mhd_write(im_stack, fname):
     """
     Write MHD file, updating both the MHD and raw file.
     imStack - is the image stack volume ndarray
     fname - is the absolute path to the mhd file.
     """
-    imStack = np.swapaxes(imStack, 1, 2)
-    out = mhd_write_raw_file(imStack, fname)
+    im_stack = np.swapaxes(im_stack, 1, 2)
+    out = mhd_write_raw_file(im_stack, fname)
     if not out:
         return False
     else:
         info = out
 
     # Write the mhd header file, as it may have been modified
-    print("Saving image of size %s" % str(imStack.shape))
+    print("Saving image of size %s" % str(im_stack.shape))
     mhd_write_header_file(fname, info)
     return True
 
 
-def mhdRead_fallback(fname):
+def mhd_read_fallback(fname):
     """
     Read the header file from the MHA file then use this to
     build a 3D stack from the raw file
 
     fname should be the name of the mhd (header) file
     """
-
-    if not os.path.exists(fname):
-        print("mha_read can not find file %s" % fname)
+    if not check_file_exists(fname, 'mhd_read_fallback'):
         return False
     else:
         info = mhd_read_header_file(fname)
@@ -196,12 +211,12 @@ def mhdRead_fallback(fname):
             print("No data extracted from header file")
             return False
 
-    if not ('dimsize' in info):
+    if 'dimsize' not in info:
         print("Can not find dimension size information in MHD file. Not importing data")
         return False
 
     # read the raw file
-    if not ('elementdatafile' in info):
+    if 'elementdatafile' not in info:
         print("Can not find the data file as the key 'elementdatafile' does not exist in the MHD file")
         return False
 
@@ -214,63 +229,17 @@ def mhd_read_raw_file(fname, header):
     CAUTION: this may not adhere to MHD specs! Report bugs to author.
     """
 
-    if 'headersize' in header:
-        if header['headersize']>0:
-            print("\n\n **MHD reader can not currently cope with header information in .raw file. "
-                  "Contact the author** \n\n")
-            return False
+    if 'headersize' in header and header['headersize'] > 0:
+        print("\n\n **MHD reader can not currently cope with header information in .raw file. "
+              "Contact the author** \n\n")
+        return False
 
     # Set the endian type correctly
-    if 'byteorder' in header:
-        if header['byteorder'].lower == 'true':
-            endian = '>'  # big endian
-        else:
-            endian = '<'  # little endian
-    else:
-        endian = '<'  # little endian
+    endian = '<'  # default little endian
+    if 'byteorder' in header and header['byteorder'].lower == 'true':
+        endian = '>'  # big endian
 
-    # Set the data type correctly
-    if 'datatype' in header:
-        datatype = header['datatype'].lower()
-
-        if datatype == 'float':
-            format_type = 'f'
-        elif datatype == 'double':
-            format_type = 'd'
-        elif datatype == 'long':
-            format_type = 'l'
-        elif datatype == 'ulong':
-            format_type = 'L'
-        elif datatype == 'char':
-            format_type = 'c'
-        elif datatype == 'uchar':
-            format_type = 'B'
-        elif datatype == 'short':
-            format_type = 'h'
-        elif datatype == 'ushort':
-            format_type = 'H'
-        elif datatype == 'int':
-            format_type = 'i'
-        elif datatype == 'uint':
-            format_type = 'I'
-        else:
-            format_type = False
-
-    else:
-        format_type = False
-
-    # If we couldn't find it, look in the ElenentType field
-    if not format_type:
-        if 'elementtype' in header:
-            datatype = header['elementtype'].lower()
-
-            if datatype == 'met_short':
-                format_type = 'h'
-            else:
-                format_type = False
-    else:
-        format_type = False
-
+    format_type = get_format_type_from_mhd_header(header)
     if not format_type:
         print("\nCan not find data format type in MHD file. **CONTACT AUTHOR**\n")
         return False
@@ -278,13 +247,13 @@ def mhd_read_raw_file(fname, header):
     path_to_file = path_utils.stripTrailingFileFromPath(fname)
     print(header['elementdatafile'])   # TODO: CLEAN THIS SHIT
 
-    rawFname = os.path.join(path_to_file, header['elementdatafile'])
-    with open(rawFname, 'rb') as fid:
+    raw_fname = os.path.join(path_to_file, header['elementdatafile'])
+    with open(raw_fname, 'rb') as fid:
         data = fid.read()
     
     dim_size = header['dimsize']
     # from: http://stackoverflow.com/questions/26542345/reading-data-from-a-16-bit-unsigned-big-endian-raw-image-file-in-python
-    fmt = endian + str(int(np.prod(dim_size))) + format_type
+    fmt = '{}{}{}'.format(endian, (int(np.prod(dim_size))), format_type)
     pix = np.asarray(struct.unpack(fmt, data))
 
     # Round it to keep python 3 happy
@@ -293,7 +262,31 @@ def mhd_read_raw_file(fname, header):
     return pix.reshape((dim_size[2], dim_size[1], dim_size[0])).swapaxes(1, 2)
 
 
-def mhd_write_raw_file(imStack, fname, info=None):
+def get_format_type_from_mhd_header(header):
+    # Set the data type correctly
+    if 'datatype' in header:
+        datatype = header['datatype'].lower()
+        try:
+            format_type = DATA_TYPES[datatype]
+        except KeyError:
+            format_type = False
+    else:
+        format_type = False
+
+    # If we couldn't find it, look in the ElenentType field
+    if not format_type:
+        if 'elementtype' in header:
+            datatype = header['elementtype'].lower()
+            if datatype == 'met_short':
+                format_type = 'h'
+            else:
+                format_type = False
+    else:
+        format_type = False
+    return format_type
+
+
+def mhd_write_raw_file(im_stack, fname, info=None):
     """
     Write raw MHD file.
     imStack - is the image stack volume ndarray
@@ -314,12 +307,12 @@ def mhd_write_raw_file(imStack, fname, info=None):
         return False
 
     # replace the stack dimension sizes in the info stack in case the user changed this
-    info['dimsize'] = imStack.shape[::-1]  # We need to flip the list for some reason
+    info['dimsize'] = im_stack.shape[::-1]  # We need to flip the list for some reason
 
     # TODO: the endianness is not set here or defined in the MHD file. Does this matter?
     try:
         with open(path_to_raw, 'wb') as fid:
-            fid.write(bytearray(imStack.ravel()))
+            fid.write(bytearray(im_stack.ravel()))
         return info
     except IOError:
         print("Failed to write raw file in mhd_write_raw_file")
@@ -340,7 +333,7 @@ def mhd_read_header_file(fname):
     info = dict()  # header data stored here
 
     for line in contents.split('\n'):
-        if len(line) == 0:
+        if not line:
             continue
 
         m = re.match('\A(\w+)', line)
@@ -371,10 +364,7 @@ def mhd_read_header_file(fname):
         # So we return these as a list or a single number. We convert everything to float just in
         # case it's not an integer.
         data = data.split(' ')
-        numbers = []
-        for number in data:
-            if len(number) > 0:
-                numbers.append(float(number))
+        numbers = [float(nb) for nb in data if len(nb) > 0]
 
         # If the list has just one number we return an int
         if len(numbers) == 1:
@@ -387,7 +377,8 @@ def mhd_read_header_file(fname):
 
 def mhd_write_header_file(fname, info):
     """
-    This is a quick and very dirty, *SIMPLE*, mhd header writer. It can only cope with the fields hard-coded described below.
+    This is a quick and very dirty, *SIMPLE*, mhd header writer.
+    It can only cope with the fields hard-coded described below.
     """
 
     file_str = ''  # Build a string that we will write to a file
@@ -423,12 +414,11 @@ def mhd_write_header_file(fname, info):
         fid.write(file_str)
 
 
-def mhd_getRatios(fname):
+def mhd_get_ratios(fname):
     """
     Get relative axis ratios from MHD file defined by fname
     """
-    if not os.path.exists(fname):
-        print("imageStackLoader.mhd_getRatios can not find %s" % fname)
+    if not check_file_exists(fname, mhd_get_ratios):
         return
     
     try:
@@ -454,17 +444,16 @@ def mhd_getRatios(fname):
         print("Failed to find spacing valid spacing info in MHA file. Using default axis length values")
         return preferences.readPreference('defaultAxisRatios')  # defaults
   
-    return spacingToRatio(spacing)
+    return spacing_to_ratio(spacing)
 
 
 # -------------------------------------------------------------------------------------------
 #   *NRRD handling methods*
-def nrrdRead(fname):
+def nrrd_read(fname):
     """
     Read NRRD file
     """
-    if not os.path.exists(fname):
-        print("imageStackLoader.nrrdRead can not find %s" % fname)
+    if not check_file_exists(fname, 'nrrd_read'):
         return
 
     import nrrd
@@ -472,12 +461,11 @@ def nrrdRead(fname):
     return data.swapaxes(1, 2)
 
 
-def nrrdHeaderRead(fname):
+def nrrd_header_read(fname):
     """
     Read NRRD header
     """
-    if not os.path.exists(fname):
-        print("imageStackLoader.nrrdHeaderRead can not find {}".format(fname))
+    if not check_file_exists(fname, 'nrrd_header_read'):
         return
 
     import nrrd
@@ -487,19 +475,26 @@ def nrrdHeaderRead(fname):
     return header
 
 
-def nrrd_getRatios(fname):
+def nrrd_get_ratios(fname):
     """
     Get the aspect ratios from the NRRD file
     """
-    if not os.path.exists(fname):
-        print("imageStackLoader.nrrd_getRatios can not find {}".format(fname))
+    if not check_file_exists(fname, 'nrrd_get_rations'):
         return
 
-    header = nrrdHeaderRead(fname)
+    header = nrrd_header_read(fname)
     ax_sizes = header['space directions']
 
     spacing = []
     for i in range(len(ax_sizes)):
         spacing.append(ax_sizes[i][i])
 
-    return spacingToRatio(spacing)
+    return spacing_to_ratio(spacing)
+
+
+def check_file_exists(file_path, source_function_name):
+    if not os.path.exists(file_path):
+        print("image_stack_loader.{} can not find {}".format(file_path, source_function_name))
+        return False
+    else:
+        return True

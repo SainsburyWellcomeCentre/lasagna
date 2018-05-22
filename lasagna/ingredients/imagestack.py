@@ -8,7 +8,7 @@ import numpy as np
 import pyqtgraph as pg
 from PyQt5 import QtGui, QtCore
 
-from lasagna.io_libs.image_stack_loader import saveStack
+from lasagna.io_libs.image_stack_loader import save_stack
 from lasagna.lasagna_ingredient import lasagna_ingredient
 
 
@@ -254,7 +254,7 @@ class imagestack(lasagna_ingredient):
             path = QtGui.QFileDialog.getSaveFileName(self.parent, 'File to save {}'.format(self.objectName))
         if not path:
             return
-        saveStack(path, self.raw_data())
+        save_stack(path, self.raw_data())
         print(('%s saved as %s' % (self.objectName, path)))
 
     # ---------------------------------------------------------------

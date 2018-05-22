@@ -192,7 +192,7 @@ class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, area_namer_UI.Ui_area_na
         self.data['labels'] = self.loadLabels(paths['labels'])
 
         # Load the raw image data but do not display it.
-        self.data['atlas'] = image_stack_loader.loadStack(paths['atlas'])
+        self.data['atlas'] = image_stack_loader.load_stack(paths['atlas'])
 
         self.data['currentlyLoadedAtlasName'] = paths['atlas'].split(os.path.sep)[-1]
 
@@ -215,7 +215,7 @@ class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, area_namer_UI.Ui_area_na
         self.data['labels'] = self.loadLabels(paths['labels'])
 
         # load the selected atlas (without displaying it)
-        self.data['atlas'] = image_stack_loader.loadStack(fnameToLoad)
+        self.data['atlas'] = image_stack_loader.load_stack(fnameToLoad)
 
         self.data['currentlyLoadedAtlasName'] = fnameToLoad.split(os.path.sep)[-1]
 

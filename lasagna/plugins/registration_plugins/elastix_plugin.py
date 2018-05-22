@@ -268,7 +268,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  #
         orig_button_text = self.saveModifiedMovingStack.text()
         self.saveModifiedMovingStack.setText('SAVING') #TODO: bug - this text does not appear
 
-        return_val = image_stack_loader.mhdWrite(im_stack, self.originalMovingFname)
+        return_val = image_stack_loader.mhd_write(im_stack, self.originalMovingFname)
         
         if return_val:
             self.saveModifiedMovingStack.setEnabled(False)
