@@ -4,11 +4,13 @@ This class overlays points on top of the image stacks.
 
 
 import numpy as np
-from lasagna.lasagna_ingredient import lasagna_ingredient
-from PyQt5 import QtGui, QtCore
-from lasagna import lasagna_helperFunctions as lasHelp
-from matplotlib import cm
 from numpy import linspace
+from matplotlib import cm
+
+from PyQt5 import QtGui, QtCore
+
+from lasagna.lasagna_ingredient import lasagna_ingredient
+from lasagna import lasagna_helperFunctions as lasHelp
 
 
 class sparsepoints(lasagna_ingredient):
