@@ -371,4 +371,4 @@ class Ui_elastixMain(object):
         self.showOriginalMovingImage_radioButton.setText(_translate("elastixMain", "Show &Original Moving Image"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("elastixMain", "Results"))
 
-import elastix_plugin_rc
+from lasagna.registrationPlugins import elastix_plugin_rc

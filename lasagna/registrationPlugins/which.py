@@ -4,8 +4,11 @@ Returns path to an executable if it exists. otherwise returns None
 http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
 """
 
+import os
+
+
 def which(program):
-    import os
+
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
@@ -19,7 +22,4 @@ def which(program):
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
                 return exe_file
-
     return None
-
-

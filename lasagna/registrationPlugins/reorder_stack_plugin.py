@@ -1,24 +1,24 @@
 """
 A simple plugin just to change the order of the slices
 """
-
-from lasagna_plugin import lasagna_plugin
-import reorder_stack_UI
-import selectstack_UI
 from PyQt5 import QtGui
 
+from lasagna.lasagna_plugin import lasagna_plugin
+from lasagna.registrationPlugins import reorder_stack_UI
+from lasagna.registrationPlugins import selectstack_UI
 
-class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #must inherit lasagna_plugin first
 
-    def __init__(self,lasagna,parent=None):
-        super(plugin,self).__init__(lasagna) #This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  # must inherit lasagna_plugin first
 
-        #re-define some default properties that were originally defined in lasagna_plugin
-        self.pluginShortName='Reorder stack' #Appears on the menu
-        self.pluginLongName='manually reorder a stack' #Can be used for other purposes (e.g. tool-tip)
-        self.pluginAuthor='Antonin Blot'
+    def __init__(self, lasagna, parent=None):
+        super(plugin, self).__init__(lasagna)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
 
-        #Create widgets defined in the designer file
+        # re-define some default properties that were originally defined in lasagna_plugin
+        self.pluginShortName = 'Reorder stack'  # Appears on the menu
+        self.pluginLongName = 'manually reorder a stack'  # Can be used for other purposes (e.g. tool-tip)
+        self.pluginAuthor = 'Antonin Blot'
+
+        # Create widgets defined in the designer file
         self.setupUi(self)
         self.show()
         self.initialise()
@@ -40,7 +40,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
         for i in range(nslices):
             self.listWidget.addItem('slice %i'%i)
 
-
     def move_up(self):
         """moves selected slices up
         """
@@ -52,11 +51,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
         elif len(indice) != 1:
             raise IOError('Should not accept multiple selection. Change UI')
         indice = indice[0]
-        if indice==0:
+        if indice == 0:
             print('already first')
             return
         item = self.listWidget.takeItem(indice)
-        self.listWidget.insertItem(indice-1,item)
+        self.listWidget.insertItem(indice-1, item)
         self.listWidget.setCurrentRow(indice-1)
 
     def move_down(self):
@@ -67,11 +66,11 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
         elif len(indice) != 1:
             raise IOError('Should not accept multiple selection. Change UI')
         indice = indice[0]
-        if indice== self.listWidget.count()-1:
+        if indice == self.listWidget.count()-1:
             print('already last')
             return
         item = self.listWidget.takeItem(indice)
-        self.listWidget.insertItem(indice+1,item)
+        self.listWidget.insertItem(indice+1, item)
         self.listWidget.setCurrentRow(indice+1)
 
     def update_plot(self, current=None, previous=None):
@@ -99,7 +98,6 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
             axis.updatePlotItems_2D(self.lasagna.ingredientList,
                                     sliceToPlot=int(item.text().split(' ')[1]))
 
-
     def doit(self):
         stk_list = [st.objectName for st in self.lasagna.returnIngredientByType('imagestack')]
         dlg = SelectStack(self, stk_list)
@@ -113,15 +111,14 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
             print('Nothing selected, do nothing')
             return
 
-        order =  [self.listWidget.item(i) for i in range(self.listWidget.count())]
+        order = [self.listWidget.item(i) for i in range(self.listWidget.count())]
         order = [int(l.text().split(' ')[1]) for l in order]
         for stck_name in values:
             stk = self.lasagna.returnIngredientByName(str(stck_name))
-            stk._data = stk._data[order,:,:]
+            stk._data = stk._data[order, :, :]
         self.initialise()
 
-
-    #The following methods are involved in shutting down the plugin window
+    # The following methods are involved in shutting down the plugin window
     def closePlugin(self):
         """
         This method is called by lasagna when the user unchecks the plugin in the menu.
@@ -129,22 +126,20 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack): #
         self.detachHooks()
         self.close()
 
-
-
-    #We define this here because we can't assume all plugins will have QWidget::closeEvent
+    # We define this here because we can't assume all plugins will have QWidget::closeEvent
     def closeEvent(self, event):
         """
         This event is executed when the user presses the close window (cross) button in the title bar
         """
-        self.lasagna.stopPlugin(self.__module__) #This will call self.closePlugin
-        self.lasagna.pluginActions[self.__module__].setChecked(False) #Uncheck the menu item associated with this plugin's name
+        self.lasagna.stopPlugin(self.__module__)  # This will call self.closePlugin
+        self.lasagna.pluginActions[self.__module__].setChecked(False)  # Uncheck the menu item associated with this plugin's name
         self.deleteLater()
         event.accept()
 
 
-class SelectStack(QtGui.QDialog, selectstack_UI.Ui_selectStack): #must inherit lasagna_plugin first)
+class SelectStack(QtGui.QDialog, selectstack_UI.Ui_selectStack):  # must inherit lasagna_plugin first)
     def __init__(self, parent=None, stack_list=[]):
-        super(SelectStack, self).__init__(parent) #This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+        super(SelectStack, self).__init__(parent)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
         self.setupUi(self)
 
         for st in stack_list:
