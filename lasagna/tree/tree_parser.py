@@ -8,7 +8,7 @@ from lasagna.tree.tree import Tree
 from lasagna.utils import data_type_from_string
 
 
-def parse_file(fname, displayTree=False, colSep=',', headerLine=None, verbose=False):
+def parse_file(fname, display_tree=False, col_sep=',', header_line=None, verbose=False):
     """
     Import tree data from a CSV (text) file or list. 
 
@@ -47,13 +47,13 @@ def parse_file(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
         contents = fname  # assume that fname is data rather than a file name
 
     # Get header data if present
-    if headerLine is None:
+    if header_line is None:
         header = contents.pop(0)
-        header = header.rstrip('\n').split(colSep)
-    elif isinstance(headerLine, str):
-        header = headerLine.rstrip('\n').split(colSep)
-    elif isinstance(headerLine, list):
-        header = headerLine
+        header = header.rstrip('\n').split(col_sep)
+    elif isinstance(header_line, str):
+        header = header_line.rstrip('\n').split(col_sep)
+    elif isinstance(header_line, list):
+        header = header_line
     else:
         header = False
 
@@ -62,7 +62,7 @@ def parse_file(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
         if not line:
             continue
 
-        data_line = line.split(colSep)
+        data_line = line.split(col_sep)
         if len(header) != len(data_line):
             print("\nTree file appears corrupt! header length is %d but data line length is %d."
                   "\ntree.tree_parser.parse_file is aborting.\n" % (len(header), len(data_line)))
@@ -92,7 +92,7 @@ def parse_file(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
         tree[thisNode[0]].data = thisNode[2]
 
     # Optionally dump the tree to screen (unlikely to be useful for large trees)
-    if displayTree:
+    if display_tree:
         tree.display(0)
         for node_id in tree.traverse(0):
             print("%s - %s" % (node_id, tree[node_id].data))

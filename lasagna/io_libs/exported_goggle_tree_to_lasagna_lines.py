@@ -8,7 +8,7 @@ This module imports this file and turns it into a format suitable
 for plotting in lasagna. i.e. into a line series format:
 line series #, z, x, y
 Where each line series is one segment from the tree. This is 
-produced using tree.findSegments, which returns all unique segments 
+produced using tree.find_segments, which returns all unique segments
 such that only nodes at the end of each segment are duplicated. 
 
 Processed text is dumped to standard output by default unless
@@ -58,7 +58,7 @@ data_tree = importData(fname, headerLine=['id', 'parent', 'z', 'x', 'y'])
 
 # Get the unique segments of each tree
 paths = []
-for segment in data_tree.findSegments():
+for segment in data_tree.find_segments():
     paths.append(segment)
 
 

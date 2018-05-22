@@ -85,14 +85,14 @@ class loaderClass(LasagnaPlugin):
                 if verbose:
                     print("tree_reader_plugin.showLoadDialog - importing %s" % fname)
 
-                data_tree = tree_parser.parse_file(fname, headerLine=['id', 'parent', 'z', 'x', 'y'], verbose=verbose)
+                data_tree = tree_parser.parse_file(fname, header_line=['id', 'parent', 'z', 'x', 'y'], verbose=verbose)
                 if not data_tree:
                     print("No data loaded from %s" % fname)
                     return
 
                 # We now have an array of unique paths (segments)
                 paths = []
-                for thisSegment in data_tree.findSegments():
+                for thisSegment in data_tree.find_segments():
                     paths.append(thisSegment)
 
                 as_list = []  # list of list data (one item per node)

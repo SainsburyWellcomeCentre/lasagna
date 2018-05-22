@@ -3,80 +3,80 @@ from lasagna.tree.tree import Tree
 # Generate an example if run from the command line
 if __name__ == '__main__':
 
-    (_ROOT, _DEPTH, _WIDTH) = list(range(3))
+    _ROOT, _DEPTH, _WIDTH = list(range(3))
 
     print("\n\n   --------- Tree of life --------- \n")
-    treeOfLife = Tree()
+    tree_of_life = Tree()
 
-    treeOfLife.add_node("Life")  # root node
-    treeOfLife.add_node("Archaebacteria", "Life")
-    treeOfLife.add_node("Eukaryotes", "Life")
-    treeOfLife.add_node("Protista", "Eukaryotes")
-    treeOfLife.add_node("Plants", "Eukaryotes")
-    treeOfLife.add_node("Fungi", "Eukaryotes")
-    treeOfLife.add_node("Algae", "Plants")
-    treeOfLife.add_node("Mosses", "Plants")
-    treeOfLife.add_node("Ferns", "Plants")
-    treeOfLife.add_node("Animals", "Eukaryotes")
-    treeOfLife.add_node("Sponges", "Animals")
-    treeOfLife.add_node("Flatworms", "Animals")
-    treeOfLife.add_node("Arthropods", "Animals")
-    treeOfLife.add_node("Insects", "Arthropods")
-    treeOfLife.add_node("Crustaceans", "Arthropods")
-    treeOfLife.add_node("Vertebrates", "Animals")
-    treeOfLife.add_node("Fish", "Vertebrates")
-    treeOfLife.add_node("Amphibians", "Vertebrates")
-    treeOfLife.add_node("Reptiles", "Vertebrates")
-    treeOfLife.add_node("Mammals", "Vertebrates")
+    tree_of_life.add_node("Life")  # root node
+    tree_of_life.add_node("Archaebacteria", "Life")
+    tree_of_life.add_node("Eukaryotes", "Life")
+    tree_of_life.add_node("Protista", "Eukaryotes")
+    tree_of_life.add_node("Plants", "Eukaryotes")
+    tree_of_life.add_node("Fungi", "Eukaryotes")
+    tree_of_life.add_node("Algae", "Plants")
+    tree_of_life.add_node("Mosses", "Plants")
+    tree_of_life.add_node("Ferns", "Plants")
+    tree_of_life.add_node("Animals", "Eukaryotes")
+    tree_of_life.add_node("Sponges", "Animals")
+    tree_of_life.add_node("Flatworms", "Animals")
+    tree_of_life.add_node("Arthropods", "Animals")
+    tree_of_life.add_node("Insects", "Arthropods")
+    tree_of_life.add_node("Crustaceans", "Arthropods")
+    tree_of_life.add_node("Vertebrates", "Animals")
+    tree_of_life.add_node("Fish", "Vertebrates")
+    tree_of_life.add_node("Amphibians", "Vertebrates")
+    tree_of_life.add_node("Reptiles", "Vertebrates")
+    tree_of_life.add_node("Mammals", "Vertebrates")
 
     # Add some data to the vertebrates
-    treeOfLife["Vertebrates"].data = 'they have backbones'
-    treeOfLife["Fish"].data = 'they swim'
-    treeOfLife["Amphibians"].data = 'they croak'
-    treeOfLife["Reptiles"].data = 'they stick to walls'
-    treeOfLife["Mammals"].data = 'they have udders'
+    tree_of_life["Vertebrates"].data = 'they have backbones'
+    tree_of_life["Fish"].data = 'they swim'
+    tree_of_life["Amphibians"].data = 'they croak'
+    tree_of_life["Reptiles"].data = 'they stick to walls'
+    tree_of_life["Mammals"].data = 'they have udders'
 
     print("List of nodes:")
-    print(list(treeOfLife.nodes.keys()))
+    print(list(tree_of_life.nodes.keys()))
     print("")
 
     print("Children of node 'Vertebrates'")
-    print(treeOfLife.nodes['Vertebrates'].children)
+    print(tree_of_life.nodes['Vertebrates'].children)
     print("")
 
-    print(treeOfLife.display('Life'))
+    print(tree_of_life.display('Life'))
 
     print("\n***** Depth-first *****")
-    for nodeID in treeOfLife.traverse("Life"):
-        print(nodeID)
+    for node_id in tree_of_life.traverse("Life"):
+        print(node_id)
 
     print("\n***** Width-first *****")
-    for nodeID in treeOfLife.traverse("Life", mode=_WIDTH):
-        print(nodeID)
+    for node_id in tree_of_life.traverse("Life", mode=_WIDTH):
+        print(node_id)
 
     print("\n***** Width-first of all data in vertebrates *****")
-    for nodeID in treeOfLife.traverse("Vertebrates", mode=_WIDTH):
-        print("%s - %s" % (nodeID, treeOfLife[nodeID].data))
+    for node_id in tree_of_life.traverse("Vertebrates", mode=_WIDTH):
+        print("%s - %s" % (node_id, tree_of_life[node_id].data))
 
     print("\nLeaves:")
-    print(treeOfLife.findLeaves('Life'))
+    print(tree_of_life.find_leaves('Life'))
 
     print("\nBranches:")
-    print(treeOfLife.findBranches('Life'))
+    print(tree_of_life.find_branches('Life'))
 
     print("\nPath to root from Fish:")
-    print(treeOfLife.pathToRoot('Fish'))
+    print(tree_of_life.path_to_root('Fish'))
 
     # - - - - - - -
     print("\n\n   --------- Tree of Fibonacci numbers --------- \n")
-    treeOfN = Tree()
+    tree_of_n = Tree()
 
-    treeOfN.add_node(1)  # root node
-    treeOfN.add_node(2, 1)
-    treeOfN.add_node(3, 2)
-    treeOfN.add_node(5, 3)
-    treeOfN.add_node(8, 5)
-    treeOfN.add_node(13, 8)
-    treeOfN.add_node(21, 13)
+    tree_of_n.add_node(1)  # root node
+    tree_of_n.add_node(2, 1)
+    tree_of_n.add_node(3, 2)
+    tree_of_n.add_node(5, 3)
+    tree_of_n.add_node(8, 5)
+    tree_of_n.add_node(13, 8)
+    tree_of_n.add_node(21, 13)
 
-    treeOfN.display(1)
+    tree_of_n.display(1)

@@ -56,13 +56,13 @@ class Tree(object):
             elif mode == _WIDTH:
                 queue = queue[1:] + expansion  # width-first
 
-    def isLeaf(self, identifier):
+    def is_leaf(self, identifier):
         """
         Is the node indexed by 'identifier' a leaf?
         returns True or False
         """
         n = 0
-        for nodeID in self.traverse(identifier):
+        for node_id in self.traverse(identifier):
             n += 1
             if n > 1:
                 break
@@ -72,23 +72,23 @@ class Tree(object):
         else:
             return False
 
-    def findLeaves(self, fromNode=0):
+    def find_leaves(self, from_node=0):
         """
         Returns a list of nodes that are leaves, searching from
         the node "fromNode". To find all leaves, fromNode should
         be the root node.
         """
-        return [node_id for node_id in self.traverse(fromNode) if self.isLeaf(node_id)]
+        return [node_id for node_id in self.traverse(from_node) if self.is_leaf(node_id)]
 
-    def findBranches(self, fromNode=0):
+    def find_branches(self, from_node=0):
         """
         Is the node indexed by 'identifier' a branch?
         A branch is defined as a node with more than two children
         To find all branches, fromNode should be the root node.
         """
-        return [node_id for node_id in self.traverse(fromNode) if self.nodes[node_id].isbranch()]
+        return [node_id for node_id in self.traverse(from_node) if self.nodes[node_id].is_branch()]
 
-    def findSegments(self, linkSegments=1, nodeID=0, segments=()):  # FIXME: nodeID to node_ids
+    def find_segments(self, link_segments=1, node_ids=0, segments=()):
         """
         Return a list containing all unique segments of the tree
 
@@ -98,28 +98,28 @@ class Tree(object):
         """
         # print "Calling find segments with nodeID %d" % nodeID
 
-        if linkSegments and nodeID > 0:
-            _path = [self.nodes[nodeID].parent]
+        if link_segments and node_ids > 0:
+            _path = [self.nodes[node_ids].parent]
         else:
             _path = []
 
-        if isinstance(nodeID, int):
-            nodeID = [nodeID]
+        if isinstance(node_ids, int):
+            node_ids = [node_ids]
 
-        while len(nodeID) == 1:
+        while len(node_ids) == 1:
             # print "appending node %d" % nodeID[0]
-            _path.append(nodeID[0])
-            nodeID = self.nodes[nodeID[0]].children
+            _path.append(node_ids[0])
+            node_ids = self.nodes[node_ids[0]].children
 
         segments = segments + (_path,)  # Store this segment
 
         # Go into the branches with a recursive call
-        for node in nodeID:
-            segments = self.findSegments(linkSegments, node, segments)
+        for node in node_ids:
+            segments = self.find_segments(link_segments, node, segments)
 
         return segments
 
-    def pathToRoot(self, fromNode):
+    def path_to_root(self, from_node):
         """
         Path from node "fromNode" to the tree's root
         To achieve this we simply need to follow the tree back by looking
@@ -127,8 +127,8 @@ class Tree(object):
         trivial and quick. No nee to exhaustively search the tree for the
         fastest path.
         """
-        current_node = fromNode
-        path = [fromNode]
+        current_node = from_node
+        path = [from_node]
         while self.nodes[current_node].parent is not None:
             path.append(self.nodes[current_node].parent)
             current_node = self.nodes[current_node].parent

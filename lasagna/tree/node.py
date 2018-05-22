@@ -27,7 +27,7 @@ class Node(object):
     def add_child(self, identifier):
         self.__children.append(identifier)
 
-    def isbranch(self):
+    def is_branch(self):
         """
         Is this node a branch?
         A branch is defined as a node with more than two children

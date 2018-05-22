@@ -66,6 +66,6 @@ if __name__ == '__main__':
     if return_tree:
         from lasagna.tree import tree_parser
 
-        tree_parser.parse_file(flattened_ara_tree.split('\n'), colSep='|', displayTree=True, headerLine=header)
+        tree_parser.parse_file(flattened_ara_tree.split('\n'), col_sep='|', display_tree=True, header_line=header)
     else:
         print(flattened_ara_tree)
