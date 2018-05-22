@@ -62,9 +62,9 @@ class imagestack(lasagna_ingredient):
         if isinstance(cmap, np.ndarray):  # In order to allow the user to set an arbitrary color map array to lut
             return cmap
 
-        validCmaps = ['gray', 'red', 'green', 'blue']
+        valid_cmaps = ('gray', 'red', 'green', 'blue')
         if not cmap:
-            print("valid color maps are gray, red, and green")
+            print("valid color maps are {}".format(valid_cmaps))
             return
 
         pos = np.array([0.0, 1.0])

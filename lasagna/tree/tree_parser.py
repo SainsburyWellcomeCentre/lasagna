@@ -33,7 +33,7 @@ def parse_file(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
     headerLine - if True, the first line is stripped off and considered to be the column headings.
                 headerLine can also be a CSV string or a list that defines the column headings. Must have the
                 same number of columns as the rest of the file.
-    verbose - prints diagnositic info to screen if true
+    verbose - prints diagnostic info to screen if true
     """
     if verbose:
         print("tree.tree_parser.parse_file importing file %s" % fname)

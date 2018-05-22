@@ -9,7 +9,7 @@ the main main.py file and without bloating it much.
 import numpy as np
 
 
-def defaultHistRange(y, x):
+def default_hist_range(y, x):
     """
     Returns a reasonable values for the maximum plotted value.
     y - range of values from the intensity histogram
