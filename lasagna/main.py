@@ -709,8 +709,8 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.plotImageStackHistogram()
 
-        for ii in range(len(self.axisRatioLineEdits)):
-            self.axes2D[ii].view.setAspectLocked(True, float(self.axisRatioLineEdits[ii].text()))
+        for i in range(len(self.axisRatioLineEdits)):
+            self.axes2D[i].view.setAspectLocked(True, float(self.axisRatioLineEdits[i].text()))
 
         if resetAxes:
             self.resetAxes()
