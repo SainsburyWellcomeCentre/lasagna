@@ -187,13 +187,13 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Handle IO plugins. For instance these are the loaders that handle different data types
         # and different loading actions.
         lasagna_path = os.path.dirname(os.path.realpath(sys.argv[0]))
-        built_in_io_path = os.path.join(lasagna_path, 'IO')
+        built_in_io_path = os.path.join(lasagna_path, 'io_libs')
         io_paths = preferences.readPreference('IO_modulePaths')  # directories containing IO modules
         io_paths.append(built_in_io_path)
         io_paths = list(set(io_paths))  # remove duplicate paths
 
         print("Adding IO module paths to Python path")
-        io_plugins, io_plugin_paths = plugin_handler.findPlugins(io_paths)
+        io_plugins, io_plugin_paths = plugin_handler.find_plugins(io_paths)
         for p in io_paths:
             sys.path.append(p)  # append to system path
             print(p)
@@ -202,8 +202,8 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # TODO: currently we only have code to handle load actions as no save actions are available
         self.loadActions = {}  # actions must be attached to the lasagna object or they won't function
         for io_module in io_plugins:
-            io_class, io_name = plugin_handler.getPluginInstanceFromFileName(io_module,
-                                                                             attributeToImport='loaderClass')
+            io_class, io_name = plugin_handler.get_plugin_instance_from_file_name(io_module,
+                                                                                  attribute_to_import='loaderClass')
             if io_class is None:
                 continue
             this_instance = io_class(self)
@@ -275,7 +275,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
         plugin_paths = preferences.readPreference('pluginPaths')
 
-        plugins, plugin_paths = plugin_handler.findPlugins(plugin_paths)
+        plugins, plugin_paths = plugin_handler.find_plugins(plugin_paths)
         print("Adding plugin paths to Python path:")
         self.pluginSubMenus = {}
         for p in plugin_paths:  # print plugin paths to screen, add to path, add as sub-dir names in Plugins menu
@@ -293,7 +293,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.pluginActions = {}  # A dictionary where keys are plugin names and values are QActions associated with a plugin
         for plugin in plugins:
             # Get the module name and class
-            plugin_class, plugin_name = plugin_handler.getPluginInstanceFromFileName(plugin, None)
+            plugin_class, plugin_name = plugin_handler.get_plugin_instance_from_file_name(plugin, None)
             if plugin_class is None:
                 continue
 
@@ -349,7 +349,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # NOTE: plugins with a window do not run the following code when the window is closed. They should, however,
         # detach hooks (unless the plugin author forgot to do this)
         del(self.plugins[pluginName])
-        plugin_class, pluginName = plugin_handler.getPluginInstanceFromFileName(pluginName + ".py", None)
+        plugin_class, pluginName = plugin_handler.get_plugin_instance_from_file_name(pluginName + ".py", None)
         if plugin_class is None:
             return
         self.plugins[pluginName] = plugin_class.plugin
