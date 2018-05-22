@@ -19,7 +19,7 @@ import numpy as np
 from PyQt5 import QtGui
 
 from lasagna.plugins.lasagna_plugin import lasagna_plugin
-from lasagna.tree import importData
+from lasagna.tree import tree_parser
 
 
 class loaderClass(lasagna_plugin):
@@ -85,7 +85,7 @@ class loaderClass(lasagna_plugin):
                 if verbose:
                     print("tree_reader_plugin.showLoadDialog - importing %s" % fname)
 
-                data_tree = importData(fname, headerLine=['id', 'parent', 'z', 'x', 'y'], verbose=verbose)
+                data_tree = tree_parser.parse_file(fname, headerLine=['id', 'parent', 'z', 'x', 'y'], verbose=verbose)
                 if not data_tree:
                     print("No data loaded from %s" % fname)
                     return

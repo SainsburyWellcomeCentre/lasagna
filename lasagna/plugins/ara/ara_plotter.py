@@ -9,7 +9,7 @@ import pyqtgraph as pg
 # For contour drawing
 from skimage import measure
 
-from lasagna import tree
+from lasagna.tree import tree_parser
 # For handling the labels files
 from lasagna.io_libs import ara_json
 
@@ -41,17 +41,18 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
 
         if fname.lower().endswith('.csv'):
             col_sep = self.guessFileSep(fname)
-            return tree.importData(fname, colSep=col_sep)
+            return tree_parser.parse_file(fname, colSep=col_sep)
 
         if fname.lower().endswith('.json'):
             flattened, col_names = ara_json.importData(fname)
             table = flattened.split('\n')
-            return tree.importData(table, colSep='|', headerLine=col_names)
+            return tree_parser.parse_file(table, colSep='|', headerLine=col_names)
 
     def guessFileSep(self, fname):
         """
         Guess the file separator in file fname. [MAY BE ORPHANED]
         """
+        default_sep = ','  # Just return comma if nothing was found. At least we tried!
         with open(fname, 'r') as fid:
             contents = fid.read()
     
@@ -60,9 +61,7 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
         for separator in possible_separators:
             if contents.count(separator) >= n_lines:
                 return separator
-
-        # Just return comma if nothing was found. At least we tried!
-        return ','
+        return default_sep
 
     def defaultPrefs(self):
         """

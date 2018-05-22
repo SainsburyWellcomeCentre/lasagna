@@ -62,8 +62,8 @@ if __name__ == '__main__':
 
     # Optionally run flattened structure through tree
     if return_tree:
-        from lasagna import tree
+        from lasagna.tree import tree_parser
 
-        tree.importData(flattened.split('\n'), colSep='|', displayTree=True, headerLine=colNames)
+        tree_parser.parse_file(flattened.split('\n'), colSep='|', displayTree=True, headerLine=colNames)
     else:
         print(flattened)
