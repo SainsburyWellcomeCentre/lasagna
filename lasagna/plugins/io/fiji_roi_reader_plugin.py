@@ -1,14 +1,20 @@
 """
 Loads data from imagej/fiji ROIs or ROIs sets (zip files)
 
-Require ijroi from: https://github.com/tdsmith/ijroi/blob/master/ijroi/ijroi.py
+Requires ijroi from: https://github.com/tdsmith/ijroi/blob/master/ijroi/ijroi.py
 `pip install ijroi` to get it.
 
 
 """
 import os
+try:
+    import ijroi
+except ImportError:
+    print('fiji_roi_reader_plugin requires the ijroi module from:\n'
+          '  https://github.com/tdsmith/ijroi/blob/master/ijroi/ijroi.py.'
+          '  Use `pip install ijroi` to get it.')
+    raise
 
-import ijroi
 import numpy as np
 from PyQt5 import QtGui
 

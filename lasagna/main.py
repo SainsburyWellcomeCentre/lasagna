@@ -202,6 +202,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         for io_module in io_plugins:
             io_class, io_name = plugin_handler.getPluginInstanceFromFileName(io_module,
                                                                              attributeToImport='loaderClass')
+            if io_class is None:
+                continue
             this_instance = io_class(self)
             self.loadActions[this_instance.objectName] = this_instance
             print(("Added %s to load menu as object name %s" % (io_module, this_instance.objectName)))
@@ -290,6 +292,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         for plugin in plugins:
             # Get the module name and class
             plugin_class, plugin_name = plugin_handler.getPluginInstanceFromFileName(plugin, None)
+            if plugin_class is None:
+                continue
 
             # Get the name of the directory in which the plugin resides so we can add it to the right sub-menu
             dir_name = os.path.dirname(plugin_class.__file__).split(os.path.sep)[-1]
@@ -344,6 +348,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # detach hooks (unless the plugin author forgot to do this)
         del(self.plugins[pluginName])
         plugin_class, pluginName = plugin_handler.getPluginInstanceFromFileName(pluginName + ".py", None)
+        if plugin_class is None:
+            return
         self.plugins[pluginName] = plugin_class.plugin
 
     def runHook(self, hookArray, *args):

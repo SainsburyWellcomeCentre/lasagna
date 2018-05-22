@@ -41,7 +41,11 @@ def getPluginInstanceFromFileName(fileName, attributeToImport='plugin'):
     """
 
     module_name = os.path.splitext(fileName)[0]
-    imported_module = __import__(module_name)
+    try:
+        imported_module = __import__(module_name)
+    except ImportError:
+        print('Could not load module {}. Skipping.'.format(module_name))
+        return None, None
     if attributeToImport is not None:
         returned_attribute = getattr(imported_module, attributeToImport)
     else:
