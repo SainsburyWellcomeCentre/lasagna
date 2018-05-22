@@ -2,7 +2,7 @@
 Module to handle tree data. 
 Defines a tree and a node class as well as functions for importing data
 """
-import os.path
+import os
 
 from lasagna.utils import data_type_from_string
 

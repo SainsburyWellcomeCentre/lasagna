@@ -4,13 +4,13 @@ This class overlays points on top of the image stacks.
 
 
 import numpy as np
-from PyQt5 import QtGui, QtCore
-from matplotlib import cm
 from numpy import linspace
+from matplotlib import cm
 
-import lasagna.utils.preferences
+from PyQt5 import QtGui, QtCore
+
+from lasagna.utils import preferences
 from lasagna.lasagna_ingredient import lasagna_ingredient
-from lasagna.utils import lasagna_qt_helper_functions as lasHelp
 
 
 class sparsepoints(lasagna_ingredient):
@@ -20,7 +20,7 @@ class sparsepoints(lasagna_ingredient):
                                            )
 
         # Choose symbols from preferences file. TODO: in future could increment through so successive ingredients have different symbols and colors
-        self.symbol = lasagna.utils.preferences.readPreference('symbolOrder')[0]
+        self.symbol = preferences.readPreference('symbolOrder')[0]
         self.symbolSize = int(self.parent.markerSize_spinBox.value())
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = None  # Not used right now

@@ -8,7 +8,7 @@ plugin under construction
 
 """
 
-import os.path
+import os
 
 from PyQt5 import QtGui, QtCore
 
@@ -122,7 +122,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             # If we're here, this entry should at least have a valid atlas file and a valid labels file
             # We will index the self.paths dictionary by the name of the atlas file as this is also
             # what will be put into the combobox.
-            atlas_dir_name = path.split(os.path.sep)[-1]
+            atlas_dir_name = path.split(os.path.sep)[-1]  # FIXME: use os.path.dirname or basename
 
             # skip if a file with this name already exists
             if atlas_dir_name in self.paths:

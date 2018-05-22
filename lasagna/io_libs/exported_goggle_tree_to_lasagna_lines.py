@@ -26,10 +26,11 @@ exportedGoggleTree2LasagnaLines.py -f ./ingredients/exampleTreeDump.csv  > /tmp/
 
 import sys
 import os
+import argparse
+
 from lasagna.tree import importData
 
 # Parse command-line input arguments
-import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", help="File name to load")
 parser.add_argument("-p", help="Optionally plot tree", action="store_true")

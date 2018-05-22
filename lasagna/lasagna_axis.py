@@ -6,8 +6,8 @@ import pyqtgraph as pg
 
 
 from lasagna.ingredients.imagestack import imagestack as lasagna_imagestack
-from lasagna.utils import lasagna_qt_helper_functions as lasHelp
-from lasagna.utils.preferences import readPreference
+from lasagna.utils.lasagna_qt_helper_functions import find_pyqt_graph_object_name_in_plot_widget
+from lasagna.utils import preferences
 
 
 class projection2D():
@@ -30,10 +30,10 @@ class projection2D():
         print("Creating axis at " + str(thisPlotWidget.objectName()))
         self.view = thisPlotWidget  # This should target the axes to a particular plot widget
 
-        if readPreference('hideZoomResetButtonOnImageAxes'):
+        if preferences.readPreference('hideZoomResetButtonOnImageAxes'):
             self.view.hideButtons()
 
-        if readPreference('hideAxes'):
+        if preferences.readPreference('hideAxes'):
             self.view.hideAxis('left')
             self.view.hideAxis('bottom')               
 
@@ -192,9 +192,9 @@ class projection2D():
                     print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + ingredient.objectName)
 
                 ingredient.plotIngredient(
-                    pyqtObject=lasHelp.find_pyqt_graph_object_name_in_plot_widget(self.view,
-                                                                                  ingredient.objectName,
-                                                                                  verbose=verbose),
+                    pyqtObject=find_pyqt_graph_object_name_in_plot_widget(self.view,
+                                                                          ingredient.objectName,
+                                                                          verbose=verbose),
                     axisToPlot=self.axisToPlot,
                     sliceToPlot=self.currentSlice
                 )
@@ -209,9 +209,9 @@ class projection2D():
                     print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + ingredient.objectName)
 
                 ingredient.plotIngredient(
-                    pyqtObject=lasHelp.find_pyqt_graph_object_name_in_plot_widget(self.view,
-                                                                                  ingredient.objectName,
-                                                                                  verbose=verbose),
+                    pyqtObject=find_pyqt_graph_object_name_in_plot_widget(self.view,
+                                                                          ingredient.objectName,
+                                                                          verbose=verbose),
                     axisToPlot=self.axisToPlot,
                     sliceToPlot=self.currentSlice
                 )

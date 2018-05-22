@@ -1,6 +1,8 @@
-import json
 import os
 import sys
+
+import json
+
 """
 Dumps ARA JSON as a flattened file that we can feed into our tree reader
 """

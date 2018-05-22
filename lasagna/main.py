@@ -14,27 +14,26 @@ argparse
 tempfile
 urllib
 """
-import lasagna.utils.path_utils
-import lasagna.utils.preferences
 
 __author__ = "Rob Campbell"
 __license__ = "GPL v3"
 __maintainer__ = "Rob Campbell"
 
 
-# Parse command-line input arguments
-import argparse
-import os.path
+import os
 import sys
+import argparse
 
 import numpy as np
+
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
 
 # lasagna modules
 from lasagna import ingredients, lasagna_mainWindow, lasagna_axis
-from lasagna.utils import lasagna_qt_helper_functions as lasHelp
+from lasagna.utils.lasagna_qt_helper_functions import find_pyqt_graph_object_name_in_plot_widget
+from lasagna.utils import path_utils, preferences
 from lasagna.io_libs import image_stack_loader
 from lasagna.plugins import plugin_handler
 
@@ -42,6 +41,7 @@ from lasagna.plugins import plugin_handler
 # application on the Mac with py2app
 # import tifffile  # Used to load tiff and LSM files
 # import nrrd
+# Parse command-line input arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("-D", help="Load demo images", action="store_true")  # Store true makes it zero by default
 parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
@@ -99,12 +99,12 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.ingredientList = []
 
         # Set up GUI based on preferences
-        self.view1Z_spinBox.setValue(lasagna.utils.preferences.readPreference('defaultPointZSpread')[0])
-        self.view2Z_spinBox.setValue(lasagna.utils.preferences.readPreference('defaultPointZSpread')[1])
-        self.view3Z_spinBox.setValue(lasagna.utils.preferences.readPreference('defaultPointZSpread')[2])
-        self.markerSize_spinBox.setValue(lasagna.utils.preferences.readPreference('defaultSymbolSize'))
-        self.lineWidth_spinBox.setValue(lasagna.utils.preferences.readPreference('defaultLineWidth'))
-        self.markerAlpha_spinBox.setValue(lasagna.utils.preferences.readPreference('defaultSymbolOpacity'))
+        self.view1Z_spinBox.setValue(preferences.readPreference('defaultPointZSpread')[0])
+        self.view2Z_spinBox.setValue(preferences.readPreference('defaultPointZSpread')[1])
+        self.view3Z_spinBox.setValue(preferences.readPreference('defaultPointZSpread')[2])
+        self.markerSize_spinBox.setValue(preferences.readPreference('defaultSymbolSize'))
+        self.lineWidth_spinBox.setValue(preferences.readPreference('defaultLineWidth'))
+        self.markerAlpha_spinBox.setValue(preferences.readPreference('defaultSymbolOpacity'))
 
         # Set up axes
         # Turn axisRatioLineEdit_x elements into a list to allow functions to iterate across them
@@ -149,7 +149,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # UI elements updated during mouse moves over an axis
         self.crossHairVLine = None
         self.crossHairHLine = None
-        self.showCrossHairs = lasagna.utils.preferences.readPreference('showCrossHairs')
+        self.showCrossHairs = preferences.readPreference('showCrossHairs')
         self.mouseX = None
         self.mouseY = None
         self.inAxis = 0  # The axis the mouse is currently in [see mouseMoved()]
@@ -188,7 +188,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # and different loading actions.
         lasagna_path = os.path.dirname(os.path.realpath(sys.argv[0]))
         built_in_io_path = os.path.join(lasagna_path, 'IO')
-        io_paths = lasagna.utils.preferences.readPreference('IO_modulePaths')  # directories containing IO modules
+        io_paths = preferences.readPreference('IO_modulePaths')  # directories containing IO modules
         io_paths.append(built_in_io_path)
         io_paths = list(set(io_paths))  # remove duplicate paths
 
@@ -244,7 +244,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.points_TreeView.selectionModel().selectionChanged[QtCore.QItemSelection, QtCore.QItemSelection].connect(self.pointsLayers_TreeView_slot)
 
         # Settings boxes, etc, for the points (sparse data) ingredients
-        [self.markerSymbol_comboBox.addItem(pointType) for pointType in lasagna.utils.preferences.readPreference('symbolOrder')]  # populate with markers
+        [self.markerSymbol_comboBox.addItem(pointType) for pointType in preferences.readPreference('symbolOrder')]  # populate with markers
         self.markerSymbol_comboBox.activated.connect(self.markerSymbol_comboBox_slot)
         self.markerSize_spinBox.valueChanged.connect(self.markerSize_spinBox_slot)
         self.markerAlpha_spinBox.valueChanged.connect(self.markerAlpha_spinBox_slot)
@@ -273,7 +273,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # Plugins menu and initialisation
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
-        plugin_paths = lasagna.utils.preferences.readPreference('pluginPaths')
+        plugin_paths = preferences.readPreference('pluginPaths')
 
         plugins, plugin_paths = plugin_handler.findPlugins(plugin_paths)
         print("Adding plugin paths to Python path:")
@@ -413,7 +413,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # if more than one stack has been added, we will colour successive stacks according
         # to the colorOrder preference in the parameter file
         stacks = self.stacksInTreeList()
-        color_order = lasagna.utils.preferences.readPreference('colorOrder')
+        color_order = preferences.readPreference('colorOrder')
 
         if len(stacks) == 2:
             self.returnIngredientByName(stacks[0]).lut = color_order[0]
@@ -460,18 +460,18 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file',
-                                                  lasagna.utils.preferences.readPreference('lastLoadDir'),
+                                                  preferences.readPreference('lastLoadDir'),
                                                   fileFilter)[0]
         fname = str(fname)
         if len(fname) == 0:
             return None
 
         # Update last loaded directory
-        lasagna.utils.preferences.preferenceWriter('lastLoadDir', lasagna.utils.path_utils.stripTrailingFileFromPath(fname))
+        preferences.preferenceWriter('lastLoadDir', path_utils.stripTrailingFileFromPath(fname))
 
         # Keep a track of the last loaded files
-        recently_loaded = lasagna.utils.preferences.readPreference('recentlyLoadedFiles')
-        n = lasagna.utils.preferences.readPreference('numRecentFiles')
+        recently_loaded = preferences.readPreference('recentlyLoadedFiles')
+        n = preferences.readPreference('numRecentFiles')
 
         # Add to start of list
         recently_loaded.reverse()
@@ -484,7 +484,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # TODO: list will no longer have the most recent item first
         recently_loaded = list(set(recently_loaded))  # get remove repeats (i.e. keep only unique values)
 
-        lasagna.utils.preferences.preferenceWriter('recentlyLoadedFiles', recently_loaded)
+        preferences.preferenceWriter('recentlyLoadedFiles', recently_loaded)
         self.updateRecentlyOpenedFiles()
 
         self.runHook(self.hooks['showFileLoadDialog_End'])
@@ -495,7 +495,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Updates the list of recently opened files
         """
-        recently_loaded_files = lasagna.utils.preferences.readPreference('recentlyLoadedFiles')
+        recently_loaded_files = preferences.readPreference('recentlyLoadedFiles')
 
         # Remove existing actions if present
         if len(self.recentLoadActions) > 0 and len(recently_loaded_files) > 0:
@@ -1052,7 +1052,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # action.triggered.connect(self.changeImageStackColorMap_Slot)
 
-        for thisColor in lasagna.utils.preferences.readPreference('colorOrder'):
+        for thisColor in preferences.readPreference('colorOrder'):
             action = QtGui.QAction(thisColor, self)
             # action.triggered.connect(lambda: self.changeImageStackColorMap_Slot(thisColor))
             action.triggered.connect(self.changeImageStackColorMap_Slot)
@@ -1165,7 +1165,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 continue
 
             for thisAxis in self.axes2D:
-                img = lasHelp.find_pyqt_graph_object_name_in_plot_widget(thisAxis.view, object_name)
+                img = find_pyqt_graph_object_name_in_plot_widget(thisAxis.view, object_name)
                 img.setLevels([min_x, max_x])  # Sets levels immediately
                 img_stack.minMax = [min_x, max_x]  # ensures levels stay set during all plot updates that follow
 

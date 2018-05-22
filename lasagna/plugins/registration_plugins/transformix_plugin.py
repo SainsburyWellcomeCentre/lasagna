@@ -13,11 +13,10 @@ import time
 from PyQt5 import QtGui, QtCore
 
 import lasagna.utils.path_utils
-import lasagna.utils.preferences
+from lasagna.utils import preferences
 from lasagna.plugins.lasagna_plugin import lasagna_plugin
 from lasagna.plugins.registration_plugins import transformix_plugin_UI
 from lasagna.plugins.registration_plugins import which  # To test if binaries exist in system path
-from lasagna.utils import lasagna_qt_helper_functions as las_help
 
 
 class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin):  # must inherit lasagna_plugin first
@@ -99,7 +98,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             file_filter = "Images (*.mhd *.mha)"
             fname_to_choose = QtGui.QFileDialog.getOpenFileName(self,
                                                                 'Choose stack',
-                                                                lasagna.utils.preferences.readPreference('lastLoadDir'),
+                                                                preferences.readPreference('lastLoadDir'),
                                                                 file_filter)
             fname_to_choose = str(fname_to_choose)
         if os.path.exists(fname_to_choose):
@@ -110,7 +109,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             print("that file does not exits")
         
         self.checkIfReadyToRun()
-        lasagna.utils.preferences.preferenceWriter('lastLoadDir', lasagna.utils.path_utils.stripTrailingFileFromPath(fname_to_choose))
+        preferences.preferenceWriter('lastLoadDir', lasagna.utils.path_utils.stripTrailingFileFromPath(fname_to_choose))
         self.stackName_label.setText(fname_to_choose.split(os.path.sep)[-1])
 
     def chooseTransform_slot(self, fname_to_choose=False):
@@ -122,7 +121,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             file_filter = "Images (*.txt)"
             fname_to_choose = QtGui.QFileDialog.getOpenFileName(self,
                                                                 'Choose transform',
-                                                                lasagna.utils.preferences.readPreference('lastLoadDir'),
+                                                                preferences.readPreference('lastLoadDir'),
                                                                 file_filter)
             fname_to_choose = str(fname_to_choose)
 
@@ -134,7 +133,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             print("that file does not exits")
 
         self.checkIfReadyToRun()
-        lasagna.utils.preferences.preferenceWriter('lastLoadDir', lasagna.utils.path_utils.stripTrailingFileFromPath(fname_to_choose))
+        preferences.preferenceWriter('lastLoadDir', lasagna.utils.path_utils.stripTrailingFileFromPath(fname_to_choose))
         self.transformName_label.setText(fname_to_choose.split(os.path.sep)[-1])
 
     def selectOutputDir_slot(self):

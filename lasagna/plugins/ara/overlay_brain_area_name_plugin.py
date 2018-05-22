@@ -3,7 +3,7 @@
 Overlays brain area onto a registered sample brain without overlaying the atlas.
 """
 
-import os.path
+import os
 
 import numpy as np
 from PyQt5 import QtGui
@@ -68,11 +68,11 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         n = 1
         for path in self.prefs['ara_paths']:
             if not os.path.exists(path):
-                print("%s does not exist. skipping" % path) 
+                print("{} does not exist. skipping".format(path))
                 continue
 
             if not os.listdir(path):
-                print("No files in %s . skipping" % path)
+                print("No files in {}. skipping".format(path))
                 continue
 
             pths = dict(atlas='', labels='')
@@ -103,7 +103,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
             # If we're here, this entry should at least have a valid atlas file and a valid labels file
             # We will index the self.paths dictionary by the name of the atlas file as this is also
             # what will be put into the combobox.
-            atlas_dir_name = path.split(os.path.sep)[-1]
+            atlas_dir_name = path.split(os.path.sep)[-1]  # FIXME: use os.path.basename
 
             # skip if a file with this name already exists
             if atlas_dir_name in self.paths:
@@ -205,7 +205,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
             file_filter = "Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
             fnameToLoad = QtGui.QFileDialog.getOpenFileName(self,
                                                             'Open file',
-                                                            lasagna.utils.preferences.readPreference('lastLoadDir'),
+                                                            preferences.readPreference('lastLoadDir'),
                                                             file_filter)
             fnameToLoad = str(fnameToLoad[0])  # tuple with filter as 2nd value
 

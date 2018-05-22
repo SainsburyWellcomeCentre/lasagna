@@ -4,6 +4,7 @@ This class defines the basic imagestack and instructs lasagna as to how to handl
 
 
 import numpy as np
+
 import pyqtgraph as pg
 from PyQt5 import QtGui, QtCore
 

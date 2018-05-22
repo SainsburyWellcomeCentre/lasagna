@@ -3,7 +3,6 @@ Ingredients inherit this class
 """
 
 import os
-import pyqtgraph as pg
 from PyQt5 import QtGui, QtCore
 
 
