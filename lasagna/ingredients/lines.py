@@ -16,14 +16,13 @@ loads the data from the csv file, and calles lines.py
 import warnings  # to disable some annoying NaN-related warnings
 
 import numpy as np
-from numpy import linspace
-from matplotlib import cm
-
 import pyqtgraph as pg
 from PyQt5 import QtGui, QtCore
+from matplotlib import cm
+from numpy import linspace
 
+from lasagna.ingredients.lasagna_ingredient import lasagna_ingredient
 from lasagna.utils import preferences
-from lasagna.lasagna_ingredient import lasagna_ingredient
 
 
 class lines(lasagna_ingredient):
