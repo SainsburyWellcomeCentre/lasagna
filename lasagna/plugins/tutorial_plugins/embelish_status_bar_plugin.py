@@ -8,8 +8,8 @@ from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 class plugin(lasagna_plugin):
 
-    def __init__(self, lasagna):
-        super(plugin, self).__init__(lasagna)  # Run the constructor from lasagna_plugin with lasagna as an input argument
+    def __init__(self, lasagna_serving):
+        super(plugin, self).__init__(lasagna_serving)  # Run the constructor from lasagna_plugin with lasagna as an input argument
         # re-define some default properties that were originally defined in lasagna_plugin
         self.pluginShortName = 'Embelisher'  # Appears on the menu
         self.pluginLongName = 'status bar emblishment'  # Can be used for other purposes (e.g. tool-tip)

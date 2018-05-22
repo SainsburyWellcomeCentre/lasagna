@@ -13,11 +13,11 @@ from PyQt5 import QtGui, QtCore
 
 class alert(alert_UI.Ui_alertBox, QtGui.QWidget):
 
-    def __init__(self, lasagna, alertText="Alert!"):
+    def __init__(self, lasagna_serving, alertText="Alert!"):
         super(alert, self).__init__()
 
         self.alertText = alertText
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
 
         # Create widgets defined in the designer file
         self.setupUi(self)

@@ -15,10 +15,10 @@ from lasagna.io_libs import ara_json
 
 
 class ARA_plotter(object):  # must inherit lasagna_plugin first
-    def __init__(self, lasagna):
-        super(ARA_plotter, self).__init__(lasagna)
+    def __init__(self, lasagna_serving):
+        super(ARA_plotter, self).__init__(lasagna_serving)
        
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
         self.contourName = 'aracontour'  # The ingredient name for the ARA contour
 
     # --------------------------------------

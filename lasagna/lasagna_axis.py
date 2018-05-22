@@ -4,13 +4,15 @@ this file describes a class that handles the axis behavior for the lasagna viewe
 
 import pyqtgraph as pg
 
-from lasagna import lasagna_helperFunctions as lasHelp
+
 from lasagna.ingredients.imagestack import imagestack as lasagna_imagestack
+from lasagna.utils import lasagna_qt_helper_functions as lasHelp
+from lasagna.utils.preferences import readPreference
 
 
 class projection2D():
 
-    def __init__(self, thisPlotWidget, lasagna, axisName='', minMax=(0,1500), axisRatio=1, axisToPlot=0):
+    def __init__(self, thisPlotWidget, lasagna_serving, axisName='', minMax=(0, 1500), axisRatio=1, axisToPlot=0):
         """
         thisPlotWidget - the PlotWidget to which we will add the axes
         minMax - the minimum and maximum values of the plotted image. 
@@ -22,23 +24,23 @@ class projection2D():
         self.axisToPlot = axisToPlot  # the axis in 3D space that this view correponds to
         self.axisName = axisName
         # We can link this projection to two others
-        self.linkedXprojection=None
-        self.linkedYprojection=None
+        self.linkedXprojection = None
+        self.linkedYprojection = None
 
         print("Creating axis at " + str(thisPlotWidget.objectName()))
         self.view = thisPlotWidget  # This should target the axes to a particular plot widget
 
-        if lasHelp.readPreference('hideZoomResetButtonOnImageAxes'):
+        if readPreference('hideZoomResetButtonOnImageAxes'):
             self.view.hideButtons()
 
-        if lasHelp.readPreference('hideAxes'):
+        if readPreference('hideAxes'):
             self.view.hideAxis('left')
             self.view.hideAxis('bottom')               
 
-        self.view.setAspectLocked(True,axisRatio)
+        self.view.setAspectLocked(True, axisRatio)
 
         # Loop through the ingredients list and add them to the ViewBox
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
         self.items = []  # a list of added plot items TODO: check if we really need this
         self.addItemsToPlotWidget(self.lasagna.ingredientList)
 
@@ -190,9 +192,9 @@ class projection2D():
                     print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + ingredient.objectName)
 
                 ingredient.plotIngredient(
-                    pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,
-                                                                           ingredient.objectName,
-                                                                           verbose=verbose),
+                    pyqtObject=lasHelp.find_pyqt_graph_object_name_in_plot_widget(self.view,
+                                                                                  ingredient.objectName,
+                                                                                  verbose=verbose),
                     axisToPlot=self.axisToPlot,
                     sliceToPlot=self.currentSlice
                 )
@@ -207,9 +209,9 @@ class projection2D():
                     print("lasagna_axis.updatePlotItems_2D - plotting ingredient " + ingredient.objectName)
 
                 ingredient.plotIngredient(
-                    pyqtObject=lasHelp.findPyQtGraphObjectNameInPlotWidget(self.view,
-                                                                           ingredient.objectName,
-                                                                           verbose=verbose),
+                    pyqtObject=lasHelp.find_pyqt_graph_object_name_in_plot_widget(self.view,
+                                                                                  ingredient.objectName,
+                                                                                  verbose=verbose),
                     axisToPlot=self.axisToPlot,
                     sliceToPlot=self.currentSlice
                 )

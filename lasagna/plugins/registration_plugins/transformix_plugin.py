@@ -12,24 +12,28 @@ import time
 
 from PyQt5 import QtGui, QtCore
 
-from lasagna import lasagna_helperFunctions as las_help
+import lasagna.utils.path_utils
+import lasagna.utils.preferences
 from lasagna.plugins.lasagna_plugin import lasagna_plugin
 from lasagna.plugins.registration_plugins import transformix_plugin_UI
 from lasagna.plugins.registration_plugins import which  # To test if binaries exist in system path
+from lasagna.utils import lasagna_qt_helper_functions as las_help
 
 
 class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin):  # must inherit lasagna_plugin first
 
-    def __init__(self, lasagna, parent=None):
+    def __init__(self, lasagna_serving, parent=None):
 
-        super(plugin, self).__init__(lasagna)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+        super(plugin, self).__init__(lasagna_serving)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
 
         # Is the Transformix (or Elastix) binary in the system path?
         # We search for both in case we in the future add the ability to calculate inverse transforms and other good stuff
         if which('transformix') is None or which('elastix') is None:
             #TODO: does it stop properly? Will we have to uncheck and recheck the plugin menu item to get it to run a second time?
             from lasagna.alert import alert
-            self.alert = alert(lasagna, 'The elastix or transformix binaries do not appear to be in your path.<br>Not starting plugin.')
+            self.alert = alert(lasagna_serving,
+                               'The elastix or transformix binaries do not appear'
+                               ' to be in your path.<br>Not starting plugin.')
             self.lasagna.pluginActions[self.__module__].setChecked(False)  # Uncheck the menu item associated with this plugin's name
             self.deleteLater()
             return
@@ -95,7 +99,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             file_filter = "Images (*.mhd *.mha)"
             fname_to_choose = QtGui.QFileDialog.getOpenFileName(self,
                                                                 'Choose stack',
-                                                                las_help.readPreference('lastLoadDir'),
+                                                                lasagna.utils.preferences.readPreference('lastLoadDir'),
                                                                 file_filter)
             fname_to_choose = str(fname_to_choose)
         if os.path.exists(fname_to_choose):
@@ -106,7 +110,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             print("that file does not exits")
         
         self.checkIfReadyToRun()
-        las_help.preferenceWriter('lastLoadDir', las_help.stripTrailingFileFromPath(fname_to_choose))
+        lasagna.utils.preferences.preferenceWriter('lastLoadDir', lasagna.utils.path_utils.stripTrailingFileFromPath(fname_to_choose))
         self.stackName_label.setText(fname_to_choose.split(os.path.sep)[-1])
 
     def chooseTransform_slot(self, fname_to_choose=False):
@@ -118,7 +122,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             file_filter = "Images (*.txt)"
             fname_to_choose = QtGui.QFileDialog.getOpenFileName(self,
                                                                 'Choose transform',
-                                                                las_help.readPreference('lastLoadDir'),
+                                                                lasagna.utils.preferences.readPreference('lastLoadDir'),
                                                                 file_filter)
             fname_to_choose = str(fname_to_choose)
 
@@ -130,7 +134,7 @@ class plugin(lasagna_plugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix
             print("that file does not exits")
 
         self.checkIfReadyToRun()
-        las_help.preferenceWriter('lastLoadDir', las_help.stripTrailingFileFromPath(fname_to_choose))
+        lasagna.utils.preferences.preferenceWriter('lastLoadDir', lasagna.utils.path_utils.stripTrailingFileFromPath(fname_to_choose))
         self.transformName_label.setText(fname_to_choose.split(os.path.sep)[-1])
 
     def selectOutputDir_slot(self):

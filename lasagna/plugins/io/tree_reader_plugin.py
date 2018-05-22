@@ -23,10 +23,10 @@ from lasagna.tree import importData
 
 
 class loaderClass(lasagna_plugin):
-    def __init__(self, lasagna):
-        super(loaderClass, self).__init__(lasagna)
+    def __init__(self, lasagna_serving):
+        super(loaderClass, self).__init__(lasagna_serving)
 
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
         self.objectName = 'tree_reader'
         self.kind = 'lines'
 

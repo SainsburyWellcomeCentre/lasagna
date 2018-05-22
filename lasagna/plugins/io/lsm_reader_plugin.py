@@ -7,15 +7,15 @@ import os
 import tifffile
 from PyQt5 import QtGui
 
-from lasagna import lasagna_helperFunctions as lasHelp
+from lasagna.utils import preferences
 from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 
 class loaderClass(lasagna_plugin):
-    def __init__(self, lasagna):
-        super(loaderClass, self).__init__(lasagna)
+    def __init__(self, lasagna_serving):
+        super(loaderClass, self).__init__(lasagna_serving)
 
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
         self.objectName = 'LSM_reader'
         self.kind = 'imagestack'
         # Construct the QActions and other stuff required to integrate the load dialog into the menu
@@ -33,7 +33,6 @@ class loaderClass(lasagna_plugin):
 
         self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
 
-
     # Slots follow
     def showLoadDialog(self):
         """
@@ -45,7 +44,7 @@ class loaderClass(lasagna_plugin):
         if fname is None:
             return
 
-        color_order = lasHelp.readPreference('colorOrder')
+        color_order = preferences.readPreference('colorOrder')
         if os.path.isfile(fname): 
             im = tifffile.imread(str(fname))
             print("Found LSM stack with dimensions:")

@@ -19,15 +19,16 @@ from lasagna.plugins.registration_plugins import which  # To test if binaries ex
 
 class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  # must inherit lasagna_plugin first
 
-    def __init__(self, lasagna, parent=None):
+    def __init__(self, lasagna_serving, parent=None):
 
-        super(plugin, self).__init__(lasagna)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+        super(plugin, self).__init__(lasagna_serving)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
 
         # Is the Elastix binary in the system path?
         if which('elastix') is None:
             # TODO: does not stop properly. Have to uncheck and recheck the plugin menu item to get it to run a second time.
             from lasagna.alert import alert
-            self.alert = alert(lasagna, 'The elastix binary does not appear to be in your path.<br>Not starting plugin.')
+            self.alert = alert(lasagna_serving,
+                               'The elastix binary does not appear to be in your path.<br>Not starting plugin.')
             self.lasagna.pluginActions[self.__module__].setChecked(False)  # Uncheck the menu item associated with this plugin's name
             self.deleteLater()
             return

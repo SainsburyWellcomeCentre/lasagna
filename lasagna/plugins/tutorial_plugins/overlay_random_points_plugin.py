@@ -20,15 +20,15 @@ from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 class plugin(lasagna_plugin): 
 
-    def __init__(self, lasagna, parent=None):
-        super(plugin, self).__init__(lasagna)
+    def __init__(self, lasagna_serving, parent=None):
+        super(plugin, self).__init__(lasagna_serving)
 
         # re-define some default properties that were originally defined in lasagna_plugin
         self.pluginShortName = 'Overlay random points'
         self.pluginLongName = 'displays dynamically generated random points onto the axes'
         self.pluginAuthor = 'Rob Campbell'
 
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
 
         # add a sparsepoints ingredient
         self.objName = 'tutePoints'

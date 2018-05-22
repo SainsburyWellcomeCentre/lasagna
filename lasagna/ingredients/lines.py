@@ -16,14 +16,14 @@ loads the data from the csv file, and calles lines.py
 import warnings  # to disable some annoying NaN-related warnings
 
 import numpy as np
+import pyqtgraph as pg
+from PyQt5 import QtGui, QtCore
 from matplotlib import cm
 from numpy import linspace
 
-from PyQt5 import QtGui, QtCore
-import pyqtgraph as pg
-
-from lasagna import lasagna_helperFunctions as las_help
+import lasagna.utils.preferences
 from lasagna.lasagna_ingredient import lasagna_ingredient
+from lasagna.utils import lasagna_qt_helper_functions as las_help
 
 
 class lines(lasagna_ingredient):
@@ -34,7 +34,7 @@ class lines(lasagna_ingredient):
 
         # Choose symbols from preferences file.
         # TODO: read symbols from GUI
-        self.symbol = las_help.readPreference('symbolOrder')[0]
+        self.symbol = lasagna.utils.preferences.readPreference('symbolOrder')[0]
         self.symbolSize = int(self.parent.markerSize_spinBox.value())
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = int(self.parent.lineWidth_spinBox.value())

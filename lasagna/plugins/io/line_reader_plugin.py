@@ -22,10 +22,10 @@ from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 
 class loaderClass(lasagna_plugin):
-    def __init__(self, lasagna):
-        super(loaderClass, self).__init__(lasagna)
+    def __init__(self, lasagna_serving):
+        super(loaderClass, self).__init__(lasagna_serving)
 
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
         self.objectName = 'lines_reader'
         self.kind = 'lines'
 

@@ -6,7 +6,7 @@ Module to infer data type from string or convert a string to a data type.
 """
 
 
-def dataTypeFromString(input_string):
+def data_type_from_string(input_string):
     """
     Returns the data type which string appears to be: int, float, or str
     """
@@ -25,11 +25,11 @@ def dataTypeFromString(input_string):
     return None
 
 
-def convertString(input_string):
+def convert_string(input_string):
     """
     converts string to float or int (or returns a str) based on the pattern of the string
     """
-    data_type = dataTypeFromString(input_string)
+    data_type = data_type_from_string(input_string)
     if data_type is None:
         return input_string
     else:
@@ -38,32 +38,32 @@ def convertString(input_string):
 
 if __name__ == '__main__':
     # testing code
-    if dataTypeFromString('32423') != int:
+    if data_type_from_string('32423') != int:
         print('failed int test 1')
 
-    if dataTypeFromString('3') != int:
+    if data_type_from_string('3') != int:
         print('failed int test 2')
 
-    if dataTypeFromString('3.0') != float:
+    if data_type_from_string('3.0') != float:
         print('failed float test 1')
 
-    if dataTypeFromString('33342.0234') != float:
+    if data_type_from_string('33342.0234') != float:
         print('failed float test 2')
 
-    if dataTypeFromString('33342F.0234') != str:
+    if data_type_from_string('33342F.0234') != str:
         print('failed str test 1')
 
-    if dataTypeFromString('aardvark') != str:
+    if data_type_from_string('aardvark') != str:
         print('failed str test 2')
 
-    if dataTypeFromString('AardvarK') != str:
+    if data_type_from_string('AardvarK') != str:
         print('failed str test 3')
 
-    if dataTypeFromString('1.2.3') != str:
+    if data_type_from_string('1.2.3') != str:
         print('failed str test 4')
 
     # try some conversions
     conversions = ['123', '1', '1.1', '1.2.2', 'hello']
     for c in conversions:
-        converted = convertString(c)
+        converted = convert_string(c)
         print("converted %s as %s" % (c, str(type(converted))))

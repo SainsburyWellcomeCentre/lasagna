@@ -22,10 +22,10 @@ from lasagna.plugins import lasagna_plugin
 
 
 class loaderClass(lasagna_plugin):
-    def __init__(self, lasagna):
-        super(loaderClass, self).__init__(lasagna)
+    def __init__(self, lasagna_serving):
+        super(loaderClass, self).__init__(lasagna_serving)
 
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
         self.objectName = 'fiji_roi_reader'
         self.kind = 'sparsepoints'
         # Construct the QActions and other stuff required to integrate the load dialog into the menu

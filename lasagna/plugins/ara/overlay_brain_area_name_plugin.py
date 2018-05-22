@@ -8,7 +8,7 @@ import os.path
 import numpy as np
 from PyQt5 import QtGui
 
-from lasagna import lasagna_helperFunctions as lasHelp
+from lasagna.utils import preferences
 from lasagna.alert import alert
 from lasagna.io_libs import image_stack_loader
 # For the UI
@@ -16,20 +16,21 @@ from lasagna.plugins.ara import area_namer_UI
 # For contour drawing
 from lasagna.plugins.ara.ara_plotter import ARA_plotter
 from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.utils.pref_utils import get_lasagna_pref_dir
 
 
 class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_namer): 
-    def __init__(self, lasagna):
-        super(plugin, self).__init__(lasagna)
-        self.lasagna = lasagna
+    def __init__(self, lasagna_serving):
+        super(plugin, self).__init__(lasagna_serving)
+        self.lasagna = lasagna_serving
 
         self.pluginShortName = "area namer"
         self.pluginLongName = "brain area namer"
         self.pluginAuthor = "Rob Campbell"
 
         # Read file locations from preferences file (creating a default file if none exists)
-        self.pref_file = lasHelp.getLasagna_prefDir() + 'ARA_plugin_prefs.yml'
-        self.prefs = lasHelp.loadAllPreferences(prefFName=self.pref_file, defaultPref=self.defaultPrefs())
+        self.pref_file = get_lasagna_pref_dir() + 'ARA_plugin_prefs.yml'
+        self.prefs = preferences.loadAllPreferences(prefFName=self.pref_file, defaultPref=self.defaultPrefs())
 
         # The last value the mouse hovered over. When this changes, we re-calculate the contour
         self.lastValue = -1
@@ -204,7 +205,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
             file_filter = "Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
             fnameToLoad = QtGui.QFileDialog.getOpenFileName(self,
                                                             'Open file',
-                                                            lasHelp.readPreference('lastLoadDir'),
+                                                            lasagna.utils.preferences.readPreference('lastLoadDir'),
                                                             file_filter)
             fnameToLoad = str(fnameToLoad[0])  # tuple with filter as 2nd value
 

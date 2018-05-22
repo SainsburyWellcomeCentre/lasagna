@@ -6,12 +6,16 @@ https://github.com/raacampbell13/lasagna
 """
 
 
-import re
-import os
-import struct 
-import numpy as np
 import imp  # to look for the presence of a module. Python 3 will require importlib
-from lasagna import lasagna_helperFunctions as lasHelp
+import os
+import re
+import struct
+
+import numpy as np
+
+import lasagna.utils.path_utils
+import lasagna.utils.preferences
+from lasagna.utils import lasagna_qt_helper_functions as lasHelp
 
 
 # -------------------------------------------------------------------------------------------
@@ -66,7 +70,7 @@ def getVoxelSpacing(fname, fallBackMode=False):
     if fname.lower().endswith('.nrrd') or fname.lower().endswith('.nrd'):
         return nrrd_getRatios(fname)
     else:
-        return lasHelp.readPreference('defaultAxisRatios')  # defaults
+        return lasagna.utils.preferences.readPreference('defaultAxisRatios')  # defaults
 
 
 def spacingToRatio(spacing):
@@ -273,7 +277,7 @@ def mhd_read_raw_file(fname, header):
         print("\nCan not find data format type in MHD file. **CONTACT AUTHOR**\n")
         return False
 
-    path_to_file = lasHelp.stripTrailingFileFromPath(fname)
+    path_to_file = lasagna.utils.path_utils.stripTrailingFileFromPath(fname)
     print(header['elementdatafile'])   # TODO: CLEAN THIS SHIT
 
     rawFname = os.path.join(path_to_file, header['elementdatafile'])
@@ -446,11 +450,11 @@ def mhd_getRatios(fname):
             spacing = info['elementspacing']
         else:
             print("Failed to find spacing info in MHA file. Using default axis length values")
-            return lasHelp.readPreference('defaultAxisRatios')  # defaults
+            return lasagna.utils.preferences.readPreference('defaultAxisRatios')  # defaults
 
     if not spacing:
         print("Failed to find spacing valid spacing info in MHA file. Using default axis length values")
-        return lasHelp.readPreference('defaultAxisRatios')  # defaults
+        return lasagna.utils.preferences.readPreference('defaultAxisRatios')  # defaults
   
     return spacingToRatio(spacing)
 

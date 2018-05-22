@@ -4,7 +4,7 @@ Defines a tree and a node class as well as functions for importing data
 """
 import os.path
 
-from lasagna.utils import dataTypeFromString
+from lasagna.utils import data_type_from_string
 
 (_ROOT, _DEPTH, _WIDTH) = list(range(3))  # Used by classes to navigate the tree
 
@@ -74,7 +74,7 @@ def importData(fname, displayTree=False, colSep=',', headerLine=None, verbose=Fa
             data_col = dict()
             for i in range(len(header)-2):
                 i += 2
-                data_col[header[i]] = dataTypeFromString.convertString(data_line[i])
+                data_col[header[i]] = data_type_from_string.convert_string(data_line[i])
         else:
             data_col = data_line[2:]  # add as list of strings
 

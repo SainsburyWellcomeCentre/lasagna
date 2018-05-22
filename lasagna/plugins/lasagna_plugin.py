@@ -6,30 +6,28 @@ or if the menu should load a new window from which
 plugins are started. I prefer the latter. 
 """
 
-
-"""
-This class must implement the following:
-
-1. Provide access to required information from the viewer
-2. Perform common duties at startup. Maybe send to the viewer some signal that the plugin is running
-3. Perform common duties at shutdown. 
-"""
-
 import re
 
 
 class lasagna_plugin(object):
-    def __init__(self, lasagna):
+    """
+    This class must implement the following:
+
+    1. Provide access to required information from the viewer
+    2. Perform common duties at startup. Maybe send to the viewer some signal that the plugin is running
+    3. Perform common duties at shutdown.
+    """
+    def __init__(self, lasagna_serving):
         super(lasagna_plugin, self).__init__()  # In case of multiple inheritence. Useful for GUI making
         # This is crude, but the plugin will have access to everything
         # in the main window
-        self.lasagna = lasagna
+        self.lasagna = lasagna_serving
 
         # code to indicate visually that the plugin is running
 
         # define some default properties that all plugins must have
-        self.pluginShortName = 'Plugin' #Appears on the menu
-        self.pluginLongName = 'Lasagna plugin' #Can be used for other purposes (e.g. tool-tip)
+        self.pluginShortName = 'Plugin'  # Appears on the menu
+        self.pluginLongName = 'Lasagna plugin'  # Can be used for other purposes (e.g. tool-tip)
         self.pluginAuthor = 'author name'
 
         self.confirmOnClose = False

@@ -11,8 +11,8 @@ from lasagna.plugins.tutorial_plugins import add_line_UI
 
 class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inherit lasagna_plugin first
 
-    def __init__(self, lasagna, parent=None):
-        super(plugin, self).__init__(lasagna)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+    def __init__(self, lasagna_serving, parent=None):
+        super(plugin, self).__init__(lasagna_serving)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
 
         # re-define some default properties that were originally defined in lasagna_plugin
         self.pluginShortName = 'Add lines'  # Appears on the menu
