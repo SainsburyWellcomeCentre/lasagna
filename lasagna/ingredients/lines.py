@@ -67,7 +67,7 @@ class lines(lasagna_ingredient):
         lines data are an n by 3 array where each row defines the location
         of a single point in x, y, and z
         """
-        if not self._data.size:
+        if not len(self._data):  # may be an array of a list
             return False
 
         data = np.delete(self._data, axisToPlot, 1)
