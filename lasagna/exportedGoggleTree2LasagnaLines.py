@@ -38,7 +38,7 @@ parser.add_argument("-q", help="Quiet - do not dump processed tree to standard o
 args = parser.parse_args()
 
 fname = args.f
-doPlot = args.p
+do_plot = args.p
 quiet = args.q
 
 
@@ -53,12 +53,12 @@ if not os.path.exists(fname):
     sys.exit(0)
 
 
-dataTree = importData(fname,headerLine=['id','parent','z','x','y']) 
+data_tree = importData(fname, headerLine=['id', 'parent', 'z', 'x', 'y'])
 
 # Get the unique segments of each tree
 paths = []
-for thisSegment in dataTree.findSegments():
-    paths.append(thisSegment)
+for segment in data_tree.findSegments():
+    paths.append(segment)
 
 
 def dataFromPath(tree, path):
@@ -68,26 +68,26 @@ def dataFromPath(tree, path):
     x = []
     y = []
     z = []
-    for thisNode in path:
-        if thisNode == 0:
+    for node in path:
+        if node == 0:
             continue
-        z.append(tree.nodes[thisNode].data['z'])
-        x.append(tree.nodes[thisNode].data['x'])
-        y.append(tree.nodes[thisNode].data['y'])
+        z.append(tree.nodes[node].data['z'])
+        x.append(tree.nodes[node].data['x'])
+        y.append(tree.nodes[node].data['y'])
     return z, x, y
 
 
 # Show paths in standard output
 if not quiet:
-    for i, thisPath in enumerate(paths):
-        data = dataFromPath(dataTree, thisPath)
+    for i, path in enumerate(paths):
+        data = dataFromPath(data_tree, path)
         for j in range(len(data[0])):
             print("%d,%d,%d,%d" % (i, data[0][j], data[1][j], data[2][j]))
 
 
 # -------------------------------------------------
 # Optionally plot
-if not doPlot:
+if not do_plot:
     sys.exit(0)
 
 from pyqtgraph.Qt import QtGui, QtCore
@@ -95,44 +95,44 @@ import pyqtgraph as pg
 
 # Set up the window
 app = QtGui.QApplication([])
-mw = QtGui.QMainWindow()
-mw.resize(800, 800)
+main_window = QtGui.QMainWindow()
+main_window.resize(800, 800)
 
 view = pg.GraphicsLayoutWidget()  # GraphicsView with GraphicsLayout inserted by default
-mw.setCentralWidget(view)
-mw.show()
-mw.setWindowTitle('Neurite Tree')
+main_window.setCentralWidget(view)
+main_window.show()
+main_window.setWindowTitle('Neurite Tree')
 
 
 # view 1
 w1 = view.addPlot()
-pathItem = []
-for thisPath in paths:
-    pathItem.append( pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
-    data = dataFromPath(dataTree, thisPath)
-    pathItem[-1].setData(x=data[0], y=data[1])
-    w1.addItem(pathItem[-1])
+path_item = []
+for path in paths:
+    path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))  # FIXME: extract
+    data = dataFromPath(data_tree, path)
+    path_item[-1].setData(x=data[0], y=data[1])
+    w1.addItem(path_item[-1])
 
 
 # view 2
 w2 = view.addPlot()
-pathItem = []
-for thisPath in paths:
-    pathItem.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
-    data = dataFromPath(dataTree, thisPath)
-    pathItem[-1].setData(x=data[0], y=data[2])
-    w2.addItem(pathItem[-1])
+path_item = []
+for path in paths:
+    path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
+    data = dataFromPath(data_tree, path)
+    path_item[-1].setData(x=data[0], y=data[2])
+    w2.addItem(path_item[-1])
 
 
 # view 3
 view.nextRow()
 w3 = view.addPlot()
-pathItem = []
-for thisPath in paths:
-    pathItem.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
-    data = dataFromPath(dataTree, thisPath)
-    pathItem[-1].setData(x=data[1], y=data[2])
-    w3.addItem(pathItem[-1])
+path_item = []
+for path in paths:
+    path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
+    data = dataFromPath(data_tree, path)
+    path_item[-1].setData(x=data[1], y=data[2])
+    w3.addItem(path_item[-1])
 
 
 # Start Qt event loop unless running in interactive mode.
