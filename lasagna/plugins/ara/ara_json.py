@@ -56,10 +56,10 @@ if __name__ == '__main__':
 
     (flattened, colNames) = importData(fname)
 
-    returnTree = True
+    return_tree = True
 
     # Optionally run flattened structure through tree
-    if returnTree:
+    if return_tree:
         from lasagna import tree
 
         tree.importData(flattened.split('\n'), colSep='|', displayTree=True, headerLine=colNames)

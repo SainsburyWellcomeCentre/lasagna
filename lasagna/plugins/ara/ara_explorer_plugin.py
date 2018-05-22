@@ -78,12 +78,11 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         n = 1
         for path in self.prefs['ara_paths']:
             if not os.path.exists(path):
-                print("%s does not exist. skipping" % path) 
+                print("{} does not exist. skipping".format(path))
                 continue
 
-            filesInPath = os.listdir(path) 
-            if not filesInPath:
-                print("No files in %s . skipping" % path) 
+            if not os.listdir(path):
+                print("No files in {}. skipping".format(path))
                 continue
 
             pths = dict(atlas='', labels='', template='')
@@ -93,26 +92,26 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             files = os.listdir(path)
 
             # get the file names
-            for thisFile in files:
-                if thisFile.startswith(self.atlasFileName):
-                    if thisFile.endswith('raw'):
+            for file in files:
+                if file.startswith(self.atlasFileName):
+                    if file.endswith('raw'):
                         continue
-                    pths['atlas'] = os.path.join(path, thisFile)
-                    print("Adding atlas file %s" % thisFile)
+                    pths['atlas'] = os.path.join(path, file)
+                    print("Adding atlas file {}".format(file))
                     break 
 
-            for thisFile in files:
-                if thisFile.startswith(self.labelsFileName):
-                    pths['labels'] = os.path.join(path, thisFile)
-                    print("Adding labels file %s" % thisFile)
+            for file in files:
+                if file.startswith(self.labelsFileName):
+                    pths['labels'] = os.path.join(path, file)
+                    print("Adding labels file {}".format(file))
                     break 
 
-            for thisFile in files:
-                if thisFile.startswith(self.templateFileName):
-                    if thisFile.endswith('raw'):
+            for file in files:
+                if file.startswith(self.templateFileName):
+                    if file.endswith('raw'):
                         continue
-                    pths['template'] = os.path.join(path, thisFile)
-                    print("Adding template file %s" % thisFile)
+                    pths['template'] = os.path.join(path, file)
+                    print("Adding template file {}".format(file))
                     break
 
             if not pths['atlas'] or not pths['labels']:
@@ -122,16 +121,16 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             # If we're here, this entry should at least have a valid atlas file and a valid labels file
             # We will index the self.paths dictionary by the name of the atlas file as this is also
             # what will be put into the combobox.
-            atlasDirName = path.split(os.path.sep)[-1]
+            atlas_dir_name = path.split(os.path.sep)[-1]
 
             # skip if a file with this name already exists
-            if atlasDirName in self.paths:
-                print("Skipping as a directory called %s is already in the list" % atlasDirName)
+            if atlas_dir_name in self.paths:
+                print("Skipping as a directory called {} is already in the list".format(atlas_dir_name))
                 continue
 
             # Add this ARA to the paths dictionary and to the combobox
-            self.paths[atlasDirName] = pths
-            self.araName_comboBox.addItem(atlasDirName)
+            self.paths[atlas_dir_name] = pths
+            self.araName_comboBox.addItem(atlas_dir_name)
 
         # blank line
         print("")
@@ -148,10 +147,10 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         # If the user has asked for this, load the first ARA entry automatically
         self.data = dict(currentlyLoadedAtlasName='', currentlyLoadedOverlay='')
 
-        currentlySelectedARA = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        currently_selected_ara = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
         if self.prefs['loadFirstAtlasOnStartup']:
-            print("Auto-Loading " + currentlySelectedARA)
-            self.loadARA(currentlySelectedARA)
+            print("Auto-Loading " + currently_selected_ara)
+            self.loadARA(currently_selected_ara)
             self.load_pushButton.setEnabled(False)  # disable because the current selection has now been loaded
 
         # Make a lines ingredient that will house the contours for the currently selected area.
@@ -173,21 +172,22 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         """
 
         # Get the atlas volume and find in which voxel the mouse cursor is located
-        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        ingredient = self.lasagna.returnIngredientByName(atlasLayerName)
+        ara_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlas_layer_name = self.paths[ara_name]['atlas'].split(os.path.sep)[-1]
+        ingredient = self.lasagna.returnIngredientByName(atlas_layer_name)
 
         if not ingredient:
-            print("ARA_explorer_plugin.hook_updateStatusBar_End Failed to find imageStack named %s" % atlasLayerName)
+            print("ARA_explorer_plugin.hook_updateStatusBar_End Failed to find image_stack named {}"
+                  .format(atlas_layer_name))
             return
 
-        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+        image_stack = self.lasagna.returnIngredientByName(atlas_layer_name).raw_data()
 
-        value = self.writeAreaNameInStatusBar(imageStack, self.statusBarName_checkBox.isChecked())  # Inherited from ARA_plotter
+        value = self.writeAreaNameInStatusBar(image_stack, self.statusBarName_checkBox.isChecked())  # Inherited from ARA_plotter
 
         # Highlight the brain area we are mousing over by drawing a boundary around it
         if self.lastValue != value and self.highlightArea_checkBox.isChecked():
-            self.drawAreaHighlight(imageStack, value)  # Inherited from ARA_plotter
+            self.drawAreaHighlight(image_stack, value)  # Inherited from ARA_plotter
 
     def hook_deleteLayerStack_Slot_End(self):
         """
@@ -195,8 +195,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         triggers closing of the plugin if it is removed.
         """
         # is the current loaded atlas present
-        atlasName = self.data['currentlyLoadedAtlasName']
-        if not self.lasagna.returnIngredientByName(atlasName):
+        atlas_name = self.data['currentlyLoadedAtlasName']
+        if not self.lasagna.returnIngredientByName(atlas_name):
             print("The current atlas has been removed by the user. Closing the ARA explorer plugin")
             self.closePlugin()
 
@@ -213,7 +213,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             self.load_pushButton.setEnabled(True) 
             return
 
-        if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
+        if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):  # FIXME: else ?
             self.load_pushButton.setEnabled(True) 
         elif self.data['currentlyLoadedAtlasName'] == str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
             self.load_pushButton.setEnabled(False)
@@ -222,8 +222,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
         """
         Load the currently selected ARA version
         """
-        selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        self.loadARA(selectedName)
+        selected_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        self.loadARA(selected_name)
 
     def overlayTemplate_checkBox_slot(self):
         """
@@ -239,19 +239,19 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
                 return
 
         if not self.overlayTemplate_checkBox.isChecked():
-            overlayName = fname.split(os.path.sep)[-1]
-            self.lasagna.removeIngredientByName(overlayName)
+            overlay_name = fname.split(os.path.sep)[-1]
+            self.lasagna.removeIngredientByName(overlay_name)
 
-        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut='gray'
+        self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut = 'gray'
         self.lasagna.initialiseAxes()
 
     def statusBarName_checkBox_slot(self):
         """
         Remove the area name or add it as soon as the check box is unchecked
         """
-        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+        ara_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlas_layer_name = self.paths[ara_name]['atlas'].split(os.path.sep)[-1]
+        imageStack = self.lasagna.returnIngredientByName(atlas_layer_name).raw_data()
         
         if not self.statusBarName_checkBox.isChecked():
             self.writeAreaNameInStatusBar(imageStack, False)
@@ -347,35 +347,35 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
             if thisTree[child].data['name'] == name:
                 return child
             else:
-                returnVal = self.AreaName2NodeID(thisTree=thisTree, name=name, nodeID=child)
-                if returnVal:
-                    return returnVal
+                return_val = self.AreaName2NodeID(thisTree=thisTree, name=name, nodeID=child)
+                if return_val:
+                    return return_val
         return False
 
     def highlightSelectedAreaFromList(self):
         """
         This slot is run when the user clicks on a brain area in the list
         """
-        getFromModel = False  # It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the data
+        get_from_model = False  # It would be great to get the area ID from the model, but I can't figure out how to get the sub-model that houses the data
 
         index = self.brainArea_treeView.selectedIndexes()[0]
 
         # Get the image stack, as we need to feed it to drawAreaHighlight
-        araName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlasLayerName = self.paths[araName]['atlas'].split(os.path.sep)[-1]
-        imageStack = self.lasagna.returnIngredientByName(atlasLayerName).raw_data()
+        ara_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        atlas_layer_name = self.paths[ara_name]['atlas'].split(os.path.sep)[-1]
+        image_stack = self.lasagna.returnIngredientByName(atlas_layer_name).raw_data()
 
-        if getFromModel:
+        if get_from_model:
             # The following row and column indexes are also correct, but index.model() is the root model and this is wrong.
-            treeIndex = index.model().item(index.row(), index.column()).data().toInt()[0]
-            print("treeIndex (%d,%d): %d" % (index.row(), index.column(), treeIndex))
+            tree_index = index.model().item(index.row(), index.column()).data().toInt()[0]
+            print("tree_index (%d,%d): %d" % (index.row(), index.column(), tree_index))
         else:  # so we do it the stupid way from the reee
-            areaName = index.data()
-            treeIndex = self.AreaName2NodeID(self.data['labels'], areaName)
+            area_name = index.data()
+            tree_index = self.AreaName2NodeID(self.data['labels'], area_name)
 
-        if treeIndex is not None:
-            # print("highlighting %d" % treeIndex)
-            self.drawAreaHighlight(imageStack, treeIndex, highlightOnlyCurrentAxis=False)
+        if tree_index is not None:
+            # print("highlighting %d" % tree_index)
+            self.drawAreaHighlight(image_stack, tree_index, highlightOnlyCurrentAxis=False)
 
     # ----------------------------
     # Methods to handle close events and errors

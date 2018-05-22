@@ -70,9 +70,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
                 print("%s does not exist. skipping" % path) 
                 continue
 
-            filesInPath = os.listdir(path) 
-            if not filesInPath:
-                print("No files in %s . skipping" % path) 
+            if not os.listdir(path):
+                print("No files in %s . skipping" % path)
                 continue
 
             pths = dict(atlas='', labels='')
@@ -103,16 +102,16 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
             # If we're here, this entry should at least have a valid atlas file and a valid labels file
             # We will index the self.paths dictionary by the name of the atlas file as this is also
             # what will be put into the combobox.
-            atlasDirName = path.split(os.path.sep)[-1]
+            atlas_dir_name = path.split(os.path.sep)[-1]
 
             # skip if a file with this name already exists
-            if atlasDirName in self.paths:
-                print("Skipping as a directory called %s is already in the list" % atlasDirName)
+            if atlas_dir_name in self.paths:
+                print("Skipping as a directory called %s is already in the list" % atlas_dir_name)
                 continue
 
             # Add this ARA to the paths dictionary and to the combobox
-            self.paths[atlasDirName] = pths
-            self.araName_comboBox.addItem(atlasDirName)
+            self.paths[atlas_dir_name] = pths
+            self.araName_comboBox.addItem(atlas_dir_name)
 
         # blank line
         print("")
@@ -139,12 +138,12 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         hooks into the status bar update function to show the brain area name in the status bar 
         as the user mouses over the images
         """
-        imageStack = self.data['atlas'] 
-        value = self.writeAreaNameInStatusBar(imageStack, self.statusBarName_checkBox.isChecked())  # Inherited from ARA_plotter
+        image_stack = self.data['atlas']
+        value = self.writeAreaNameInStatusBar(image_stack, self.statusBarName_checkBox.isChecked())  # Inherited from ARA_plotter
 
         # Highlight the brain area we are mousing over by drawing a boundary around it
         if self.lastValue != value and self.highlightArea_checkBox.isChecked():
-            self.drawAreaHighlight(imageStack, value)  # Inherited from ARA_plotter
+            self.drawAreaHighlight(image_stack, value)  # Inherited from ARA_plotter
 
     def hook_deleteLayerStack_Slot_End(self):
         """
@@ -152,8 +151,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         triggers closing of the plugin if it is removed.
         """
         # is the current loaded atlas present
-        atlasName = self.data['currentlyLoadedAtlasName']
-        if not self.lasagna.returnIngredientByName(atlasName):
+        atlas_name = self.data['currentlyLoadedAtlasName']
+        if not self.lasagna.returnIngredientByName(atlas_name):
             print("The current atlas has been removed by the user. Closing the ARA explorer plugin")
             self.closePlugin()
 
@@ -170,7 +169,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
             self.loadOrig_pushButton.setEnabled(True) 
             return
 
-        if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
+        if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):  # FIXME: else ?
             self.loadOrig_pushButton.setEnabled(True) 
         elif self.data['currentlyLoadedAtlasName'] == str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
             self.loadOrig_pushButton.setEnabled(False)
@@ -184,9 +183,9 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         'atlas' (full path to atlas volume file)
         'labels' (full path to atlas labels file - csv or json)
         """
-        selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        selected_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
 
-        paths = self.paths[selectedName]
+        paths = self.paths[selected_name]
 
         # Load the labels (this associates brain area index values with brain area names)
         self.data['labels'] = self.loadLabels(paths['labels'])
@@ -202,16 +201,16 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         Can optionally load a specific file name (used for de-bugging)
         """
         if not fnameToLoad:
-            fileFilter = "Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
+            file_filter = "Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
             fnameToLoad = QtGui.QFileDialog.getOpenFileName(self,
                                                             'Open file',
                                                             lasHelp.readPreference('lastLoadDir'),
-                                                            fileFilter)
+                                                            file_filter)
             fnameToLoad = str(fnameToLoad[0])  # tuple with filter as 2nd value
 
         # re-load labels
-        selectedName = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        paths = self.paths[selectedName]
+        selected_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        paths = self.paths[selected_name]
         self.data['labels'] = self.loadLabels(paths['labels'])
 
         # load the selected atlas (without displaying it)

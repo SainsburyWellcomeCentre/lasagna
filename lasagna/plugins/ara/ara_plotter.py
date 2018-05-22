@@ -40,13 +40,13 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
         """
 
         if fname.lower().endswith('.csv'):
-            colSep = self.guessFileSep(fname)
-            return tree.importData(fname, colSep=colSep)
+            col_sep = self.guessFileSep(fname)
+            return tree.importData(fname, colSep=col_sep)
 
         if fname.lower().endswith('.json'):
-            flattened, colNames = ara_json.importData(fname)
+            flattened, col_names = ara_json.importData(fname)
             table = flattened.split('\n')
-            return tree.importData(table, colSep='|', headerLine=colNames)
+            return tree.importData(table, colSep='|', headerLine=col_names)
 
     def guessFileSep(self, fname):
         """
@@ -55,11 +55,11 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
         with open(fname, 'r') as fid:
             contents = fid.read()
     
-        nLines = contents.count('\n')
-        possibleSeparators = ['|', '\t', ',']  # don't include space because for these data that would be crazy
-        for thisSep in possibleSeparators:
-            if contents.count(thisSep) >= nLines:
-                return thisSep
+        n_lines = contents.count('\n')
+        possible_separators = ('|', '\t', ',')  # don't include space because for these data that would be crazy
+        for separator in possible_separators:
+            if contents.count(separator) >= n_lines:
+                return separator
 
         # Just return comma if nothing was found. At least we tried!
         return ','
@@ -103,20 +103,21 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
         if not imageStack.shape:
             return -1
 
-        imShape = imageStack.shape
+        im_shape = imageStack.shape
         pos = self.lasagna.mousePositionInStack
         
         verbose = False
         if verbose:
-            print("Mouse is in %d,%d,%d and image size is %d,%d,%d" % (pos[0],pos[1],pos[2],imShape[0],imShape[1],imShape[2]))
+            print("Mouse is in %d,%d,%d and image size is %d,%d,%d" %
+                  (pos[0], pos[1], pos[2], im_shape[0], im_shape[1], im_shape[2]))
 
         # Detect if the mouse is outside of the atlas
         value = 0
-        for i in range(len(imShape)):
-            if pos[i] < 0 or pos[i] >= imShape[i]:
+        for i in range(len(im_shape)):
+            if pos[i] < 0 or pos[i] >= im_shape[i]:
                 if verbose:
-                    print("NOT IN RANGE: pos: %d shape %d" % (pos[i], imShape[i]))
-                thisArea = 'outside image area'
+                    print("NOT IN RANGE: pos: %d shape %d" % (pos[i], im_shape[i]))
+                area = 'outside image area'
                 value = -1
                 break
 
@@ -124,14 +125,14 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
         if value == 0:
             value = imageStack[pos[0], pos[1], pos[2]]
             if value == 0:
-                thisArea = 'outside brain'
+                area = 'outside brain'
             elif value in self.data['labels'].nodes:
-                thisArea = self.data['labels'][value].data['name']
+                area = self.data['labels'][value].data['name']
             else:
-                thisArea = 'UNKNOWN'
+                area = 'UNKNOWN'
 
         if displayAreaName:
-            self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + thisArea
+            self.lasagna.statusBarText = self.lasagna.statusBarText + ", area: " + area
 
         return value
 
@@ -144,13 +145,13 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
             return False
 
         imageStack = np.swapaxes(imageStack, 0, axisNumber)
-        thisSlice = self.lasagna.axes2D[axisNumber].currentSlice  # This is the current slice in this axis
-        tmpImage = np.array(imageStack[thisSlice])  # So this is the image associated with that slice
+        this_slice = self.lasagna.axes2D[axisNumber].currentSlice  # This is the current slice in this axis
+        tmp_image = np.array(imageStack[this_slice])  # So this is the image associated with that slice
 
         # Make a copy of the image and set values lower than our value to a greater number
         # since the countour finder will draw around everything less than our value
-        tmpImage[tmpImage < value] = value+10
-        return measure.find_contours(tmpImage, value)
+        tmp_image[tmp_image < value] = value+10
+        return measure.find_contours(tmp_image, value)
 
     def drawAreaHighlight(self, imageStack, value, highlightOnlyCurrentAxis=False):
         """
@@ -160,37 +161,37 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
             return
 
         nans = np.array([np.nan, np.nan, np.nan]).reshape(1, 3)
-        allContours = nans
+        all_contours = nans
 
-        for axNum in range(len(self.lasagna.axes2D)):
-            contours = self.getContoursFromAxis(imageStack, axisNumber=axNum, value=value)
-            if (highlightOnlyCurrentAxis and axNum != self.lasagna.inAxis) or not contours:
-                tmpNan = np.array([np.nan, np.nan, np.nan]).reshape(1, 3)
-                tmpNan[0][axNum] = self.lasagna.axes2D[axNum].currentSlice  # ensure nothing is plotted in this layer
-                allContours = np.append(allContours, tmpNan, axis=0)
+        for ax_num in range(len(self.lasagna.axes2D)):
+            contours = self.getContoursFromAxis(imageStack, axisNumber=ax_num, value=value)
+            if (highlightOnlyCurrentAxis and ax_num != self.lasagna.inAxis) or not contours:
+                tmp_nan = np.array([np.nan, np.nan, np.nan]).reshape(1, 3)
+                tmp_nan[0][ax_num] = self.lasagna.axes2D[ax_num].currentSlice  # ensure nothing is plotted in this layer
+                all_contours = np.append(all_contours, tmp_nan, axis=0)
                 continue
 
-            # print "Plotting area %d in plane %d" % (value,self.lasagna.axes2D[axNum].currentSlice)
-            for thisContour in contours:
-                tmp = np.ones(thisContour.shape[0]*3).reshape(thisContour.shape[0], 3)*self.lasagna.axes2D[axNum].currentSlice
+            # print "Plotting area %d in plane %d" % (value,self.lasagna.axes2D[ax_num].currentSlice)
+            for contour in contours:
+                tmp = np.ones(contour.shape[0]*3).reshape(contour.shape[0], 3)*self.lasagna.axes2D[ax_num].currentSlice
 
-                if axNum == 0:
-                    tmp[:, 1:] = thisContour
-                elif axNum == 1:
-                    tmp[:, 0] = thisContour[:, 0]
-                    tmp[:, 2] = thisContour[:, 1]
-                elif axNum == 2:
-                    tmp[:, 1] = thisContour[:, 0]
-                    tmp[:, 0] = thisContour[:, 1]
+                if ax_num == 0:
+                    tmp[:, 1:] = contour
+                elif ax_num == 1:
+                    tmp[:, 0] = contour[:, 0]
+                    tmp[:, 2] = contour[:, 1]
+                elif ax_num == 2:
+                    tmp[:, 1] = contour[:, 0]
+                    tmp[:, 0] = contour[:, 1]
 
                 tmp = np.append(tmp, nans, axis=0)  # Terminate each contour with nans so that they are not  linked
-                allContours = np.append(allContours, tmp, axis=0)
+                all_contours = np.append(all_contours, tmp, axis=0)
 
             if highlightOnlyCurrentAxis:
                 self.lastValue = value
             
         # Replace the data in the ingredient so they are plotted
-        self.lasagna.returnIngredientByName(self.contourName)._data = allContours
+        self.lasagna.returnIngredientByName(self.contourName)._data = all_contours
         self.lasagna.initialiseAxes()
 
     def setARAcolors(self):
@@ -204,14 +205,14 @@ class ARA_plotter(object):  # must inherit lasagna_plugin first
                           [7, 153, 255, 255],
                           [255, 7, 235, 255]
                           ], dtype=np.ubyte)
-        map = pg.ColorMap(pos, color)
-        lut = map.getLookupTable(0.0, 1.0, 256)
+        color_map = pg.ColorMap(pos, color)
+        lut = color_map.getLookupTable(0.0, 1.0, 256)
 
         # Assign the colormap to the imagestack object
-        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0, 0).data().toString()  # TODO: a bit horrible
-        firstLayer = self.lasagna.returnIngredientByName(self.ARAlayerName)
-        firstLayer.lut = lut
+        self.ARAlayerName = self.lasagna.imageStackLayers_Model.index(0, 0).data().toString()  # FIXME: a bit horrible
+        first_layer = self.lasagna.returnIngredientByName(self.ARAlayerName)
+        first_layer.lut = lut
         # Specify what colors the histogram should be so it doesn't end up megenta and
         # vomit-yellow, or who knows what, due to the weird color map we use here.
-        firstLayer.histPenCustomColor = [180, 180, 180, 255]
-        firstLayer.histBrushCustomColor = [150, 150, 150, 150]
+        first_layer.histPenCustomColor = [180, 180, 180, 255]
+        first_layer.histBrushCustomColor = [150, 150, 150, 150]
