@@ -19,7 +19,7 @@ def read_pts_file(file_name):
         npts = int(in_file.readline().strip())
         for line in in_file.readlines():
             line = line.strip()
-            if not len(line):  # skip last empty line
+            if not line:  # skip last empty line
                 break
             coords = [float(c) for c in line.split(' ')]
             pts_coord.append([coords[i] for i in [2, 0, 1]])  # reorder in lasagna order (Z,X,Y)
@@ -107,6 +107,7 @@ def read_vv_txt_landmarks(path2file):
                 data.append([line_data[i] for i in [2, 0, 1]])  # reorder in lasagna Z,X,Y system
     return data
 
+
 def read_masiv_roi(path2file):
     """ Read a masiv roi file
 
@@ -126,6 +127,7 @@ def read_masiv_roi(path2file):
                 roi_coords.append([c['x'], c['y'], c['z'], int(ctype[4:])])
     return roi_coords
 
+
 def read_lasagna_pts(fname):
     """ Read default lasagna pts format
 
@@ -138,10 +140,10 @@ def read_lasagna_pts(fname):
         contents = fid.read()
 
     # a list of strings with each string being one line from the file
-    asList = contents.split('\n')
+    as_list = contents.split('\n')
     data = []
-    for ii in range(len(asList)):
-        if len(asList[ii]) == 0:
+    for i in range(len(as_list)):
+        if not as_list[i]:
             continue
-        data.append([float(x) for x in asList[ii].split(',')])
+        data.append([float(x) for x in as_list[i].split(',')])
     return data

@@ -14,94 +14,86 @@ All points bearing the same lineseries_id are grouped into the same list.
 """
 
 import os
-from lasagna_plugin import lasagna_plugin
+from lasagna.lasagna_plugin import lasagna_plugin
 import numpy as np
 from PyQt5 import QtGui
 
 
 class loaderClass(lasagna_plugin):
-    def __init__(self,lasagna):
-        super(loaderClass,self).__init__(lasagna)
+    def __init__(self, lasagna):
+        super(loaderClass, self).__init__(lasagna)
 
         self.lasagna = lasagna
         self.objectName = 'lines_reader'
         self.kind = 'lines'
 
-        #Construct the QActions and other stuff required to integrate the load dialog into the menu
-        self.loadAction = QtGui.QAction(self.lasagna) #Instantiate the menu action
+        # Construct the QActions and other stuff required to integrate the load dialog into the menu
+        self.loadAction = QtGui.QAction(self.lasagna)  # Instantiate the menu action
 
-        #Add an icon to the action
-        iconLoadOverlay = QtGui.QIcon()
-        iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/lines_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.loadAction.setIcon(iconLoadOverlay)
+        # Add an icon to the action
+        icon_load_overlay = QtGui.QIcon()
+        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/lines_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.loadAction.setIcon(icon_load_overlay)
 
-
-        #Insert the action into the menu
+        # Insert the action into the menu
         self.loadAction.setObjectName("linesRead")
         self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
         self.loadAction.setText("Lines read")
 
-        self.loadAction.triggered.connect(self.showLoadDialog) #Link the action to the slot
+        self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
 
-
-
- #Slots follow
-    def showLoadDialog(self,fname=None):
+    # Slots follow
+    def showLoadDialog(self, fname=None):
         """
         This slot brings up the load dialog and retrieves the file name.
         If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
         """
-        if fname is None or fname == False:
+        if not fname:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
     
-        if fname is None or fname == False:
+        if not fname:
             return
 
         if os.path.isfile(fname): 
-            with open(str(fname),'r') as fid:
+            with open(str(fname), 'r') as fid:
                 contents = fid.read()
-    
 
             # a list of strings with each string being one line from the file
             # add nans between lineseries
-            asList = contents.split('\n')
+            as_list = contents.split('\n')
 
-            data=[]
-            lastLineSeries=None
-            n=0
-            expectedCols = 4 
-            for ii in range(len(asList)):
-                if len(asList[ii])==0:
+            data = []
+            last_line_series = None
+            n = 0
+            expected_cols = 4
+            for i in range(len(as_list)):
+                if not as_list[i]:
                     continue
 
-                thisLineAsFloats = [float(x) for x in asList[ii].split(',')]
-                if not len(thisLineAsFloats)==expectedCols:
-                    #Check that all rows have a length of 4, since this is what a line series needs
-                    print("Lines data file %s appears corrupt" % fname)
+                this_line_as_floats = [float(x) for x in as_list[i].split(',')]
+                if len(this_line_as_floats) != expected_cols:
+                    # Check that all rows have a length of 4, since this is what a line series needs
+                    print("Lines data file {} appears corrupt".format(fname))
                     return                     
 
-                if lastLineSeries is None:
-                    lastLineSeries=thisLineAsFloats[0]
+                if last_line_series is None:
+                    last_line_series = this_line_as_floats[0]
 
-                if lastLineSeries != thisLineAsFloats[0]:
-                    n+=1
+                if last_line_series != this_line_as_floats[0]:
+                    n += 1
                     data.append([np.nan, np.nan, np.nan])
 
-                lastLineSeries=thisLineAsFloats[0]
-                data.append(thisLineAsFloats[1:])
+                last_line_series = this_line_as_floats[0]
+                data.append(this_line_as_floats[1:])
 
-
-            objName=fname.split(os.path.sep)[-1]
-            self.lasagna.addIngredient(objectName=objName, 
-                        kind=self.kind,
-                        data=np.asarray(data), 
-                        fname=fname,
-                        )
-
-            self.lasagna.returnIngredientByName(objName).addToPlots() #Add item to all three 2D plots
+            obj_name = fname.split(os.path.sep)[-1]
+            self.lasagna.addIngredient(objectName=obj_name,
+                                       kind=self.kind,
+                                       data=np.asarray(data),
+                                       fname=fname,
+                                       )
+            self.lasagna.returnIngredientByName(obj_name).addToPlots()  # Add item to all three 2D plots
             self.lasagna.initialiseAxes()
-
-
         else:
-            self.lasagna.statusBar.showMessage("Unable to find " + str(fname))
+            self.lasagna.statusBar.showMessage("Unable to find {}".format(fname))

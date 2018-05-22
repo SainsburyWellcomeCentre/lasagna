@@ -15,7 +15,7 @@ def findPlugins(pluginPaths):
 
     for plugin_folder in pluginPaths:
         if not os.path.isdir(plugin_folder):
-            print("Plugin path " + plugin_folder + " is not a valid path. SKIPPING")
+            print("Plugin path {} is not a valid path. SKIPPING".format(plugin_folder))
             continue
 
         # Get all files in the directory that match the plugin file name pattern
@@ -24,8 +24,7 @@ def findPlugins(pluginPaths):
             continue
 
         plugin_directories.append(plugin_folder)
-        for plugin in plugin_files:
-            plugins.append(plugin)
+        plugins.extend(plugin_files)
     return plugins, plugin_directories
 
 

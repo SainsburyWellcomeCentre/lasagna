@@ -31,15 +31,17 @@ image and have their properties changed together.
 
 
 import os
+
 import numpy as np
 from PyQt5 import QtGui
-from lasagna_plugin import lasagna_plugin
-from sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
+
+from lasagna.lasagna_plugin import lasagna_plugin
+from lasagna.IO.sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
 
 
 class loaderClass(lasagna_plugin):
-    def __init__(self,lasagna):
-        super(loaderClass,self).__init__(lasagna)
+    def __init__(self, lasagna):
+        super(loaderClass, self).__init__(lasagna)
 
         self.lasagna = lasagna
         self.objectName = 'sparse_point_reader'
@@ -48,9 +50,9 @@ class loaderClass(lasagna_plugin):
         self.loadAction = QtGui.QAction(self.lasagna)  # Instantiate the menu action
 
         # Add an icon to the action
-        iconLoadOverlay = QtGui.QIcon()
-        iconLoadOverlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.loadAction.setIcon(iconLoadOverlay)
+        icon_load_overlay = QtGui.QIcon()
+        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.loadAction.setIcon(icon_load_overlay)
 
         # Insert the action into the menu
         self.loadAction.setObjectName("sparsePointRead")
@@ -60,7 +62,6 @@ class loaderClass(lasagna_plugin):
         self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
 
     # Slots follow
-
     def showLoadDialog(self, fname=None):
         """
         This slot brings up the load dialog and retrieves the file name.
@@ -69,10 +70,10 @@ class loaderClass(lasagna_plugin):
 
         """
         
-        if fname is None or fname is False:
+        if not fname:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)")
 
-        if fname is None or fname is False:
+        if not fname:
             return
 
         if os.path.isfile(fname):
@@ -94,25 +95,25 @@ class loaderClass(lasagna_plugin):
             # with the the standard case:
             if len(data[0]) == 3:
                 # Create an ingredient with the same name as the file name 
-                objName = fname.split(os.path.sep)[-1]
-                self.lasagna.addIngredient(objectName=objName,
+                obj_name = fname.split(os.path.sep)[-1]
+                self.lasagna.addIngredient(objectName=obj_name,
                                            kind=self.kind,
                                            data=np.asarray(data),
                                            fname=fname
                                            )
                 # Add this ingredient to all three plots
-                self.lasagna.returnIngredientByName(objName).addToPlots() 
+                self.lasagna.returnIngredientByName(obj_name).addToPlots()
                 # Update the plots
                 self.lasagna.initialiseAxes()
 
             elif len(data[0]) == 4:
                 # What are the unique data series values?
-                dSeries = [x[3] for x in data]
-                dSeries = list(set(dSeries))
+                d_series = [x[3] for x in data]
+                d_series = list(set(d_series))
                 
                 # Loop through these unique series and add as separate sparse point objects
 
-                for thisIndex in dSeries:
+                for thisIndex in d_series:
                     tmp = []
                     for thisRow in data:
                         if thisRow[3] == thisIndex:
@@ -121,16 +122,16 @@ class loaderClass(lasagna_plugin):
                     print("Adding point series %d with %d points" % (thisIndex,len(tmp)))
 
                     # Create an ingredient with the same name as the file name 
-                    objName = "%s #%d" % (fname.split(os.path.sep)[-1],thisIndex)
+                    obj_name = "%s #%d" % (fname.split(os.path.sep)[-1],thisIndex)
 
-                    self.lasagna.addIngredient(objectName=objName,
+                    self.lasagna.addIngredient(objectName=obj_name,
                                                kind=self.kind,
                                                data=np.asarray(tmp),
                                                fname=fname
                                                )
 
                     # Add this ingredient to all three plots
-                    self.lasagna.returnIngredientByName(objName).addToPlots() 
+                    self.lasagna.returnIngredientByName(obj_name).addToPlots()
 
                     # Update the plots
                     self.lasagna.initialiseAxes()
@@ -139,4 +140,4 @@ class loaderClass(lasagna_plugin):
                 print(("Point series has %d columns. Only 3 or 4 columns are supported" % len(data[1])))
 
         else:
-            self.lasagna.statusBar.showMessage("Unable to find " + str(fname))
+            self.lasagna.statusBar.showMessage("Unable to find {}".format(fname))
