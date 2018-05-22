@@ -8,9 +8,9 @@ import yaml
 def read_pts_file(file_name):
     """ Read an elastix pts file
 
-    :param file_name:
-    :return pts_coord: list of list with pts coordinates
-    :return pts_type: coordinate system, 'point' or 'index'
+    :param str file_name:
+    :return list pts_coord: list of list with pts coordinates
+    :return tuple pts_type: coordinate system, 'point' or 'index'
     """
 
     pts_coord = []
@@ -31,7 +31,7 @@ def read_pts_file(file_name):
 def read_transformix_output(file_path):
     """ read outputpoints.txt of transformix
 
-    :param file_path: path to outputpoints.txt
+    :param str file_path: path to outputpoints.txt
     :return: a list of dictionary with one element per point
     """
 
@@ -51,34 +51,34 @@ def read_transformix_output(file_path):
     return out
 
 
-def write_pts_file(file_name, Xs, Ys, Zs=None, index=False, force=False):
+def write_pts_file(file_name, xs, ys, zs=None, index=False, force=False):
     """ Write a pts file for elastix
 
-    :param file_name: target file
-    :param Xs: list of X values
-    :param Ys: list of Y values
-    :param Zs: list of Z value (or None for 2D)
-    :param index: coordinates is pixel coordinate (not real world coordinates) default False
-    :param force: erase file is name already exists (default False)
+    :param str file_name: target file
+    :param list xs: list of X values
+    :param list ys: list of Y values
+    :param list zs: list of Z value (or None for 2D)
+    :param bool index: coordinates is pixel coordinate (not real world coordinates) default False
+    :param bool force: erase file is name already exists (default False)
     :return:
     """
 
     if os.path.exists(file_name) and not force:
         raise IOError("File %s already exists. Use force to replace")
 
-    assert(len(Xs) == len(Ys))
-    to_zip = [Xs, Ys]
+    assert(len(xs) == len(ys))
+    to_zip = [xs, ys]
 
-    if Zs is not None:
-        assert(len(Xs) == len(Ys))
-        to_zip.append(Zs)
+    if zs is not None:
+        assert(len(xs) == len(ys))
+        to_zip.append(zs)
 
     with open(file_name, 'w') as out_file:
         # write the first line. VV should return thing in real world coordinate
         pts_type = 'index' if index else 'point'
         out_file.write('%s\n' % pts_type)
         # write the number of points
-        out_file.write('%i\n' % len(Xs))
+        out_file.write('%i\n' % len(xs))
         # Write all the line
         for data in zip(*to_zip):
             out_file.write(' '.join([str(d) for d in data]) + '\n')
@@ -86,14 +86,14 @@ def write_pts_file(file_name, Xs, Ys, Zs=None, index=False, force=False):
         out_file.write('\n')
 
 
-def read_vv_txt_landmarks(path2file):
+def read_vv_txt_landmarks(file_path):
     """ Read a VV landmark file
 
-    :param path2file:
+    :param str file_path:
     :return:
     """
     # read the vv file
-    with open(path2file, 'r') as in_file:
+    with open(file_path, 'r') as in_file:
         # get rid of useless first line
         header = in_file.readline()
         if not header.strip().lower().startswith('landmarks1'):
@@ -108,19 +108,19 @@ def read_vv_txt_landmarks(path2file):
     return data
 
 
-def read_masiv_roi(path2file):
+def read_masiv_roi(file_path):
     """ Read a masiv roi file
 
-    :param path2file: path to the masiv file
+    :param str file_path: path to the masiv file
     :return roi_coords: a list of list with 4 elements (X,Y,Z, cell type)
     """
 
     roi_coords = []
-    with open(path2file, 'r') as in_file:
+    with open(file_path, 'r') as in_file:
         data = yaml.load(in_file)
         for ctype, pts_prop in data.items():
             # keep only cell type with at least one point
-            if not 'markers' in pts_prop:
+            if 'markers' not in pts_prop:
                 continue
             coords = pts_prop['markers']
             for i, c in enumerate(coords):
@@ -133,7 +133,7 @@ def read_lasagna_pts(fname):
 
     It is just a list of space separated coordinante
 
-    :param fname: path to file (usually .pts)
+    :param str fname: path to file (usually .pts)
     :return data: a list of coordinates
     """
     with open(str(fname), 'r') as fid:
