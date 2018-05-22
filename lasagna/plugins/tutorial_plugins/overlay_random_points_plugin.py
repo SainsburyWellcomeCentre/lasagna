@@ -15,7 +15,7 @@ point data onto the plot axes. The plugin does the following:
 
 import numpy as np
 
-from lasagna.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 
 class plugin(lasagna_plugin): 

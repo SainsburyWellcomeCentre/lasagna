@@ -20,27 +20,26 @@ __license__ = "GPL v3"
 __maintainer__ = "Rob Campbell"
 
 
+# Parse command-line input arguments
+import argparse
+import os.path
+import sys
+
+import numpy as np
+import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
-import pyqtgraph as pg
-import numpy as np
-import sys
-import os.path
 
-
+from lasagna import imageStackLoader  # To load TIFF and MHD files
 # lasagna modules
 from lasagna import ingredients, lasagna_mainWindow, lasagna_axis
 from lasagna import lasagna_helperFunctions as lasHelp
-from lasagna import imageStackLoader                    # To load TIFF and MHD files
-from lasagna import pluginHandler                       # Deals with finding plugins in the path, etc
+from lasagna.plugins import plugin_handler
 
 # The following imports are made here in order to ensure Lasagna builds as a standlone
 # application on the Mac with py2app
 # import tifffile  # Used to load tiff and LSM files
 # import nrrd
-
-# Parse command-line input arguments
-import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-D", help="Load demo images", action="store_true")  # Store true makes it zero by default
 parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
@@ -192,7 +191,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         io_paths = list(set(io_paths))  # remove duplicate paths
 
         print("Adding IO module paths to Python path")
-        io_plugins, io_plugin_paths = pluginHandler.findPlugins(io_paths)
+        io_plugins, io_plugin_paths = plugin_handler.findPlugins(io_paths)
         for p in io_paths:
             sys.path.append(p)  # append to system path
             print(p)
@@ -201,8 +200,8 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # TODO: currently we only have code to handle load actions as no save actions are available
         self.loadActions = {}  # actions must be attached to the lasagna object or they won't function
         for io_module in io_plugins:
-            io_class, io_name = pluginHandler.getPluginInstanceFromFileName(io_module,
-                                                                            attributeToImport='loaderClass')
+            io_class, io_name = plugin_handler.getPluginInstanceFromFileName(io_module,
+                                                                             attributeToImport='loaderClass')
             this_instance = io_class(self)
             self.loadActions[this_instance.objectName] = this_instance
             print(("Added %s to load menu as object name %s" % (io_module, this_instance.objectName)))
@@ -272,7 +271,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
         plugin_paths = lasHelp.readPreference('pluginPaths')
 
-        plugins, plugin_paths = pluginHandler.findPlugins(plugin_paths)
+        plugins, plugin_paths = plugin_handler.findPlugins(plugin_paths)
         print("Adding plugin paths to Python path:")
         self.pluginSubMenus = {}
         for p in plugin_paths:  # print plugin paths to screen, add to path, add as sub-dir names in Plugins menu
@@ -290,7 +289,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.pluginActions = {}  # A dictionary where keys are plugin names and values are QActions associated with a plugin
         for plugin in plugins:
             # Get the module name and class
-            plugin_class, plugin_name = pluginHandler.getPluginInstanceFromFileName(plugin, None)
+            plugin_class, plugin_name = plugin_handler.getPluginInstanceFromFileName(plugin, None)
 
             # Get the name of the directory in which the plugin resides so we can add it to the right sub-menu
             dir_name = os.path.dirname(plugin_class.__file__).split(os.path.sep)[-1]
@@ -344,7 +343,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # NOTE: plugins with a window do not run the following code when the window is closed. They should, however,
         # detach hooks (unless the plugin author forgot to do this)
         del(self.plugins[pluginName])
-        plugin_class, pluginName = pluginHandler.getPluginInstanceFromFileName(pluginName+".py", None)
+        plugin_class, pluginName = plugin_handler.getPluginInstanceFromFileName(pluginName + ".py", None)
         self.plugins[pluginName] = plugin_class.plugin
 
     def runHook(self, hookArray, *args):

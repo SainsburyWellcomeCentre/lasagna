@@ -14,9 +14,12 @@ All points bearing the same lineseries_id are grouped into the same list.
 """
 
 import os
-from lasagna.lasagna_plugin import lasagna_plugin
+
 import numpy as np
 from PyQt5 import QtGui
+
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.tree import importData
 
 
 class loaderClass(lasagna_plugin):
@@ -24,7 +27,7 @@ class loaderClass(lasagna_plugin):
         super(loaderClass, self).__init__(lasagna)
 
         self.lasagna = lasagna
-        self.objectName = 'lines_reader'
+        self.objectName = 'tree_reader'
         self.kind = 'lines'
 
         # Construct the QActions and other stuff required to integrate the load dialog into the menu
@@ -32,23 +35,44 @@ class loaderClass(lasagna_plugin):
 
         # Add an icon to the action
         icon_load_overlay = QtGui.QIcon()
-        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/lines_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/tree_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.loadAction.setIcon(icon_load_overlay)
 
         # Insert the action into the menu
-        self.loadAction.setObjectName("linesRead")
+        self.loadAction.setObjectName("treeRead")
         self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
-        self.loadAction.setText("Lines read")
+        self.loadAction.setText("Tree read")
 
         self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
+
+    def dataFromPath(self, tree, path):
+        """
+        Get the data from the tree given a path.
+        """
+
+        z = []
+        x = []
+        y = []
+
+        for node in path:
+            if node == 0:
+                continue
+            z.append(tree.nodes[node].data['z'])
+            x.append(tree.nodes[node].data['x'])
+            y.append(tree.nodes[node].data['y'])
+        return z, x, y
 
     # Slots follow
     def showLoadDialog(self, fname=None):
         """
         This slot brings up the load dialog and retrieves the file name.
+        NOTE:
         If a filename is provided then this is loaded and no dialog is brought up.
         If the file name is valid, it loads the base stack using the load method.
         """
+
+        verbose = False 
+
         if not fname:
             fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv)")
     
@@ -57,42 +81,58 @@ class loaderClass(lasagna_plugin):
 
         if os.path.isfile(fname): 
             with open(str(fname), 'r') as fid:
-                contents = fid.read()
+                # import the tree
+                if verbose:
+                    print("tree_reader_plugin.showLoadDialog - importing %s" % fname)
 
-            # a list of strings with each string being one line from the file
+                data_tree = importData(fname, headerLine=['id', 'parent', 'z', 'x', 'y'], verbose=verbose)
+                if not data_tree:
+                    print("No data loaded from %s" % fname)
+                    return
+
+                # We now have an array of unique paths (segments)
+                paths = []
+                for thisSegment in data_tree.findSegments():
+                    paths.append(thisSegment)
+
+                as_list = []  # list of list data (one item per node)
+                for i, thisPath in enumerate(paths):
+                    data = self.dataFromPath(data_tree, thisPath)
+                    for j in range(len(data[0])):
+                        tmp = [i, data[0][j], data[1][j], data[2][j]]
+                        tmp = [float(x) for x in tmp]
+                        as_list.append(tmp)
+
             # add nans between lineseries
-            as_list = contents.split('\n')
-
             data = []
             last_line_series = None
             n = 0
-            expected_cols = 4
             for i in range(len(as_list)):
-                if not as_list[i]:
+                if len(as_list[i]) == 0:
                     continue
 
-                this_line_as_floats = [float(x) for x in as_list[i].split(',')]
-                if len(this_line_as_floats) != expected_cols:
-                    # Check that all rows have a length of 4, since this is what a line series needs
-                    print("Lines data file {} appears corrupt".format(fname))
-                    return                     
-
+                line = as_list[i]
                 if last_line_series is None:
-                    last_line_series = this_line_as_floats[0]
+                    last_line_series = line[0]
 
-                if last_line_series != this_line_as_floats[0]:
+                if last_line_series != line[0]:
                     n += 1
                     data.append([np.nan, np.nan, np.nan])
 
-                last_line_series = this_line_as_floats[0]
-                data.append(this_line_as_floats[1:])
+                last_line_series = line[0]
+                data.append(line[1:])
 
+            if verbose:
+                print("Divided tree into %d segments" % n)
+
+            # print data
             obj_name = fname.split(os.path.sep)[-1]
             self.lasagna.addIngredient(objectName=obj_name,
                                        kind=self.kind,
                                        data=np.asarray(data),
                                        fname=fname,
                                        )
+
             self.lasagna.returnIngredientByName(obj_name).addToPlots()  # Add item to all three 2D plots
             self.lasagna.initialiseAxes()
         else:

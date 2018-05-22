@@ -7,8 +7,8 @@ import os
 import tifffile
 from PyQt5 import QtGui
 
-from lasagna.lasagna_plugin import lasagna_plugin
 from lasagna import lasagna_helperFunctions as lasHelp
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 
 class loaderClass(lasagna_plugin):

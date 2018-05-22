@@ -6,15 +6,15 @@ Rob Campbell
 """
 
 import os
-import tempfile
-import subprocess  # To run the elastix binary
 import shutil
+import subprocess  # To run the elastix binary
+import tempfile
 
 from PyQt5 import QtGui, QtCore
 
-from lasagna.lasagna_plugin import lasagna_plugin
-from lasagna.registrationPlugins import elastix_plugin_UI
-from lasagna.registrationPlugins.which import which  # To test if binaries exist in system path
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.registration_plugins import elastix_plugin_UI
+from lasagna.plugins.registration_plugins import which  # To test if binaries exist in system path
 
 
 class plugin(lasagna_plugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  # must inherit lasagna_plugin first

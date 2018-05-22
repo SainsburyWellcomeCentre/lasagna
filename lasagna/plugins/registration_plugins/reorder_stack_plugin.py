@@ -3,9 +3,9 @@ A simple plugin just to change the order of the slices
 """
 from PyQt5 import QtGui
 
-from lasagna.lasagna_plugin import lasagna_plugin
-from lasagna.registrationPlugins import reorder_stack_UI
-from lasagna.registrationPlugins import selectstack_UI
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.registration_plugins import reorder_stack_UI
+from lasagna.plugins.registration_plugins import selectstack_UI
 
 
 class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  # must inherit lasagna_plugin first

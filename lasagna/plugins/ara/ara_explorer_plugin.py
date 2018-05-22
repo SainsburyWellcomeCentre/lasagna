@@ -12,16 +12,14 @@ import os.path
 
 from PyQt5 import QtGui, QtCore
 
-
 from lasagna import lasagna_helperFunctions as lasHelp
-from lasagna.lasagna_plugin import lasagna_plugin
 from lasagna.alert import alert
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 # For the UI
-from lasagna.ARA import ara_explorer_UI
-
+from lasagna.plugins.ara import ara_explorer_UI
 # For contour drawing
-from lasagna.ARA.ARA_plotter import ARA_plotter
+from lasagna.plugins.ara.ara_plotter import ARA_plotter
 
 
 class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): 

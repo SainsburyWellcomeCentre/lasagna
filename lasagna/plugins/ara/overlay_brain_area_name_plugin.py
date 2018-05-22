@@ -6,19 +6,16 @@ Overlays brain area onto a registered sample brain without overlaying the atlas.
 import os.path
 
 import numpy as np
-
 from PyQt5 import QtGui
-
-from lasagna import lasagna_helperFunctions as lasHelp
-from lasagna.lasagna_plugin import lasagna_plugin
-from lasagna.alert import alert
-from lasagna import imageStackLoader
-
 # For the UI
-from lasagna.ARA import area_namer_UI
+from lasagna.plugins.ara import area_namer_UI
 
+from lasagna import imageStackLoader
+from lasagna import lasagna_helperFunctions as lasHelp
+from lasagna.alert import alert
 # For contour drawing
-from lasagna.ARA.ARA_plotter import ARA_plotter
+from lasagna.plugins.ara.ara_plotter import ARA_plotter
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 
 class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_namer): 

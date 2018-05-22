@@ -7,8 +7,8 @@ mouse cursor is at.
 from PyQt5 import QtGui
 
 from lasagna import lasagna_helperFunctions
-from lasagna.lasagna_plugin import lasagna_plugin
-from lasagna.tutorialPlugins import cross_section_plot_UI
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.tutorial_plugins import cross_section_plot_UI
 
 
 class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #must inherit lasagna_plugin first

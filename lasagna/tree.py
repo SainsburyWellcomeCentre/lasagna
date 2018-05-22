@@ -4,8 +4,7 @@ Defines a tree and a node class as well as functions for importing data
 """
 import os.path
 
-from lasagna import dataTypeFromString
-
+from lasagna.utils import dataTypeFromString
 
 (_ROOT, _DEPTH, _WIDTH) = list(range(3))  # Used by classes to navigate the tree
 

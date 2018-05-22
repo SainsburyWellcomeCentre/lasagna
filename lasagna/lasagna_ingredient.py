@@ -8,7 +8,7 @@ from PyQt5 import QtGui, QtCore
 
 
 class lasagna_ingredient(object):
-    def __init__(self, parent, data, fnameAbsPath='', enable=True, objectName='',pgObject='', pgObjectConstructionArgs=dict()):
+    def __init__(self, parent, data, fnameAbsPath='', enable=True, objectName='', pgObject='', pgObjectConstructionArgs=dict()):
 
         self.parent = parent
         self._data = data                   # The raw data for this ingredient go here.
@@ -19,7 +19,7 @@ class lasagna_ingredient(object):
 
         self.enable = enable                # Item is plotted if enable is True. Hidden if enable is False
         self.pgObject = pgObject            # The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
-        self.pgObjectConstructionArgs = pgObjectConstructionArgs # The pyqtgraph item is created with these arguments
+        self.pgObjectConstructionArgs = pgObjectConstructionArgs  # The pyqtgraph item is created with these arguments
 
         self.color = None                   # The ingredient color (e.g. colour of the stack or lines or points)
 

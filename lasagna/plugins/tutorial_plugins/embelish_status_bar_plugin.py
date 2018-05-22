@@ -3,7 +3,7 @@
 """
 Embelishes the lasagna status bar in a pointless way
 """
-from lasagna.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 
 class plugin(lasagna_plugin):
