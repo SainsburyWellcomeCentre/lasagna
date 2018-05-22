@@ -1,5 +1,7 @@
-from lasagna.tree.tree_parser import _ROOT, _DEPTH, _WIDTH
 from lasagna.tree.node import Node
+
+
+_ROOT, _DEPTH, _WIDTH = list(range(3))  # Used by classes to navigate the tree
 
 
 class Tree(object):

@@ -7,8 +7,6 @@ import os
 from lasagna.tree.tree import Tree
 from lasagna.utils import data_type_from_string
 
-_ROOT, _DEPTH, _WIDTH = list(range(3))  # Used by classes to navigate the tree
-
 
 def parse_file(fname, displayTree=False, colSep=',', headerLine=None, verbose=False):
     """
