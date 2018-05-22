@@ -11,7 +11,7 @@ from skimage import measure
 
 from lasagna import tree
 # For handling the labels files
-from lasagna.plugins.ara import ara_json
+from lasagna.io_libs import ara_json
 
 
 class ARA_plotter(object):  # must inherit lasagna_plugin first

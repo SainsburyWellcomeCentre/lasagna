@@ -7,12 +7,12 @@ import os.path
 
 import numpy as np
 from PyQt5 import QtGui
-# For the UI
-from lasagna.plugins.ara import area_namer_UI
 
-from lasagna import imageStackLoader
 from lasagna import lasagna_helperFunctions as lasHelp
 from lasagna.alert import alert
+from lasagna.io_libs import image_stack_loader
+# For the UI
+from lasagna.plugins.ara import area_namer_UI
 # For contour drawing
 from lasagna.plugins.ara.ara_plotter import ARA_plotter
 from lasagna.plugins.lasagna_plugin import lasagna_plugin
@@ -191,7 +191,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.data['labels'] = self.loadLabels(paths['labels'])
 
         # Load the raw image data but do not display it.
-        self.data['atlas'] = imageStackLoader.loadStack(paths['atlas'])
+        self.data['atlas'] = image_stack_loader.loadStack(paths['atlas'])
 
         self.data['currentlyLoadedAtlasName'] = paths['atlas'].split(os.path.sep)[-1]
 
@@ -214,7 +214,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
         self.data['labels'] = self.loadLabels(paths['labels'])
 
         # load the selected atlas (without displaying it)
-        self.data['atlas'] = imageStackLoader.loadStack(fnameToLoad)
+        self.data['atlas'] = image_stack_loader.loadStack(fnameToLoad)
 
         self.data['currentlyLoadedAtlasName'] = fnameToLoad.split(os.path.sep)[-1]
 

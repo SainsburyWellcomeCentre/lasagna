@@ -4,7 +4,7 @@ This function accepts a csv file produced by aratools.utils.exportMaSIVPoints2La
 Each row of the csv file produced by that function is in this format:
 nodeId,parentID,z position,x position,y position
 
-This file imports this file and turns it into a format suitable
+This module imports this file and turns it into a format suitable
 for plotting in lasagna. i.e. into a line series format:
 line series #, z, x, y
 Where each line series is one segment from the tree. This is 

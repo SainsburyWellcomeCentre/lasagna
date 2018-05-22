@@ -30,10 +30,10 @@ import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
 
-from lasagna import imageStackLoader  # To load TIFF and MHD files
 # lasagna modules
 from lasagna import ingredients, lasagna_mainWindow, lasagna_axis
 from lasagna import lasagna_helperFunctions as lasHelp
+from lasagna.io_libs import image_stack_loader
 from lasagna.plugins import plugin_handler
 
 # The following imports are made here in order to ensure Lasagna builds as a standlone
@@ -381,14 +381,14 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         print(("Loading image stack " + fnameToLoad))
 
         # TODO: The axis swap likely shouldn't be hard-coded here
-        loaded_image_stack = imageStackLoader.loadStack(fnameToLoad)
+        loaded_image_stack = image_stack_loader.loadStack(fnameToLoad)
 
         if len(loaded_image_stack) == 0 and not loaded_image_stack:
             return False
 
         # Set up default values in tabs
         # It's ok to load images of different sizes but their voxel sizes need to be the same
-        ax_ratio = imageStackLoader.getVoxelSpacing(fnameToLoad)
+        ax_ratio = image_stack_loader.getVoxelSpacing(fnameToLoad)
         for i in range(len(ax_ratio)):
             self.axisRatioLineEdits[i].setText(str(ax_ratio[i]))
 
@@ -420,7 +420,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         self.runHook(self.hooks['loadImageStack_End'])
 
-    def showStackLoadDialog(self, triggered=None, fileFilter=imageStackLoader.imageFilter()):
+    def showStackLoadDialog(self, triggered=None, fileFilter=image_stack_loader.imageFilter()):
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.

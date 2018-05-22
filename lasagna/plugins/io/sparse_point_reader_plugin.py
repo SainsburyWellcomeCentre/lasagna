@@ -35,7 +35,7 @@ import os
 import numpy as np
 from PyQt5 import QtGui
 
-from lasagna.plugins.io.sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
+from lasagna.io_libs.sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
 from lasagna.plugins.lasagna_plugin import lasagna_plugin
 
 
