@@ -14,7 +14,7 @@ from lasagna.tree import tree_parser
 from lasagna.io_libs import ara_json
 
 
-class ARA_plotter(object):  # must inherit lasagna_plugin first
+class ARA_plotter(object):  # must inherit LasagnaPlugin first
     def __init__(self, lasagna_serving):
         super(ARA_plotter, self).__init__(lasagna_serving)
        

@@ -6,17 +6,17 @@ mouse cursor is at.
 
 from PyQt5 import QtGui
 
-from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.tutorial_plugins import cross_section_plot_UI
 from lasagna.utils import lasagna_qt_helper_functions
 
 
-class plugin(lasagna_plugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #must inherit lasagna_plugin first
+class plugin(LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #must inherit LasagnaPlugin first
 
     def __init__(self, lasagna_serving, parent=None):
-        super(plugin, self).__init__(lasagna_serving)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+        super(plugin, self).__init__(lasagna_serving)  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
 
-        # re-define some default properties that were originally defined in lasagna_plugin
+        # re-define some default properties that were originally defined in LasagnaPlugin
         self.pluginShortName = 'Cross Section'  # Appears on the menu
         self.pluginLongName = 'displays cross section in a new window'  # Can be used for other purposes (e.g. tool-tip)
         self.pluginAuthor = 'Rob Campbell'

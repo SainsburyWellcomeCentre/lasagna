@@ -3,17 +3,17 @@ A simple plugin just to change the order of the slices
 """
 from PyQt5 import QtGui
 
-from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.registration_plugins import reorder_stack_UI
 from lasagna.plugins.registration_plugins import selectstack_UI
 
 
-class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  # must inherit lasagna_plugin first
+class plugin(LasagnaPlugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  # must inherit LasagnaPlugin first
 
     def __init__(self, lasagna_serving, parent=None):
-        super(plugin, self).__init__(lasagna_serving)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+        super(plugin, self).__init__(lasagna_serving)  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
 
-        # re-define some default properties that were originally defined in lasagna_plugin
+        # re-define some default properties that were originally defined in LasagnaPlugin
         self.pluginShortName = 'Reorder stack'  # Appears on the menu
         self.pluginLongName = 'manually reorder a stack'  # Can be used for other purposes (e.g. tool-tip)
         self.pluginAuthor = 'Antonin Blot'
@@ -137,9 +137,9 @@ class plugin(lasagna_plugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  
         event.accept()
 
 
-class SelectStack(QtGui.QDialog, selectstack_UI.Ui_selectStack):  # must inherit lasagna_plugin first)
+class SelectStack(QtGui.QDialog, selectstack_UI.Ui_selectStack):  # must inherit LasagnaPlugin first)
     def __init__(self, parent=None, stack_list=[]):
-        super(SelectStack, self).__init__(parent)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+        super(SelectStack, self).__init__(parent)  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
         self.setupUi(self)
 
         for st in stack_list:

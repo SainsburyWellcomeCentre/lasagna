@@ -36,10 +36,10 @@ import numpy as np
 from PyQt5 import QtGui
 
 from lasagna.io_libs.sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
-from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 
 
-class loaderClass(lasagna_plugin):
+class loaderClass(LasagnaPlugin):
     def __init__(self, lasagna_serving):
         super(loaderClass, self).__init__(lasagna_serving)
 

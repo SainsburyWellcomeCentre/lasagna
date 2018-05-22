@@ -5,16 +5,16 @@ Creates a plugin that can add lines and points on the image manually
 import numpy as np
 from PyQt5 import QtGui
 
-from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.tutorial_plugins import add_line_UI
 
 
-class plugin(lasagna_plugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inherit lasagna_plugin first
+class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inherit LasagnaPlugin first
 
     def __init__(self, lasagna_serving, parent=None):
-        super(plugin, self).__init__(lasagna_serving)  # This calls the lasagna_plugin constructor which in turn calls subsequent constructors
+        super(plugin, self).__init__(lasagna_serving)  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
 
-        # re-define some default properties that were originally defined in lasagna_plugin
+        # re-define some default properties that were originally defined in LasagnaPlugin
         self.pluginShortName = 'Add lines'  # Appears on the menu
         self.pluginLongName = 'manually add lines and points'  # Can be used for other purposes (e.g. tool-tip)
         self.pluginAuthor = 'Antonin Blot'

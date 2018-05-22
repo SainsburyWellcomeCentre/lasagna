@@ -15,11 +15,11 @@ from lasagna.io_libs import image_stack_loader
 from lasagna.plugins.ara import area_namer_UI
 # For contour drawing
 from lasagna.plugins.ara.ara_plotter import ARA_plotter
-from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.utils.pref_utils import get_lasagna_pref_dir
 
 
-class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_namer): 
+class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, area_namer_UI.Ui_area_namer):
     def __init__(self, lasagna_serving):
         super(plugin, self).__init__(lasagna_serving)
         self.lasagna = lasagna_serving
@@ -133,7 +133,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
     # --------------------------------------
     # plugin hooks
     # all methods starting with hook_ are automatically registered as hooks with lasagna
-    # when the plugin is started this happens in the lasagna_plugin constructor
+    # when the plugin is started this happens in the LasagnaPlugin constructor
     def hook_updateStatusBar_End(self):
         """
         hooks into the status bar update function to show the brain area name in the status bar 
@@ -160,7 +160,7 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, area_namer_UI.Ui_area_n
     # --------------------------------------
     # UI slots
     # all methods starting with hook_ are automatically registered as hooks with lasagna
-    # when the plugin is started this happens in the lasagna_plugin constructor
+    # when the plugin is started this happens in the LasagnaPlugin constructor
     def araName_comboBox_slot(self):
         """
         Enables the load button only if the currently selected item is not loaded

@@ -18,10 +18,10 @@ import os
 import numpy as np
 from PyQt5 import QtGui
 
-from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 
 
-class loaderClass(lasagna_plugin):
+class loaderClass(LasagnaPlugin):
     def __init__(self, lasagna_serving):
         super(loaderClass, self).__init__(lasagna_serving)
 

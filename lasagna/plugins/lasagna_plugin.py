@@ -9,7 +9,7 @@ plugins are started. I prefer the latter.
 import re
 
 
-class lasagna_plugin(object):
+class LasagnaPlugin(object):
     """
     This class must implement the following:
 
@@ -18,7 +18,7 @@ class lasagna_plugin(object):
     3. Perform common duties at shutdown.
     """
     def __init__(self, lasagna_serving):
-        super(lasagna_plugin, self).__init__()  # In case of multiple inheritence. Useful for GUI making
+        super(LasagnaPlugin, self).__init__()  # In case of multiple inheritence. Useful for GUI making
         # This is crude, but the plugin will have access to everything
         # in the main window
         self.lasagna = lasagna_serving

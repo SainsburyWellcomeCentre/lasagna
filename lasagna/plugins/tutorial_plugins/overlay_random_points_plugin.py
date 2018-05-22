@@ -15,15 +15,15 @@ point data onto the plot axes. The plugin does the following:
 
 import numpy as np
 
-from lasagna.plugins.lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 
 
-class plugin(lasagna_plugin): 
+class plugin(LasagnaPlugin): 
 
     def __init__(self, lasagna_serving, parent=None):
         super(plugin, self).__init__(lasagna_serving)
 
-        # re-define some default properties that were originally defined in lasagna_plugin
+        # re-define some default properties that were originally defined in LasagnaPlugin
         self.pluginShortName = 'Overlay random points'
         self.pluginLongName = 'displays dynamically generated random points onto the axes'
         self.pluginAuthor = 'Rob Campbell'
