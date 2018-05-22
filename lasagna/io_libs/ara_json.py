@@ -18,7 +18,7 @@ def is_valid_json_file_path(fname):
     return True
 
 
-def importData(fname, verbose=False):
+def import_data(fname, verbose=False):
     """
     Import from ARA JSON
     """
@@ -33,11 +33,11 @@ def importData(fname, verbose=False):
     return flattened_tree, col_names
 
 
-def flatten_tree(obj, flattened=''):
+def flatten_tree(obj, flattened_tree=''):
     if obj['parent_structure_id'] is None:
         obj['parent_structure_id'] = 0
 
-    flattened += "{id}|{parent_id}|{atlas_id}|{acronym}|{name}|{color}\n".format(
+    flattened_tree += "{id}|{parent_id}|{atlas_id}|{acronym}|{name}|{color}\n".format(
             id=obj['id'],
             parent_id=obj['parent_structure_id'],
             atlas_id=obj['atlas_id'],
@@ -46,17 +46,19 @@ def flatten_tree(obj, flattened=''):
             color=obj['color_hex_triplet'])
 
     for child in obj.get('children', []):
-        flattened = flatten_tree(child, flattened=flattened)
+        flattened_tree = flatten_tree(child, flattened_tree=flattened_tree)  # FIXME: check if shouldn't bee +=
 
-    return flattened
+    return flattened_tree
 
 
 # ----------------------------------------------------------------------------
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        fname = sys.argv[1]
+        file_name = sys.argv[1]
+    else:
+        sys.exit()
 
-    (flattened, colNames) = importData(fname)
+    flattened_ara_tree, header = import_data(file_name)
 
     return_tree = True
 
@@ -64,6 +66,6 @@ if __name__ == '__main__':
     if return_tree:
         from lasagna.tree import tree_parser
 
-        tree_parser.parse_file(flattened.split('\n'), colSep='|', displayTree=True, headerLine=colNames)
+        tree_parser.parse_file(flattened_ara_tree.split('\n'), colSep='|', displayTree=True, headerLine=header)
     else:
-        print(flattened)
+        print(flattened_ara_tree)

@@ -44,7 +44,7 @@ class ARA_plotter(object):  # must inherit LasagnaPlugin first
             return tree_parser.parse_file(fname, colSep=col_sep)
 
         if fname.lower().endswith('.json'):
-            flattened, col_names = ara_json.importData(fname)
+            flattened, col_names = ara_json.import_data(fname)
             table = flattened.split('\n')
             return tree_parser.parse_file(table, colSep='|', headerLine=col_names)
 
