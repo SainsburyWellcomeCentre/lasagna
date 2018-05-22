@@ -24,9 +24,9 @@ class plugin(lasagna_plugin):
         super(plugin, self).__init__(lasagna)
 
         # re-define some default properties that were originally defined in lasagna_plugin
-        self.pluginShortName='Overlay random points' 
-        self.pluginLongName='displays dynamically generated random points onto the axes' 
-        self.pluginAuthor='Rob Campbell'
+        self.pluginShortName = 'Overlay random points'
+        self.pluginLongName = 'displays dynamically generated random points onto the axes'
+        self.pluginAuthor = 'Rob Campbell'
 
         self.lasagna = lasagna
 
