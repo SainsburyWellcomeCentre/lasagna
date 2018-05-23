@@ -98,16 +98,16 @@ class loaderClass(IoBasePlugin):
                 
                 # Loop through these unique series and add as separate sparse point objects
 
-                for thisIndex in d_series:
+                for idx in d_series:
                     tmp = []
-                    for thisRow in data:
-                        if thisRow[3] == thisIndex:
-                            tmp.append(thisRow[:3])
+                    for row in data:
+                        if row[3] == idx:
+                            tmp.append(row[:3])
 
-                    print("Adding point series %d with %d points" % (thisIndex,len(tmp)))
+                    print("Adding point series %d with %d points" % (idx, len(tmp)))
 
                     # Create an ingredient with the same name as the file name 
-                    obj_name = "%s #%d" % (fname.split(os.path.sep)[-1],thisIndex)
+                    obj_name = "%s #%d" % (fname.split(os.path.sep)[-1], idx)
 
                     self.lasagna.addIngredient(objectName=obj_name,
                                                kind=self.kind,

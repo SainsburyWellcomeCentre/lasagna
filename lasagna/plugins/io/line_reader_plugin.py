@@ -57,21 +57,21 @@ class loaderClass(IoBasePlugin):
                 if not as_list[i]:
                     continue
 
-                this_line_as_floats = [float(x) for x in as_list[i].split(',')]
-                if len(this_line_as_floats) != expected_cols:
+                line_as_floats = [float(x) for x in as_list[i].split(',')]
+                if len(line_as_floats) != expected_cols:
                     # Check that all rows have a length of 4, since this is what a line series needs
                     print("Lines data file {} appears corrupt".format(fname))
                     return                     
 
                 if last_line_series is None:
-                    last_line_series = this_line_as_floats[0]
+                    last_line_series = line_as_floats[0]
 
-                if last_line_series != this_line_as_floats[0]:
+                if last_line_series != line_as_floats[0]:
                     n += 1
                     data.append([np.nan, np.nan, np.nan])
 
-                last_line_series = this_line_as_floats[0]
-                data.append(this_line_as_floats[1:])
+                last_line_series = line_as_floats[0]
+                data.append(line_as_floats[1:])
 
             obj_name = fname.split(os.path.sep)[-1]
             self.lasagna.addIngredient(objectName=obj_name,
