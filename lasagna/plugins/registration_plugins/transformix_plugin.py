@@ -13,10 +13,9 @@ import time
 from PyQt5 import QtGui, QtCore
 
 import lasagna.utils.path_utils
-from lasagna.utils import preferences
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.registration_plugins import transformix_plugin_UI
-from lasagna.plugins.registration_plugins import which  # To test if binaries exist in system path
+from lasagna.utils import preferences, which
 
 
 class plugin(LasagnaPlugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin):  # must inherit LasagnaPlugin first

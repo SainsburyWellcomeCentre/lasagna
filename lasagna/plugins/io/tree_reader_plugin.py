@@ -35,7 +35,7 @@ class loaderClass(LasagnaPlugin):
 
         # Add an icon to the action
         icon_load_overlay = QtGui.QIcon()
-        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/tree_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/tree_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)  # FIXME: use module to give icon folder
         self.loadAction.setIcon(icon_load_overlay)
 
         # Insert the action into the menu
@@ -79,7 +79,7 @@ class loaderClass(LasagnaPlugin):
         if not fname:
             return
 
-        if os.path.isfile(fname): 
+        if os.path.isfile(fname):
             with open(str(fname), 'r') as fid:
                 # import the tree
                 if verbose:

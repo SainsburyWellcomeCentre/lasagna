@@ -14,7 +14,7 @@ from PyQt5 import QtGui, QtCore
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.registration_plugins import elastix_plugin_UI
-from lasagna.plugins.registration_plugins import which  # To test if binaries exist in system path
+from lasagna.utils import which
 
 
 class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  # must inherit LasagnaPlugin first

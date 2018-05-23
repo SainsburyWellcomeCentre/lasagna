@@ -51,7 +51,7 @@ class loaderClass(LasagnaPlugin):
 
         # Add an icon to the action
         icon_load_overlay = QtGui.QIcon()
-        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)  # FIXME: use module to give icon folder
         self.loadAction.setIcon(icon_load_overlay)
 
         # Insert the action into the menu
