@@ -27,81 +27,91 @@ import argparse
 import pyqtgraph as pg
 from PyQt5 import QtGui
 
-# Parse command-line input arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("-D", help="Load demo images", action="store_true")  # Store true makes it zero by default
-parser.add_argument("-im", nargs='+', help="file name(s) of image stacks to load")
-parser.add_argument("-S", nargs='+', help="file names of sparse points file(s) to load")
-parser.add_argument("-L", nargs='+', help="file names of lines file(s) to load")
-parser.add_argument("-T", nargs='+', help="file names of tree file(s) to load")
-parser.add_argument("-C", help="start a ipython console", action='store_true')
-parser.add_argument("-P", help="start plugin of this name. use string from plugins menu as the argument")
-args = parser.parse_args()
-
-PLUGIN_TO_START = args.P
-SPARSE_POINTS_TO_LOAD = args.S
-LINES_TO_LOAD = args.L
-TREES_TO_LOAD = args.T
-
-# Either load the demo stacks or a user-specified stacks
-if args.D:
-    import tempfile
-    import urllib.request, urllib.parse, urllib.error
 from lasagna.lasagna_object import Lasagna
 
-    IM_STACK_FNAMES_TO_LOAD = [tempfile.gettempdir() + os.path.sep + 'reference.tiff',
-                               tempfile.gettempdir() + os.path.sep + 'sample.tiff']
 
-    loadUrl = 'http://mouse.vision/lasagna/'
-    for fname in IM_STACK_FNAMES_TO_LOAD:
+def get_parser():
+    """
+    Parse command-line input arguments
+
+    :return: The argparse parser object
+    """
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('-i', '--image-stacks', dest='image_stacks', type=str, nargs='+',
+                        help='File name(s) of image stacks to load')
+
+    parser.add_argument('-S', '--sparse-points', dest='sparse_points', type=str, nargs='+',
+                        help='File names of sparse points file(s) to load')
+    parser.add_argument('-L', '--lines', type=str, nargs='+',
+                        help='File names of lines file(s) to load')
+    parser.add_argument('-T', '--tree', type=str, nargs='+',
+                        help='File names of tree file(s) to load')
+
+    parser.add_argument('-P', '--plugin', type=str,
+                        help="Start plugin of this name. Use string from plugins menu as the argument")
+
+    parser.add_argument('-C', '--console', action='store_true',  # Store true makes it False by default
+                        help='Start a ipython console')
+    parser.add_argument('-D', '--demo', action='store_true',
+                        help='Load demo images')
+    return parser
+
+
+def download_sample_stacks():
+    import tempfile
+    import urllib.request, urllib.parse, urllib.error
+    tmp_dir = tempfile.gettempdir()
+    img_stacks_filenames = [os.path.join(tmp_dir, 'reference.tiff'),
+                            os.path.join(tmp_dir, 'sample.tiff')]
+    base_url = 'http://mouse.vision/lasagna/'
+    for fname in img_stacks_filenames:
         if not os.path.exists(fname):
-            url = loadUrl + fname.split(os.path.sep)[-1]
-            print(('Downloading %s to %s' % (url, fname)))
+            url = base_url + os.path.basename(fname)
+            print('Downloading {} to {}'.format(url, fname))
             urllib.request.urlretrieve(url, fname)
-else:
-    IM_STACK_FNAMES_TO_LOAD = args.im
+    return img_stacks_filenames
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set up the figure window
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pluginToStart=None, embedConsole=False):
+def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load=None, trees_to_load=None,
+         plugin_to_start=None, embed_console=False):
+
     app = QtGui.QApplication([])
 
     tasty = Lasagna()
     tasty.app = app
 
     # Data from command line input if the user specified this
-    if imStackFnamesToLoad is not None:
-        for fname in imStackFnamesToLoad:
-            print(("Loading stack " + fname))
+    if im_stack_fnames_to_load is not None:
+        for fname in im_stack_fnames_to_load:
+            print("Loading stack {}".format(fname))
             tasty.loadImageStack(fname)
 
-    if sparsePointsToLoad is not None:
-        for fname in sparsePointsToLoad:
-            print(("Loading points " + fname))
+    if sparse_points_to_load is not None:
+        for fname in sparse_points_to_load:
+            print("Loading points {}".format(fname))
             tasty.loadActions['sparse_point_reader'].showLoadDialog(fname)
 
-    if linesToLoad is not None:
-        for fname in linesToLoad:
-            print(("Loading lines " + fname))
+    if lines_to_load is not None:
+        for fname in lines_to_load:
+            print("Loading lines {}".format(fname))
             tasty.loadActions['lines_reader'].showLoadDialog(fname)
 
-    if TREES_TO_LOAD is not None:
-        for fname in TREES_TO_LOAD:
-            print(("Loading tree " + fname))
+    if trees_to_load is not None:
+        for fname in trees_to_load:
+            print("Loading tree {}".format(fname))
             tasty.loadActions['tree_reader'].showLoadDialog(fname)
 
     tasty.initialiseAxes()
 
-    if pluginToStart is not None:
-        if pluginToStart in tasty.plugins:
-            tasty.startPlugin(pluginToStart)
-            tasty.pluginActions[pluginToStart].setChecked(True)
+    if plugin_to_start is not None:
+        if plugin_to_start in tasty.plugins:
+            tasty.startPlugin(plugin_to_start)
+            tasty.pluginActions[plugin_to_start].setChecked(True)
         else:
-            print(("No plugin '%s': not starting" % pluginToStart))
+            print("No plugin {}: not starting".format(plugin_to_start))
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Link slots to signals
     # connect views to the mouseMoved slot. After connection this runs in the background.
     proxies = []
@@ -114,7 +124,7 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
         proxy.axisID = i  # this is picked up the mouseMoved slot
         proxies.append(proxy)
 
-    if embedConsole:
+    if embed_console:
         from IPython import embed
         embed()
 
@@ -123,5 +133,15 @@ def main(imStackFnamesToLoad=None, sparsePointsToLoad=None, linesToLoad=None, pl
 
 # Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    main(imStackFnamesToLoad=IM_STACK_FNAMES_TO_LOAD, sparsePointsToLoad=SPARSE_POINTS_TO_LOAD, linesToLoad=LINES_TO_LOAD,
-         pluginToStart=PLUGIN_TO_START, embedConsole=args.C)
+    sys.path.append(os.path.abspath('.'))
+    args = get_parser().parse_args()
+
+    # Either load the demo stacks or a user-specified stacks
+    if args.demo:
+        img_stack_fnames_to_load = download_sample_stacks()
+    else:
+        img_stack_fnames_to_load = args.image_stacks
+
+    main(im_stack_fnames_to_load=img_stack_fnames_to_load, sparse_points_to_load=args.sparse_points,
+         lines_to_load=args.lines, trees_to_load=args.tree,
+         plugin_to_start=args.plugin, embed_console=args.console)
