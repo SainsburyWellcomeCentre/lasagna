@@ -7,6 +7,8 @@ Requires ijroi from: https://github.com/tdsmith/ijroi/blob/master/ijroi/ijroi.py
 
 """
 import os
+
+
 try:
     import ijroi
 except ImportError:
@@ -16,32 +18,17 @@ except ImportError:
     raise
 
 import numpy as np
-from PyQt5 import QtGui
 
-from lasagna.plugins import lasagna_plugin
+from lasagna.plugins.io.io_plugin_base import IoBasePlugin
 
 
-class loaderClass(lasagna_plugin):
+class loaderClass(IoBasePlugin):
     def __init__(self, lasagna_serving):
-        super(loaderClass, self).__init__(lasagna_serving)
-
-        self.lasagna = lasagna_serving
         self.objectName = 'fiji_roi_reader'
         self.kind = 'sparsepoints'
-        # Construct the QActions and other stuff required to integrate the load dialog into the menu
-        self.loadAction = QtGui.QAction(self.lasagna)  # Instantiate the menu action
-
-        # Add an icon to the action
-        icon_load_overlay = QtGui.QIcon()
-        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/points.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.loadAction.setIcon(icon_load_overlay)
-
-        # Insert the action into the menu
-        self.loadAction.setObjectName("fijiPointRead")
-        self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
-        self.loadAction.setText("Fiji roi read")
-
-        self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
+        self.icon_name = 'points'
+        self.actionObjectName = 'fijiPointRead'  # FIXME: rename or find way to compute from objectName
+        super(loaderClass, self).__init__(lasagna_serving)
 
     # Slots follow
     def showLoadDialog(self, fname=None):

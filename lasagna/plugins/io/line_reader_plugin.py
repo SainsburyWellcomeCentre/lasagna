@@ -16,33 +16,17 @@ All points bearing the same lineseries_id are grouped into the same list.
 import os
 
 import numpy as np
-from PyQt5 import QtGui
 
-from lasagna.plugins.lasagna_plugin import LasagnaPlugin
+from lasagna.plugins.io.io_plugin_base import IoBasePlugin
 
 
-class loaderClass(LasagnaPlugin):
+class loaderClass(IoBasePlugin):
     def __init__(self, lasagna_serving):
-        super(loaderClass, self).__init__(lasagna_serving)
-
-        self.lasagna = lasagna_serving
         self.objectName = 'lines_reader'
         self.kind = 'lines'
-
-        # Construct the QActions and other stuff required to integrate the load dialog into the menu
-        self.loadAction = QtGui.QAction(self.lasagna)  # Instantiate the menu action
-
-        # Add an icon to the action
-        icon_load_overlay = QtGui.QIcon()
-        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/lines_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.loadAction.setIcon(icon_load_overlay)
-
-        # Insert the action into the menu
-        self.loadAction.setObjectName("linesRead")
-        self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
-        self.loadAction.setText("Lines read")
-
-        self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
+        self.icon_name = 'lines_64'
+        self.actionObjectName = 'linesRead'
+        super(loaderClass, self).__init__(lasagna_serving)
 
     # Slots follow
     def showLoadDialog(self, fname=None):

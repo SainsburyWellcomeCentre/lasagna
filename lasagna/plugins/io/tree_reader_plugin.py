@@ -16,34 +16,18 @@ All points bearing the same lineseries_id are grouped into the same list.
 import os
 
 import numpy as np
-from PyQt5 import QtGui
 
-from lasagna.plugins.lasagna_plugin import LasagnaPlugin
+from lasagna.plugins.io.io_plugin_base import IoBasePlugin
 from lasagna.tree import tree_parser
 
 
-class loaderClass(LasagnaPlugin):
+class loaderClass(IoBasePlugin):
     def __init__(self, lasagna_serving):
-        super(loaderClass, self).__init__(lasagna_serving)
-
-        self.lasagna = lasagna_serving
         self.objectName = 'tree_reader'
         self.kind = 'lines'
-
-        # Construct the QActions and other stuff required to integrate the load dialog into the menu
-        self.loadAction = QtGui.QAction(self.lasagna)  # Instantiate the menu action
-
-        # Add an icon to the action
-        icon_load_overlay = QtGui.QIcon()
-        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/tree_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)  # FIXME: use module to give icon folder
-        self.loadAction.setIcon(icon_load_overlay)
-
-        # Insert the action into the menu
-        self.loadAction.setObjectName("treeRead")
-        self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
-        self.loadAction.setText("Tree read")
-
-        self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
+        self.icon_name = 'tree_64'
+        self.actionObjectName = 'treeRead'
+        super(loaderClass, self).__init__(lasagna_serving)
 
     def dataFromPath(self, tree, path):
         """

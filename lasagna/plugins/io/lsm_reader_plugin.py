@@ -5,33 +5,18 @@ Load an LSM stack into Lasagna
 import os
 
 import tifffile
-from PyQt5 import QtGui
 
+from lasagna.plugins.io.io_plugin_base import IoBasePlugin
 from lasagna.utils import preferences
-from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 
 
-class loaderClass(LasagnaPlugin):
+class loaderClass(IoBasePlugin):
     def __init__(self, lasagna_serving):
-        super(loaderClass, self).__init__(lasagna_serving)
-
-        self.lasagna = lasagna_serving
         self.objectName = 'LSM_reader'
         self.kind = 'imagestack'
-        # Construct the QActions and other stuff required to integrate the load dialog into the menu
-        self.loadAction = QtGui.QAction(self.lasagna)  # Instantiate the menu action
-
-        # Add an icon to the action
-        icon_load_overlay = QtGui.QIcon()
-        icon_load_overlay.addPixmap(QtGui.QPixmap(":/actions/icons/overlay.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.loadAction.setIcon(icon_load_overlay)
-
-        # Insert the action into the menu
-        self.loadAction.setObjectName("LSMread")
-        self.lasagna.menuLoad_ingredient.addAction(self.loadAction)
-        self.loadAction.setText("Load LSM stack")
-
-        self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
+        self.icon_name = 'overlay'
+        self.actionObjectName = 'LSMread'
+        super(loaderClass, self).__init__(lasagna_serving)
 
     # Slots follow
     def showLoadDialog(self):
