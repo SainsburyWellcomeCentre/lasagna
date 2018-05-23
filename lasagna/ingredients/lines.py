@@ -44,11 +44,11 @@ class lines(lasagna_ingredient):
 
         # Add checkbox
         thing = QtGui.QStandardItem()
-        thing.setFlags(QtCore.Qt.ItemIsEnabled  | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
+        thing.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable)
         thing.setCheckState(QtCore.Qt.Checked)
 
         # self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get access to the checkbox state
-        self.modelItems=name
+        self.modelItems = name
         self.model = self.parent.points_Model
 
         self.addToList()
