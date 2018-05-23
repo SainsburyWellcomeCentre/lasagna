@@ -86,33 +86,34 @@ class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_e
                 print("No files in {}. skipping".format(path))
                 continue
 
-            pths = dict(atlas='', labels='', template='')
+            pths = dict(atlas='', labels='')
             print("\n %d. Looking for files in directory %s" % (n, path))
             n += 1
 
             files = os.listdir(path)
 
             # get the file names
-            for file in files:
-                if file.startswith(self.atlasFileName):
-                    if file.endswith('raw'):
+            for fname in files:
+                if fname.startswith(self.atlasFileName):
+                    if fname.endswith('raw'):
                         continue
-                    pths['atlas'] = os.path.join(path, file)
-                    print("Adding atlas file {}".format(file))
+                    pths['atlas'] = os.path.join(path, fname)
+                    print("Adding atlas file {}".format(fname))
                     break 
 
-            for file in files:
-                if file.startswith(self.labelsFileName):
-                    pths['labels'] = os.path.join(path, file)
-                    print("Adding labels file {}".format(file))
+            for fname in files:
+                if fname.startswith(self.labelsFileName):
+                    pths['labels'] = os.path.join(path, fname)
+                    print("Adding labels file {}".format(fname))
                     break 
 
-            for file in files:
-                if file.startswith(self.templateFileName):
-                    if file.endswith('raw'):
+            pths['template'] = ''
+            for fname in files:
+                if fname.startswith(self.templateFileName):
+                    if fname.endswith('raw'):
                         continue
-                    pths['template'] = os.path.join(path, file)
-                    print("Adding template file {}".format(file))
+                    pths['template'] = os.path.join(path, fname)
+                    print("Adding template file {}".format(fname))
                     break
 
             if not pths['atlas'] or not pths['labels']:

@@ -45,8 +45,8 @@ class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, area_namer_UI.Ui_area_na
         # Warn and quit if there are no paths
         if not self.prefs['ara_paths']:
             self.warnAndQuit('Please fill in preferences file at<br>%s<br><a href='
-                             '"http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html">'
-                             'http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
+                             '"http://raacampbell.github.io/lasagna/ara_explorer_plugin.html">'
+                             'http://raacampbell.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
             return
 
         # Set up the UI
@@ -82,18 +82,18 @@ class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, area_namer_UI.Ui_area_na
             files = os.listdir(path)
 
             # get the file names
-            for thisFile in files:
-                if thisFile.startswith(self.atlasFileName):
-                    if thisFile.endswith('raw'):
+            for fname in files:
+                if fname.startswith(self.atlasFileName):
+                    if fname.endswith('raw'):
                         continue
-                    pths['atlas'] = os.path.join(path, thisFile)
-                    print("Adding atlas file %s" % thisFile)
+                    pths['atlas'] = os.path.join(path, fname)
+                    print("Adding atlas file {}".format(fname))
                     break 
 
-            for thisFile in files:
-                if thisFile.startswith(self.labelsFileName):
-                    pths['labels'] = os.path.join(path, thisFile)
-                    print("Adding labels file %s" % thisFile)
+            for fname in files:
+                if fname.startswith(self.labelsFileName):
+                    pths['labels'] = os.path.join(path, fname)
+                    print("Adding labels file {}".format(fname))
                     break 
 
             if not pths['atlas'] or not pths['labels']:
@@ -103,11 +103,11 @@ class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, area_namer_UI.Ui_area_na
             # If we're here, this entry should at least have a valid atlas file and a valid labels file
             # We will index the self.paths dictionary by the name of the atlas file as this is also
             # what will be put into the combobox.
-            atlas_dir_name = path.split(os.path.sep)[-1]  # FIXME: use os.path.basename
+            atlas_dir_name = path.split(os.path.sep)[-1]  # FIXME: use os.path.dirname or basename
 
             # skip if a file with this name already exists
             if atlas_dir_name in self.paths:
-                print("Skipping as a directory called %s is already in the list" % atlas_dir_name)
+                print("Skipping as a directory called {} is already in the list".format(atlas_dir_name))
                 continue
 
             # Add this ARA to the paths dictionary and to the combobox
@@ -120,8 +120,8 @@ class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, area_namer_UI.Ui_area_na
         # If we have no paths to ARAs by the end of this, issue an error alertbox and quit
         if not self.paths:
             self.warnAndQuit('Found no valid paths in preferences file at<br>%s.<br>SEE <a href='
-                             '"http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html"'
-                             '>http://raacampbell13.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
+                             '"http://raacampbell.github.io/lasagna/ara_explorer_plugin.html"'
+                             '>http://raacampbell.github.io/lasagna/ara_explorer_plugin.html</a>' % self.pref_file)
             return
 
         # If the user has asked for this, load the first ARA entry automatically
