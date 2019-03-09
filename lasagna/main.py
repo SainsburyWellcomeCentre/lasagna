@@ -15,9 +15,9 @@ tempfile
 urllib
 """
 
-__author__ = "Rob Campbell"
+__author__ = "Sainsbury Wellcome Centre"
 __license__ = "GPL v3"
-__maintainer__ = "Rob Campbell"
+__maintainer__ = "Sainsbury Wellcome Centre"
 
 
 import os

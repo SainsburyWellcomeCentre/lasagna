@@ -1,0 +1,11 @@
+Lasagna Changelog
+
+
+What is Lasagna?
+Lasagna is a Python-based image viewer for 3-D anatomy datasets. It was inspired by the "slicing viewer",
+VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 2015/2016 at the Mrsic-Flogel
+laboratory, Basel, by Rob Campbell.
+
+
+2019/03/09 Transfer ownership of repository to Sainsbury Wellcome Centre 2p serial section team
+
