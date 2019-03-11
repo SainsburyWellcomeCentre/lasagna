@@ -1,7 +1,7 @@
 name: lasagna_py3
 dependencies:
  - python=3
- - pyqt=5
+# - pyqt=5
  - numpy
  - tifffile
  - pyqtgraph
