@@ -2,14 +2,7 @@
 This class overlays points on top of the image stacks. 
 """
 
-
 import numpy as np
-<<<<<<< HEAD:ingredients/sparsepoints.py
-import os
-import pyqtgraph as pg
-from lasagna_ingredient import lasagna_ingredient
-=======
->>>>>>> refactoring:lasagna/ingredients/sparsepoints.py
 from PyQt5 import QtGui, QtCore
 from matplotlib import cm
 from numpy import linspace
@@ -47,11 +40,11 @@ class sparsepoints(lasagna_ingredient):
 
         # Set the colour of the object based on how many items are already present
         number_of_colors = 6
-        this_number = (self.parent.points_Model.rowCount()-1) % number_of_colors  # FIXME: rename
+        this_number = (self.parent.points_Model.rowCount() - 1) % number_of_colors  # FIXME: rename
         cm_subsection = linspace(0, 1, number_of_colors)
         colors = [cm.jet(x) for x in cm_subsection]
         color = colors[this_number]
-        self.color = [color[0]*255, color[1]*255, color[2]*255]
+        self.color = [color[0] * 255, color[1] * 255, color[2] * 255]
 
     def data(self, axisToPlot=0):
         """
@@ -71,7 +64,7 @@ class sparsepoints(lasagna_ingredient):
         """
         Plots the ingredient onto pyqtObject along axisAxisToPlot,
         onto the object with which it is associated
-        """ 
+        """
         if not pyqtObject:
             return
 
@@ -85,9 +78,9 @@ class sparsepoints(lasagna_ingredient):
         data = self.data(axisToPlot)
 
         # Find points within this z-plane +/- a certain region
-        z_range = self.parent.viewZ_spinBoxes[axisToPlot].value()-1
-        from_layer = sliceToPlot-z_range
-        to_layer = sliceToPlot+z_range
+        z_range = self.parent.viewZ_spinBoxes[axisToPlot].value() - 1
+        from_layer = sliceToPlot - z_range
+        to_layer = sliceToPlot + z_range
         data = data[(z >= from_layer) * (z <= to_layer), :]
         z = z[(z >= from_layer) * (z <= to_layer)]
 
@@ -97,11 +90,11 @@ class sparsepoints(lasagna_ingredient):
         data_to_add = []
         for i in range(len(data)):
             # Get size for out-of layer points
-            size = (self.symbolSize - abs(z[i]-sliceToPlot)*2)
+            size = (self.symbolSize - abs(z[i] - sliceToPlot) * 2)
             if size < 1:
                 size = 1
             # Get opacity for out-of layer points
-            alpha = (self.alpha - abs(z[i]-sliceToPlot)*20)
+            alpha = (self.alpha - abs(z[i] - sliceToPlot) * 20)
             if alpha < 10:
                 alpha = 10
 
@@ -157,6 +150,7 @@ class sparsepoints(lasagna_ingredient):
 
     def set_symbolSize(self, symbolSize):
         self._symbolSize = symbolSize
+
     symbolSize = property(get_symbolSize, set_symbolSize)
 
     def get_symbol(self):
@@ -164,6 +158,7 @@ class sparsepoints(lasagna_ingredient):
 
     def set_symbol(self, symbol):
         self._symbol = symbol
+
     symbol = property(get_symbol, set_symbol)
 
     def get_color(self):
@@ -172,11 +167,13 @@ class sparsepoints(lasagna_ingredient):
     def set_color(self, color):
         self._color = color
         self.setRowColor()
+
     color = property(get_color, set_color)
 
     def get_alpha(self):
         return self._alpha
 
     def set_alpha(self, alpha):
-        self._alpha = alpha        
+        self._alpha = alpha
+
     alpha = property(get_alpha, set_alpha)

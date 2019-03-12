@@ -66,11 +66,11 @@ def write_pts_file(file_name, xs, ys, zs=None, index=False, force=False):
     if os.path.exists(file_name) and not force:
         raise IOError("File %s already exists. Use force to replace")
 
-    assert(len(xs) == len(ys))
+    assert (len(xs) == len(ys))
     to_zip = [xs, ys]
 
     if zs is not None:
-        assert(len(xs) == len(ys))
+        assert (len(xs) == len(ys))
         to_zip.append(zs)
 
     with open(file_name, 'w') as out_file:
@@ -103,16 +103,12 @@ def read_vv_txt_landmarks(file_path):
             line_data = line.strip()
             if len(line_data):
                 line_data = line_data.split(' ')
-                assert(len(line_data) == 6)
+                assert (len(line_data) == 6)
                 data.append([line_data[i] for i in [2, 0, 1]])  # reorder in lasagna Z,X,Y system
     return data
 
 
-<<<<<<< HEAD:IO/sparse_point_io.py
-def read_masiv_roi(path2file):
-=======
 def read_masiv_roi(file_path):
->>>>>>> refactoring:lasagna/io_libs/sparse_point_io.py
     """ Read a masiv roi file
 
     :param str file_path: path to the masiv file
