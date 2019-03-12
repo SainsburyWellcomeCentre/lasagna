@@ -6,8 +6,8 @@ Lasagna is a lightweight platform for visualising for 3D volume data. Lasagna fe
 a flexible plugin system, allowing it to be easily extended using Python and PyQt. 
 Visualisation is peformed via three linked 2D views. Lasagna was written to explore 
 registration accuracy of 3D data, guide registration, and overlay point data onto images. 
-It was also written to help explore the Allen Reference Atlas. Lasagna is still under 
-development but is usable. 
+It was also written to help explore the Allen Reference Atlas. *Lasagna is still under 
+development but is usable*. For details [see the website](http://sainsburywellcomecentre.github.io/lasagna/). 
 
 ## Installation ##
 Lasagna runs on Python 3, PyQt5, and uses PyQtGraph for the plotting and requires the following modules:
