@@ -131,8 +131,7 @@ def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load
     sys.exit(app.exec_())
 
 
-# Start Qt event loop unless running in interactive mode.
-if __name__ == '__main__':
+def run():
     sys.path.append(os.path.abspath('.'))
     args = get_parser().parse_args()
 
@@ -145,3 +144,8 @@ if __name__ == '__main__':
     main(im_stack_fnames_to_load=img_stack_fnames_to_load, sparse_points_to_load=args.sparse_points,
          lines_to_load=args.lines, trees_to_load=args.tree,
          plugin_to_start=args.plugin, embed_console=args.console)
+
+
+# Start Qt event loop unless running in interactive mode.
+if __name__ == '__main__':
+    run()
