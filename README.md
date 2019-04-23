@@ -14,6 +14,26 @@ the [website](http://raacampbell.github.io/lasagna).
 
 
 ## Installation ##
+
+### Using conda ###
+
+An environment file is provided. If you use [conda](https://docs.conda.io/en/latest/), you can create a virtual environment and download all the dependencies by running: 
+```
+git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
+cd lasagna
+conda env create -f lasagna_environment.yml
+```
+Activate the virtual environment and install `lasagna`
+
+```
+source activate lasagna
+python setup.py install
+```
+
+Lasagna is now installed. 
+
+### Manual installation ###
+
 Lasagna runs on Python 3, PyQt5, and uses PyQtGraph for the plotting and requires the following modules:
 
 
@@ -83,7 +103,32 @@ This step isn't user-friendly, sorry.
 
 ## Usage
 
-See the [website](http://raacampbell.github.io/lasagna).
+To start lasagna, just activate the virtual environment (if you use conda or virtualenv) and enter `lasagna`. The command line arguments can be listed using `lasagna -h`
+
+```
+usage: lasagna [-h] [-i IMAGE_STACKS [IMAGE_STACKS ...]]
+               [-S SPARSE_POINTS [SPARSE_POINTS ...]] [-L LINES [LINES ...]]
+               [-T TREE [TREE ...]] [-P PLUGIN] [-C] [-D]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i IMAGE_STACKS [IMAGE_STACKS ...], --image-stacks IMAGE_STACKS [IMAGE_STACKS ...]
+                        File name(s) of image stacks to load (default: None)
+  -S SPARSE_POINTS [SPARSE_POINTS ...], --sparse-points SPARSE_POINTS [SPARSE_POINTS ...]
+                        File names of sparse points file(s) to load (default:
+                        None)
+  -L LINES [LINES ...], --lines LINES [LINES ...]
+                        File names of lines file(s) to load (default: None)
+  -T TREE [TREE ...], --tree TREE [TREE ...]
+                        File names of tree file(s) to load (default: None)
+  -P PLUGIN, --plugin PLUGIN
+                        Start plugin of this name. Use string from plugins
+                        menu as the argument (default: None)
+  -C, --console         Start a ipython console, once the console has started, enter "%gui qt" (default: False)
+  -D, --demo            Load demo images (default: False)
+```
+
+For more info, see the [website](http://raacampbell.github.io/lasagna).
 
 ## Current status ##
 Even the master branch is currently unstable (although should always be usable). 
