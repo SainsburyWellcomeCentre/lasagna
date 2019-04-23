@@ -10,7 +10,7 @@ Visualisation is peformed via three linked 2D views. Lasagna was written to expl
 registration accuracy of 3D data, guide registration, and overlay point data onto images. 
 It was also written to help explore the Allen Reference Atlas. Lasagna is under heavy 
 development but is maturing rapidly. For more information see 
-the [website](http://raacampbell.github.io/lasagna).
+the [website](https://sainsburywellcomecentre.github.io/OpenSerialSection/).
 
 
 ## Installation ##
