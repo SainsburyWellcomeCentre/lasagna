@@ -1,4 +1,4 @@
-name: lasagna_py3
+name: lasagna
 dependencies:
  - python=3
 # - pyqt=5
