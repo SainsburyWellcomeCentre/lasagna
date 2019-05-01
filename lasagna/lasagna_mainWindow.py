@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets, Qt
-from PyQt5.QtGui import QColor
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_lasagna_mainWindow(object):
@@ -64,7 +63,7 @@ class Ui_lasagna_mainWindow(object):
         self.gridLayout.addWidget(self.splitter_3, 0, 0, 1, 1)
         lasagna_mainWindow.setCentralWidget(self.centralwidget)
         self.menuBar = QtWidgets.QMenuBar(lasagna_mainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 26))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 20))
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
         self.menuFile.setObjectName("menuFile")
@@ -84,14 +83,12 @@ class Ui_lasagna_mainWindow(object):
         self.dockWidgetContents = QtWidgets.QWidget()
         self.dockWidgetContents.setObjectName("dockWidgetContents")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.dockWidgetContents)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.tabWidget = QtWidgets.QTabWidget(self.dockWidgetContents)
         self.tabWidget.setObjectName("tabWidget")
         self.imageSettingsTab = QtWidgets.QWidget()
         self.imageSettingsTab.setObjectName("imageSettingsTab")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.imageSettingsTab)
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.intensityHistogram = PlotWidget(self.imageSettingsTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -141,7 +138,6 @@ class Ui_lasagna_mainWindow(object):
         self.pointsSettingsTab = QtWidgets.QWidget()
         self.pointsSettingsTab.setObjectName("pointsSettingsTab")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.pointsSettingsTab)
-        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.points_TreeView = QtWidgets.QTreeView(self.pointsSettingsTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -588,6 +584,6 @@ class Ui_lasagna_mainWindow(object):
         self.actionOpen_2.setText(_translate("lasagna_mainWindow", "Open"))
 
 
-from pyqtgraph import PlotWidget
 from lasagna.lasagnaplotwidget import LasagnaPlotWidget
-from lasagna import mainWindow_rc
+from pyqtgraph import PlotWidget
+import mainWindow_rc
