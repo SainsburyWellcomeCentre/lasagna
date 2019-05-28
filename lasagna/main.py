@@ -127,11 +127,12 @@ def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load
     if embed_console:
         from IPython import embed
         embed()
-
+    app.aboutToQuit.connect(tasty.shutdown_kernel)
     sys.exit(app.exec_())
 
 
 def run():
+    print('Starting')
     sys.path.append(os.path.abspath('.'))
     args = get_parser().parse_args()
 
