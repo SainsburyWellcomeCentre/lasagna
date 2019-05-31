@@ -28,17 +28,17 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         self.closeButton.released.connect(self.closePlugin)
         self.id_count = 0
         # add a sparsepoints ingredient
-        self.ptsName = 'addLine_currentLine'
-        self.lasagna.addIngredient(object_name=self.ptsName,
+        self.pts_name = 'addLine_currentLine'
+        self.lasagna.addIngredient(objectName=self.pts_name,
                                    kind='sparsepoints',
                                    data=[])
-        self.lasagna.returnIngredientByName(self.ptsName).addToPlots()  # Add item to all three 2D plots
+        self.lasagna.returnIngredientByName(self.pts_name).addToPlots()  # Add item to all three 2D plots
         # add a line ingredient
-        self.lineName = 'addLine_fit_currentLine'
-        self.lasagna.addIngredient(object_name=self.lineName,
+        self.line_name = 'addLine_fit_currentLine'
+        self.lasagna.addIngredient(objectName=self.line_name,
                                    kind='lines',
                                    data=[])
-        self.lasagna.returnIngredientByName(self.lineName).addToPlots()  # Add item to all three 2D plots
+        self.lasagna.returnIngredientByName(self.line_name).addToPlots()  # Add item to all three 2D plots
         self.fit = {}
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
@@ -76,8 +76,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
     def add_line(self):
         """Add the current line and points to lasagna and start a new line"""
 
-        ptsName = '%s_pts'%self.name_lineEdit.text()
-        self.lasagna.addIngredient(object_name=ptsName,
+        pts_name = '%s_pts'%self.name_lineEdit.text()
+        self.lasagna.addIngredient(objectName=pts_name,
                                    kind='sparsepoints',
                                    data=self.get_points_coord())
         self.lasagna.returnIngredientByName(pts_name).addToPlots()  # Add i
@@ -85,8 +85,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         if self.fit:
             data = self.fit['fit_coords']
 
-            lineName = '%s_fit'%self.name_lineEdit.text()
-            self.lasagna.addIngredient(object_name=lineName,
+            line_name = '%s_fit'%self.name_lineEdit.text()
+            self.lasagna.addIngredient(objectName=line_name,
                                        kind='lines',
                                        data=data)
             self.lasagna.returnIngredientByName(line_name).addToPlots()  # Add item to all three 2D plots
@@ -110,7 +110,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         :return:
         """
         coords = self.get_points_coord()
-        pts = self.lasagna.returnIngredientByName(self.ptsName)
+        pts = self.lasagna.returnIngredientByName(self.pts_name)
 
         changed = False
         if len(coords) != len(pts.raw_data()):
@@ -173,7 +173,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         line_coords = np.repeat(fit_data, 3).reshape((-1, 3))
         line_coords[:, 0] = self.lasagna.axes2D[0].currentSlice
         line_coords[:, replaced_ax] = self.fit['fit'](fit_data)
-        line = self.lasagna.returnIngredientByName(self.lineName)
+        line = self.lasagna.returnIngredientByName(self.line_name)
         line._data = line_coords
         self.fit['fit_coords'] = line_coords
 
@@ -211,8 +211,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         """
         This method is called by lasagna when the user unchecks the plugin in the menu.
         """
-        self.lasagna.removeIngredientByName(self.ptsName)
-        self.lasagna.removeIngredientByName(self.lineName)
+        self.lasagna.removeIngredientByName(self.pts_name)
+        self.lasagna.removeIngredientByName(self.line_name)
         self.detachHooks() 
         self.close()
 
