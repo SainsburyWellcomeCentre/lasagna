@@ -18,7 +18,7 @@ from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 import numpy as np
 from PyQt5 import QtGui
 
-from tree import importData
+from lasagna.tree import importData
 
 
 class loaderClass(LasagnaPlugin):
