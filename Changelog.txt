@@ -15,9 +15,9 @@ Very extensive changes have been made to the dev branch and many things currentl
 First goal is to get everything running again. Some things are partially refactored, like tree, 
 and so aren't working. The first goal is to get everything running and then we can go back and 
 refactor. To that end I will add a tag to 7c1d0a7b4437864d3d6cb9dd6518901dad627113 on GitHub. 
-This is the last commit with partially refactored stuff. I will revert stuff that's not working
-yet in order to get it working. We can later come back to this commit and use it as the basis
-for refactoring. 
+This is tagged as refactorBreakPoint01 This is the last commit with partially refactored stuff. 
+I will revert stuff that's not working yet in order to get it working. We can later come back 
+to this commit and use it as the basis for refactoring. 
 
 
 
