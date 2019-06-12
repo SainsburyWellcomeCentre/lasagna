@@ -13,13 +13,13 @@ All points bearing the same lineseries_id are grouped into the same list.
 """
 
 import os
-from lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 import numpy as np
 from PyQt5 import QtGui
-from sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
+from lasagna.plugins.io.sparse_point_reader_plugin import read_pts_file, read_masiv_roi, read_lasagna_pts
 
 
-class loaderClass(lasagna_plugin):
+class loaderClass(LasagnaPlugin):
     def __init__(self, lasagna):
         super(loaderClass, self).__init__(lasagna)
 

@@ -5,7 +5,6 @@ This enables more than one plugin to use these features.
 """
 
 
-import lasagna_helperFunctions as lasHelp 
 import numpy as np
 import pyqtgraph as pg
 import os.path
@@ -15,7 +14,8 @@ import os.path
 
 
 #For handling the labels files
-import ara_json, tree
+import lasagna.tree
+import lasagna.io_libs.ara_json
 
 #For contour drawing
 from skimage import measure
@@ -23,7 +23,7 @@ from skimage import measure
 class ARA_plotter(object): #must inherit lasagna_plugin first
     def __init__(self,lasagna):
         super(ARA_plotter,self).__init__(lasagna)
-       
+
         self.lasagna = lasagna
         self.contourName = 'aracontour' #The ingredient name for the ARA contour
 
@@ -62,7 +62,7 @@ class ARA_plotter(object): #must inherit lasagna_plugin first
         """
         with open(fname,'r') as fid:
             contents=fid.read()
-    
+
         nLines = contents.count('\n')
         possibleSeparators = ['|','\t',','] #don't include space because for these data that would be crazy
         for thisSep in possibleSeparators:

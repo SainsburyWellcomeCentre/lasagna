@@ -13,11 +13,11 @@ point data onto the plot axes. The plugin does the following:
 
 """
 
-from lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 import numpy as np
 import sys
 
-class plugin(lasagna_plugin): 
+class plugin(LasagnaPlugin): 
 
     def __init__(self,lasagna,parent=None):
         super(plugin,self).__init__(lasagna)

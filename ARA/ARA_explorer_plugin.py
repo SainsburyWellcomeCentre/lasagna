@@ -8,17 +8,17 @@ plugin under construction
 
 """
 
-import lasagna_helperFunctions as lasHelp
+import lasagna.utils.preferences as lasPref # Module the provides a variety of import functions (e.g. preference file handling)
 from PyQt5.QtWidgets import *
-from lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 import numpy as np
 import pyqtgraph as pg
 import os.path
-from alert import alert
+from lasagna.alert import alert
 
 #For the UI
 from PyQt5 import QtGui, QtCore
-import ara_explorer_UI
+import lasagna.plugins.ara.ara_explorer_UI as ara_explorer_UI
 
 #For contour drawing
 from skimage import measure
@@ -26,7 +26,7 @@ from skimage import measure
 from ARA_plotter import ARA_plotter
 
 
-class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): 
+class plugin(ARA_plotter, LasagnaPlugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_explorer): 
     def __init__(self,lasagna):
         super(plugin,self).__init__(lasagna)
         self.lasagna=lasagna
@@ -37,8 +37,8 @@ class plugin(ARA_plotter, lasagna_plugin, QtGui.QWidget, ara_explorer_UI.Ui_ara_
 
 
         #Read file locations from preferences file (creating a default file if none exists)
-        self.pref_file = lasHelp.getLasagna_prefDir() + 'ARA_plugin_prefs.yml'
-        self.prefs = lasHelp.loadAllPreferences(prefFName=self.pref_file,defaultPref=self.defaultPrefs())
+        self.pref_file = lasPref.getLasagna_prefDir() + 'ARA_plugin_prefs.yml'
+        self.prefs = lasPref.loadAllPreferences(prefFName=self.pref_file,defaultPref=self.defaultPrefs())
 
         #The last value the mouse hovered over. When this changes, we re-calculate the contour 
         self.lastValue=-1

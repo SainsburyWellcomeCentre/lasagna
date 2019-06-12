@@ -14,14 +14,14 @@ All points bearing the same lineseries_id are grouped into the same list.
 """
 
 import os
-from lasagna_plugin import lasagna_plugin
+from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 import numpy as np
 from PyQt5 import QtGui
-import lasagna_helperFunctions as lasHelp # Module the provides a variety of import functions (e.g. preference file handling)
+
 from tree import importData
 
 
-class loaderClass(lasagna_plugin):
+class loaderClass(LasagnaPlugin):
     def __init__(self,lasagna):
         super(loaderClass,self).__init__(lasagna)
 
