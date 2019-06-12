@@ -16,8 +16,14 @@ the [website](http://sainsburywellcomecentre.github.io/lasagna/).
 ## Installation ##
 
 ### Using conda ###
+First clone the repo and `cd` to it:
+```
+git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
+cd lasagna
+```
 
-An environment file is provided. If you use [conda](https://docs.conda.io/en/latest/), you can create a virtual environment and download all the dependencies by running: 
+An environment file is provided. 
+If you use [conda](https://docs.conda.io/en/latest/), you can create a virtual environment and download all the dependencies by running: 
 ```
 git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
 cd lasagna
@@ -30,7 +36,13 @@ source activate lasagna
 python setup.py install
 ```
 
-Lasagna is now installed. 
+Lasagna is now installed and can be run with `lasagna`. 
+If this fails run:
+```
+pip  install -e ./
+```
+Then try `lasagna` again. 
+
 
 ### Manual installation ###
 
@@ -96,7 +108,7 @@ pip3 install matplotlib
 
 
 
-## Setup ##
+## Configuring Lasagna ##
 After the first run, Lasagna creates a preferences file in the ```.lasagna``` hidden directory in your home directory. 
 You may need to edit this file to make Lasagna aware of its built in-plugins. i.e. edit the pluginPaths preference. 
 This step isn't user-friendly, sorry.
