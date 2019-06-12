@@ -39,8 +39,9 @@ python setup.py install
 Lasagna is now installed and can be run with `lasagna`. 
 If this fails run:
 ```
-pip  install -e ./
+pip install -e ./
 ```
+
 Then try `lasagna` again. 
 
 

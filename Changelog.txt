@@ -7,5 +7,21 @@ VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 
 laboratory, Basel, by Rob Campbell.
 
 
-2019/03/09 Transfer ownership of repository to Sainsbury Wellcome Centre 2p serial section team
 
+
+
+2019/06/12 - Rob Campbell
+Very extensive changes have been made to the dev branch and many things currently don't start. 
+First goal is to get everything running again. Some things are partially refactored, like tree, 
+and so aren't working. The first goal is to get everything running and then we can go back and 
+refactor. To that end I will add a tag to 7c1d0a7b4437864d3d6cb9dd6518901dad627113 on GitHub. 
+This is the last commit with partially refactored stuff. I will revert stuff that's not working
+yet in order to get it working. We can later come back to this commit and use it as the basis
+for refactoring. 
+
+
+
+FROM NOW ON ALL CHANGES SHOULD BE DESCRIBED. ESPECIALLY STUFF TO DO WITH REFACTORING THIS THING
+
+
+2019/03/09 Transfer ownership of repository to Sainsbury Wellcome Centre 2p serial section team
