@@ -9,6 +9,7 @@ This information is then displayed on the screen.
 
 
 from PyQt5 import QtGui
+from PyQt5.QtWidgets import qApp
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.tutorial_plugins import infoBox_UI
@@ -37,7 +38,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, infoBox_UI.Ui_infoBox):  # must inher
         z, x, y = self.lasagna.mousePositionInStack
 
         pos = QtGui.QCursor.pos()
-        current_widget = QtGui.qApp.widgetAt(pos)
+        current_widget = qApp.widgetAt(pos)
         try:
             plot_widget = current_widget.parent()
             current_axis_name = plot_widget.objectName()
