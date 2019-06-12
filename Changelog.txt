@@ -19,6 +19,14 @@ This is tagged as refactorBreakPoint01 This is the last commit with partially re
 I will revert stuff that's not working yet in order to get it working. We can later come back 
 to this commit and use it as the basis for refactoring. 
 
+291ffac8273b3609573075be6e3f44c795332f5f
+Most modules now load. All this commit does is change module load paths. Mainly:
+"import lasagna_helperFunctions as lasHelp" to "import lasagna.utils.preferences as lasPref"
+"from lasagna_plugin import lasagna_plugin" to "from lasagna.plugins.lasagna_plugin import LasagnaPlugin"
+
+1ee8bea3ed16d423d2938163f63f49f31c0ea8c9
+Reverts partial refactoring of the tree class used for plotting neurite trees and also for the ARA tree view. 
+TODO: in future refactor tree. See Issue #192.
 
 
 FROM NOW ON ALL CHANGES SHOULD BE DESCRIBED. ESPECIALLY STUFF TO DO WITH REFACTORING THIS THING
