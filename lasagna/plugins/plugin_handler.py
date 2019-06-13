@@ -44,7 +44,7 @@ def get_plugin_instance_from_file_name(file_name, attribute_to_import='plugin'):
     try:
         imported_module = __import__(module_name)
     except ImportError as err:
-        print('Could not load module {}. Skipping.'.format(module_name))
+        print(' * Could not load plugin module {}. Skipping.'.format(module_name))
         #print(err.__class__.__name__ + ": " + err.message) ## TODO: uncomment to see error, but then loading does not proceed
         return None, None
     if attribute_to_import is not None:

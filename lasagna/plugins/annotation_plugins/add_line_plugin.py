@@ -6,7 +6,7 @@ import numpy as np
 from PyQt5 import QtGui
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
-from lasagna.plugins.tutorial_plugins import add_line_UI
+from lasagna.plugins.annotation_plugins import add_line_UI
 
 
 class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inherit LasagnaPlugin first
