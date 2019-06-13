@@ -7,12 +7,7 @@ Lasagna a lightweight platform for visualising for 3D volume data developed for 
 a flexible plugin system, allowing it to be easily extended using Python and PyQt. 
 Visualisation is peformed via three linked 2D views. Lasagna was written to explore 
 registration accuracy of 3D data, guide registration, and overlay point data onto images. 
-
-It was also written to help explore the Allen Reference Atlas. Lasagna is under heavy 
-development but is maturing rapidly. For more information see 
-the [website](http://sainsburywellcomecentre.github.io/lasagna/).
-
-
+For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/lasagna/wiki).
 ## Installation ##
 
 ### Using conda ###
@@ -36,13 +31,13 @@ source activate lasagna
 python setup.py install
 ```
 
-Lasagna is now installed and can be run with `lasagna`. 
+Lasagna is now installed. Try `lasagna -D` for load with a demo image. 
 If this fails run:
 ```
 pip install -e ./
 ```
 
-Then try `lasagna` again. 
+Then try starting lasgna again. 
 
 
 ### Manual installation ###
@@ -140,7 +135,7 @@ optional arguments:
   -D, --demo            Load demo images (default: False)
 ```
 
-For more info, see the [website](http://sainsburywellcomecentre.github.io/lasagna/).
+For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/lasagna/wiki).
 
 ## Current status ##
 Even the master branch is currently unstable (although should always be usable). 
