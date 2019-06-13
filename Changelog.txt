@@ -11,6 +11,8 @@ laboratory, Basel, by Rob Campbell.
 2019/06/13 
 - Rob Campbell
 Bugfixes and minor re-organisation. 
+Replace lasagna which (caused a crash) with shutils.which (since we now are on >>Python 3.3)
+Bugfix in MHD header reader that was causing files to fail to load. 
 
 
 2019/06/12 

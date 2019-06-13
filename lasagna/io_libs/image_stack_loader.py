@@ -264,14 +264,13 @@ def mhd_read_raw_file(fname, header):
 
 def get_format_type_from_mhd_header(header):
     # Set the data type correctly
+    format_type = False
     if 'datatype' in header:
         datatype = header['datatype'].lower()
         try:
             format_type = DATA_TYPES[datatype]
         except KeyError:
             format_type = False
-    else:
-        format_type = False
 
     # If we couldn't find it, look in the ElenentType field
     if not format_type:
@@ -279,10 +278,7 @@ def get_format_type_from_mhd_header(header):
             datatype = header['elementtype'].lower()
             if datatype == 'met_short':
                 format_type = 'h'
-            else:
-                format_type = False
-    else:
-        format_type = False
+
     return format_type
 
 
@@ -342,7 +338,7 @@ def mhd_read_header_file(fname):
 
         key = m.groups()[0].lower()  # This is the data key
 
-        # Now we get the data
+        # Before getting the value (data) for this line, make sure that we have something readable.
         m = re.match('\A\w+ *= * (.*) *', line)
         if m is None:
             print("Can not get data for key {}".format(key))
