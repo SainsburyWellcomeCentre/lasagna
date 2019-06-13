@@ -1,15 +1,52 @@
 # Lasagna - Python Volume Visualiser for 3-D data. #
 
+![cover image](http://sainsburywellcomecentre.github.io/lasagna/images/mainWindow.jpg "Main Window")
 
 ## Concept ##
-Lasagna is a lightweight platform for visualising for 3D volume data. Lasagna features
+Lasagna a lightweight platform for visualising for 3D volume data developed for the [OpenSerialSection](https://sainsburywellcomecentre.github.io/OpenSerialSection/) project. Lasagna features
 a flexible plugin system, allowing it to be easily extended using Python and PyQt. 
 Visualisation is peformed via three linked 2D views. Lasagna was written to explore 
 registration accuracy of 3D data, guide registration, and overlay point data onto images. 
-It was also written to help explore the Allen Reference Atlas. *Lasagna is still under 
-development but is usable*. For details [see the website](http://sainsburywellcomecentre.github.io/lasagna/). 
+
+It was also written to help explore the Allen Reference Atlas. Lasagna is under heavy 
+development but is maturing rapidly. For more information see 
+the [website](http://sainsburywellcomecentre.github.io/lasagna/).
+
 
 ## Installation ##
+
+### Using conda ###
+First clone the repo and `cd` to it:
+```
+git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
+cd lasagna
+```
+
+An environment file is provided. 
+If you use [conda](https://docs.conda.io/en/latest/), you can create a virtual environment and download all the dependencies by running: 
+```
+git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
+cd lasagna
+conda env create -f lasagna_environment.yml
+```
+Activate the virtual environment and install `lasagna`
+
+```
+source activate lasagna
+python setup.py install
+```
+
+Lasagna is now installed and can be run with `lasagna`. 
+If this fails run:
+```
+pip install -e ./
+```
+
+Then try `lasagna` again. 
+
+
+### Manual installation ###
+
 Lasagna runs on Python 3, PyQt5, and uses PyQtGraph for the plotting and requires the following modules:
 
 
@@ -72,12 +109,38 @@ pip3 install matplotlib
 
 
 
-## Setup ##
+## Configuring Lasagna ##
 After the first run, Lasagna creates a preferences file in the ```.lasagna``` hidden directory in your home directory. 
 You may need to edit this file to make Lasagna aware of its built in-plugins. i.e. edit the pluginPaths preference. 
 This step isn't user-friendly, sorry.
 
 ## Usage
+To start lasagna, just activate the virtual environment (if you use conda or virtualenv) and enter `lasagna`. The command line arguments can be listed using `lasagna -h`
+
+```
+usage: lasagna [-h] [-i IMAGE_STACKS [IMAGE_STACKS ...]]
+               [-S SPARSE_POINTS [SPARSE_POINTS ...]] [-L LINES [LINES ...]]
+               [-T TREE [TREE ...]] [-P PLUGIN] [-C] [-D]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i IMAGE_STACKS [IMAGE_STACKS ...], --image-stacks IMAGE_STACKS [IMAGE_STACKS ...]
+                        File name(s) of image stacks to load (default: None)
+  -S SPARSE_POINTS [SPARSE_POINTS ...], --sparse-points SPARSE_POINTS [SPARSE_POINTS ...]
+                        File names of sparse points file(s) to load (default:
+                        None)
+  -L LINES [LINES ...], --lines LINES [LINES ...]
+                        File names of lines file(s) to load (default: None)
+  -T TREE [TREE ...], --tree TREE [TREE ...]
+                        File names of tree file(s) to load (default: None)
+  -P PLUGIN, --plugin PLUGIN
+                        Start plugin of this name. Use string from plugins
+                        menu as the argument (default: None)
+  -C, --console         Start a ipython console, once the console has started, enter "%gui qt" (default: False)
+  -D, --demo            Load demo images (default: False)
+```
+
+For more info, see the [website](http://sainsburywellcomecentre.github.io/lasagna/).
 
 ## Current status ##
 Even the master branch is currently unstable (although should always be usable). 

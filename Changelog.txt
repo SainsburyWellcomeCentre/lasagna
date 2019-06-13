@@ -1,0 +1,43 @@
+Lasagna Changelog
+
+
+What is Lasagna?
+Lasagna is a Python-based image viewer for 3-D anatomy datasets. It was inspired by the "slicing viewer",
+VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 2015/2016 at the Mrsic-Flogel
+laboratory, Basel, by Rob Campbell.
+
+
+
+2019/06/13 
+- Rob Campbell
+Bugfixes and minor re-organisation. 
+Replace lasagna which (caused a crash) with shutils.which (since we now are on >>Python 3.3)
+Bugfix in MHD header reader that was causing files to fail to load. 
+
+
+2019/06/12 
+- Rob Campbell
+Very extensive changes have been made to the dev branch and many things currently don't start. 
+First goal is to get everything running again. Some things are partially refactored, like tree, 
+and so aren't working. The first goal is to get everything running and then we can go back and 
+refactor. To that end I will add a tag to 7c1d0a7b4437864d3d6cb9dd6518901dad627113 on GitHub. 
+This is tagged as refactorBreakPoint01 This is the last commit with partially refactored stuff. 
+I will revert stuff that's not working yet in order to get it working. We can later come back 
+to this commit and use it as the basis for refactoring. 
+
+291ffac8273b3609573075be6e3f44c795332f5f
+Most modules now load. All this commit does is change module load paths. Mainly:
+"import lasagna_helperFunctions as lasHelp" to "import lasagna.utils.preferences as lasPref"
+"from lasagna_plugin import lasagna_plugin" to "from lasagna.plugins.lasagna_plugin import LasagnaPlugin"
+
+1ee8bea3ed16d423d2938163f63f49f31c0ea8c9
+Reverts partial refactoring of the tree class used for plotting neurite trees and also for the ARA tree view. 
+TODO: in future refactor tree. See Issue #192.
+
+Bugfixes to plugins
+
+
+FROM NOW ON ALL CHANGES SHOULD BE DESCRIBED. ESPECIALLY STUFF TO DO WITH REFACTORING THIS THING
+
+
+2019/03/09 Transfer ownership of repository to Sainsbury Wellcome Centre 2p serial section team

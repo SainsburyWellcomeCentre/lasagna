@@ -1,3 +1,7 @@
 *.pyc
 /__pycache__/
 *.DS_Store
+.idea/
+build
+dist
+Lasagna.egg*

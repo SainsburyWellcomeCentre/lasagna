@@ -8,3 +8,4 @@ sip
 scikit-image
 scipy
 matplotlib
+vtk
