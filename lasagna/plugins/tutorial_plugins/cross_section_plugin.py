@@ -5,6 +5,7 @@ mouse cursor is at.
 """
 
 from PyQt5 import QtGui
+from PyQt5.QtWidgets import qApp
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.tutorial_plugins import cross_section_plot_UI
@@ -40,7 +41,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #
 
         # Get the widget that the mouse is currently in
         pos = QtGui.QCursor.pos()
-        plot_widget = QtGui.qApp.widgetAt(pos).parent()  # The mouse is in this widget
+        plot_widget = qApp.widgetAt(pos).parent()  # The mouse is in this widget
 
         # Get the base image from this widget
         selected_stack_name = self.lasagna.selectedStackName()
