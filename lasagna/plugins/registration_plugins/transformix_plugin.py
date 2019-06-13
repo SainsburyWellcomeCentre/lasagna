@@ -15,8 +15,8 @@ from PyQt5 import QtGui, QtCore
 import lasagna.utils.path_utils
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.registration_plugins import transformix_plugin_UI
-from lasagna.utils import preferences, which
-
+from lasagna.utils import preferences
+from shutil import which
 
 class plugin(LasagnaPlugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin):  # must inherit LasagnaPlugin first
 

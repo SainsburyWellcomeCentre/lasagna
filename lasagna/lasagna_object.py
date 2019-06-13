@@ -111,20 +111,20 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # 3. _End indicates that the hook will run at the end of the method, appending its functionality
         #    to whatever the method normally does.
         self.hooks = {  # FIXME: use default dict
-            'updateStatusBar_End'           :   [],
-            'loadImageStack_Start'          :   [],
-            'loadImageStack_End'            :   [],
-            'showStackLoadDialog_Start'     :   [],
-            'showStackLoadDialog_End'       :   [],
-            'removeCrossHairs_Start'        :   [],
-            'showFileLoadDialog_Start'      :   [],
-            'showFileLoadDialog_End'        :   [],
-            'loadRecentFileSlot_Start'      :   [],
+            'updateStatusBar_End'           :    [],
+            'loadImageStack_Start'          :    [],
+            'loadImageStack_End'            :    [],
+            'showStackLoadDialog_Start'     :    [],
+            'showStackLoadDialog_End'       :    [],
+            'removeCrossHairs_Start'        :    [],
+            'showFileLoadDialog_Start'      :    [],
+            'showFileLoadDialog_End'        :    [],
+            'loadRecentFileSlot_Start'      :    [],
             'updateMainWindowOnMouseMove_Start': [],
-            'updateMainWindowOnMouseMove_End': [],
+            'updateMainWindowOnMouseMove_End':   [],
             'changeImageStackColorMap_Slot_End': [],
-            'deleteLayerStack_Slot_End'     :   [],
-            'axisClicked'                   :   [],
+            'deleteLayerStack_Slot_End'     :    [],
+            'axisClicked'                   :    [],
         }
 
         # Handle IO plugins. For instance these are the loaders that handle different data types

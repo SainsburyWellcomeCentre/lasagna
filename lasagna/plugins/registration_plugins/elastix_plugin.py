@@ -14,7 +14,7 @@ from PyQt5 import QtGui, QtCore
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.registration_plugins import elastix_plugin_UI
-from lasagna.utils import which
+from shutil import which
 
 
 class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  # must inherit LasagnaPlugin first
@@ -134,7 +134,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  #
             self.movingStackPath = '/mnt/data/TissueCyte/registrationTests/regPipelinePrototype/YH84_150507_moving.mhd'
             do_real_load = True
             if do_real_load:
-                self.loadFixed_slot(self.fixedStackPath)                
+                self.loadFixed_slot(self.fixedStackPath)
                 self.loadMoving_slot(self.movingStackPath)
                 self.lasagna.initialiseAxes()
             do_param_file = True
