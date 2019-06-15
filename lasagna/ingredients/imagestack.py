@@ -101,7 +101,7 @@ class imagestack(lasagna_ingredient):
 
     def calcHistogram(self):
         """
-        Calculate the histogram and store results in a variable
+        Calculate the histogram and return results
         """
         y, x = np.histogram(self._data, bins=256)
         x = x[0:-1]  # chop off last value

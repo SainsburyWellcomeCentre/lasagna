@@ -930,6 +930,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.intensityHistogram.clear()
             return
 
+        # Get the data for the intensity histogram
         x = ingredient.histogram['x']
         y = ingredient.histogram['y']
 
@@ -949,6 +950,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.intensityHistogram.showGrid(x=True, y=True, alpha=0.33)
 
         self.intensityHistogram.getPlotItem().ctrl.fftCheck.setEnabled(False)
+        self.intensityHistogram.setLimits(yMin=min(y),xMin=min(x),yMax=max(y),xMax=max(x)) # Blocks panning beyond the data values
 
         # The object that represents the plotted intensity range is only set up the first time the
         # plot is made or following a new base image being loaded (any existing plottedIntensityRegionObj
@@ -965,6 +967,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Add to the ViewBox but exclude it from auto-range calculations.
         self.intensityHistogram.addItem(self.plottedIntensityRegionObj, ignoreBounds=True)
 
+
     def setIntensityRange(self, intRange=(0, 2**12)):
         """
         Set the intensity range of the images and update the axis labels.
@@ -973,6 +976,8 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         self.plottedIntensityRegionObj.setRegion(intRange)
         self.updateAxisLevels()
+
+
 
     # -  -  -  -  -
     # The following methods and slots coordinate updating of the GUI
