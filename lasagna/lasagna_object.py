@@ -948,6 +948,8 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.intensityHistogram.plot(x, y, stepMode=False, fillLevel=0, pen=pen_color, brush=brush_color, yMin=0, xMin=0)
         self.intensityHistogram.showGrid(x=True, y=True, alpha=0.33)
 
+        self.intensityHistogram.getPlotItem().ctrl.fftCheck.setEnabled(False)
+
         # The object that represents the plotted intensity range is only set up the first time the
         # plot is made or following a new base image being loaded (any existing plottedIntensityRegionObj
         # is deleted at base image load time.)
