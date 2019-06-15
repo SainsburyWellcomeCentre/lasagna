@@ -103,7 +103,7 @@ class imagestack(lasagna_ingredient):
         """
         Calculate the histogram and store results in a variable
         """
-        y, x = np.histogram(self._data, bins=500)
+        y, x = np.histogram(self._data, bins=256)
         x = x[0:-1]  # chop off last value
 
         return {'x': x, 'y': y}
