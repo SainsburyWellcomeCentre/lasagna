@@ -136,7 +136,13 @@ optional arguments:
   -D, --demo            Load demo images (default: False)
 ```
 
+For example, to load Lasagna with demo images and also start the add_line_plugin you should run:
+```
+$ lasagna -D -P add_line_plugin
+```
 For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/lasagna/wiki).
 
 ## Current status ##
-Even the master branch is currently unstable (although should always be usable). 
+Lasagna is functional but has lots of small bugs (sorry). 
+Development stalled for a while but has restarted somewhat. 
+We are looking for contributors. 
