@@ -9,6 +9,10 @@ Visualisation is peformed via three linked 2D views.
 Lasagna was written to explore registration accuracy of 3D data, guide registration, and overlay point data onto images. 
 For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/lasagna/wiki).
 The above image shows a mouse brain (green) registered to the Allen Atlas template brain (red). 
+
+[Here is a video](https://youtu.be/NaDrk2N9iBg) showing navigation of a three-channel dataset with Lasagna. 
+In this example video the image stack is pretty big (a few GB) which makes the navigation a little laggier than normal. 
+
 ## Installation ##
 
 ### Using conda ###
