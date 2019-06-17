@@ -4,6 +4,7 @@ Creates a plugin that can add lines and points on the image manually
 
 import numpy as np
 from PyQt5 import QtGui
+import scipy.linalg # For the 3D line fit
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.annotation_plugins import add_line_UI
@@ -42,15 +43,17 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         self.fit = {}
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
+        self.fitType = 'poly2d' #ploy2d or svd3d
+
         # Connections:
-        self.fit_pushButton.clicked.connect(self.fit_line)
-        self.deg_spinBox.valueChanged.connect(self.fit_line)
+        self.fit_pushButton.clicked.connect(self.fit_and_display_line)
+        self.deg_spinBox.valueChanged.connect(self.fit_and_display_line)
         self.clear_pushButton.clicked.connect(self.clear_line)
         self.add_pushButton.clicked.connect(self.add_line)
-        self.interactive_checkBox.clicked.connect(self.fit_line)
+        self.interactive_checkBox.clicked.connect(self.fit_and_display_line)
 
-    # self.lasagna.updateMainWindowOnMouseMove is run each time the axes are updated. So we can hook into it
-    # to update this window also
+    # self.lasagna.updateMainWindowOnMouseMove (see lasagna_object.py) is run each time 
+    # the axes are updated. So we can hook into it to update this window also.
     def hook_axisClicked(self, axis):
         pos = self.lasagna.mousePositionInStack
         if not pos:
@@ -101,7 +104,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         self.tableWidget.clear()
         self.tableWidget.setRowCount(0)
         self.spinBox.setValue(0)
-        self.fit_line()
+        self.fit_and_display_line()
         self.update_current_line()
 
     def update_current_line(self):
@@ -123,10 +126,10 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         pts._data = coords
         self.lasagna.initialiseAxes()  # update the plots.
         if self.interactive_checkBox.isChecked():
-            self.fit_line(coords)
+            self.fit_and_display_line(coords)
         return
 
-    def fit_line(self, *args, **kwargs):
+    def fit_and_display_line(self, *args, **kwargs):
         """Polynomial fit of the points.
 
         Try to fit y = f(x) and x = f(y) and keep the version with lowest residuals to take
@@ -142,11 +145,42 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         else:
             coords = self.get_points_coord()
 
+        # The columns in coords are [optical plane, coronal plane X, coronal plane Y]
         deg = self.deg_spinBox.value()
         if len(coords) <= deg:
             print("Need at least %i points to fit"%(deg+1))
             self.fit = {}
             return
+        elif deg > 3:
+            print("Only polynomials up to third order supported") # TODO: restrict dialog to 3
+            self.fit = {}
+            return
+
+        if self.fitType=='poly2d':
+            self.fit_this_line_coronal(coords)
+        elif self.fitType=='svd3d':
+            self.fit_this_line_svd(coords)
+        else:
+            print("Unknown fit type '%s'" % self.fitType)
+            return
+
+
+        line = self.lasagna.returnIngredientByName(self.line_name)
+        line._data = self.fit['fit_coords']
+
+        self.lasagna.initialiseAxes()
+
+    def fit_this_line_coronal(self,coords):
+        """ Fits a 2D line with a polynomial
+            This method is called by fit_and_display_line
+            The columns in coords are [optical plane, coronal plane X, coronal plane Y]
+
+            : return:
+            None - all fit information will bein self.fit
+        """
+        print(coords)
+        deg = self.deg_spinBox.value() # Polynomial fit order
+
         coefs_x = np.polyfit(coords[:, 1], coords[:, 2], deg)
         fit_x = np.poly1d(coefs_x)
         res_x = np.sum((coords[:, 2]-fit_x(coords[:, 1]))**2)
@@ -170,14 +204,27 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):  # must inhe
         else:
             fit_data = np.arange(coords[:, 2].min(), coords[:, 2].max())
             replaced_ax = 1
+
         line_coords = np.repeat(fit_data, 3).reshape((-1, 3))
         line_coords[:, 0] = self.lasagna.axes2D[0].currentSlice
         line_coords[:, replaced_ax] = self.fit['fit'](fit_data)
-        line = self.lasagna.returnIngredientByName(self.line_name)
-        line._data = line_coords
         self.fit['fit_coords'] = line_coords
 
-        self.lasagna.initialiseAxes()
+    def fit_this_line_svd(self,coords):
+        """ Fits a 3D line with SVD
+            This method is called by fit_and_display_line
+            The columns in coords are [optical plane, coronal plane X, coronal plane Y]
+
+            : return:
+            None - all fit information will bein self.fit
+        """
+        muCoords = coords.mean(axis=0)
+
+        # Do an SVD on the mean-centered data.
+        uu, dd, vv = np.linalg.svd(coords - muCoords)
+        linepts = vv[0] * np.mgrid[-100:500:2][:, np.newaxis]
+        linepts += muCoords
+        self.fit['fit_coords'] = linepts
 
     def get_points_coord(self):
         """Return the coordinates of points in the table

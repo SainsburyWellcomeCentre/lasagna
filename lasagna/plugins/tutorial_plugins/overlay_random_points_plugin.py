@@ -53,6 +53,7 @@ class plugin(LasagnaPlugin):
         im_shape = first_layer.data().shape
 
         n = 10000  # number of random points to make
+        print("Overlaying %d random points" % n)
         num_axes = 3
 
         r = np.random.rand(n*num_axes).reshape((n, num_axes))  # the random array

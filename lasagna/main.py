@@ -59,6 +59,9 @@ def get_parser():
 
 
 def download_sample_stacks():
+    """ Downloads example data stacks from mouse.vision
+        This method runs if the user asks for -D or --demo
+    """
     import tempfile
     import urllib.request, urllib.parse, urllib.error
     tmp_dir = tempfile.gettempdir()
@@ -114,15 +117,15 @@ def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load
 
     # Link slots to signals
     # connect views to the mouseMoved slot. After connection this runs in the background.
-    proxies = []
+    sigProxies = [] # This list will be populated this with pyqtgraph.SignalProxy objects for linking signals and slots
     for i in range(3):
-        proxy = pg.SignalProxy(tasty.axes2D[i].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
-        proxy.axisID = i  # this is picked up the mouseMoved slot
-        proxies.append(proxy)
+        thisProxy = pg.SignalProxy(tasty.axes2D[i].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
+        thisProxy.axisID = i  # this is picked up the mouseMoved slot
+        sigProxies.append(thisProxy)
 
-        proxy = pg.SignalProxy(tasty.axes2D[i].view.getViewBox().mouseClicked, rateLimit=30, slot=tasty.axisClicked)
-        proxy.axisID = i  # this is picked up the mouseMoved slot
-        proxies.append(proxy)
+        thisProxy = pg.SignalProxy(tasty.axes2D[i].view.getViewBox().mouseClicked, rateLimit=30, slot=tasty.axisClicked)
+        thisProxy.axisID = i  # this is picked up the mouseMoved slot
+        sigProxies.append(thisProxy)
 
     if embed_console:
         from IPython import embed
