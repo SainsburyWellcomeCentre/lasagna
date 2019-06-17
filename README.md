@@ -1,13 +1,18 @@
 # Lasagna - Python Volume Visualiser for 3-D data. #
 
-![cover image](http://sainsburywellcomecentre.github.io/lasagna/images/mainWindow.jpg "Main Window")
+![cover image](https://raw.githubusercontent.com/wiki/SainsburyWellcomeCentre/lasagna/images/general/sample_ARA_overlay.jpg "Main Window")
 
 ## Concept ##
 Lasagna a lightweight platform for visualising for 3D volume data developed for the [OpenSerialSection](https://sainsburywellcomecentre.github.io/OpenSerialSection/) project. Lasagna features
 a flexible plugin system, allowing it to be easily extended using Python and PyQt. 
-Visualisation is peformed via three linked 2D views. Lasagna was written to explore 
-registration accuracy of 3D data, guide registration, and overlay point data onto images. 
+Visualisation is peformed via three linked 2D views. 
+Lasagna was written to explore registration accuracy of 3D data, guide registration, and overlay point data onto images. 
 For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/lasagna/wiki).
+The above image shows a mouse brain (green) registered to the Allen Atlas template brain (red). 
+
+[Here is a video](https://youtu.be/NaDrk2N9iBg) showing navigation of a three-channel dataset with Lasagna. 
+In this example video the image stack is pretty big (a few GB) which makes the navigation a little laggier than normal. 
+
 ## Installation ##
 
 ### Using conda ###
@@ -135,7 +140,13 @@ optional arguments:
   -D, --demo            Load demo images (default: False)
 ```
 
+For example, to load Lasagna with demo images and also start the add_line_plugin you should run:
+```
+$ lasagna -D -P add_line_plugin
+```
 For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/lasagna/wiki).
 
 ## Current status ##
-Even the master branch is currently unstable (although should always be usable). 
+Lasagna is functional but has lots of small bugs (sorry). 
+Development stalled for a while but has restarted somewhat. 
+We are looking for contributors. 
