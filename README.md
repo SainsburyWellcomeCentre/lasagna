@@ -148,5 +148,5 @@ For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/l
 
 ## Current status ##
 Lasagna is functional but has lots of small bugs (sorry). 
-Development stalled for a while but has restarted somewhat. 
-We are looking for contributors. 
+Development stalled for a while but has now restarted somewhat. 
+We are looking for [contributors](https://github.com/SainsburyWellcomeCentre/lasagna/wiki/Developer-How-To). 
