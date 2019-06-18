@@ -7,6 +7,10 @@ VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 
 laboratory, Basel, by Rob Campbell.
 
 
+2019/06/18
+- Rob Campbell
+Start to apply Black (https://black.readthedocs.io/en/latest/) to all new commits. 
+
 
 2019/06/13 
 - Rob Campbell

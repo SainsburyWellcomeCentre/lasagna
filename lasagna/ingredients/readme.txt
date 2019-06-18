@@ -14,6 +14,6 @@ associated with the object, including how to plot it. Each ingredient
 is a class and each class is defined by a single Python file in this
 directory. 
 
-All classes must descriptive lowercase names. 
+All classes must be descriptive lowercase names. 
 
 

@@ -1,5 +1,10 @@
 """
-Ingredients inherit this class
+lasagna.ingredients.lasagna_ingredient 
+
+Each ingredient is a class which defines how lasagna displays and interacts with 
+a particular sort of data. Things like images, data points, lines, polygons, 
+areas, etc, etc. This superclass is inherited by ingredient files and helps 
+define interactions between the data and Lasagna.
 """
 
 import os
@@ -7,20 +12,39 @@ from PyQt5 import QtGui, QtCore
 
 
 class lasagna_ingredient(object):
-    def __init__(self, parent, data, fnameAbsPath='', enable=True, objectName='', pgObject='', pgObjectConstructionArgs=dict()):
+    def __init__(
+        self,
+        parent,
+        data,
+        fnameAbsPath="",
+        enable=True,
+        objectName="",
+        pgObject="",
+        pgObjectConstructionArgs=dict(),
+    ):
 
         self.parent = parent
-        self._data = data                   # The raw data for this ingredient go here.
+        self._data = data  # The raw data for this ingredient go here.
 
-        self.objectName = objectName        # The name of the object TODO: decide exactly what this will be
+        self.objectName = (
+            objectName
+        )  # The name of the object TODO: decide exactly what this will be
 
-        self.fnameAbsPath = fnameAbsPath    # Absolute path to file name
+        self.fnameAbsPath = fnameAbsPath  # Absolute path to file name
 
-        self.enable = enable                # Item is plotted if enable is True. Hidden if enable is False
-        self.pgObject = pgObject            # The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
-        self.pgObjectConstructionArgs = pgObjectConstructionArgs  # The pyqtgraph item is created with these arguments
+        self.enable = (
+            enable
+        )  # Item is plotted if enable is True. Hidden if enable is False
+        self.pgObject = (
+            pgObject
+        )  # The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
+        self.pgObjectConstructionArgs = (
+            pgObjectConstructionArgs
+        )  # The pyqtgraph item is created with these arguments
 
-        self.color = None                   # The ingredient color (e.g. colour of the stack or lines or points)
+        self.color = (
+            None
+        )  # The ingredient color (e.g. colour of the stack or lines or points)
 
     def fname(self):
         """
@@ -53,7 +77,9 @@ class lasagna_ingredient(object):
         """
         self.setRowColor()
         self.model.appendRow(self.modelItems)
-        self.model.parent().setCurrentIndex(self.modelItems.index())  # Parent is, for example, a QTreeView
+        self.model.parent().setCurrentIndex(
+            self.modelItems.index()
+        )  # Parent is, for example, a QTreeView
 
     def removeFromList(self):
         """
@@ -67,7 +93,7 @@ class lasagna_ingredient(object):
         Set the color of this ingredient row based upon its stored color
         """
 
-        if self.color is None or not hasattr(self, 'modelItems'):
+        if self.color is None or not hasattr(self, "modelItems"):
             return
 
         if not isinstance(self.color, list):

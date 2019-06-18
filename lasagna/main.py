@@ -7,7 +7,7 @@ Show coronal, transverse and saggital plots in different panels
 
 Depends on:
 vtk
-pyqtgraph (0.9.10 and above 0.9.8 is known not to work)
+pyqtgraph
 numpy
 tifffile
 argparse
