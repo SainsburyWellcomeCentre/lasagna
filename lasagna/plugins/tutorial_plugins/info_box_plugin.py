@@ -17,14 +17,11 @@ Creates a plugin that is a new window containing dynamically updating informatio
 
 from lasagna.plugins.tutorial_plugins import infoBox_UI
 
-
-class plugin(
-    LasagnaPlugin, QtGui.QWidget, infoBox_UI.Ui_infoBox
-):  # must inherit LasagnaPlugin first
+# Must be a class called "plugin" and must inherit LasagnaPlugin first
+class plugin(LasagnaPlugin, QtGui.QWidget, infoBox_UI.Ui_infoBox):
     def __init__(self, lasagna_serving, parent=None):
-        super(plugin, self).__init__(
-            lasagna_serving
-        )  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
+        # The following calls the LasagnaPlugin constructor which in turn calls subsequent constructors
+        super(plugin, self).__init__(lasagna_serving)
 
         # re-define some default properties that were originally defined in LasagnaPlugin
         self.pluginShortName = "Info Box"  # Appears on the menu
@@ -39,6 +36,34 @@ class plugin(
 
         # Set up the close button by linking it to the same slot as the normal window close button
         self.closeButton.released.connect(self.closePlugin)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # The following methods are involved in shutting down the plugin window
+
+    def closePlugin(self):
+        """
+        This method is called by lasagna when the user unchecks the plugin in the menu
+        """
+        self.detachHooks()
+        self.close()
+
+    # We define this here because we can't assume all plugins will have QWidget::closeEvent
+    def closeEvent(self, event):
+        """
+        This event is execute when the user presses the close window (cross) button in the title bar
+        """
+        self.lasagna.stopPlugin(
+            self.__module__
+        )  # This will call self.closePlugin as well as making it possible to restart the plugin
+        self.lasagna.pluginActions[self.__module__].setChecked(
+            False
+        )  # Uncheck the menu item associated with this plugin's name
+        self.deleteLater()
+        event.accept()
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Hooks
+    # The following methods are called from methods in lasagna_object
 
     # self.lasagna.updateMainWindowOnMouseMove is run each time the axes are updated. So we can hook into it
     # to update this window also
@@ -56,26 +81,3 @@ class plugin(
 
         msg = "Mouse is in %s\nZ: %d, X: %d, Y: %d" % (current_axis_name, z, x, y)
         self.label.setText(msg)
-
-    # The following methods are involved in shutting down the plugin window
-    """
-    This method is called by lasagna when the user unchecks the plugin in the menu
-    """
-
-    def closePlugin(self):
-        self.detachHooks()
-        self.close()
-
-    # We define this here because we can't assume all plugins will have QWidget::closeEvent
-    def closeEvent(self, event):
-        """
-        This event is execute when the user presses the close window (cross) button in the title bar
-        """
-        self.lasagna.stopPlugin(
-            self.__module__
-        )  # This will call self.closePlugin as well as making it possible to restart the plugin
-        self.lasagna.pluginActions[self.__module__].setChecked(
-            False
-        )  # Uncheck the menu item associated with this plugin's name
-        self.deleteLater()
-        event.accept()

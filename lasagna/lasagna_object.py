@@ -1065,12 +1065,16 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.statusBar.showMessage(self.statusBarText)
 
     def axisClicked(self, event):
+        """
+        Run plugin events whenver the user clicks on an axis
+        """
         axis_id = self.sender().axisID
         self.runHook(self.hooks["axisClicked"], self.axes2D[axis_id])
 
     def updateMainWindowOnMouseMove(self, axis):
         """
         Update UI elements on the screen (but not the plotted images) as the user moves the mouse across an axis
+        TODO: it would be nice to also run this on mouse wheel
         """
         self.runHook(
             self.hooks["updateMainWindowOnMouseMove_Start"]

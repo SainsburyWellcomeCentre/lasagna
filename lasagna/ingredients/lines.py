@@ -55,7 +55,7 @@ class lines(lasagna_ingredient):
         )
         thing.setCheckState(QtCore.Qt.Checked)
 
-        # self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get access to the checkbox state
+        # self.modelItems=(name,thing) # FIXME: Remove this for now because I have NO CLUE how to get access to the checkbox state
         self.modelItems = name
         self.model = self.parent.points_Model
 
