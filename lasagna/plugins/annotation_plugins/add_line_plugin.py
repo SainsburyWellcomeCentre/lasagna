@@ -248,9 +248,9 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         elif self.fitType_comboBox.currentText() == "3D line":
             self.fit_this_line_svd(coords)
         elif self.fitType_comboBox.currentText() == "piecewise":
-            print("NO CODE TO ADD PIECEWISE FIT YET")
+            self.link_points_with_line(coords)
         elif self.fitType_comboBox.currentText() == "No fit":
-            print("NO CODE TO REMOVE LINE YET")
+            self.fit["fit_coords"]=[]
         else:
             print("Unknown fit type '%s'" % self.fitType_comboBox.currentText())
             return
@@ -268,7 +268,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             : return:
             None - all fit information will bein self.fit
         """
-        print(coords)
+
         deg = self.deg_spinBox.value()  # Polynomial fit order
 
         coefs_x = np.polyfit(coords[:, 1], coords[:, 2], deg)
@@ -311,6 +311,9 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         linepts = vv[0] * np.mgrid[-100:500:2][:, np.newaxis]
         linepts += muCoords
         self.fit["fit_coords"] = linepts
+
+    def link_points_with_line(self,coords):
+        self.fit["fit_coords"] = coords
 
     def get_points_coord(self):
         """Return the coordinates of points in the table
