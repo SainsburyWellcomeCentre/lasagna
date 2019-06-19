@@ -56,7 +56,14 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.fit = {}
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
-        self.fitType = "poly2d"  # ploy2d or svd3d
+        self.fitType_comboBox.addItem('No fit')
+        self.fitType_comboBox.addItem('piecewise')
+        self.fitType_comboBox.addItem('3D line')
+        self.fitType_comboBox.addItem('2D polynomial')
+
+        self.addPoint_radioButton.setChecked(True)
+
+
 
         # Set up connections
         self.fit_pushButton.clicked.connect(self.fit_and_display_line)
@@ -64,6 +71,9 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.clear_pushButton.clicked.connect(self.clear_line)
         self.add_pushButton.clicked.connect(self.add_line)
         self.interactive_checkBox.clicked.connect(self.fit_and_display_line)
+        self.addPoint_radioButton.toggled.connect(self.addRemoveToggle)
+        self.fitType_comboBox.activated.connect(self.fit_and_display_line)
+
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # The following methods are involved in shutting down the plugin window
@@ -103,23 +113,28 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             raise ValueError("I expect 3D coordinates. Got: {}".format(pos))
 
         # Update the add_line_plugin GUI
-        n_pts = self.spinBox.value() + 1
-        self.spinBox.setValue(n_pts)
-        self.tableWidget.setRowCount(n_pts)
-        item_id = self.id_count
-        self.id_count += 1
-        new_item = QtGui.QTableWidgetItem(str(item_id))
-        self.items[(item_id, 0)] = new_item
-        self.tableWidget.setItem(n_pts - 1, 0, new_item)
+        if self.addPoint_radioButton.isChecked():
+            n_pts = self.spinBox.value() + 1
+            self.spinBox.setValue(n_pts)
+            self.tableWidget.setRowCount(n_pts)
+            item_id = self.id_count
+            self.id_count += 1
+            new_item = QtGui.QTableWidgetItem(str(item_id))
+            self.items[(item_id, 0)] = new_item
+            self.tableWidget.setItem(n_pts - 1, 0, new_item)
 
-        # Add clicked position to the table
-        for i, p in enumerate(pos):
-            new_item = QtGui.QTableWidgetItem(str(p))
-            self.items[(item_id, i)] = new_item
-            self.tableWidget.setItem(n_pts - 1, i + 1, new_item)
+            # Add clicked position to the table
+            for i, p in enumerate(pos):
+                new_item = QtGui.QTableWidgetItem(str(p))
+                self.items[(item_id, i)] = new_item
+                self.tableWidget.setItem(n_pts - 1, i + 1, new_item)
+            print(pos)
+        elif self.removePoint_radioButton.isChecked():
+            pass
+
 
         self.update_current_line()
-        print(pos)
+
 
     def hook_updateMainWindowOnMouseMove_End(self):
         """
@@ -159,6 +174,16 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             self.lasagna.returnIngredientByName(line_name).addToPlots()  
 
         self.clear_line()
+
+    def addRemoveToggle(self):
+        """
+        This slot runs when the user interacts with the add/remove radio buttons
+        """
+        if self.addPoint_radioButton.isChecked():
+            print("add")
+        elif self.removePoint_radioButton.isChecked():
+            print("REMOVE")
+
 
     def clear_line(self):
         """Clear current line
@@ -217,19 +242,17 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             print("Need at least %i points to fit" % (deg + 1))
             self.fit = {}
             return
-        elif deg > 3:
-            print(
-                "Only polynomials up to third order supported"
-            )  # TODO: restrict dialog to 3
-            self.fit = {}
-            return
 
-        if self.fitType == "poly2d":
+        if self.fitType_comboBox.currentText() == "2D polynomial":
             self.fit_this_line_coronal(coords)
-        elif self.fitType == "svd3d":
+        elif self.fitType_comboBox.currentText() == "3D line":
             self.fit_this_line_svd(coords)
+        elif self.fitType_comboBox.currentText() == "piecewise":
+            print("NO CODE TO ADD PIECEWISE FIT YET")
+        elif self.fitType_comboBox.currentText() == "No fit":
+            print("NO CODE TO REMOVE LINE YET")
         else:
-            print("Unknown fit type '%s'" % self.fitType)
+            print("Unknown fit type '%s'" % self.fitType_comboBox.currentText())
             return
 
         line = self.lasagna.returnIngredientByName(self.line_name)
