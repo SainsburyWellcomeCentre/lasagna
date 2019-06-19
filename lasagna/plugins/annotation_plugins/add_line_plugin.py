@@ -183,7 +183,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         changed = False
         if len(coords) != len(pts.raw_data()):
             changed = True
-        elif len(coords) and any(coords != pts.raw_data()):
+        elif len(coords) and any(coords.flatten() != pts.raw_data().flatten()):
             changed = True
         if not changed:
             return
