@@ -10,4 +10,6 @@ class LasagnaPlotWidget(PlotWidget):
     def __init__(self, *args, **kwargs):
         if 'viewBox' not in kwargs.keys():
             kwargs['viewBox'] = lasagna_viewBox()
-        super(LasagnaPlotWidget, self).__init__(*args, **kwargs)
+
+        # Build the plot widget but disable the right-click pop-up menu
+        super(LasagnaPlotWidget, self).__init__(enableMenu=False,*args, **kwargs)

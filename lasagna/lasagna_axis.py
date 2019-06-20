@@ -35,7 +35,7 @@ class projection2D():
 
         if preferences.readPreference('hideAxes'):
             self.view.hideAxis('left')
-            self.view.hideAxis('bottom')               
+            self.view.hideAxis('bottom')
 
         self.view.setAspectLocked(True, axisRatio)
 
