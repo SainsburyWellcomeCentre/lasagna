@@ -42,26 +42,11 @@ class imagestack(lasagna_ingredient):
 
         self.lut = lut  # The look-up table
         self.maxColMapValue = 255
-        self._alpha = (
-            100
-        )  # image transparency stored here. see getters and setter at end of file
 
-        # Add to the imageStackLayers_model which is associated with the imagestack QTreeView
-        name = QtGui.QStandardItem(objectName)
-        name.setEditable(False)
+        # image transparency stored in _alpha. see getters and setter at end of class def
+        self._alpha = (100)
 
-        # Add checkbox
-        thing = QtGui.QStandardItem()
-        thing.setFlags(
-            QtCore.Qt.ItemIsEnabled
-            | QtCore.Qt.ItemIsEditable
-            | QtCore.Qt.ItemIsUserCheckable
-        )
-        thing.setCheckState(QtCore.Qt.Checked)
-
-        # Append to list
-        # self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
-        self.modelItems = name
+        self.build_model_for_list(objectName)
         self.model = self.parent.imageStackLayers_Model
         self.addToList()
 

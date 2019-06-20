@@ -70,6 +70,30 @@ class lasagna_ingredient(object):
         """
         [axis.removeItemFromPlotWidget(self.objectName) for axis in self.parent.axes2D]
 
+    def build_model_for_list(self, objectName):
+        """
+        Builds a QStandardItem and add it to self.modelItems so that it that 
+        can be added to the list of ingredients.
+        """
+
+        # Add to the imageStackLayers_model which is associated with the points QTreeView
+        itemName = QtGui.QStandardItem(objectName)
+
+        # It's possible other code depends on the name staying the same so block the user from editing
+        itemName.setEditable(False)
+
+        # Add checkbox
+        itemCheckBox = QtGui.QStandardItem()
+        itemCheckBox.setFlags(
+            QtCore.Qt.ItemIsEnabled
+            | QtCore.Qt.ItemIsEditable
+            | QtCore.Qt.ItemIsUserCheckable
+        )
+        itemCheckBox.setCheckState(QtCore.Qt.Checked)
+
+        # self.modelItems=(itemName,itemCheckBox) # FIXME: Remove this for now because I have NO CLUE how to get access to the checkbox state
+        self.modelItems = itemName  # Run this instead
+
     def addToList(self):
         """
         Add this ingredient's list items to the QStandardModel (model) associated with its QTreeView

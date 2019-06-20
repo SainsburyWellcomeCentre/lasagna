@@ -25,23 +25,8 @@ class sparsepoints(lasagna_ingredient):
         self.alpha = int(self.parent.markerAlpha_spinBox.value())
         self.lineWidth = None  # Not used right now
 
-        # Add to the imageStackLayers_model which is associated with the points QTreeView
-        name = QtGui.QStandardItem(objectName)
-        name.setEditable(False)
-
-        # Add checkbox
-        thing = QtGui.QStandardItem()
-        thing.setFlags(
-            QtCore.Qt.ItemIsEnabled
-            | QtCore.Qt.ItemIsEditable
-            | QtCore.Qt.ItemIsUserCheckable
-        )
-        thing.setCheckState(QtCore.Qt.Checked)
-
-        # self.modelItems=(name,thing) #Remove this for now because I have NO CLUE how to get the checkbox state bacl
-        self.modelItems = name
+        self.build_model_for_list(objectName)
         self.model = self.parent.points_Model
-
         self.addToList()
 
         # Set the colour of the object based on how many items are already present

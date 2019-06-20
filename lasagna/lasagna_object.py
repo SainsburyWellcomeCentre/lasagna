@@ -1138,7 +1138,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         )
         self.intensityHistogram.showGrid(x=True, y=True, alpha=0.33)
 
-        self.intensityHistogram.getPlotItem().ctrl.fftCheck.setEnabled(False)
+        self.intensityHistogram.getPlotItem().ctrl.fftCheck.setEnabled(False) #otherwise it crashes
         self.intensityHistogram.setLimits(
             yMin=min(y), xMin=min(x), yMax=max(y), xMax=max(x)
         )  # Blocks panning beyond the data values

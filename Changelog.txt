@@ -9,6 +9,12 @@ laboratory, Basel, by Rob Campbell.
 
 2019/06/18
 - Rob Campbell
+Move code that generates ingredient QStandardItem for list out for the points, lines, and imagestack 
+ingredients and into lasagna_ingredient. Remove orphan version of lasanga_ingredient in root dir.
+
+
+2019/06/18
+- Rob Campbell
 Start to apply Black (https://black.readthedocs.io/en/latest/) to all new commits. 
 
 
