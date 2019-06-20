@@ -79,7 +79,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.interactive_checkBox.clicked.connect(self.fit_and_display_line)
         self.addPoint_radioButton.toggled.connect(self.addRemoveToggle)
         self.fitType_comboBox.activated.connect(self.fit_and_display_line)
-
+        #TODO: trigger off an edit signal not item changed
+        #self.tableWidget.itemChanged.connect(self.update_from_table)
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # The following methods are involved in shutting down the plugin window
     def closePlugin(self):
@@ -345,8 +346,16 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         """
         if self.tableWidget.rowCount() == 0:
             return []
-        o = []
-        for i in range(self.tableWidget.rowCount()):
+
+        output_points = []
+        for i in range(self.tableWidget.rowCount()):            
             coords = [int(self.tableWidget.item(i, c).text()) for c in range(1, 4)]
-            o.append(np.array(coords, dtype=float))
-        return np.vstack(o)
+            output_points.append(np.array(coords, dtype=float))
+        return np.vstack(output_points)
+
+    def update_from_table(self):
+        """If the table cells all contain data then we can update the plot based upon this
+
+        :return:
+        """
+        # TODO: ensure all text boxes have something in them and then update the plots
