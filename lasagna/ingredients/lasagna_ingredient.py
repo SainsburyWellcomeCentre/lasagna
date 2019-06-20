@@ -91,9 +91,9 @@ class lasagna_ingredient(object):
         )
         itemCheckBox.setCheckState(QtCore.Qt.Checked)
 
-        # self.modelItems=(itemName,itemCheckBox) # FIXME: Remove this for now because I have NO CLUE how to get access to the checkbox state
-        self.modelItems = itemName  # Run this instead
 
+        self.modelItems = itemName  # Run this instead
+        #self.modelItems=(itemName,itemCheckBox) # FIXME: Remove this for now because I have NO CLUE how to get access to the checkbox state
     def addToList(self):
         """
         Add this ingredient's list items to the QStandardModel (model) associated with its QTreeView

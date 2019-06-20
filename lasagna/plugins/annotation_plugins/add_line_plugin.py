@@ -38,32 +38,28 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.closeButton.released.connect(self.closePlugin)
         self.id_count = 0  # The number of points added see self.hook_axisClicked()
 
-        # add a sparsepoints ingredient
+        # -- Add ingredients to Lasagna
+
+        # 1. Add a sparsepoints ingredient for the clicked points
         self.pts_name = "addLine_currentLine"
         self.lasagna.addIngredient(
             objectName=self.pts_name, kind="sparsepoints", data=[]
         )
+        self.lasagna.returnIngredientByName(self.pts_name).addToPlots()
 
-        # Add item to all three 2D plots
-        self.lasagna.returnIngredientByName(self.pts_name).addToPlots()  
-
-        # add a line ingredient
+        # 2. Add a line ingredient for the line linking or fitting the points
         self.line_name = "addLine_fit_currentLine"
         self.lasagna.addIngredient(objectName=self.line_name, kind="lines", data=[])
-
-        # Add item to all three 2D plots
         self.lasagna.returnIngredientByName(self.line_name).addToPlots()
         self.fit = {}
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
-        self.fitType_comboBox.addItem('No fit')
-        self.fitType_comboBox.addItem('piecewise')
-        self.fitType_comboBox.addItem('3D line')
-        self.fitType_comboBox.addItem('2D polynomial')
+        self.fitType_comboBox.addItem("No fit")
+        self.fitType_comboBox.addItem("piecewise")
+        self.fitType_comboBox.addItem("3D line")
+        self.fitType_comboBox.addItem("2D polynomial")
 
         self.addPoint_radioButton.setChecked(True)
-
-
 
         # Set up connections
         self.fit_pushButton.clicked.connect(self.fit_and_display_line)
@@ -73,7 +69,6 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.interactive_checkBox.clicked.connect(self.fit_and_display_line)
         self.addPoint_radioButton.toggled.connect(self.addRemoveToggle)
         self.fitType_comboBox.activated.connect(self.fit_and_display_line)
-
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # The following methods are involved in shutting down the plugin window
@@ -132,9 +127,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         elif self.removePoint_radioButton.isChecked():
             pass
 
-
         self.update_current_line()
-
 
     def hook_updateMainWindowOnMouseMove_End(self):
         """
@@ -161,6 +154,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         """
 
         pts_name = "%s_pts" % self.name_lineEdit.text()
+        # FIXME: we are adding the ingredient again. Should be modifying it instead.
         self.lasagna.addIngredient(
             objectName=pts_name, kind="sparsepoints", data=self.get_points_coord()
         )
@@ -171,7 +165,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             line_name = "%s_fit" % self.name_lineEdit.text()
             self.lasagna.addIngredient(objectName=line_name, kind="lines", data=data)
             # Add item to all three 2D plots
-            self.lasagna.returnIngredientByName(line_name).addToPlots()  
+            self.lasagna.returnIngredientByName(line_name).addToPlots()
 
         self.clear_line()
 
@@ -183,7 +177,6 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             print("add")
         elif self.removePoint_radioButton.isChecked():
             print("REMOVE")
-
 
     def clear_line(self):
         """Clear current line
@@ -214,7 +207,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             return
 
         pts._data = coords
-        self.lasagna.initialiseAxes()  # update the plots.
+        self.lasagna.update_2D_plot_ingredients_in_axes()
         if self.interactive_checkBox.isChecked():
             self.fit_and_display_line(coords)
 
@@ -228,15 +221,15 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         :return:
         """
-        # The *args catches whatever connected slot might send (deg for deg_spinBox.valueChanged
+        # The *args catches whatever the connected slot might send (deg for deg_spinBox.valueChanged
         #         for instance)
 
+        # The columns in coords are [optical plane, coronal plane X, coronal plane Y]
         if "coords" in kwargs:
             coords = kwargs["coords"]
         else:
             coords = self.get_points_coord()
 
-        # The columns in coords are [optical plane, coronal plane X, coronal plane Y]
         deg = self.deg_spinBox.value()
         if len(coords) <= deg:
             print("Need at least %i points to fit" % (deg + 1))
@@ -250,7 +243,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         elif self.fitType_comboBox.currentText() == "piecewise":
             self.link_points_with_line(coords)
         elif self.fitType_comboBox.currentText() == "No fit":
-            self.fit["fit_coords"]=[]
+            self.fit["fit_coords"] = []
         else:
             print("Unknown fit type '%s'" % self.fitType_comboBox.currentText())
             return
@@ -258,7 +251,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         line = self.lasagna.returnIngredientByName(self.line_name)
         line._data = self.fit["fit_coords"]
 
-        self.lasagna.initialiseAxes()
+        self.lasagna.update_2D_plot_ingredients_in_axes()
 
     def fit_this_line_coronal(self, coords):
         """ Fits a 2D line with a polynomial
@@ -312,7 +305,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         linepts += muCoords
         self.fit["fit_coords"] = linepts
 
-    def link_points_with_line(self,coords):
+    def link_points_with_line(self, coords):
         self.fit["fit_coords"] = coords
 
     def get_points_coord(self):

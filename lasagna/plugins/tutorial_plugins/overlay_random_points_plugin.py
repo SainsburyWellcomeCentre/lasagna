@@ -38,7 +38,7 @@ class plugin(LasagnaPlugin):
 
         self.lasagna.returnIngredientByName(self.objName).addToPlots()  # Add item to all three 2D plots
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
-        self.lasagna.initialiseAxes(resetAxes=True)  # update the plots.
+        self.lasagna.update_2D_plot_ingredients_in_axes(resetAxes=True)  # update the plots.
 
     def generateRandomData(self):
         """

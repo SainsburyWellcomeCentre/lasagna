@@ -30,6 +30,7 @@ class sparsepoints(lasagna_ingredient):
         self.addToList()
 
         # Set the colour of the object based on how many items are already present
+        # TODO: duplicate code with lines.py
         number_of_colors = 6
         this_number = (
             self.parent.points_Model.rowCount() - 1

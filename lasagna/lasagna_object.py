@@ -771,20 +771,14 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def initialiseAxes(self, resetAxes=False):
         """
         Initial display of images in axes and also update other parts of the GUI.
+        We will initially choose default images that are the middlemost layer of each axis
         """
         if not self.stacksInTreeList():
             self.plotImageStackHistogram()  # wipes the histogram
             return
 
-        # show default images (snap to middle layer of each axis)
-        [
-            axis.updatePlotItems_2D(
-                self.ingredientList,
-                sliceToPlot=axis.currentSlice,
-                resetToMiddleLayer=resetAxes,
-            )
-            for axis in self.axes2D
-        ]
+
+        self.update_2D_plot_ingredients_in_axes(resetAxes=resetAxes)
 
         # initialize cross hair
         if self.showCrossHairs:
@@ -809,6 +803,16 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if resetAxes:
             self.resetAxes()
 
+    def update_2D_plot_ingredients_in_axes(self,resetAxes=False):
+        [
+            axis.updatePlotItems_2D(
+                self.ingredientList,
+                sliceToPlot=axis.currentSlice,
+                resetToMiddleLayer=resetAxes,
+            )
+            for axis in self.axes2D
+        ]
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Slots for image stack tab
     # In each case, we set the values of the currently selected ingredient using the spinbox value
@@ -830,7 +834,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     # In each case, we set the values of the currently selected ingredient using the spinbox value
     # TODO: this is an example of code that is not flexible. These UI elements should be created by the ingredient
     def viewZ_spinBoxes_slot(self):
-        self.initialiseAxes()
+        self.update_2D_plot_ingredients_in_axes()
 
     def markerSymbol_comboBox_slot(self, index):
         symbol = str(self.markerSymbol_comboBox.currentText())
@@ -838,28 +842,28 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not ingredient:
             return
         ingredient.symbol = symbol
-        self.initialiseAxes()
+        self.update_2D_plot_ingredients_in_axes()
 
     def markerSize_spinBox_slot(self, spinBoxValue):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
         if not ingredient:
             return
         ingredient.symbolSize = spinBoxValue
-        self.initialiseAxes()
+        self.update_2D_plot_ingredients_in_axes()
 
     def markerAlpha_spinBox_slot(self, spinBoxValue):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
         if not ingredient:
             return
         ingredient.alpha = spinBoxValue
-        self.initialiseAxes()
+        self.update_2D_plot_ingredients_in_axes()
 
     def lineWidth_spinBox_slot(self, spinBoxValue):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
         if not ingredient:
             return
         ingredient.lineWidth = spinBoxValue
-        self.initialiseAxes()
+        self.update_2D_plot_ingredients_in_axes()
 
     def markerColor_pushButton_slot(self):
         ingredient = self.returnIngredientByName(self.selectedPointsName())
@@ -869,7 +873,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         col = QtGui.QColorDialog.getColor()
         rgb = [col.toRgb().red(), col.toRgb().green(), col.toRgb().blue()]
         ingredient.color = rgb
-        self.initialiseAxes()
+        self.update_2D_plot_ingredients_in_axes()
 
     def selectedPointsName(self):
         """

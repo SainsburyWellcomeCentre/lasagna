@@ -12,6 +12,9 @@ laboratory, Basel, by Rob Campbell.
 Move code that generates ingredient QStandardItem for list out for the points, lines, and imagestack 
 ingredients and into lasagna_ingredient. Remove orphan version of lasanga_ingredient in root dir.
 
+Replace some instances of lasanga.initialiseAxes() with the the new lasagna.update_2D_plot_ingredients_in_axes
+Changes made in lasagna_object.py, overlay_random_points_plugin.py, and add_line_plugin.py
+
 
 2019/06/18
 - Rob Campbell
