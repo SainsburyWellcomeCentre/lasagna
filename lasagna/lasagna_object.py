@@ -1073,6 +1073,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Run plugin events whenver the user clicks on an axis
         """
         axis_id = self.sender().axisID
+        self.last_button_click_in_axis = event[0].button()
         self.runHook(self.hooks["axisClicked"], self.axes2D[axis_id])
 
     def updateMainWindowOnMouseMove(self, axis):
