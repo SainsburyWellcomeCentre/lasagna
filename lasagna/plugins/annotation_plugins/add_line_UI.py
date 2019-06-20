@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'add_line.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_addLine(object):
     def setupUi(self, addLine):
@@ -66,13 +67,9 @@ class Ui_addLine(object):
         self.verticalLayout.addWidget(self.fitType_comboBox)
         spacerItem = QtWidgets.QSpacerItem(20, 30, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
-        self.label_2 = QtWidgets.QLabel(self.layoutWidget)
-        self.label_2.setObjectName("label_2")
-        self.verticalLayout.addWidget(self.label_2)
-        self.spinBox = QtWidgets.QSpinBox(self.layoutWidget)
-        self.spinBox.setReadOnly(True)
-        self.spinBox.setObjectName("spinBox")
-        self.verticalLayout.addWidget(self.spinBox)
+        self.numPoints_textLabel = QtWidgets.QLabel(self.layoutWidget)
+        self.numPoints_textLabel.setObjectName("numPoints_textLabel")
+        self.verticalLayout.addWidget(self.numPoints_textLabel)
         self.line = QtWidgets.QFrame(self.layoutWidget)
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -98,7 +95,6 @@ class Ui_addLine(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.label_3.setBuddy(self.name_lineEdit)
         self.label.setBuddy(self.deg_spinBox)
-        self.label_2.setBuddy(self.spinBox)
 
         self.retranslateUi(addLine)
         QtCore.QMetaObject.connectSlotsByName(addLine)
@@ -119,9 +115,10 @@ class Ui_addLine(object):
         self.interactive_checkBox.setText(_translate("addLine", "&interactive"))
         self.addPoint_radioButton.setText(_translate("addLine", "Add"))
         self.removePoint_radioButton.setText(_translate("addLine", "Remove"))
-        self.label_2.setText(_translate("addLine", "n pts:"))
+        self.numPoints_textLabel.setText(_translate("addLine", "n pts:"))
         self.fit_pushButton.setText(_translate("addLine", "&fit"))
         self.add_pushButton.setText(_translate("addLine", "&Add it!"))
         self.closeButton.setText(_translate("addLine", "&Close"))
         self.clear_pushButton.setText(_translate("addLine", "clear"))
+
 

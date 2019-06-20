@@ -36,7 +36,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         # Set up the close button by linking it to the same slot as the normal window close button
         self.closeButton.released.connect(self.closePlugin)
-        self.id_count = 0  # The number of points added see self.hook_axisClicked()
+        self.num_points = 0  # The number of points added see self.hook_axisClicked()
+        self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
 
         # -- Add ingredients to Lasagna
 
@@ -51,7 +52,16 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.line_name = "addLine_fit_currentLine"
         self.lasagna.addIngredient(objectName=self.line_name, kind="lines", data=[])
         self.lasagna.returnIngredientByName(self.line_name).addToPlots()
-        self.fit = {}
+
+        # 3. Add a sparse point for highlighting purposes
+        self.hlite_point_name = "highlight_point"
+        self.lasagna.addIngredient(
+            objectName=self.hlite_point_name, kind="sparsepoints", data=[]
+        )
+        self.lasagna.returnIngredientByName(self.hlite_point_name).addToPlots()
+
+        self.nearest_point_index = 0 #The index of the point nearest the mouse cursor
+        self.fit = {} #The line fit to the sparse points
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
         self.fitType_comboBox.addItem("No fit")
@@ -78,6 +88,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         """
         self.lasagna.removeIngredientByName(self.pts_name)
         self.lasagna.removeIngredientByName(self.line_name)
+        self.lasagna.removeIngredientByName(self.hlite_point_name)
         self.detachHooks()
         self.close()
 
@@ -97,9 +108,14 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
     # Hooks for integration with the main Lasagna GUI via methods in lasagna_object
     def hook_axisClicked(self, axis):
         """
-        Runs when the user clicks on an axis. Gets the position of the mouse click
-        in the stack and add to the table then update the plotted points and line.
+        Runs when the user clicks on an axis. Handles either addition or removal 
+        of data (rows) from the the QTable. If adding points, the method gets the 
+        position of the mouse click in the stack from the main Lasagna class and 
+        adds this point to the table. If removing a point, it uses the identity of
+        the point nearest the mouse (see self.hook_updateMainWindowOnMouseMove_End)  
+        to remove the correct row from the table.
         """
+
         pos = self.lasagna.mousePositionInStack
         if not pos:
             print("Load an image first")
@@ -109,23 +125,24 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         # Update the add_line_plugin GUI
         if self.addPoint_radioButton.isChecked():
-            n_pts = self.spinBox.value() + 1
-            self.spinBox.setValue(n_pts)
-            self.tableWidget.setRowCount(n_pts)
-            item_id = self.id_count
-            self.id_count += 1
-            new_item = QtGui.QTableWidgetItem(str(item_id))
-            self.items[(item_id, 0)] = new_item
-            self.tableWidget.setItem(n_pts - 1, 0, new_item)
+
+            self.num_points += 1
+            self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
+            self.tableWidget.setRowCount(self.num_points)
+
+            new_item = QtGui.QTableWidgetItem(str(self.num_points))
+            self.items[(self.num_points, 0)] = new_item
+            self.tableWidget.setItem(self.num_points - 1, 0, new_item)
 
             # Add clicked position to the table
             for i, p in enumerate(pos):
                 new_item = QtGui.QTableWidgetItem(str(p))
-                self.items[(item_id, i)] = new_item
-                self.tableWidget.setItem(n_pts - 1, i + 1, new_item)
-            print(pos)
+                self.items[(self.num_points, i)] = new_item
+                self.tableWidget.setItem(self.num_points - 1, i + 1, new_item)
+            
         elif self.removePoint_radioButton.isChecked():
-            pass
+            self.num_points -= 1
+            self.tableWidget.removeRow(self.nearest_point_index[0])
 
         self.update_current_line()
 
@@ -136,25 +153,34 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
               ** We keep it because likely we'll need it. **
               e.g. we can run highlight point here
         """
-        x = self.lasagna.mouseX
-        y = self.lasagna.mouseY
+        if self.addPoint_radioButton.isChecked():
+            return
 
-        # Get the widget that the mouse is currently in
-        pos = QtGui.QCursor.pos()
+        currentMousePos = np.array(self.lasagna.mousePositionInStack)
+        existingPoints = self.get_points_coord()
+        if type(existingPoints) == list or existingPoints.size == 0:
+            return
 
-        # Get the base image from this widget
-        selected_stack_name = self.lasagna.selectedStackName()
+        distanceToPoints = (
+            np.sum((existingPoints - currentMousePos) ** 2, axis=1) ** 0.5
+        )
+        nearestInd = distanceToPoints == min(distanceToPoints)
+        nearestPoint = existingPoints[nearestInd, :]
+        self.nearest_point_index = np.where(nearestInd)
+        self.lasagna.returnIngredientByName(self.hlite_point_name)._data = nearestPoint
+        self.lasagna.update_2D_plot_ingredients_in_axes()
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Remaining methods which are not hooks or otherwise obligatory
     def add_line(self):
         """Add the current line and points to Lasagna and start a new line
+           i.e. This is not the method that updates. It commits the existing
+           data to Lasagna and allows for more to be created. 
 
         :return:
         """
 
         pts_name = "%s_pts" % self.name_lineEdit.text()
-        # FIXME: we are adding the ingredient again. Should be modifying it instead.
         self.lasagna.addIngredient(
             objectName=pts_name, kind="sparsepoints", data=self.get_points_coord()
         )
@@ -174,9 +200,11 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         This slot runs when the user interacts with the add/remove radio buttons
         """
         if self.addPoint_radioButton.isChecked():
-            print("add")
+            # Remove the highlight point
+            self.lasagna.returnIngredientByName(self.hlite_point_name)._data = []
+            self.lasagna.update_2D_plot_ingredients_in_axes()
         elif self.removePoint_radioButton.isChecked():
-            print("REMOVE")
+            pass
 
     def clear_line(self):
         """Clear current line
@@ -186,17 +214,19 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.items = {}
         self.tableWidget.clear()
         self.tableWidget.setRowCount(0)
-        self.spinBox.setValue(0)
         self.fit_and_display_line()
         self.update_current_line()
+        self.numPoints_textLabel.setText("n pts: %d" % 0)
+        self.lasagna.returnIngredientByName(self.hlite_point_name)._data = []
+ 
 
     def update_current_line(self):
         """Change current line ingredient and display points
 
         :return:
         """
-        coords = self.get_points_coord()
-        pts = self.lasagna.returnIngredientByName(self.pts_name)
+        coords = self.get_points_coord() #Existing coordinates
+        pts = self.lasagna.returnIngredientByName(self.pts_name) #What is plotted
 
         changed = False
         if len(coords) != len(pts.raw_data()):
