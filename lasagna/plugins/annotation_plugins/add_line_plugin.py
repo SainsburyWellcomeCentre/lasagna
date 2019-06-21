@@ -127,19 +127,16 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         # Update the add_line_plugin GUI
         if self.addPoint_radioButton.isChecked():
 
+            # Update the text label indicating how many points have been created
             self.num_points += 1
             self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
             self.tableWidget.setRowCount(self.num_points)
-
-            new_item = QtGui.QTableWidgetItem(str(self.num_points))
-            self.items[(self.num_points, 0)] = new_item
-            self.tableWidget.setItem(self.num_points - 1, 0, new_item)
 
             # Add clicked position to the table
             for i, p in enumerate(pos):
                 new_item = QtGui.QTableWidgetItem(str(p))
                 self.items[(self.num_points, i)] = new_item
-                self.tableWidget.setItem(self.num_points - 1, i + 1, new_item)
+                self.tableWidget.setItem(self.num_points - 1, i , new_item)
             
         elif self.removePoint_radioButton.isChecked():
             self.num_points -= 1
@@ -261,12 +258,6 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         else:
             coords = self.get_points_coord()
 
-        deg = self.deg_spinBox.value()
-        if len(coords) <= deg:
-            print("Need at least %i points to fit" % (deg + 1))
-            self.fit = {}
-            return
-
         if self.fitType_comboBox.currentText() == "2D polynomial":
             self.fit_this_line_coronal(coords)
         elif self.fitType_comboBox.currentText() == "3D line":
@@ -292,6 +283,13 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             : return:
             None - all fit information will bein self.fit
         """
+
+        deg = self.deg_spinBox.value()
+        if len(coords) <= deg:
+            print("Need at least %i points to fit" % (deg + 1))
+            self.fit = {}
+            self.fit["fit_coords"] = []
+            return
 
         deg = self.deg_spinBox.value()  # Polynomial fit order
 
@@ -349,7 +347,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         output_points = []
         for i in range(self.tableWidget.rowCount()):            
-            coords = [int(self.tableWidget.item(i, c).text()) for c in range(1, 4)]
+            coords = [int(self.tableWidget.item(i, c).text()) for c in range(0, 3)]
             output_points.append(np.array(coords, dtype=float))
         return np.vstack(output_points)
 

@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'add_line.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.2
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_addLine(object):
     def setupUi(self, addLine):
@@ -22,8 +21,8 @@ class Ui_addLine(object):
         self.tableWidget.setEnabled(True)
         self.tableWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setColumnCount(3)
         self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(4)
         self.tableWidget.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
@@ -31,9 +30,8 @@ class Ui_addLine(object):
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(3, item)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(60)
+        self.tableWidget.horizontalHeader().setMinimumSectionSize(8)
         self.layoutWidget = QtWidgets.QWidget(self.splitter)
         self.layoutWidget.setObjectName("layoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.layoutWidget)
@@ -105,12 +103,10 @@ class Ui_addLine(object):
         _translate = QtCore.QCoreApplication.translate
         addLine.setWindowTitle(_translate("addLine", "add_lines"))
         item = self.tableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("addLine", "ID"))
-        item = self.tableWidget.horizontalHeaderItem(1)
         item.setText(_translate("addLine", "Z"))
-        item = self.tableWidget.horizontalHeaderItem(2)
+        item = self.tableWidget.horizontalHeaderItem(1)
         item.setText(_translate("addLine", "X"))
-        item = self.tableWidget.horizontalHeaderItem(3)
+        item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("addLine", "Y"))
         self.label_3.setText(_translate("addLine", "&Name:"))
         self.label.setText(_translate("addLine", "&deg"))
@@ -122,5 +118,4 @@ class Ui_addLine(object):
         self.add_pushButton.setText(_translate("addLine", "&Add it!"))
         self.closeButton.setText(_translate("addLine", "&Close"))
         self.clear_pushButton.setText(_translate("addLine", "clear"))
-
 

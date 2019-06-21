@@ -29,14 +29,15 @@
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
+      <property name="columnCount">
+       <number>3</number>
+      </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>60</number>
       </attribute>
-      <column>
-       <property name="text">
-        <string>ID</string>
-       </property>
-      </column>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>8</number>
+      </attribute>
       <column>
        <property name="text">
         <string>Z</string>
