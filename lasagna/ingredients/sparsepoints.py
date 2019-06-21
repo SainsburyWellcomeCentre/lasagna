@@ -128,9 +128,10 @@ class sparsepoints(lasagna_ingredient):
 
     def save(self, path=None):
         """Save sparse point in "pts" format (basic coordinates, space separated)"""
+        fname = self.objectName + '.csv'
         if path is None:
             path, _ = QtGui.QFileDialog.getSaveFileName(
-                self.parent, "File to save %s" % self.objectName, self.objectName
+                self.parent, "File to save %s" % fname, fname
             )
             # getSaveFileName also returns the selected filter "All file (*)" for instance.
             # Ignore the second output
@@ -139,7 +140,7 @@ class sparsepoints(lasagna_ingredient):
         with open(path, "w") as F:
             for c in self.raw_data():
                 F.write(",".join(["%s" % i for i in c]) + "\n")
-        print("%s saved as %s" % (self.objectName, path))
+        print("%s saved as %s" % (fname, path))
 
     # ---------------------------------------------------------------
     # Getters and setters
