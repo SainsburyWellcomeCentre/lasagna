@@ -141,6 +141,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         elif self.removePoint_radioButton.isChecked():
             self.num_points -= 1
             self.tableWidget.removeRow(self.nearest_point_index[0])
+            self.lasagna.returnIngredientByName(self.hlite_point_name)._data = []
+            self.lasagna.update_2D_plot_ingredients_in_axes()
 
         self.update_current_line()
 
