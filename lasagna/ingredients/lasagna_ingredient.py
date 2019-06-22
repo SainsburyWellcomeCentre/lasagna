@@ -32,12 +32,11 @@ class lasagna_ingredient(object):
 
         self.fnameAbsPath = fnameAbsPath  # Absolute path to file name
 
-        self.enable = (
-            enable
-        )  # Item is plotted if enable is True. Hidden if enable is False
-        self.pgObject = (
-            pgObject
-        )  # The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
+        # Item is plotted if enable is True. Hidden if enable is False
+        self.enable = (enable)
+
+        # The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
+        self.pgObject = (pgObject)
         self.pgObjectConstructionArgs = (
             pgObjectConstructionArgs
         )  # The pyqtgraph item is created with these arguments
