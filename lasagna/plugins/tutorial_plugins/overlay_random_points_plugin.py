@@ -38,7 +38,7 @@ class plugin(LasagnaPlugin):
 
         self.lasagna.returnIngredientByName(self.objName).addToPlots()  # Add item to all three 2D plots
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
-        self.lasagna.initialiseAxes(resetAxes=True)  # update the plots.
+        self.lasagna.update_2D_plot_ingredients_in_axes(resetAxes=True)  # update the plots.
 
     def generateRandomData(self):
         """
@@ -53,6 +53,7 @@ class plugin(LasagnaPlugin):
         im_shape = first_layer.data().shape
 
         n = 10000  # number of random points to make
+        print("Overlaying %d random points" % n)
         num_axes = 3
 
         r = np.random.rand(n*num_axes).reshape((n, num_axes))  # the random array

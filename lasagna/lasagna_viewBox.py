@@ -1,7 +1,7 @@
 
 """ 
-This class overrides the behavior of the parent ViewBox to all for scaling and translating 
-of one or more linked axes
+This class overrides the behavior of the parent ViewBox to handle operations for
+for scaling and translating of one or more linked axes
 """
 
 
@@ -19,7 +19,8 @@ class lasagna_viewBox(pg.ViewBox):
     mouseClicked = QtCore.pyqtSignal(object)  # Make a mouseClicked signal
 
     def __init__(self, linkedAxis={}):
-        super(lasagna_viewBox, self).__init__()
+        super(lasagna_viewBox, self).__init__(enableMenu=False)
+
         """
         linkedAxis is a dictionary with the following structure:
         keys are ViewBoxes and their value is a dictionary with the following keys:

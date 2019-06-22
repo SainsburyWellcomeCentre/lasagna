@@ -12,15 +12,20 @@ from lasagna.plugins.tutorial_plugins import cross_section_plot_UI
 from lasagna.utils import lasagna_qt_helper_functions
 
 
-class plugin(LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #must inherit LasagnaPlugin first
-
+class plugin(
+    LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection
+):  # must inherit LasagnaPlugin first
     def __init__(self, lasagna_serving, parent=None):
-        super(plugin, self).__init__(lasagna_serving)  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
+        super(plugin, self).__init__(
+            lasagna_serving
+        )  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
 
         # re-define some default properties that were originally defined in LasagnaPlugin
-        self.pluginShortName = 'Cross Section'  # Appears on the menu
-        self.pluginLongName = 'displays cross section in a new window'  # Can be used for other purposes (e.g. tool-tip)
-        self.pluginAuthor = 'Rob Campbell'
+        self.pluginShortName = "Cross Section"  # Appears on the menu
+        self.pluginLongName = (
+            "displays cross section in a new window"
+        )  # Can be used for other purposes (e.g. tool-tip)
+        self.pluginAuthor = "Rob Campbell"
 
         # Create widgets defined in the designer file
         self.setupUi(self)
@@ -45,9 +50,9 @@ class plugin(LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #
 
         # Get the base image from this widget
         selected_stack_name = self.lasagna.selectedStackName()
-        image_item = lasagna_qt_helper_functions.find_pyqt_graph_object_name_in_plot_widget(plot_widget,
-                                                                                            itemName=selected_stack_name,
-                                                                                            regex=True)
+        image_item = lasagna_qt_helper_functions.find_pyqt_graph_object_name_in_plot_widget(
+            plot_widget, itemName=selected_stack_name, regex=True
+        )
         if not image_item:
             return
 
@@ -70,7 +75,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #
         """
         This method is called by lasagna when the user unchecks the plugin in the menu.
         """
-        self.detachHooks() 
+        self.detachHooks()
         self.close()
 
     # We define this here because we can't assume all plugins will have QWidget::closeEvent
@@ -79,6 +84,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection): #
         This event is executed when the user presses the close window (cross) button in the title bar
         """
         self.lasagna.stopPlugin(self.__module__)  # This will call self.closePlugin
-        self.lasagna.pluginActions[self.__module__].setChecked(False)  # Uncheck the menu item associated with this plugin's name
+        self.lasagna.pluginActions[self.__module__].setChecked(
+            False
+        )  # Uncheck the menu item associated with this plugin's name
         self.deleteLater()
         event.accept()

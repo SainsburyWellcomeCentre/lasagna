@@ -17,8 +17,11 @@ class LasagnaPlugin(object):
     2. Perform common duties at startup. Maybe send to the viewer some signal that the plugin is running
     3. Perform common duties at shutdown.
     """
+
     def __init__(self, lasagna_serving):
-        super(LasagnaPlugin, self).__init__()  # In case of multiple inheritence. Useful for GUI making
+        super(
+            LasagnaPlugin, self
+        ).__init__()  # In case of multiple inheritence. Useful for GUI making
         # This is crude, but the plugin will have access to everything
         # in the main window
         self.lasagna = lasagna_serving
@@ -26,13 +29,17 @@ class LasagnaPlugin(object):
         # code to indicate visually that the plugin is running
 
         # define some default properties that all plugins must have
-        self.pluginShortName = 'Plugin'  # Appears on the menu
-        self.pluginLongName = 'Lasagna plugin'  # Can be used for other purposes (e.g. tool-tip)
-        self.pluginAuthor = 'author name'
+        self.pluginShortName = "Plugin"  # Appears on the menu
+        self.pluginLongName = (
+            "Lasagna plugin"
+        )  # Can be used for other purposes (e.g. tool-tip)
+        self.pluginAuthor = "author name"
 
         self.confirmOnClose = False
 
-        self.verbose = True  # If true we print out debugging messages to the command line
+        self.verbose = (
+            True
+        )  # If true we print out debugging messages to the command line
         self.attachHooks()
 
         if self.verbose:
@@ -47,7 +54,7 @@ class LasagnaPlugin(object):
         self.detachHooks()
     """
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def attachHooks(self):
         """
         Find all methods in the plugin starting with hook_ and register these
@@ -56,8 +63,8 @@ class LasagnaPlugin(object):
         in the lasagna.hooks dictionary
 
         """
-        regexp = re.compile('hook_(.*)')
-       
+        regexp = re.compile("hook_(.*)")
+
         for this_property in dir(self):
             if regexp.match(this_property):
                 hook_name = regexp.findall(this_property)[0]
@@ -69,7 +76,12 @@ class LasagnaPlugin(object):
                         print("Linking " + this_property + " to " + hook_name)
                 else:
                     if self.verbose:
-                        print("No hook " + hook_name + " found in lasagna.hooks for method " + this_property)
+                        print(
+                            "No hook "
+                            + hook_name
+                            + " found in lasagna.hooks for method "
+                            + this_property
+                        )
 
     def detachHooks(self):
         """
@@ -77,7 +89,7 @@ class LasagnaPlugin(object):
         Remove any that are found. 
         """
         plugin_name = self.__class__.__name__
-        regexp = re.compile('.*' + plugin_name + '.*')
+        regexp = re.compile(".*" + plugin_name + ".*")
         if self.verbose:
             print("Unlinking hooks for plugin '%s'" % plugin_name)
         for hook_list in list(self.lasagna.hooks.keys()):
@@ -94,7 +106,7 @@ class LasagnaPlugin(object):
                     if self.verbose:
                         print("Removed hook '{}'".format(hook))
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def initPlugin(self):
         """
         This method must be present. It will be defined by the plugin. It may do nothing. 
