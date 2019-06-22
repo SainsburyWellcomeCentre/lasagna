@@ -74,11 +74,9 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.addPoint_radioButton.setChecked(True)
 
         # Set up connections
-        self.fit_pushButton.clicked.connect(self.fit_and_display_line)
         self.deg_spinBox.valueChanged.connect(self.fit_and_display_line)
         self.clear_pushButton.clicked.connect(self.clear_line)
         self.add_pushButton.clicked.connect(self.add_line)
-        self.interactive_checkBox.clicked.connect(self.fit_and_display_line)
         self.addPoint_radioButton.toggled.connect(self.addRemoveToggle)
         self.fitType_comboBox.activated.connect(self.fit_and_display_line)
         # TODO: trigger off an edit signal not item changed
@@ -303,8 +301,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         pts._data = coords
         self.lasagna.update_2D_plot_ingredients_in_axes()
-        if self.interactive_checkBox.isChecked():
-            self.fit_and_display_line(coords)
+        self.fit_and_display_line(coords)
 
         return
 

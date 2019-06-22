@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'add_line.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_addLine(object):
     def setupUi(self, addLine):
@@ -53,9 +54,6 @@ class Ui_addLine(object):
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        self.interactive_checkBox = QtWidgets.QCheckBox(self.layoutWidget)
-        self.interactive_checkBox.setObjectName("interactive_checkBox")
-        self.verticalLayout.addWidget(self.interactive_checkBox)
         self.addPoint_radioButton = QtWidgets.QRadioButton(self.layoutWidget)
         self.addPoint_radioButton.setObjectName("addPoint_radioButton")
         self.verticalLayout.addWidget(self.addPoint_radioButton)
@@ -75,9 +73,6 @@ class Ui_addLine(object):
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.verticalLayout.addWidget(self.line)
-        self.fit_pushButton = QtWidgets.QPushButton(self.layoutWidget)
-        self.fit_pushButton.setObjectName("fit_pushButton")
-        self.verticalLayout.addWidget(self.fit_pushButton)
         self.add_pushButton = QtWidgets.QPushButton(self.layoutWidget)
         self.add_pushButton.setObjectName("add_pushButton")
         self.verticalLayout.addWidget(self.add_pushButton)
@@ -110,12 +105,11 @@ class Ui_addLine(object):
         item.setText(_translate("addLine", "Y"))
         self.label_3.setText(_translate("addLine", "&Name:"))
         self.label.setText(_translate("addLine", "&deg"))
-        self.interactive_checkBox.setText(_translate("addLine", "&interactive"))
         self.addPoint_radioButton.setText(_translate("addLine", "Add"))
         self.removePoint_radioButton.setText(_translate("addLine", "Remove"))
         self.numPoints_textLabel.setText(_translate("addLine", "n pts:"))
-        self.fit_pushButton.setText(_translate("addLine", "&fit"))
         self.add_pushButton.setText(_translate("addLine", "&Add it!"))
         self.closeButton.setText(_translate("addLine", "&Close"))
         self.clear_pushButton.setText(_translate("addLine", "clear"))
+
 

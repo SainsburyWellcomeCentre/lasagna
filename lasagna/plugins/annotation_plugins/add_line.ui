@@ -91,13 +91,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="interactive_checkBox">
-         <property name="text">
-          <string>&amp;interactive</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QRadioButton" name="addPoint_radioButton">
          <property name="text">
           <string>Add</string>
@@ -138,13 +131,6 @@
         <widget class="Line" name="line">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="fit_pushButton">
-         <property name="text">
-          <string>&amp;fit</string>
          </property>
         </widget>
        </item>
