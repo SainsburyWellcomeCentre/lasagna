@@ -252,7 +252,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             # Add item to all three 2D plots
             self.lasagna.returnIngredientByName(line_name).addToPlots()
 
-        self._line()
+        self.clear_line()
 
     def addRemoveToggle(self):
         """
@@ -386,7 +386,6 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             : return:
             None - all fit information will bein self.fit
         """
-
         if len(coords) < 2:
             return
 

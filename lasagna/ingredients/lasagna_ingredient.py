@@ -46,14 +46,16 @@ class lasagna_ingredient(object):
         )  # The ingredient color (e.g. colour of the stack or lines or points)
 
     def fname(self):
-        """
-        Strip the absolute path and return only the file name as as a string
+        """ Strip the absolute path and return only the file name as as a string
+
+            :return:
+            file name without the absolute path
         """
         return self.fnameAbsPath.split(os.path.sep)[-1]
 
     def raw_data(self):
-        """
-        return raw data
+        """ return raw data
+
         """
         return self._data
 
