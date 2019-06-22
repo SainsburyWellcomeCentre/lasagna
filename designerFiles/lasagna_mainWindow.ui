@@ -89,7 +89,7 @@
      <x>0</x>
      <y>0</y>
      <width>1002</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -129,8 +129,8 @@
   <widget class="QDockWidget" name="mainDockWidget">
    <property name="minimumSize">
     <size>
-     <width>338</width>
-     <height>590</height>
+     <width>380</width>
+     <height>613</height>
     </size>
    </property>
    <property name="features">
@@ -694,7 +694,7 @@
            <rect>
             <x>10</x>
             <y>30</y>
-            <width>110</width>
+            <width>114</width>
             <height>22</height>
            </rect>
           </property>
@@ -759,7 +759,7 @@
            <rect>
             <x>10</x>
             <y>50</y>
-            <width>110</width>
+            <width>114</width>
             <height>22</height>
            </rect>
           </property>
@@ -821,7 +821,7 @@
            <rect>
             <x>10</x>
             <y>70</y>
-            <width>110</width>
+            <width>114</width>
             <height>22</height>
            </rect>
           </property>
@@ -1018,7 +1018,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>&amp;New base stack</string>
+    <string>&amp;New image stack</string>
+   </property>
+   <property name="toolTip">
+    <string>New image stack</string>
    </property>
   </action>
   <action name="actionAbout">

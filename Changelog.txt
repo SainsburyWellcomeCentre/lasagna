@@ -9,6 +9,8 @@ laboratory, Basel, by Rob Campbell.
 2019/06/22
 - Rob Campbell
 General work on add_line_plugin. It now handles point insertion, 3D line fit works better, bug fixes. 
+Rename "Base stack" to "Image stack"
+
 
 2019/06/18
 - Rob Campbell

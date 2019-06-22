@@ -36,7 +36,7 @@ class loaderClass(LasagnaPlugin):
     def showLoadDialog(self):
         """
         This slot brings up the load dialog and retrieves the file name.
-        If the file name is valid, it loads the base stack using the load method.
+        If the file name is valid, it loads the image stack using the load method.
         """
         
         fname = self.lasagna.showFileLoadDialog(fileFilter="LSM (*.lsm)")

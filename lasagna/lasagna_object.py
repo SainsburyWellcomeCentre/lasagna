@@ -487,8 +487,8 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     ):
         """
         This slot brings up the file load dialog and gets the file name.
-        If the file name is valid, it loads the base stack using the loadImageStack method.
-        We split things up so that the base stack can be loaded from the command line,
+        If the file name is valid, it loads the image stack using the loadImageStack method.
+        We split things up so that the image stack can be loaded from the command line,
         or from a plugin without going via the load dialog.
 
         triggered - just catches the input from the signal so we can set fileFilter
