@@ -142,7 +142,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
                     # No highlight point
                     rowToInsert = self.num_points
                 else:
-                    self.nearest_point_index, self.coords_of_nearest_point_to_cursor = self.find_nearest_point_in_array(
+                    self.nearest_point_index, _ = self.find_nearest_point_in_array(
                         self.get_points_coord(), hLightCoords
                     )
                     self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
@@ -222,7 +222,6 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         # An integer defining the row that most closely matches the search vector
         nearestInd = delta == min(delta)
         closest_match = array_to_search[nearestInd, :]
-
         nearest_point_index = np.where(nearestInd)[0].tolist()[0]
 
         return (nearest_point_index, closest_match)
@@ -385,6 +384,10 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             : return:
             None - all fit information will bein self.fit
         """
+
+        if len(coords)<2:
+            return
+
         muCoords = coords.mean(axis=0)
 
         # Do an SVD on the mean-centered data.
@@ -394,6 +397,9 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.fit["fit_coords"] = linepts
 
     def link_points_with_line(self, coords):
+        if len(coords)<2:
+            return
+
         self.fit["fit_coords"] = coords
 
     def get_points_coord(self):
