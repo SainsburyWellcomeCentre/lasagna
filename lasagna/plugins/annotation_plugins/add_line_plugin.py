@@ -164,11 +164,15 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
                     )
 
             elif self.lasagna.last_button_click_in_axis == 2:
-                # Mark nearest point if right. click
-                self.lasagna.returnIngredientByName(
-                    self.hPoint_name
-                )._data = self.coords_of_nearest_point_to_cursor
-                pass
+                # Mark nearest point if right-click. If the nearest point is already marked 
+                # then we un-mark it.
+                if len(hLightCoords)>0 and np.array_equal(hLightCoords,self.coords_of_nearest_point_to_cursor):
+                    self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
+                else:
+                    self.lasagna.returnIngredientByName(
+                        self.hPoint_name
+                    )._data = self.coords_of_nearest_point_to_cursor
+
 
         elif self.removePoint_radioButton.isChecked():
             self.num_points -= 1
@@ -273,11 +277,14 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.num_points = 0
         self.tableWidget.clear()
         self.tableWidget.setRowCount(0)
-        self.fit_and_display_line()
-        self.update_current_line()
         self.numPoints_textLabel.setText("n pts: %d" % 0)
         self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
+        self.lasagna.returnIngredientByName(self.line_name)._data = [] 
+        self.lasagna.update_2D_plot_ingredients_in_axes()
+        self.fit_and_display_line()
+        self.update_current_line()
 
+        
     def update_current_line(self):
         """Change current line ingredient and display points
 
