@@ -62,6 +62,8 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.nearest_point_index = 0  # The index of the point nearest the mouse cursor
         self.coords_of_nearest_point_to_cursor = []
         self.fit = {}  # The line fit to the sparse points
+        # Otherwise plugin can crash if user selects line fit on startup with no data:
+        self.fit["fit_coords"] = [] 
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
         self.fitType_comboBox.addItem("No fit")
@@ -385,19 +387,22 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             None - all fit information will bein self.fit
         """
 
-        if len(coords)<2:
+        if len(coords) < 2:
             return
 
         muCoords = coords.mean(axis=0)
 
         # Do an SVD on the mean-centered data.
-        uu, dd, vv = np.linalg.svd(coords - muCoords)
-        linepts = vv[0] * np.mgrid[-100:500:2][:, np.newaxis]
+        tData = coords - muCoords
+        uu, dd, vv = np.linalg.svd(tData)
+        datMin = tData.flatten().min()
+        datMax = tData.flatten().max()
+        linepts = vv[0] * np.mgrid[datMin:datMax:2][:, np.newaxis]
         linepts += muCoords
         self.fit["fit_coords"] = linepts
 
     def link_points_with_line(self, coords):
-        if len(coords)<2:
+        if len(coords) < 2:
             return
 
         self.fit["fit_coords"] = coords
