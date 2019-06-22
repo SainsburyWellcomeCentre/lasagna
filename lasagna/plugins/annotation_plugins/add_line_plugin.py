@@ -126,26 +126,54 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         elif len(pos) != 3:
             raise ValueError("I expect 3D coordinates. Got: {}".format(pos))
 
+        hLightCoords = self.lasagna.returnIngredientByName(self.hPoint_name)._data
+
         # Update the add_line_plugin GUI
         if self.addPoint_radioButton.isChecked():
 
             # Update the text label indicating how many points have been created
-            self.num_points += 1
-            self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
-            self.tableWidget.setRowCount(self.num_points)
+            if self.lasagna.last_button_click_in_axis == 1:
+                # Add point if left click
+                self.num_points += 1
 
-            # Add clicked position to the table
-            for i, p in enumerate(pos):
-                new_item = QtGui.QTableWidgetItem(str(p))
-                self.items[(self.num_points, i)] = new_item
-                self.tableWidget.setItem(self.num_points - 1, i , new_item)
-            
+                # We will append the new point to the end, unless a highlight point exists,
+                # in which case we append before that
+                if len(hLightCoords) == 0:
+                    # No highlight point
+                    rowToInsert = self.num_points
+                else:
+                    self.nearest_point_index, self.coords_of_nearest_point_to_cursor = self.find_nearest_point_in_array(
+                        self.get_points_coord(), hLightCoords
+                    )
+                    self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
+                    rowToInsert = self.nearest_point_index + 1
+
+                self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
+                # self.tableWidget.setRowCount(self.num_points) #WIth add row this was problematic
+
+                # Add clicked position to the table
+                self.tableWidget.insertRow(rowToInsert - 1)
+                for colIndex, textToAdd in enumerate(pos):
+                    # Insert number as a string into the table at column
+                    self.tableWidget.setItem(
+                        rowToInsert - 1,
+                        colIndex,
+                        QtGui.QTableWidgetItem(str(textToAdd)),
+                    )
+
+            elif self.lasagna.last_button_click_in_axis == 2:
+                # Mark nearest point if right. click
+                self.lasagna.returnIngredientByName(
+                    self.hPoint_name
+                )._data = self.coords_of_nearest_point_to_cursor
+                pass
+
         elif self.removePoint_radioButton.isChecked():
             self.num_points -= 1
-            self.tableWidget.removeRow(self.nearest_point_index[0])
-            self.lasagna.returnIngredientByName(self.hlite_point_name)._data = []
-            self.lasagna.update_2D_plot_ingredients_in_axes()
+            self.tableWidget.removeRow(self.nearest_point_index)
+            self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
 
+        self.lasagna.update_2D_plot_ingredients_in_axes()
         self.update_current_line()
 
     def hook_updateMainWindowOnMouseMove_End(self):
@@ -155,22 +183,49 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
               ** We keep it because likely we'll need it. **
               e.g. we can run highlight point here
         """
-        if self.addPoint_radioButton.isChecked():
-            return
 
         currentMousePos = np.array(self.lasagna.mousePositionInStack)
         existingPoints = self.get_points_coord()
         if type(existingPoints) == list or existingPoints.size == 0:
             return
 
-        distanceToPoints = (
-            np.sum((existingPoints - currentMousePos) ** 2, axis=1) ** 0.5
+        self.nearest_point_index, self.coords_of_nearest_point_to_cursor = self.find_nearest_point_in_array(
+            existingPoints, currentMousePos
         )
-        nearestInd = distanceToPoints == min(distanceToPoints)
-        nearestPoint = existingPoints[nearestInd, :]
-        self.nearest_point_index = np.where(nearestInd)
-        self.lasagna.returnIngredientByName(self.hlite_point_name)._data = nearestPoint
-        self.lasagna.update_2D_plot_ingredients_in_axes()
+
+        if self.removePoint_radioButton.isChecked():
+            self.lasagna.returnIngredientByName(
+                self.hPoint_name
+            )._data = self.coords_of_nearest_point_to_cursor
+
+            self.lasagna.update_2D_plot_ingredients_in_axes()
+
+    def find_nearest_point_in_array(self, array_to_search, vector_to_find):
+        """Given a 2D array, find the row that most closely matches a given vector
+
+            Purpose
+            Calculate the Euclidian distance between each row of array_to_search
+            and the vector vector_to_find. Return the index of the closest match 
+            and its value
+
+            :return:
+            nearest_point_index - an int defining the row in array_to_search that 
+                            is the closest match.
+            closest_match - the vector (row) in array_to_search that most closely
+                            matches vector_to_find.
+
+
+        """
+
+        delta = np.sum((array_to_search - vector_to_find) ** 2, axis=1) ** 0.5
+
+        # An integer defining the row that most closely matches the search vector
+        nearestInd = delta == min(delta)
+        closest_match = array_to_search[nearestInd, :]
+
+        nearest_point_index = np.where(nearestInd)[0].tolist()[0]
+
+        return (nearest_point_index, closest_match)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Remaining methods which are not hooks or otherwise obligatory
@@ -196,7 +251,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             # Add item to all three 2D plots
             self.lasagna.returnIngredientByName(line_name).addToPlots()
 
-        self.clear_line()
+        self._line()
 
     def addRemoveToggle(self):
         """
@@ -204,7 +259,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         """
         if self.addPoint_radioButton.isChecked():
             # Remove the highlight point
-            self.lasagna.returnIngredientByName(self.hlite_point_name)._data = []
+            self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
             self.lasagna.update_2D_plot_ingredients_in_axes()
         elif self.removePoint_radioButton.isChecked():
             pass
