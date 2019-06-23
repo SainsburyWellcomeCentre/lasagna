@@ -47,7 +47,7 @@ def get_plugin_instance_from_file_name(file_name, attribute_to_import='plugin'):
         print(' * Could not load plugin module {}. Skipping.'.format(module_name))
         ## TODO: uncomment following to see error, but then loading does not proceed. That's odd,
         ## because it should just report the error. This is a bug, TBH, shouldn't have to uncomment.
-        #print(err.__class__.__name__ + ": " + err.message) 
+        print(err.__class__.__name__ + ": " + err.message) 
         return None, None
     if attribute_to_import is not None:
         returned_attribute = getattr(imported_module, attribute_to_import)

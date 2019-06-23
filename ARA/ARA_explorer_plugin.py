@@ -1,6 +1,6 @@
 
-"""
-lasagna plugin for exploring the Allen Brain Atlas:
+""" lasagna plugin for exploring the Allen Brain Atlas:
+
 1. Display of average template brain.
 2. Reporting of brain area name
 more stuff... 
