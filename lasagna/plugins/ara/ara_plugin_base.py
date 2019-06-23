@@ -190,7 +190,7 @@ class AraPluginBase(ARA_plotter, LasagnaPlugin, QtGui.QWidget):
     def closePlugin(self):
         """
         Runs when the user unchecks the plugin in the menu box and also (in this case)
-        when the user loads a new base stack
+        when the user loads a new image stack
         """
         # remove the currently loaded ARA (if present)
         self.lasagna.removeIngredientByName('aracontour')

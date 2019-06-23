@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -63,7 +63,7 @@ class Ui_lasagna_mainWindow(object):
         self.gridLayout.addWidget(self.splitter_3, 0, 0, 1, 1)
         lasagna_mainWindow.setCentralWidget(self.centralwidget)
         self.menuBar = QtWidgets.QMenuBar(lasagna_mainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 20))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 22))
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
         self.menuFile.setObjectName("menuFile")
@@ -77,7 +77,7 @@ class Ui_lasagna_mainWindow(object):
         self.menuPlugins.setObjectName("menuPlugins")
         lasagna_mainWindow.setMenuBar(self.menuBar)
         self.mainDockWidget = QtWidgets.QDockWidget(lasagna_mainWindow)
-        self.mainDockWidget.setMinimumSize(QtCore.QSize(338, 590))
+        self.mainDockWidget.setMinimumSize(QtCore.QSize(380, 613))
         self.mainDockWidget.setFeatures(QtWidgets.QDockWidget.DockWidgetFloatable|QtWidgets.QDockWidget.DockWidgetMovable)
         self.mainDockWidget.setObjectName("mainDockWidget")
         self.dockWidgetContents = QtWidgets.QWidget()
@@ -344,7 +344,7 @@ class Ui_lasagna_mainWindow(object):
         self.groupBoxAxisRatio.setGeometry(QtCore.QRect(10, 10, 131, 121))
         self.groupBoxAxisRatio.setObjectName("groupBoxAxisRatio")
         self.layoutWidget3 = QtWidgets.QWidget(self.groupBoxAxisRatio)
-        self.layoutWidget3.setGeometry(QtCore.QRect(10, 30, 110, 22))
+        self.layoutWidget3.setGeometry(QtCore.QRect(10, 30, 114, 22))
         self.layoutWidget3.setObjectName("layoutWidget3")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget3)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -372,7 +372,7 @@ class Ui_lasagna_mainWindow(object):
         self.axisRatioLineEdit_1.setObjectName("axisRatioLineEdit_1")
         self.horizontalLayout.addWidget(self.axisRatioLineEdit_1)
         self.layoutWidget4 = QtWidgets.QWidget(self.groupBoxAxisRatio)
-        self.layoutWidget4.setGeometry(QtCore.QRect(10, 50, 110, 22))
+        self.layoutWidget4.setGeometry(QtCore.QRect(10, 50, 114, 22))
         self.layoutWidget4.setObjectName("layoutWidget4")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.layoutWidget4)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -399,7 +399,7 @@ class Ui_lasagna_mainWindow(object):
         self.axisRatioLineEdit_2.setObjectName("axisRatioLineEdit_2")
         self.horizontalLayout_2.addWidget(self.axisRatioLineEdit_2)
         self.layoutWidget5 = QtWidgets.QWidget(self.groupBoxAxisRatio)
-        self.layoutWidget5.setGeometry(QtCore.QRect(10, 70, 110, 22))
+        self.layoutWidget5.setGeometry(QtCore.QRect(10, 70, 114, 22))
         self.layoutWidget5.setObjectName("layoutWidget5")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.layoutWidget5)
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
@@ -570,7 +570,8 @@ class Ui_lasagna_mainWindow(object):
         self.pushButton_FlipView3.setText(_translate("lasagna_mainWindow", "View 3"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.axisSetingsTab), _translate("lasagna_mainWindow", "Axis"))
         self.toolBar.setWindowTitle(_translate("lasagna_mainWindow", "toolBar"))
-        self.actionOpen.setText(_translate("lasagna_mainWindow", "&New base stack"))
+        self.actionOpen.setText(_translate("lasagna_mainWindow", "&New image stack"))
+        self.actionOpen.setToolTip(_translate("lasagna_mainWindow", "New image stack"))
         self.actionAbout.setText(_translate("lasagna_mainWindow", "About"))
         self.actionQuit.setText(_translate("lasagna_mainWindow", "&Quit"))
         self.action_ARA_Explorer.setText(_translate("lasagna_mainWindow", "&ARA Explorer"))
