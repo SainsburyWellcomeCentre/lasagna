@@ -221,6 +221,9 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         """
 
+        if len(array_to_search)==0 or len(vector_to_find)==0:
+            return([], [])
+
         delta = np.sum((array_to_search - vector_to_find) ** 2, axis=1) ** 0.5
 
         # An integer defining the row that most closely matches the search vector

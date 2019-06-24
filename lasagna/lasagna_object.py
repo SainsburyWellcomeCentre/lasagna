@@ -181,12 +181,15 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # Handle IO plugins. For instance these are the loaders that handle different data types
         # and different loading actions.
-        lasagna_path = os.path.dirname(os.path.realpath(sys.argv[0]))
-        built_in_io_path = os.path.join(lasagna_path, "io_libs")
-        io_paths = preferences.readPreference(
-            "IO_modulePaths"
-        )  # directories containing IO modules
-        io_paths.append(built_in_io_path)
+
+        lasagna_path =  os.path.dirname(lasagna_mainWindow.__file__)
+        print("Lasagna path is: %s" % lasagna_path)
+
+        # directories containing IO modules
+        io_paths = preferences.readPreference("IO_modulePaths")
+        io_paths.append(os.path.join(lasagna_path, "io_libs"))
+        io_paths.append(os.path.join(lasagna_path, "plugins", "io"))
+
         io_paths = list(set(io_paths))  # remove duplicate paths
 
         print("Adding IO module paths to Python path")
@@ -1081,6 +1084,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Update UI elements on the screen (but not the plotted images) as the user moves the mouse across an axis
         TODO: it would be nice to also run this on mouse wheel
         """
+
         self.runHook(
             self.hooks["updateMainWindowOnMouseMove_Start"]
         )  # Runs each time the views are updated
