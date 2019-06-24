@@ -22,7 +22,7 @@ git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
 cd lasagna
 ```
 
-An environment file is provided. 
+A Conda environment yml file is provided. 
 If you use [conda](https://docs.conda.io/en/latest/), you can create a virtual environment and download all the dependencies by running: 
 ```
 git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
