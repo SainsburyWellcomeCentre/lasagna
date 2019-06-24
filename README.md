@@ -37,12 +37,15 @@ python setup.py install
 ```
 
 Lasagna is now installed. Try `lasagna -D` for load with a demo image. 
-If this fails run:
+If this fails the likely it's because the script that actually starts `lasagna` was not installed in your path.
+Try running this command:
+
 ```
-pip install -e ./
+pip3 install -e ./
 ```
 
-Then try starting lasgna again. 
+Then try starting Lasagna again. 
+That command alone has worked on a Mac too without Conda installed. 
 
 
 ### Manual installation ###
