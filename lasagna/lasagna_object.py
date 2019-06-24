@@ -181,7 +181,9 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # Handle IO plugins. For instance these are the loaders that handle different data types
         # and different loading actions.
-        lasagna_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+        lasagna_path =  os.path.dirname(lasagna_mainWindow.__file__)
+        print("Lasagna path is: %s" % lasagna_path)
         built_in_io_path = os.path.join(lasagna_path, "io_libs")
         io_paths = preferences.readPreference(
             "IO_modulePaths"
