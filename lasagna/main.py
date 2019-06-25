@@ -23,10 +23,8 @@ __maintainer__ = "Sainsbury Wellcome Centre"
 import os
 import sys
 import argparse
-
+from PyQt5.QtWidgets import QApplication
 import pyqtgraph as pg
-from PyQt5 import QtGui
-
 from lasagna.lasagna_object import Lasagna
 
 
@@ -80,7 +78,7 @@ def download_sample_stacks():
 def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load=None, trees_to_load=None,
          plugin_to_start=None, embed_console=False):
 
-    app = QtGui.QApplication([])
+    app = QApplication([])
 
     tasty = Lasagna()
     tasty.app = app
