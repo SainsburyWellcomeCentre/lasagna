@@ -58,4 +58,4 @@ def abs_path_to_lasagna():
 
 
 def lasagna_plugins_abs_path():
-    return os.path.join(abs_path_to_lasagna(), 'plugins')
+    return os.path.join(abs_path_to_lasagna(), 'plugins')+os.sep
