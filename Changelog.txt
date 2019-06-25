@@ -6,6 +6,11 @@ Lasagna is a Python-based image viewer for 3-D anatomy datasets. It was inspired
 VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 2015/2016 at the Mrsic-Flogel
 laboratory, Basel, by Rob Campbell.
 
+2019/06/25
+- Antonin Blot
+Improve the embeded ipython console. Giving the -C argument will start an ipython session in the terminal with `app`
+and `tasty` in the namespace.
+
 2019/06/22
 - Rob Campbell
 General work on add_line_plugin. It now handles point insertion, 3D line fit works better, bug fixes. 
