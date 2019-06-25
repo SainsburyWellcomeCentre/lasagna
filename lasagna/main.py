@@ -82,7 +82,7 @@ def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load
 
     app = QtGui.QApplication([])
 
-    tasty = Lasagna()
+    tasty = Lasagna(embed_console=embed_console)
     tasty.app = app
 
     # Data from command line input if the user specified this
@@ -128,10 +128,13 @@ def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load
         sigProxies.append(thisProxy)
 
     if embed_console:
-        from IPython import embed
-        embed()
-
-    sys.exit(app.exec_())
+        from traitlets.config import Config
+        cfg = Config()
+        cfg.InteractiveShellApp.gui = 'qt5'
+        import IPython
+        IPython.start_ipython(config=cfg, argv=[], user_ns=dict(tasty=tasty, app=app))
+    else:
+        sys.exit(app.exec_())
 
 
 def run():

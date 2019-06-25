@@ -23,7 +23,7 @@ from lasagna.utils.lasagna_qt_helper_functions import (
 
 
 class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, embed_console=False, parent=None):
         """
         Create default values for properties then call initialiseUI to set up main window
         """
@@ -34,6 +34,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.setupUi(self)
         self.show()
         self.app = None  # The QApplication handle kept here
+        self.embed_console = embed_console
 
         # Misc. window set up
         self.setWindowTitle("Lasagna - 3D sectioning volume visualiser")
@@ -600,6 +601,9 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     self.stopPlugin(thisPlugin)
 
         qApp.quit()
+        if self.embed_console:
+            from prompt_toolkit.application.current import get_app
+            get_app().exit()
         sys.exit(0)  # without this we get a big horrible error report on the Mac
 
     def closeEvent(self, event):
