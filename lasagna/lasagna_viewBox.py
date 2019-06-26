@@ -31,6 +31,9 @@ class lasagna_viewBox(pg.ViewBox):
         self.linkedAxis = linkedAxis  # A list of ViewBox axes to link to
         self.controlDrag = False
 
+        # Flip stack in X/Y or the image flipped incorrectly
+        self.invertY()
+
         # Define a custom signal to indicate when the user has created an event that will increment the displayed layer
         self.progressBy = 0
 
