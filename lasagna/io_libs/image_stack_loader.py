@@ -122,10 +122,10 @@ def load_tiff_stack(fname, use_lib_tiff=False):
             raise
         tiff = TIFFfile(fname)
         samples, sample_names = tiff.get_samples()  # we should have just one
-        print("Loading:\n" + tiff.get_info() + " with libtiff\n")
+        print("Loading: " + tiff.get_info() + " with libtiff\n")
         im = np.asarray(samples[0])
     else:
-        print("Loading:\n" + fname + " with tifffile\n")
+        print("Loading: " + fname + " with tifffile\n")
         from tifffile import imread
 
         im = imread(fname)

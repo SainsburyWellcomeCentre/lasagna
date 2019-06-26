@@ -114,15 +114,15 @@ class imagestack(lasagna_ingredient):
             print("Calculating histogram")
 
         nValsForCalc = 10E6 #Number of values on which to base histogram calculation
-        sampleEverynSamples = self._data.size
-        if self._data.size > nValsForCalc:
-            sampleEverynSamples = int(self._data.size/nValsForCalc)
+        sampleEverynSamples = self.data().size
+        if self.data().size > nValsForCalc:
+            sampleEverynSamples = int(self.data().size/nValsForCalc)
             if verbose:
                 print("Histogram based on one value every %d" % sampleEverynSamples)
         else:
             sampleEverynSamples=1
 
-        y, x = np.histogram(self._data[::sampleEverynSamples], bins=256)
+        y, x = np.histogram(self.data()[::sampleEverynSamples], bins=256)
         x = x[0:-1]  # chop off last value
         if verbose:
             print("Done")
@@ -180,13 +180,26 @@ class imagestack(lasagna_ingredient):
             lut=self.setColorMap(self.lut),
         )
 
-    def defaultHistRange(self, logY=False):
+    def defaultHistRange(self, logY=False, verbose=False):
         """
         Returns a reasonable values for the maximum plotted value.
         logY if True we log the Y values
         """
 
-        y, x = np.histogram(self.data(), bins=100)
+        if verbose:
+            print("Determining default histogram range")
+
+        nValsForCalc = 1E6 #Number of values on which to base histogram calculation
+        sampleEverynSamples = self.data().size
+        if self.data().size > nValsForCalc:
+            sampleEverynSamples = int(self.data().size/nValsForCalc)
+            if verbose:
+                print("Histogram based on one value every %d" % sampleEverynSamples)
+        else:
+            sampleEverynSamples=1
+
+
+        y, x = np.histogram(self.data()[::sampleEverynSamples], bins=100)
         y = np.append(y, 0)
 
         # Remove negative numbers from the calculation. Sometimes these happen with registered images
@@ -203,6 +216,9 @@ class imagestack(lasagna_ingredient):
         vals = np.cumsum(m) / np.sum(m)
 
         vals = vals > thresh
+
+        if verbose:
+            print("Done")
 
         return x[vals.tolist().index(True)]
 
