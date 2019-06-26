@@ -22,7 +22,7 @@ git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
 cd lasagna
 ```
 
-An environment file is provided. 
+A Conda environment yml file is provided. 
 If you use [conda](https://docs.conda.io/en/latest/), you can create a virtual environment and download all the dependencies by running: 
 ```
 git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
@@ -37,12 +37,15 @@ python setup.py install
 ```
 
 Lasagna is now installed. Try `lasagna -D` for load with a demo image. 
-If this fails run:
+If this fails the likely it's because the script that actually starts `lasagna` was not installed in your path.
+Try running this command:
+
 ```
-pip install -e ./
+pip3 install -e ./
 ```
 
-Then try starting lasgna again. 
+Then try starting Lasagna again. 
+That command alone has worked on a Mac too without Conda installed. 
 
 
 ### Manual installation ###
@@ -148,5 +151,5 @@ For more information see the [wiki](https://github.com/SainsburyWellcomeCentre/l
 
 ## Current status ##
 Lasagna is functional but has lots of small bugs (sorry). 
-Development stalled for a while but has restarted somewhat. 
-We are looking for contributors. 
+Development stalled for a while but has now restarted somewhat. 
+We are looking for [contributors](https://github.com/SainsburyWellcomeCentre/lasagna/wiki/Developer-How-To). 

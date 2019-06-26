@@ -18,6 +18,8 @@ def find_plugins(plugin_paths):
             print("Plugin path {} is not a valid path. SKIPPING".format(plugin_folder))
             continue
 
+        plugin_folder = plugin_folder.rstrip(os.sep)
+
         # Get all files in the directory that match the plugin file name pattern
         plugin_files = [f for f in os.listdir(plugin_folder) if is_plugin_file(plugin_folder, f)]
         if not plugin_files:
@@ -46,8 +48,8 @@ def get_plugin_instance_from_file_name(file_name, attribute_to_import='plugin'):
     except ImportError as err:
         print('\n * Could not load plugin module {}. Skipping.'.format(module_name))
         print("%s: %s\n" % (err.__class__.__name__ , str(err)) )
-
         return None, None
+
     if attribute_to_import is not None:
         returned_attribute = getattr(imported_module, attribute_to_import)
     else:

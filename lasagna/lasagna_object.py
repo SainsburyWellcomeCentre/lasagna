@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import pyqtgraph as pg
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import qApp
+from PyQt5.QtWidgets import qApp, QMainWindow
 
 # lasagna modules
 
@@ -22,6 +22,7 @@ from lasagna.utils.lasagna_qt_helper_functions import (
 )
 
 
+
 class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def __init__(self, embed_console=False, parent=None):
         """
@@ -30,7 +31,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         super(Lasagna, self).__init__(parent)
 
         # Create widgets defined in the designer file
-        # self.win = QtGui.QMainWindow()
+        # self.win = QMainWindow()
         self.setupUi(self)
         self.show()
         self.app = None  # The QApplication handle kept here

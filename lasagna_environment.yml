@@ -12,6 +12,8 @@ dependencies:
  - matplotlib
  - ipython
  - vtk
+ - ipython
+ - traitlets
  - pip:
      - pynrrd
      - pyqt5

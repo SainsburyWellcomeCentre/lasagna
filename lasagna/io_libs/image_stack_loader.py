@@ -529,6 +529,8 @@ def nrrd_get_ratios(fname):
 
 
 def check_file_exists(file_path, source_function_name):
+    """ check whether file exists and raise suitable warning message if not
+    """
     if not os.path.exists(file_path):
         print(
             "image_stack_loader.{} can not find {}".format(

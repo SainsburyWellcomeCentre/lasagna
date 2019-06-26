@@ -9,3 +9,5 @@ scikit-image
 scipy
 matplotlib
 vtk
+traitlets
+ipython

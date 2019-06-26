@@ -33,14 +33,29 @@ def stripTrailingFileFromPath(path):
     return path
 
 
+def stripTrailingDirFromPath(path):
+    """ Remove last directory from path
+
+        Given path /tmp/somthing/wibble/ strip "wibble" and return the rest
+    """
+    if path[-1] == os.path.sep:
+        path = os.path.split(path)
+        path = str(path[0])
+
+    return os.path.split(path)[0]
+  
+
+
 def abs_path_to_lasagna():
     """
     Returns the absolute path to this module, which in turn is the absolute path to lasagna.
     This function is used for thing such as identifying the correct path for loading plugins
     packaged with lasagna.
     """
-    return stripTrailingFileFromPath(os.path.abspath(__file__))
+
+    tmp = stripTrailingFileFromPath(os.path.abspath(__file__))
+    return stripTrailingDirFromPath(tmp)
 
 
 def lasagna_plugins_abs_path():
-    return os.path.join(abs_path_to_lasagna(), 'plugins')
+    return os.path.join(abs_path_to_lasagna(), 'plugins')+os.sep
