@@ -7,6 +7,20 @@ VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 
 laboratory, Basel, by Rob Campbell.
 
 
+2019/06/26
+- Rob Campbe;;
+Fix silly bug that was causing the flip along the Y axis (dorso-ventral for our samples) in the first image axis
+(the coronal axis in our data)
+
+Greatly speed up display of larger images by fixing slow histogram calculation.
+
+
+2019/06/25
+- Antonin Blot
+Improve the embeded ipython console. Giving the -C argument will start an ipython session in the terminal with `app`
+and `tasty` in the namespace.
+
+
 2019/06/24
 - Rob Campbell
 IO plugins now all start without needing to be listed in the Lasagna preferences file. 
@@ -15,7 +29,6 @@ IO plugins now all start without needing to be listed in the Lasagna preferences
 2019/06/23
 - Rob Campbell
 tree class replaced with refactored version (see note froom 2019/06/12) and confirm ARA Explorer works.
-
 
 
 2019/06/22
