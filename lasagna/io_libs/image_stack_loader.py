@@ -151,7 +151,8 @@ def save_tiff_stack(fname, data, use_lib_tiff=False):
 # -------------------------------------------------------------------------------------------
 #   *MHD handling methods*
 def mhd_read(fname, fall_back_mode=False):
-    """
+    """ Read an MHD image file
+
     Read an MHD file using either VTK (if available) or the slower-built in reader
     if fallBackMode is true we force use of the built-in reader
     """
@@ -191,7 +192,8 @@ def mhd_read(fname, fall_back_mode=False):
 
 
 def mhd_write(im_stack, fname):
-    """
+    """ Write an MHD file
+
     Write MHD file, updating both the MHD and raw file.
     imStack - is the image stack volume ndarray
     fname - is the absolute path to the mhd file.
@@ -210,7 +212,8 @@ def mhd_write(im_stack, fname):
 
 
 def mhd_read_fallback(fname):
-    """
+    """ Read MHD header
+
     Read the header file from the MHA file then use this to
     build a 3D stack from the raw file
 
@@ -280,6 +283,9 @@ def mhd_read_raw_file(fname, header):
 
 
 def get_format_type_from_mhd_header(header):
+    """ Determine data format from an MHD file
+
+    """
     # Set the data type correctly
     format_type = False
     if "datatype" in header:

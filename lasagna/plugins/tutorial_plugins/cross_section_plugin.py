@@ -46,7 +46,14 @@ class plugin(
 
         # Get the widget that the mouse is currently in
         pos = QtGui.QCursor.pos()
+        print(pos)
+        print(type(qApp.widgetAt(pos)))
+        if str(type(qApp.widgetAt(pos))) == "<class 'NoneType'>":
+            print("\n\nBAILING OUT\n\n")
+            return
+
         plot_widget = qApp.widgetAt(pos).parent()  # The mouse is in this widget
+
 
         # Get the base image from this widget
         selected_stack_name = self.lasagna.selectedStackName()

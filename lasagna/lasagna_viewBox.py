@@ -1,4 +1,3 @@
-
 """ 
 This class overrides the behavior of the parent ViewBox to handle operations for
 for scaling and translating of one or more linked axes
@@ -15,7 +14,8 @@ import platform
 
 class lasagna_viewBox(pg.ViewBox):
     mouseWheeled = QtCore.pyqtSignal(object, object)  # Make a mouseWheeled signal
-    progressLayer = QtCore.pyqtSignal()  # This fires when the user mouse-wheels without keyboard modifiers
+    # This fires when the user mouse-wheels without keyboard modifiers
+    progressLayer = (QtCore.pyqtSignal())
     mouseClicked = QtCore.pyqtSignal(object)  # Make a mouseClicked signal
 
     def __init__(self, linkedAxis={}):
@@ -31,10 +31,6 @@ class lasagna_viewBox(pg.ViewBox):
         self.linkedAxis = linkedAxis  # A list of ViewBox axes to link to
         self.controlDrag = False
 
-        # TODO: why the hell does the Mac version not require the flip but the Linux version does. What about Win?
-        if platform.system() != 'Darwin':
-            self.invertY()
-
         # Define a custom signal to indicate when the user has created an event that will increment the displayed layer
         self.progressBy = 0
 
@@ -44,7 +40,7 @@ class lasagna_viewBox(pg.ViewBox):
         """
         self.onMouseWheeled(ev, axis)
         # The sigRangeChangedManually signal is defined in pg.ViewBox:  sigRangeChangedManually = QtCore.Signal(object)
-        self.sigRangeChangedManually.emit(self.state['mouseEnabled']) 
+        self.sigRangeChangedManually.emit(self.state["mouseEnabled"])
         self.mouseWheeled.emit(ev, axis)  # Then it emits a mouseWheeled signal
 
     def mouseDragEvent(self, ev, axis=None, linkX=False, linkY=False):
@@ -52,7 +48,7 @@ class lasagna_viewBox(pg.ViewBox):
         Intercept pg.ViewBox.mouseDragEvent to provide linked panning
         across different axes
         """
-      
+
         if len(self.linkedAxis) is None:
             return
 
@@ -80,16 +76,16 @@ class lasagna_viewBox(pg.ViewBox):
             x = None
             y = None
 
-            if self.linkedAxis[thisView]['linkX'] == 'x':
+            if self.linkedAxis[thisView]["linkX"] == "x":
                 x = vr.center().x()
 
-            if self.linkedAxis[thisView]['linkY'] == 'y':
+            if self.linkedAxis[thisView]["linkY"] == "y":
                 y = vr.center().y()
 
-            if self.linkedAxis[thisView]['linkX'] == 'y':
+            if self.linkedAxis[thisView]["linkX"] == "y":
                 y = vr.center().x()
 
-            if self.linkedAxis[thisView]['linkY'] == 'x':
+            if self.linkedAxis[thisView]["linkY"] == "x":
                 x = vr.center().y()
 
             self.centreOn(thisView, x, y)
@@ -102,11 +98,11 @@ class lasagna_viewBox(pg.ViewBox):
         vr = thisViewBox.targetRect()
 
         if x is not None:
-            x = x-vr.center().x()
-            x = vr.left()+x, vr.right()+x
+            x = x - vr.center().x()
+            x = vr.left() + x, vr.right() + x
         if y is not None:
-            y = y-vr.center().y()
-            y = vr.top()+y, vr.bottom()+y
+            y = y - vr.center().y()
+            y = vr.top() + y, vr.bottom() + y
 
         if x is not None or y is not None:
             thisViewBox.setRange(xRange=x, yRange=y, padding=0)
@@ -124,7 +120,9 @@ class lasagna_viewBox(pg.ViewBox):
         """
         self.controlDrag = False  # TODO: hack that should not be needed
         modifiers = QtGui.QApplication.keyboardModifiers()
-        if modifiers == QtCore.Qt.ControlModifier or (modifiers == (QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier)):
+        if modifiers == QtCore.Qt.ControlModifier or (
+            modifiers == (QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier)
+        ):
             # Emit a signal when the wheel is rotated alone and return a positive or negative value in self.progressBy
             # that we can use to incremement the image layer in the current axes
             if ev.delta() > 0:
@@ -133,7 +131,9 @@ class lasagna_viewBox(pg.ViewBox):
                 self.progressBy = -1
             else:
                 self.progressBy = 0
-            self.progressBy = self.progressBy * abs(ev.delta()) / 120  # this may be mouse-specific!
+
+            # this may be mouse-specific!
+            self.progressBy = (self.progressBy * abs(ev.delta()) / 120)
 
             if modifiers == (QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier):
                 # Allow faster scrolling if it was a shift+wheel
@@ -142,50 +142,72 @@ class lasagna_viewBox(pg.ViewBox):
             self.progressLayer.emit()
         else:
             # Handle zoom (mousewheel with no keyboard modifier)
-            mask = np.array(self.state['mouseEnabled'], dtype=np.float)
- 
+            mask = np.array(self.state["mouseEnabled"], dtype=np.float)
+
             if axis is not None and 0 <= axis < len(mask):
                 mv = mask[axis]
                 mask[:] = 0
                 mask[axis] = mv
 
-            s = ((mask * 0.02) + 1) ** (ev.delta() * self.state['wheelScaleFactor'])  # actual scaling factor
-            center = pg.Point(fn.invertQTransform(self.childGroup.transform()).map(ev.pos()))
+            # actual scaling factor
+            s = ((mask * 0.02) + 1) ** (ev.delta() * self.state["wheelScaleFactor"])
+
+            center = pg.Point(
+                fn.invertQTransform(self.childGroup.transform()).map(ev.pos())
+            )
             # center = ev.pos()
-        
+
             self._resetTarget()
             self.scaleBy(s, center)
-            self.sigRangeChangedManually.emit(self.state['mouseEnabled'])
+            self.sigRangeChangedManually.emit(self.state["mouseEnabled"])
             ev.accept()
 
             if len(self.linkedAxis) > 0:
                 for thisViewBox in self.linkedAxis:
 
-                    if self.linkedAxis[thisViewBox]['linkZoom']:
+                    if self.linkedAxis[thisViewBox]["linkZoom"]:
                         # Centre with the appropriate axes to avoid the views translating in horrible ways during zooming
                         # I don't know why I also need to call my centerOn() method, but at least this works
-                        if self.linkedAxis[thisViewBox]['linkX'] == 'x' and self.linkedAxis[thisViewBox]['linkY'] is None:
+                        if (
+                            self.linkedAxis[thisViewBox]["linkX"] == "x"
+                            and self.linkedAxis[thisViewBox]["linkY"] is None
+                        ):
                             thisViewBox.scaleBy(s, x=center.x())
                             self.centreOn(thisViewBox, x=center.x())
 
-                        if self.linkedAxis[thisViewBox]['linkY'] == 'y' and self.linkedAxis[thisViewBox]['linkX'] is None:
+                        if (
+                            self.linkedAxis[thisViewBox]["linkY"] == "y"
+                            and self.linkedAxis[thisViewBox]["linkX"] is None
+                        ):
                             thisViewBox.scaleBy(s, y=center.y())
                             self.centreOn(thisViewBox, y=center.y())
 
-                        if self.linkedAxis[thisViewBox]['linkX'] == 'y' and self.linkedAxis[thisViewBox]['linkY'] is None:
+                        if (
+                            self.linkedAxis[thisViewBox]["linkX"] == "y"
+                            and self.linkedAxis[thisViewBox]["linkY"] is None
+                        ):
                             thisViewBox.scaleBy(s, y=center.x())
                             self.centreOn(thisViewBox, y=center.x())
 
-                        if self.linkedAxis[thisViewBox]['linkY'] == 'x' and self.linkedAxis[thisViewBox]['linkX'] is None:
+                        if (
+                            self.linkedAxis[thisViewBox]["linkY"] == "x"
+                            and self.linkedAxis[thisViewBox]["linkX"] is None
+                        ):
                             thisViewBox.scaleBy(s, x=center.y())
                             self.centreOn(thisViewBox, x=center.y())
 
                         # The following two cases aren't used currently by Lasagna, but may be required in the future.
                         # They haven't been tested yet. [28/07/15]
-                        if self.linkedAxis[thisViewBox]['linkY'] == 'x' and self.linkedAxis[thisViewBox]['linkX'] == 'y':
+                        if (
+                            self.linkedAxis[thisViewBox]["linkY"] == "x"
+                            and self.linkedAxis[thisViewBox]["linkX"] == "y"
+                        ):
                             thisViewBox.scaleBy(s, x=center.y(), y=center.x())
                             self.centreOn(thisViewBox, x=center.y(), y=center.x())
 
-                        if self.linkedAxis[thisViewBox]['linkY'] == 'y' and self.linkedAxis[thisViewBox]['linkX'] == 'x':
+                        if (
+                            self.linkedAxis[thisViewBox]["linkY"] == "y"
+                            and self.linkedAxis[thisViewBox]["linkX"] == "x"
+                        ):
                             thisViewBox.scaleBy(s, x=center.x(), y=center.y())
                             self.centreOn(thisViewBox, x=center.x(), y=center.y())
