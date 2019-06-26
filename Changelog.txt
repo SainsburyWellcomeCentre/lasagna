@@ -6,10 +6,17 @@ Lasagna is a Python-based image viewer for 3-D anatomy datasets. It was inspired
 VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 2015/2016 at the Mrsic-Flogel
 laboratory, Basel, by Rob Campbell.
 
+
+
 2019/06/26
-- Rob Campbe;;
+- Rob Campbell
 Fix silly bug that was causing the flip along the Y axis (dorso-ventral for our samples) in the first image axis
 (the coronal axis in our data)
+
+Greatly speed up display of larger images. 
+
+Bug fix axis ratio boxes that were causing a crash. 
+
 
 
 2019/06/25

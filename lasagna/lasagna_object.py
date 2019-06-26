@@ -957,25 +957,34 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
         Set axis ratio on plot 1
         """
-        self.axes2D[0].view.setAspectLocked(
-            True, float(self.axisRatioLineEdit_1.text())
-        )
+
+        textBoxVal = self.axisRatioLineEdit_1.text()
+        if len(textBoxVal)==0:
+            return
+
+        self.axes2D[0].view.setAspectLocked(True, float(textBoxVal))
 
     def axisRatio2Slot(self):
         """
         Set axis ratio on plot 2
         """
-        self.axes2D[1].view.setAspectLocked(
-            True, float(self.axisRatioLineEdit_2.text())
-        )
+
+        textBoxVal = self.axisRatioLineEdit_2.text()
+        if len(textBoxVal)==0:
+            return
+
+        self.axes2D[1].view.setAspectLocked(True, float(textBoxVal))
 
     def axisRatio3Slot(self):
         """
         Set axis ratio on plot 3
         """
-        self.axes2D[2].view.setAspectLocked(
-            True, float(self.axisRatioLineEdit_3.text())
-        )
+
+        textBoxVal = self.axisRatioLineEdit_3.text()
+        if len(textBoxVal)==0:
+            return
+
+        self.axes2D[2].view.setAspectLocked(True, float(textBoxVal))
 
     def flipAxis_Slot(self, axisToFlip):
         """
