@@ -106,13 +106,26 @@ class imagestack(lasagna_ingredient):
             print(("no pre-defined colormap %s. reverting to gray " % colorName))
             return color_dict["gray"]
 
-    def calcHistogram(self):
+    def calcHistogram(self,verbose=False):
         """
         Calculate the histogram and return results
         """
-        y, x = np.histogram(self._data, bins=256)
-        x = x[0:-1]  # chop off last value
+        if verbose:
+            print("Calculating histogram")
 
+        nValsForCalc = 10E6 #Number of values on which to base histogram calculation
+        sampleEverynSamples = self._data.size
+        if self._data.size > nValsForCalc:
+            sampleEverynSamples = int(self._data.size/nValsForCalc)
+            if verbose:
+                print("Histogram based on one value every %d" % sampleEverynSamples)
+        else:
+            sampleEverynSamples=1
+
+        y, x = np.histogram(self._data[::sampleEverynSamples], bins=256)
+        x = x[0:-1]  # chop off last value
+        if verbose:
+            print("Done")
         return {"x": x, "y": y}
 
     def histBrushColor(self):
