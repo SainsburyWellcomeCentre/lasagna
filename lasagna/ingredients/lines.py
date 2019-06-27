@@ -129,6 +129,22 @@ class lines(lasagna_ingredient):
         else:
             print(("lines.color can not cope with type " + str(type(self.color))))
 
+    def save(self, path=None):
+        """Save sparse point in "pts" format (basic coordinates, space separated)"""
+        fname = self.objectName + '.csv'
+        if path is None:
+            path, _ = QtGui.QFileDialog.getSaveFileName(
+                self.parent, "File to save %s" % fname, fname
+            )
+            # getSaveFileName also returns the selected filter "All file (*)" for instance.
+            # Ignore the second output
+        if not path:
+            return
+        with open(path, "w") as F:
+            for c in self.raw_data():
+                F.write(",".join(["%s" % i for i in c]) + "\n")
+        print("%s saved as %s" % (fname, path))
+
     # ---------------------------------------------------------------
     # Getters and setters
     def get_symbolSize(self):

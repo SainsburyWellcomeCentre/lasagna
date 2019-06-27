@@ -7,12 +7,19 @@ VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 
 laboratory, Basel, by Rob Campbell.
 
 
+
+2019/06/27
+- Rob Campbell
+Add nice interpolation on add_line lines and create a save method for the line itself. 
+
 2019/06/26
-- Rob Campbe;;
+- Rob Campbell
 Fix silly bug that was causing the flip along the Y axis (dorso-ventral for our samples) in the first image axis
 (the coronal axis in our data)
 
-Greatly speed up display of larger images by fixing slow histogram calculation.
+Greatly speed up initial display of larger images by fixing slow histogram calculation.
+
+Bug fix axis ratio boxes that were causing a crash. 
 
 
 2019/06/25
