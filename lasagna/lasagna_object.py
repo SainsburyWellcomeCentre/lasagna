@@ -921,7 +921,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if hasattr(ingredient, "save"):
             ingredient.save()
         else:
-            print('no save method for "{}"'.format(obj_name))
+            print('No save method for "{}"'.format(obj_name))
 
     def deleteLayerPoints_Slot(self):
         """
