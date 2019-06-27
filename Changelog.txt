@@ -8,6 +8,9 @@ laboratory, Basel, by Rob Campbell.
 
 
 
+2019/06/27
+- Rob Campbell
+Add nice interpolation on add_line lines and create a save method for the line itself. 
 
 2019/06/26
 - Rob Campbell

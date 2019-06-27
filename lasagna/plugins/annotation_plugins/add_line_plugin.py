@@ -405,13 +405,27 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         datMax = tData.flatten().max()
         linepts = vv[0] * np.mgrid[datMin:datMax:2][:, np.newaxis]
         linepts += muCoords
+
+        linepts = np.unique(np.round(linepts),axis=0)
         self.fit["fit_coords"] = linepts
 
     def link_points_with_line(self, coords):
         if len(coords) < 2:
             return
 
-        self.fit["fit_coords"] = coords
+        # Linearly interpolate between the points
+        for ii in range(coords.shape[0]-1):
+            delta = sum((coords[ii,:] - coords[ii+1,:])**2)**0.5
+            nSteps = int(round(delta)+2)
+
+            tmp = np.linspace(coords[ii,:], coords[ii+1,:], num=nSteps)
+            if ii == 0:
+                cInt = tmp;
+            else:
+                cInt = np.concatenate((cInt,tmp))
+
+        cInt = np.unique(np.round(cInt),axis=0)
+        self.fit["fit_coords"] = cInt
 
     def get_points_coord(self):
         """Return the coordinates of points in the table
