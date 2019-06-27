@@ -29,12 +29,14 @@ git clone https://github.com/SainsburyWellcomeCentre/lasagna.git
 cd lasagna
 conda env create -f lasagna_environment.yml
 ```
-Activate the virtual environment and install `lasagna`
+
+Now activate the virtual environment with `activate lasagna` (Windows) or `source activate lasagna` (Linux/Mac).
+You can now install:
 
 ```
-source activate lasagna
 python setup.py install
 ```
+
 
 Lasagna is now installed. Try `lasagna -D` for load with a demo image. 
 If this fails the likely it's because the script that actually starts `lasagna` was not installed in your path.
@@ -45,7 +47,10 @@ pip3 install -e ./
 ```
 
 Then try starting Lasagna again. 
-That command alone has worked on a Mac too without Conda installed. 
+
+The above ought to work without Conda too if you miss out the `conda` command. 
+If you have trouble with a non-Conda install, see the following:
+
 
 
 ### Manual installation ###
