@@ -45,19 +45,28 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.lasagna.addIngredient(
             objectName=self.pts_name, kind="sparsepoints", data=[]
         )
+
         self.lasagna.returnIngredientByName(self.pts_name).addToPlots()
+        self.lasagna.returnIngredientByName(self.pts_name).color = [42, 96, 255]
+        self.lasagna.returnIngredientByName(self.pts_name).symbolSize = 8
 
         # 2. Add a line ingredient for the line linking or fitting the points
         self.line_name = "addLine_fit_currentLine"
         self.lasagna.addIngredient(objectName=self.line_name, kind="lines", data=[])
         self.lasagna.returnIngredientByName(self.line_name).addToPlots()
+        self.lasagna.returnIngredientByName(self.line_name).lineWidth = 4
+        self.lasagna.returnIngredientByName(self.line_name).color = [0,250,250]
 
         # 3. Add a sparse point for highlighting purposes
         self.hPoint_name = "highlight_point"
         self.lasagna.addIngredient(
             objectName=self.hPoint_name, kind="sparsepoints", data=[]
         )
+
         self.lasagna.returnIngredientByName(self.hPoint_name).addToPlots()
+        self.lasagna.returnIngredientByName(self.hPoint_name).color = [250,0,0]
+        self.lasagna.returnIngredientByName(self.hPoint_name).symbolSize = 9
+        self.lasagna.returnIngredientByName(self.hPoint_name).symbol = "s"
 
         self.nearest_point_index = 0  # The index of the point nearest the mouse cursor
         self.coords_of_nearest_point_to_cursor = []
