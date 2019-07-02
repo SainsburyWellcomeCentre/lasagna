@@ -1,6 +1,7 @@
 name: lasagna
 dependencies:
  - python=3
+ - pip
 # - pyqt=5
  - numpy
  - tifffile
