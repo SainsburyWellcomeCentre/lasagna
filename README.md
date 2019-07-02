@@ -43,7 +43,7 @@ If this fails the likely it's because the script that actually starts `lasagna` 
 Try running this command:
 
 ```
-pip3 install -e ./
+pip install -e .
 ```
 
 Then try starting Lasagna again. 
