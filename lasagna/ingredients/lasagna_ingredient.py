@@ -95,6 +95,7 @@ class lasagna_ingredient(object):
 
         self.modelItems = itemName  # Run this instead
         #self.modelItems=(itemName,itemCheckBox) # FIXME: Remove this for now because I have NO CLUE how to get access to the checkbox state
+
     def addToList(self):
         """
         Add this ingredient's list items to the QStandardModel (model) associated with its QTreeView
@@ -125,8 +126,29 @@ class lasagna_ingredient(object):
             print("** lasagna_ingredient -- can not set color")
             return
 
+        # Set the text color
         basil = QtGui.QBrush()
-        basil.setColor(QtGui.QColor(self.color[0], self.color[1], self.color[2]))
         basil.setStyle(QtCore.Qt.BrushStyle(1))
+        QC=QtGui.QColor(self.color[0], self.color[1], self.color[2])
+        basil.setColor(QC)
 
-        self.modelItems.setBackground(basil)
+        # If the text is too light, we set the background to this color instead of the foreground
+        HSL = QC.getHsl()
+
+        if HSL[2] > 170:
+            #Light background with dark text
+            self.modelItems.setBackground(basil)
+            basil = QtGui.QBrush()
+            basil.setColor(QtGui.QColor(0,0,0))
+            self.modelItems.setForeground(basil)
+        else:
+            # Colored text with white background
+            self.modelItems.setForeground(basil)
+            basil = QtGui.QBrush()
+            basil.setColor(QtGui.QColor(255,255,255))
+            self.modelItems.setBackground(basil)
+
+
+
+
+
