@@ -94,7 +94,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_
         can optionally load a specific file name (used for de-bugging)
         """
         if not fname_to_choose:
-            file_filter = "Images (*.mhd *.mha)"
+            file_filter = "Images (*.mhd *.mha *.tiff *tif)"
             fname_to_choose = QtGui.QFileDialog.getOpenFileName(self,
                                                                 'Choose stack',
                                                                 preferences.readPreference('lastLoadDir'),
