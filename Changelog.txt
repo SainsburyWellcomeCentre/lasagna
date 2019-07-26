@@ -13,7 +13,9 @@ Improve display of ingredients in list.
 Elastix plugin no longer crashes if the user presses "cancel" instead of loading a stack. 
 Elastix and Transformix plugins allow loading of TIFF stacks.
 
-
+2019/07/26
+- Antonin Blot
+Add support for nii files. (Loads the data but not the aspect ratio)
 
 2019/06/27
 - Rob Campbell

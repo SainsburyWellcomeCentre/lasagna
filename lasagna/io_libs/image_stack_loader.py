@@ -4,16 +4,19 @@ Read MHD stacks (using the vtk library) or TIFF stacks
 https://github.com/sainsburywellcomecentre/lasagna
 """
 
-
 import imp  # to look for the presence of a module. Python 3 will require importlib
 import os
 import re
 import struct
+import warnings
 
 import numpy as np
 
 from lasagna.utils import preferences, path_utils
 
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import nibabel as nib
 
 # -------------------------------------------------------------------------------------------
 #   *General methods*
@@ -46,6 +49,8 @@ def load_stack(fname):
         return mhd_read(fname)
     elif fname.lower().endswith(".nrrd") or fname.lower().endswith(".nrd"):
         return nrrd_read(fname)
+    elif fname.lower().endswith(".nii"):
+        return load_nii_stack(fname)
     else:
         print("\n\n*{} NOT LOADED. DATA TYPE NOT KNOWN\n\n".format(fname))
 
@@ -67,7 +72,7 @@ def image_filter():
     As image formats are added (or removed) from this module, this
     string should be manually modified accordingly.
     """
-    return "Images (*.mhd *.tiff *.tif *.nrrd *.nrd)"
+    return "Images (*.mhd *.tiff *.tif *.nrrd *.nrd *.nii)"
 
 
 def get_voxel_spacing(fname, fall_back_mode=False):
@@ -147,6 +152,24 @@ def save_tiff_stack(fname, data, use_lib_tiff=False):
 
     imsave(str(fname), data.swapaxes(1, 2))
 
+
+# -------------------------------------------------------------------------------------------
+#   *NII handling methods*
+def load_nii_stack(fname):
+    """
+    Read a NII stack.
+    """
+    if not check_file_exists(fname, "load_nii_stack"):
+        return
+    nii_img = nib.load(fname)
+    im = nii_img.get_data()
+    print(
+        "read image of size: cols: %d, rows: %d, layers: %d"
+        % (im.shape[1], im.shape[2], im.shape[0])
+    )
+    im = im.swapaxes(0, 2)
+    im = im.swapaxes(1, 2)
+    return im
 
 # -------------------------------------------------------------------------------------------
 #   *MHD handling methods*
