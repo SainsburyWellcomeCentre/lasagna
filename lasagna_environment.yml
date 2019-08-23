@@ -18,5 +18,6 @@ dependencies:
  - pip:
      - pynrrd
      - pyqt5
+     - nibabel
 channels:
  - conda-forge
