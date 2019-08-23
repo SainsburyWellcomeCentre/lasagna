@@ -307,7 +307,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  #
         3. Create an editable copy in a tempoary location
         """
         if not selectedParamFiles:
-            selectedParamFiles = QtGui.QFileDialog.getOpenFileNames(self, "Select parameter file", "Text files (*.txt *.TXT *.ini *.INI)")
+            selectedParamFiles, filter_used = QtGui.QFileDialog.getOpenFileNames(self, "Select parameter file", "Text files (*.txt *.TXT *.ini *.INI)")
 
         # Add to list
         for path_to_param_file in selectedParamFiles:
