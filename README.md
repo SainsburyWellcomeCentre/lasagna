@@ -34,21 +34,19 @@ Now activate the virtual environment with `activate lasagna` (Windows) or `sourc
 You can now install:
 
 ```
-python setup.py install
-```
-
-
-Lasagna is now installed. Try `lasagna -D` for load with a demo image. 
-If this fails the likely it's because the script that actually starts `lasagna` was not installed in your path.
-Try running this command:
-
-```
 pip install -e .
 ```
 
-Then try starting Lasagna again. 
+Lasagna is now installed. Try `lasagna -D` for load with a demo image. 
 
 The above ought to work without Conda too if you miss out the `conda` command. 
+On systems with a Python 3 install you can try just cloning then running:
+
+```
+pip3 install --user -e .
+```
+
+
 If you have trouble with a non-Conda install, see the following:
 
 
