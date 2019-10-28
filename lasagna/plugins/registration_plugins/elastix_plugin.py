@@ -159,9 +159,12 @@ class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  #
         """
         self.lasagna.removeIngredientByType('imagestack')
         if not fnameToLoad:
-            self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *.mha)") 
+            self.lasagna.showStackLoadDialog(fileFilter="Images (*.mhd *.mha *.tiff *tif)") 
         else:
             self.lasagna.loadImageStack(fnameToLoad)
+
+        if not isinstance(self.lasagna.stacksInTreeList(),list):
+            return
 
         fixed_name = self.lasagna.stacksInTreeList()[0]
         self.referenceStackName.setText(fixed_name)
@@ -184,9 +187,16 @@ class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  #
             self.lasagna.removeIngredientByName(current_moving_stack)
 
         if not fnameToLoad:
-            self.lasagna.showStackLoadDialog(fileFilter="MHD Images (*.mhd *mha )") 
+            self.lasagna.showStackLoadDialog(fileFilter="Images (*.mhd *.mha *.tiff *tif)") 
         else:
             self.lasagna.loadImageStack(fnameToLoad)
+
+
+        if not isinstance(self.lasagna.stacksInTreeList(),list):
+            return
+
+        if len(self.lasagna.stacksInTreeList())<2:
+            return
 
         moving_name = self.lasagna.stacksInTreeList()[1]
         self.movingStackName.setText(moving_name)
