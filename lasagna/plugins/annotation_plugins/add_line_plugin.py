@@ -433,7 +433,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
             else:
                 cInt = np.concatenate((cInt,tmp))
 
-        cInt = np.around(cInt,decimals=0)
+        cInt = np.around(cInt,decimals=3)
 
         self.fit["fit_coords"] = cInt
 
