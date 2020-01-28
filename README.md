@@ -59,7 +59,7 @@ Lasagna runs on Python 3, PyQt5, and uses PyQtGraph for the plotting and require
 * PyLibTiff
 * pynrrd
 * numpy
-* pyqtgraph >0.10.0
+* pyqtgraph >0.11.0
 * MatplotLib
 * yaml [and pyyaml]
 * Scipy [optional - ARA explorer]
