@@ -55,6 +55,17 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.view3Z_spinBox.setValue(
             preferences.readPreference("defaultPointZSpread")[2]
         )
+
+        self.axisRatioLineEdit_1.setText(
+            str(preferences.readPreference("defaultAxisRatios")[0])
+        )
+        self.axisRatioLineEdit_2.setText(
+            str(preferences.readPreference("defaultAxisRatios")[1])
+        )
+        self.axisRatioLineEdit_3.setText(
+            str(preferences.readPreference("defaultAxisRatios")[2])
+        )
+
         self.markerSize_spinBox.setValue(
             preferences.readPreference("defaultSymbolSize")
         )
@@ -89,6 +100,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                     axisToPlot=i,
                 )
             )
+            print(float(self.axisRatioLineEdits[i].text()))
         print("")
 
         # Establish links between projections for panning and zooming using lasagna_viewBox.linkedAxis

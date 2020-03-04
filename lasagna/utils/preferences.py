@@ -29,7 +29,7 @@ def defaultPreferences():
                             lasagna_plugins_abs_path() + 'annotation_plugins',
                             lasagna_plugins_abs_path() + 'registration_plugins',
                             lasagna_plugins_abs_path() + 'ara'],  # must be asbolute paths
-            'defaultAxisRatios': [1, 2, 0.5],         # The default axis ratios
+            'defaultAxisRatios': [1, 1, 1],         # The default axis ratios
             'defaultPointZSpread': [5, 5, 3],         # The range of layers over which points or lines are visible
             'showCrossHairs': True,                 # Whether or not to show the cross hairs
             'colorOrder': ['red', 'green', 'blue', 'magenta', 'cyan', 'yellow', 'gray'],  # The order in which colors appear by default (see imagestack class)
