@@ -15,8 +15,10 @@ dependencies:
  - vtk
  - ipython
  - traitlets
+ - pip
  - pip:
      - pynrrd
      - pyqt5
+     - nibabel
 channels:
  - conda-forge

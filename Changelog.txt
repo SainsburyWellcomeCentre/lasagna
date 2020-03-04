@@ -6,11 +6,17 @@ Lasagna is a Python-based image viewer for 3-D anatomy datasets. It was inspired
 VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 2015/2016 at the Mrsic-Flogel
 laboratory, Basel, by Rob Campbell.
 
+
 2020/03/04
 - Rob Campbell
 Bugfix: Lasagna now honors "defaultAxisRatios" setting in .yml file
 defaultAxisRatios are now [1,1,1]
 demo images hosted on mouse.vision replaced
+
+
+2019/07/26
+- Antonin Blot
+Multiple files can be selected at once when loading new image stack
 
 
 2019/06/27
@@ -19,6 +25,10 @@ Improve display of ingredients in list.
 Elastix plugin no longer crashes if the user presses "cancel" instead of loading a stack. 
 Elastix and Transformix plugins allow loading of TIFF stacks.
 
+
+2019/07/26
+- Antonin Blot
+Add support for nii files. (Loads the data but not the aspect ratio)
 
 
 2019/06/27
