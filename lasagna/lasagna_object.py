@@ -1001,16 +1001,41 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
     def flipAxis_Slot(self, axisToFlip):
         """
-        Loops through all displayed image stacks and flips the axes
+        This slot flips two of the axes at a time in way that makes it look as though the 
+        stack itself was flipped. 
+        Originally the stack was flipped via the image_stacks.flipAlongAxis method.
+        However, this only flips the volume so points traced on the volume:
+        https://github.com/SainsburyWellcomeCentre/lasagna/issues/136
+
+        axis 0: top left
+        axis 1: top right
+        axis 2: bottom left
+
+        The flip buttons should behave as follows:
+        View 1: axis 1 X-axis, axis 2 Y-axis
+        View 2: axis 0 X-axis, axis 2 X-axis
+        View 3: axis 0 Y-axis, axis 1 Y-axis
+
         """
+
         image_stacks = self.returnIngredientByType("imagestack")
         if not image_stacks:
             return
 
-        for thisStack in image_stacks:
-            thisStack.flipAlongAxis(axisToFlip)
+        #for thisStack in image_stacks:
+        #    thisStack.flipAlongAxis(axisToFlip)
+        #
+        #self.initialiseAxes()
 
-        self.initialiseAxes()
+        if (axisToFlip==0):
+            self.axes2D[1].view.getViewBox().invertX( not(self.axes2D[1].view.getViewBox().xInverted()) ) 
+            self.axes2D[2].view.getViewBox().invertY( not(self.axes2D[2].view.getViewBox().yInverted()) ) 
+        elif (axisToFlip==1):
+            self.axes2D[0].view.getViewBox().invertX( not(self.axes2D[0].view.getViewBox().xInverted()) ) 
+            self.axes2D[2].view.getViewBox().invertX( not(self.axes2D[2].view.getViewBox().xInverted()) ) 
+        elif (axisToFlip==2):
+            self.axes2D[0].view.getViewBox().invertY( not(self.axes2D[0].view.getViewBox().yInverted()) ) 
+            self.axes2D[1].view.getViewBox().invertY( not(self.axes2D[1].view.getViewBox().yInverted()) ) 
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Methods that are run during navigation
