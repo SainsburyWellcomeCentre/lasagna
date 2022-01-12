@@ -14,7 +14,7 @@ class LoaderDialog(QtWidgets.QDialog, Ui_LoadPointDialog):
         self.loadToolButton.clicked.connect(self.get_fname)
 
     def get_fname(self):
-        fnames = QtGui.QFileDialog.getOpenFileNames(self, 'Open file',
+        fnames = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open file',
                                                     preferences.readPreference('lastLoadDir'),
                                                     self.fileFilter)[0]
         # getOpenFileNames returns a tuple of (file_list, filter). Ignore the filter

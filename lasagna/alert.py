@@ -1,17 +1,17 @@
 
 """
-Brings up an alert message to warn the user when something significant has happened. 
-We can't rely on the user watching the console for messages. 
+Brings up an alert message to warn the user when something significant has happened.
+We can't rely on the user watching the console for messages.
 """
 
 # TODO: maybe neater to just replace with a QMessageBox
 # e.g.  QMessageBox.information(None, "Hello!", "Something went wrong")
 
 from lasagna import alert_UI
-from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 
 
-class alert(alert_UI.Ui_alertBox, QtGui.QWidget):
+class alert(alert_UI.Ui_alertBox, QtWidgets.QWidget):
 
     def __init__(self, lasagna_serving, alertText="Alert!"):
         super(alert, self).__init__()
@@ -29,11 +29,11 @@ class alert(alert_UI.Ui_alertBox, QtGui.QWidget):
         self.closeButton.released.connect(self.closeAlertBox)
 
     def closeAlertBox(self):
-        self.close()    
+        self.close()
 
     def center(self):
         """
-        Centre window on screen 
+        Centre window on screen
         http://stackoverflow.com/questions/20243637/pyqt4-center-window-on-active-screen
         """
         frame_gm = self.frameGeometry()

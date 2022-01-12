@@ -10,7 +10,8 @@ import re
 import subprocess  # To run the transformix binary
 import time
 
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
+
 
 import lasagna.utils.path_utils
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
@@ -18,7 +19,7 @@ from lasagna.plugins.registration_plugins import transformix_plugin_UI
 from lasagna.utils import preferences
 from shutil import which
 
-class plugin(LasagnaPlugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_plugin):  # must inherit LasagnaPlugin first
+class plugin(LasagnaPlugin, QtWidgets.QWidget, transformix_plugin_UI.Ui_transformix_plugin):  # must inherit LasagnaPlugin first
 
     def __init__(self, lasagna_serving, parent=None):
 
@@ -95,7 +96,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_
         """
         if not fname_to_choose:
             file_filter = "Images (*.mhd *.mha *.tiff *tif)"
-            fname_to_choose = QtGui.QFileDialog.getOpenFileName(self,
+            fname_to_choose = QtWidgets.QFileDialog.getOpenFileName(self,
                                                                 'Choose stack',
                                                                 preferences.readPreference('lastLoadDir'),
                                                                 file_filter)
@@ -118,7 +119,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_
         """
         if not fname_to_choose:
             file_filter = "Images (*.txt)"
-            fname_to_choose = QtGui.QFileDialog.getOpenFileName(self,
+            fname_to_choose = QtWidgets.QFileDialog.getOpenFileName(self,
                                                                 'Choose transform',
                                                                 preferences.readPreference('lastLoadDir'),
                                                                 file_filter)
@@ -139,7 +140,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, transformix_plugin_UI.Ui_transformix_
         """
         Select the Transformix output directory via a QFileDialog
         """
-        selected_dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        selected_dir = str(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         # TODO: check if directory is not empty. If it's not empty, prompt to delete contents
         self.outputDir_label.setText(selected_dir)
         

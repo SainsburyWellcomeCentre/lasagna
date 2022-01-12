@@ -1,12 +1,12 @@
 """
 Creates a plugin that is composed of a new window with a text field (QLabel)
-The plugin hooks into updateMainWindowOnMouseMove and gets the X and Y 
-position of the mouse in the current axes each time this method is run. 
-This information is then displayed on the screen. 
+The plugin hooks into updateMainWindowOnMouseMove and gets the X and Y
+position of the mouse in the current axes each time this method is run.
+This information is then displayed on the screen.
 """
 
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import qApp
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
@@ -18,7 +18,7 @@ Creates a plugin that is a new window containing dynamically updating informatio
 from lasagna.plugins.tutorial_plugins import infoBox_UI
 
 # Must be a class called "plugin" and must inherit LasagnaPlugin first
-class plugin(LasagnaPlugin, QtGui.QWidget, infoBox_UI.Ui_infoBox):
+class plugin(LasagnaPlugin, QtWidgets.QWidget, infoBox_UI.Ui_infoBox):
     def __init__(self, lasagna_serving, parent=None):
         # The following calls the LasagnaPlugin constructor which in turn calls subsequent constructors
         super(plugin, self).__init__(lasagna_serving)

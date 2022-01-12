@@ -1,6 +1,7 @@
 import os
 
-from PyQt5 import QtGui
+import PyQt5
+
 
 from lasagna.alert import alert
 from lasagna.plugins.ara.ara_plotter import ARA_plotter
@@ -10,7 +11,7 @@ from lasagna.utils.pref_utils import get_lasagna_pref_dir
 from lasagna.utils import preferences
 
 
-class AraPluginBase(ARA_plotter, LasagnaPlugin, QtGui.QWidget):
+class AraPluginBase(ARA_plotter, LasagnaPlugin, PyQt5.QtWidgets.QWidget):
     def __init__(self, lasagna_serving):
         super(AraPluginBase, self).__init__(lasagna_serving)
         self.lasagna = lasagna_serving
