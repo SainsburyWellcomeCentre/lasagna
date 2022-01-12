@@ -1069,7 +1069,7 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # make cross hairs red if control key is pressed
         if (
-            QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
+            QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
             and highlightCrossHairs
         ):
             self.crossHairVLine.setPen(240, 0, 0, 200)
@@ -1388,7 +1388,7 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         pos = evt[0]
         self.removeCrossHairs()
-        if not (QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+        if not (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
             self.axes2D[axis_id].view.getViewBox().controlDrag = False
 
         if self.axes2D[axis_id].view.sceneBoundingRect().contains(pos):
@@ -1426,7 +1426,7 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.mousePositionInStack = voxel_position
 
             if (
-                QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
+                QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
                 and self.axes2D[axis_id].view.getViewBox().controlDrag
             ):
                 self.axes2D[axis_id].updateDisplayedSlices_2D(

@@ -115,7 +115,7 @@ def main(im_stack_fnames_to_load=None, sparse_points_to_load=None, lines_to_load
 
     # Link slots to signals
     # connect views to the mouseMoved slot. After connection this runs in the background.
-    sigProxies = [] # This list will be populated this with pyqtgraph.SignalProxy objects for linking signals and slots
+    sigProxies = []  # This list will be populated this with pyqtgraph.SignalProxy objects for linking signals and slots
     for i in range(3):
         thisProxy = pg.SignalProxy(tasty.axes2D[i].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMoved)
         thisProxy.axisID = i  # this is picked up the mouseMoved slot
