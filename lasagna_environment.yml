@@ -1,7 +1,7 @@
 name: lasagna
 dependencies:
  - python=3
-# - pyqt=5
+ - pip
  - numpy
  - tifffile
  - pyqtgraph
@@ -17,7 +17,7 @@ dependencies:
  - pip
  - pip:
      - pynrrd
-     - pyqt5
+     - pyqt5==5.15.6
      - nibabel
 channels:
  - conda-forge

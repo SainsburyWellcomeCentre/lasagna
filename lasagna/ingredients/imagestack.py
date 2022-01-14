@@ -291,7 +291,7 @@ class imagestack(lasagna_ingredient):
 
     def save(self, path=None):
         if path is None:
-            path = QtGui.QFileDialog.getSaveFileName(
+            path = QtWidgets.QFileDialog.getSaveFileName(
                 self.parent, "File to save {}".format(self.objectName)
             )
         if not path:

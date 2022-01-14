@@ -10,14 +10,14 @@ import shutil
 import subprocess  # To run the elastix binary
 import tempfile
 
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.registration_plugins import elastix_plugin_UI
 from shutil import which
 
 
-class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  # must inherit LasagnaPlugin first
+class plugin(LasagnaPlugin, QtWidgets.QWidget, elastix_plugin_UI.Ui_elastixMain):  # must inherit LasagnaPlugin first
 
     def __init__(self, lasagna_serving, parent=None):
 
@@ -294,7 +294,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  #
         """
         Select the Elastix output directory
         """
-        selected_dir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        selected_dir = str(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         # TODO: check if directory is not empty. If it's not empty, prompt to delete contents
         self.outputDir_label.setText(selected_dir)
         self.updateWidgets_slot()
@@ -307,7 +307,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, elastix_plugin_UI.Ui_elastixMain):  #
         3. Create an editable copy in a tempoary location
         """
         if not selectedParamFiles:
-            selectedParamFiles, filter_used = QtGui.QFileDialog.getOpenFileNames(self, "Select parameter file", "Text files (*.txt *.TXT *.ini *.INI)")
+            selectedParamFiles, filter_used = QtWidgets.QFileDialog.getOpenFileNames(self, "Select parameter file", "Text files (*.txt *.TXT *.ini *.INI)")
 
         # Add to list
         for path_to_param_file in selectedParamFiles:

@@ -1,25 +1,25 @@
 """
-This class overlays lines on top of the image stacks. 
+This class overlays lines on top of the image stacks.
 This class can handle csv files with columns in the format:
-line_series, z, x, y but the loading itself is handled by 
+line_series, z, x, y but the loading itself is handled by
 line_reader_plugin.py
 
 The first column in the CSV file, "line_series", is a scalar
 line_series is a scalar. All points within the same line_series
 are joined by lines. Different line series are not joined but all
 line series from the same CSV file are part of the same ingredient
-(and the same plot item) and are rendered with the same colours, etc. 
+(and the same plot item) and are rendered with the same colours, etc.
 
-Instances of lines are created by line_reader_plugin. It is 
-line_reader_plugin that creates the menu entry in the file menu, 
-loads the data from the csv file, and calls lines.py 
+Instances of lines are created by line_reader_plugin. It is
+line_reader_plugin that creates the menu entry in the file menu,
+loads the data from the csv file, and calls lines.py
 """
 
 import warnings  # to disable some annoying NaN-related warnings
 
 import numpy as np
 import pyqtgraph as pg
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtWidgets
 from matplotlib import cm
 from numpy import linspace
 
@@ -133,7 +133,7 @@ class lines(lasagna_ingredient):
         """Save sparse point in "pts" format (basic coordinates, space separated)"""
         fname = self.objectName + '.csv'
         if path is None:
-            path, _ = QtGui.QFileDialog.getSaveFileName(
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
                 self.parent, "File to save %s" % fname, fname
             )
             # getSaveFileName also returns the selected filter "All file (*)" for instance.
