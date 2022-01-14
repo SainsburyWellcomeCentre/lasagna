@@ -6,6 +6,10 @@ Lasagna is a Python-based image viewer for 3-D anatomy datasets. It was inspired
 VV (https://www.creatis.insa-lyon.fr/rio/vv). Lasagna was originally written in 2015/2016 at the Mrsic-Flogel
 laboratory, Basel, by Rob Campbell.
 
+2022/01/12
+- Rob Campbell
+Bug fix: An apparently previously working version of PyQt5 started throwing namespace errors. Corrected these. Segfaults started happening on image load. Updated to PyQt 5.15.6 and all is good.
+
 2020/04/08
 - Rob Campbell
 Bug fix: Axis flipping is now done using PyQtGraph's invert axis methods. Previously it just flipped the image stack, which of course caused all sorts of problems. 

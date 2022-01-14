@@ -52,20 +52,20 @@ class plugin(AraPluginBase, area_namer_UI.Ui_area_namer):
         """
         # If nothing has been loaded then for sure we need the load button enabled
         if not self.data['currentlyLoadedAtlasName']:
-            self.loadOrig_pushButton.setEnabled(True) 
+            self.loadOrig_pushButton.setEnabled(True)
             return
 
         if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):  # FIXME: else ?
-            self.loadOrig_pushButton.setEnabled(True) 
+            self.loadOrig_pushButton.setEnabled(True)
         elif self.data['currentlyLoadedAtlasName'] == str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
             self.loadOrig_pushButton.setEnabled(False)
 
     def loadOrig_pushButton_slot(self):
         """
-        Loads the atlas file but does not display it. Coordinate loading of the ARA items defined in the dictionary paths. 
-        araName is a value from the self.paths dictionary. The values will be 
+        Loads the atlas file but does not display it. Coordinate loading of the ARA items defined in the dictionary paths.
+        araName is a value from the self.paths dictionary. The values will be
         combobox item texts and will load a dictionary from self.paths. The keys
-        of this dictionary have these keys: 
+        of this dictionary have these keys:
         'atlas' (full path to atlas volume file)
         'labels' (full path to atlas labels file - csv or json)
         """
@@ -88,7 +88,7 @@ class plugin(AraPluginBase, area_namer_UI.Ui_area_namer):
         """
         if not fnameToLoad:
             file_filter = "Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
-            fnameToLoad = QtGui.QFileDialog.getOpenFileName(self,
+            fnameToLoad = QtWidgets.QFileDialog.getOpenFileName(self,
                                                             'Open file',
                                                             preferences.readPreference('lastLoadDir'),
                                                             file_filter)

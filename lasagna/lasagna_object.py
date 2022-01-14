@@ -3,7 +3,7 @@ import sys
 
 import numpy as np
 import pyqtgraph as pg
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import qApp, QMainWindow
 
 # lasagna modules
@@ -22,8 +22,7 @@ from lasagna.utils.lasagna_qt_helper_functions import (
 )
 
 
-
-class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
+class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
     def __init__(self, embed_console=False, parent=None):
         """
         Create default values for properties then call initialiseUI to set up main window
@@ -31,7 +30,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         super(Lasagna, self).__init__(parent)
 
         # Create widgets defined in the designer file
-        # self.win = QMainWindow()
+        self.win = QMainWindow()
         self.setupUi(self)
         self.show()
         self.app = None  # The QApplication handle kept here
@@ -196,7 +195,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         # Handle IO plugins. For instance these are the loaders that handle different data types
         # and different loading actions.
 
-        lasagna_path =  os.path.dirname(lasagna_mainWindow.__file__)
+        lasagna_path = os.path.dirname(lasagna_mainWindow.__file__)
         print("Lasagna path is: %s" % lasagna_path)
 
         # directories containing IO modules
@@ -325,7 +324,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             print(p)
             sys.path.append(p)
             dir_name = p.split(os.path.sep)[-1]
-            self.pluginSubMenus[dir_name] = QtGui.QMenu(self.menuPlugins)
+            self.pluginSubMenus[dir_name] = QtWidgets.QMenu(self.menuPlugins)
             self.pluginSubMenus[dir_name].setObjectName(dir_name)
             self.pluginSubMenus[dir_name].setTitle(dir_name)
             self.menuPlugins.addAction(self.pluginSubMenus[dir_name].menuAction())
@@ -355,7 +354,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
             # create an action associated with the plugin and add to the self.pluginActions dictionary
             print(("Creating menu QAction for " + plugin_name))
-            self.pluginActions[plugin_name] = QtGui.QAction(plugin_name, self)
+            self.pluginActions[plugin_name] = QtWidgets.QAction(plugin_name, self)
             self.pluginActions[plugin_name].setObjectName(plugin_name)
             self.pluginActions[plugin_name].setCheckable(
                 True
@@ -377,7 +376,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         A simple about box
         """
         msg = "Lasagna - Rob Campbell<br>Basel - 2015, SWC 2019"
-        reply = QtGui.QMessageBox.question(self, "Message", msg)
+        reply = QtWidgets.QMessageBox.question(self, "Message", msg)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Plugin-related methods
@@ -533,7 +532,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Bring up the file load dialog. Return the file name. Update the last used path.
         """
         self.runHook(self.hooks["showFileLoadDialog_Start"])
-        fname = QtGui.QFileDialog.getOpenFileName(
+        fname = QtWidgets.QFileDialog.getOpenFileName(
             self, "Open file", preferences.readPreference("lastLoadDir"), fileFilter
         )[0]
         fname = str(fname)
@@ -796,7 +795,6 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.plotImageStackHistogram()  # wipes the histogram
             return
 
-
         self.update_2D_plot_ingredients_in_axes(resetAxes=resetAxes)
 
         # initialize cross hair
@@ -822,7 +820,10 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if resetAxes:
             self.resetAxes()
 
-    def update_2D_plot_ingredients_in_axes(self,resetAxes=False):
+    def update_2D_plot_ingredients_in_axes(self, resetAxes=False):
+        """
+        Updates all 2D plot elements in an axis.
+        """
         [
             axis.updatePlotItems_2D(
                 self.ingredientList,
@@ -889,7 +890,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not ingredient:
             return
 
-        col = QtGui.QColorDialog.getColor()
+        col = QtWidgets.QColorDialog.getColor()
         rgb = [col.toRgb().red(), col.toRgb().green(), col.toRgb().blue()]
         ingredient.color = rgb
         self.update_2D_plot_ingredients_in_axes()
@@ -916,12 +917,12 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Defines a pop-up menu that appears when the user right-clicks on a points ingredient
         in the points QTreeView
         """
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
 
-        action = QtGui.QAction("Delete", self)
+        action = QtWidgets.QAction("Delete", self)
         action.triggered.connect(self.deleteLayerPoints_Slot)
         menu.addAction(action)
-        action = QtGui.QAction("Save", self)
+        action = QtWidgets.QAction("Save", self)
         action.triggered.connect(self.saveLayerPoints_Slot)
         menu.addAction(action)
         menu.exec_(self.points_TreeView.viewport().mapToGlobal(position))
@@ -972,7 +973,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
 
         textBoxVal = self.axisRatioLineEdit_1.text()
-        if len(textBoxVal)==0:
+        if len(textBoxVal) == 0:
             return
 
         self.axes2D[0].view.setAspectLocked(True, float(textBoxVal))
@@ -983,7 +984,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
 
         textBoxVal = self.axisRatioLineEdit_2.text()
-        if len(textBoxVal)==0:
+        if len(textBoxVal) == 0:
             return
 
         self.axes2D[1].view.setAspectLocked(True, float(textBoxVal))
@@ -994,15 +995,15 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         """
 
         textBoxVal = self.axisRatioLineEdit_3.text()
-        if len(textBoxVal)==0:
+        if len(textBoxVal) == 0:
             return
 
         self.axes2D[2].view.setAspectLocked(True, float(textBoxVal))
 
     def flipAxis_Slot(self, axisToFlip):
         """
-        This slot flips two of the axes at a time in way that makes it look as though the 
-        stack itself was flipped. 
+        This slot flips two of the axes at a time in way that makes it look as though the
+        stack itself was flipped.
         Originally the stack was flipped via the image_stacks.flipAlongAxis method.
         However, this only flips the volume so points traced on the volume:
         https://github.com/SainsburyWellcomeCentre/lasagna/issues/136
@@ -1022,20 +1023,20 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if not image_stacks:
             return
 
-        #for thisStack in image_stacks:
-        #    thisStack.flipAlongAxis(axisToFlip)
+        # for thisStack in image_stacks:
+        #     thisStack.flipAlongAxis(axisToFlip)
         #
-        #self.initialiseAxes()
+        # self.initialiseAxes()
 
-        if (axisToFlip==0):
-            self.axes2D[1].view.getViewBox().invertX( not(self.axes2D[1].view.getViewBox().xInverted()) ) 
-            self.axes2D[2].view.getViewBox().invertY( not(self.axes2D[2].view.getViewBox().yInverted()) ) 
-        elif (axisToFlip==1):
-            self.axes2D[0].view.getViewBox().invertX( not(self.axes2D[0].view.getViewBox().xInverted()) ) 
-            self.axes2D[2].view.getViewBox().invertX( not(self.axes2D[2].view.getViewBox().xInverted()) ) 
-        elif (axisToFlip==2):
-            self.axes2D[0].view.getViewBox().invertY( not(self.axes2D[0].view.getViewBox().yInverted()) ) 
-            self.axes2D[1].view.getViewBox().invertY( not(self.axes2D[1].view.getViewBox().yInverted()) ) 
+        if (axisToFlip == 0):
+            self.axes2D[1].view.getViewBox().invertX(not(self.axes2D[1].view.getViewBox().xInverted()))
+            self.axes2D[2].view.getViewBox().invertY(not(self.axes2D[2].view.getViewBox().yInverted()))
+        elif (axisToFlip == 1):
+            self.axes2D[0].view.getViewBox().invertX(not(self.axes2D[0].view.getViewBox().xInverted()))
+            self.axes2D[2].view.getViewBox().invertX(not(self.axes2D[2].view.getViewBox().xInverted()))
+        elif (axisToFlip == 2):
+            self.axes2D[0].view.getViewBox().invertY(not(self.axes2D[0].view.getViewBox().yInverted()))
+            self.axes2D[1].view.getViewBox().invertY(not(self.axes2D[1].view.getViewBox().yInverted()))
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Methods that are run during navigation
@@ -1068,7 +1069,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         # make cross hairs red if control key is pressed
         if (
-            QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
+            QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
             and highlightCrossHairs
         ):
             self.crossHairVLine.setPen(240, 0, 0, 200)
@@ -1197,7 +1198,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         )
         self.intensityHistogram.showGrid(x=True, y=True, alpha=0.33)
 
-        self.intensityHistogram.getPlotItem().ctrl.fftCheck.setEnabled(False) #otherwise it crashes
+        self.intensityHistogram.getPlotItem().ctrl.fftCheck.setEnabled(False)  # Otherwise it crashes
         self.intensityHistogram.setLimits(
             yMin=min(y), xMin=min(x), yMax=max(y), xMax=max(x)
         )  # Blocks panning beyond the data values
@@ -1248,24 +1249,24 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Defines a pop-up menu that appears when the user right-clicks on an
         imagestack-related item in the image stack layers QTreeView
         """
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
 
-        change_color_menu = QtGui.QMenu("Change color", self)
+        change_color_menu = QtWidgets.QMenu("Change color", self)
 
         # action.triggered.connect(self.changeImageStackColorMap_Slot)
 
         for thisColor in preferences.readPreference("colorOrder"):
-            action = QtGui.QAction(thisColor, self)
+            action = QtWidgets.QAction(thisColor, self)
             # action.triggered.connect(lambda: self.changeImageStackColorMap_Slot(thisColor))
             action.triggered.connect(self.changeImageStackColorMap_Slot)
             change_color_menu.addAction(action)
 
         menu.addAction(change_color_menu.menuAction())
 
-        action = QtGui.QAction("Delete", self)
+        action = QtWidgets.QAction("Delete", self)
         action.triggered.connect(self.deleteLayerStack_Slot)
         menu.addAction(action)
-        action = QtGui.QAction("Save", self)
+        action = QtWidgets.QAction("Save", self)
         action.triggered.connect(self.saveLayerStack_Slot)
         menu.addAction(action)
         menu.exec_(self.imageStackLayers_TreeView.viewport().mapToGlobal(position))
@@ -1387,7 +1388,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         pos = evt[0]
         self.removeCrossHairs()
-        if not (QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+        if not (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
             self.axes2D[axis_id].view.getViewBox().controlDrag = False
 
         if self.axes2D[axis_id].view.sceneBoundingRect().contains(pos):
@@ -1425,7 +1426,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.mousePositionInStack = voxel_position
 
             if (
-                QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
+                QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier
                 and self.axes2D[axis_id].view.getViewBox().controlDrag
             ):
                 self.axes2D[axis_id].updateDisplayedSlices_2D(

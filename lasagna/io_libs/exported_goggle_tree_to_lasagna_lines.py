@@ -7,16 +7,16 @@ nodeId,parentID,z position,x position,y position
 This module imports this file and turns it into a format suitable
 for plotting in lasagna. i.e. into a line series format:
 line series #, z, x, y
-Where each line series is one segment from the tree. This is 
+Where each line series is one segment from the tree. This is
 produced using tree.find_segments, which returns all unique segments
-such that only nodes at the end of each segment are duplicated. 
+such that only nodes at the end of each segment are duplicated.
 
 Processed text is dumped to standard output by default unless
 the user specifies otherwise with -q
 
 Example:
 1. Plot and don't dump data to screen
-exportedGoggleTree2LasagnaLines.py -pqf ./ingredients/exampleTreeDump.csv 
+exportedGoggleTree2LasagnaLines.py -pqf ./ingredients/exampleTreeDump.csv
 
 2. Dump data to text file and don't plot
 exportedGoggleTree2LasagnaLines.py -f ./ingredients/exampleTreeDump.csv  > /tmp/dumpedTree.csv
@@ -91,11 +91,11 @@ if not quiet:
 if not do_plot:
     sys.exit(0)
 
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 import pyqtgraph as pg
 
 # Set up the window
-app = QtGui.QApplication([])
+app = QtWidgets.QApplication([])
 main_window = QtGui.QMainWindow()
 main_window.resize(800, 800)
 
@@ -140,4 +140,4 @@ for path in paths:
 if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QtGui.QApplication.instance().exec_()
+        QtWidgets.Qpplication.instance().exec_()

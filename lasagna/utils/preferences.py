@@ -20,11 +20,11 @@ def defaultPreferences():
     """
 
     return {
-            'lastLoadDir': getHomeDir(),           # The directory from which we last loaded data
-            'numRecentFiles': 5,                   # The number of recently loaded file names to store
-            'recentlyLoadedFiles': [],             # A list containing the last "numRecentFiles" file names
+            'lastLoadDir': getHomeDir(),  # The directory from which we last loaded data
+            'numRecentFiles': 5,          # The number of recently loaded file names to store
+            'recentlyLoadedFiles': [],    # A list containing the last "numRecentFiles" file names
             # All paths must be absolute:
-            'IO_modulePaths': [], # Core loaders defined in lasagna_object constructor
+            'IO_modulePaths': [],  # Core loaders defined in lasagna_object constructor
             'pluginPaths': [lasagna_plugins_abs_path() + 'tutorial_plugins',
                             lasagna_plugins_abs_path() + 'annotation_plugins',
                             lasagna_plugins_abs_path() + 'registration_plugins',
@@ -56,7 +56,7 @@ def loadAllPreferences(prefFName=get_lasagna_pref_file(), defaultPref=defaultPre
 
     # Load preferences YAML file as a dictionary
     with open(prefFName, 'r') as stream:
-        return yaml.load(stream)
+        return yaml.load(stream,Loader=yaml.FullLoader)
 
 
 def readPreference(preferenceName, prefFName=get_lasagna_pref_file(), preferences=get_lasagna_pref_file()):
