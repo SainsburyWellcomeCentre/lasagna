@@ -3,7 +3,7 @@ This class overlays points on top of the image stacks.
 """
 
 import numpy as np
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from matplotlib import cm
 from numpy import linspace
 
