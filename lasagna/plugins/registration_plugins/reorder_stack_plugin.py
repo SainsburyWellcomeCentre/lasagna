@@ -1,14 +1,14 @@
 """
 A simple plugin just to change the order of the slices
 """
-from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.registration_plugins import reorder_stack_UI
 from lasagna.plugins.registration_plugins import selectstack_UI
 
 
-class plugin(LasagnaPlugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  # must inherit LasagnaPlugin first
+class plugin(LasagnaPlugin, QtWidgets.QWidget, reorder_stack_UI.Ui_reorderStack):  # must inherit LasagnaPlugin first
 
     def __init__(self, lasagna_serving, parent=None):
         super(plugin, self).__init__(lasagna_serving)  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
@@ -38,7 +38,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  #
         stk = self.lasagna.returnIngredientByName(self.stack_name)
         nslices = stk._data.shape[0]
         for i in range(nslices):
-            self.listWidget.addItem('slice %i'%i)
+            self.listWidget.addItem('slice %i' % i)
 
     def move_up(self):
         """moves selected slices up
@@ -137,7 +137,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, reorder_stack_UI.Ui_reorderStack):  #
         event.accept()
 
 
-class SelectStack(QtGui.QDialog, selectstack_UI.Ui_selectStack):  # must inherit LasagnaPlugin first)
+class SelectStack(QtWidgets.QDialog, selectstack_UI.Ui_selectStack):  # must inherit LasagnaPlugin first)
     def __init__(self, parent=None, stack_list=[]):
         super(SelectStack, self).__init__(parent)  # This calls the LasagnaPlugin constructor which in turn calls subsequent constructors
         self.setupUi(self)

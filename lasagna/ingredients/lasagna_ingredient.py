@@ -12,6 +12,9 @@ from PyQt5 import QtGui, QtCore
 
 
 class lasagna_ingredient(object):
+    '''
+    The ingredient class handles generic objects added to the views
+    '''
     def __init__(
         self,
         parent,
@@ -35,7 +38,7 @@ class lasagna_ingredient(object):
         # Item is plotted if enable is True. Hidden if enable is False
         self.enable = (enable)
 
-        # The PyQtGraph item type which will display the data [see lasagna_axis.addItemToPlotWidget()]
+        # The PyQtGraph item type which displays the data [see lasagna_axis.addItemToPlotWidget()]
         self.pgObject = (pgObject)
         self.pgObjectConstructionArgs = (
             pgObjectConstructionArgs
@@ -61,13 +64,15 @@ class lasagna_ingredient(object):
 
     def addToPlots(self):
         """
-        Show ingredient on plots by adding the plot item to all 2D axes so that it becomes available for plotting
+        Show ingredient on plots by adding the plot item to all 2D axes so that it becomes available
+        for plotting
         """
         [axis.addItemToPlotWidget(self) for axis in self.parent.axes2D]
 
     def removePlotItem(self):
         """
-        Remove ingredient from plots by removing the plot item from all 2D axes so that it becomes unavailable for plotting
+        Remove ingredient from plots by removing the plot item from all 2D axes so that it becomes
+        unavailable for plotting
         """
         [axis.removeItemFromPlotWidget(self.objectName) for axis in self.parent.axes2D]
 
@@ -80,7 +85,7 @@ class lasagna_ingredient(object):
         # Add to the imageStackLayers_model which is associated with the points QTreeView
         itemName = QtGui.QStandardItem(objectName)
 
-        # It's possible other code depends on the name staying the same so block the user from editing
+        # Maybe other code depends on the name staying the same so block the user from editing.
         itemName.setEditable(False)
 
         # Add checkbox
@@ -94,7 +99,8 @@ class lasagna_ingredient(object):
 
 
         self.modelItems = itemName  # Run this instead
-        #self.modelItems=(itemName,itemCheckBox) # FIXME: Remove this for now because I have NO CLUE how to get access to the checkbox state
+        #self.modelItems=(itemName,itemCheckBox) # FIXME: Remove this for now because I have
+        #NO CLUE how to get access to the checkbox state
 
     def addToList(self):
         """
@@ -129,7 +135,7 @@ class lasagna_ingredient(object):
         # Set the text color
         basil = QtGui.QBrush()
         basil.setStyle(QtCore.Qt.BrushStyle(1))
-        QC=QtGui.QColor(self.color[0], self.color[1], self.color[2])
+        QC = QtGui.QColor(int(self.color[0]), int(self.color[1]), int(self.color[2]))
         basil.setColor(QC)
 
         # If the text is too light, we set the background to this color instead of the foreground
@@ -147,8 +153,4 @@ class lasagna_ingredient(object):
             basil = QtGui.QBrush()
             basil.setColor(QtGui.QColor(255,255,255))
             self.modelItems.setBackground(basil)
-
-
-
-
 

@@ -1,10 +1,10 @@
 """
 Creates a plugin that is composed of a new window with a pyqtgraph PlotWidget
-On this graph we plot an x-axis cross-section of the image at the level which the 
-mouse cursor is at. 
+On this graph we plot an x-axis cross-section of the image at the level which the
+mouse cursor is at.
 """
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import qApp
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
@@ -13,7 +13,7 @@ from lasagna.utils import lasagna_qt_helper_functions
 
 
 class plugin(
-    LasagnaPlugin, QtGui.QWidget, cross_section_plot_UI.Ui_xSection
+    LasagnaPlugin, QtWidgets.QWidget, cross_section_plot_UI.Ui_xSection
 ):  # must inherit LasagnaPlugin first
     def __init__(self, lasagna_serving, parent=None):
         super(plugin, self).__init__(

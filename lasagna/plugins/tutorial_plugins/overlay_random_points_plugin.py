@@ -1,14 +1,14 @@
 
 
 """
-This tutorial plugin demonstrates how to overlay dynamically generated 
+This tutorial plugin demonstrates how to overlay dynamically generated
 point data onto the plot axes. The plugin does the following:
 
-* Upon starting, the plugin generates 100 independent random points in 
+* Upon starting, the plugin generates 100 independent random points in
   each view and overlays them onto the axes.
-* Upon each re-painting of the axes a new set of 100 points are created 
+* Upon each re-painting of the axes a new set of 100 points are created
   and overlaid.
-* The points are all removed and their plot items are cleaned up when 
+* The points are all removed and their plot items are cleaned up when
   the plugin is closed.
 
 """
@@ -18,7 +18,7 @@ import numpy as np
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 
 
-class plugin(LasagnaPlugin): 
+class plugin(LasagnaPlugin):
 
     def __init__(self, lasagna_serving, parent=None):
         super(plugin, self).__init__(lasagna_serving)

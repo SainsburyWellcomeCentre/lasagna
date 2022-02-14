@@ -1,4 +1,4 @@
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtWidgets
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 
@@ -8,7 +8,7 @@ class IoBasePlugin(LasagnaPlugin):
         super(IoBasePlugin, self).__init__(lasagna_serving)
         self.lasagna = lasagna_serving
         # Construct the QActions and other stuff required to integrate the load dialog into the menu
-        self.loadAction = QtGui.QAction(self.lasagna)  # Instantiate the menu action
+        self.loadAction = QtWidgets.QAction(self.lasagna)  # Instantiate the menu action
 
         self.add_icon()
         self.insert_in_menu()
@@ -39,5 +39,3 @@ class IoBasePlugin(LasagnaPlugin):
         self.loadAction.setText(self.objectName.title().replace('_', ' ')[:-2])
 
         self.loadAction.triggered.connect(self.showLoadDialog)  # Link the action to the slot
-
-    # def showLoadDialog(self, fname=None):

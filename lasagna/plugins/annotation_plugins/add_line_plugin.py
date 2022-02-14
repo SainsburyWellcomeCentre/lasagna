@@ -1,6 +1,6 @@
 """lasagna.plugins.annotation_plugins.add_line_plugin
 
-    This Lasagna plugin is used to annotate image stacks by allowing the user to 
+    This Lasagna plugin is used to annotate image stacks by allowing the user to
     add lines and points interactively to the image stack.
 
 
@@ -12,14 +12,14 @@
 """
 
 import numpy as np
-from PyQt5 import QtGui
-import scipy.linalg  # For the 3D line fit
+from PyQt5 import QtGui, QtWidgets
+
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.annotation_plugins import add_line_UI
 
 
-class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
+class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
     def __init__(self, lasagna_serving, parent=None):
         super(plugin, self).__init__(lasagna_serving)
 
@@ -55,7 +55,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.lasagna.addIngredient(objectName=self.line_name, kind="lines", data=[])
         self.lasagna.returnIngredientByName(self.line_name).addToPlots()
         self.lasagna.returnIngredientByName(self.line_name).lineWidth = 4
-        self.lasagna.returnIngredientByName(self.line_name).color = [0,250,250]
+        self.lasagna.returnIngredientByName(self.line_name).color = [0, 250, 250]
 
         # 3. Add a sparse point for highlighting purposes
         self.hPoint_name = "highlight_point"
@@ -64,7 +64,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         )
 
         self.lasagna.returnIngredientByName(self.hPoint_name).addToPlots()
-        self.lasagna.returnIngredientByName(self.hPoint_name).color = [250,0,0]
+        self.lasagna.returnIngredientByName(self.hPoint_name).color = [250, 0, 0]
         self.lasagna.returnIngredientByName(self.hPoint_name).symbolSize = 9
         self.lasagna.returnIngredientByName(self.hPoint_name).symbol = "s"
 
@@ -72,7 +72,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.coords_of_nearest_point_to_cursor = []
         self.fit = {}  # The line fit to the sparse points
         # Otherwise plugin can crash if user selects line fit on startup with no data:
-        self.fit["fit_coords"] = [] 
+        self.fit["fit_coords"] = []
         self.lasagna.axes2D[0].listNamedItemsInPlotWidget()
 
         self.fitType_comboBox.addItem("No fit")
@@ -121,10 +121,10 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         """  Runs when the user clicks on an axis.
 
         This method handles either addition or removal of data (rows) from the the
-        QTable. If adding points, the method gets the position of the mouse click 
+        QTable. If adding points, the method gets the position of the mouse click
         in the stack from the main Lasagna class and adds this point to the table.
-        If removing a point, it uses the identity of the point nearest the mouse 
-        (see self.hook_updateMainWindowOnMouseMove_End) to remove the correct row 
+        If removing a point, it uses the identity of the point nearest the mouse
+        (see self.hook_updateMainWindowOnMouseMove_End) to remove the correct row
         from the table.
         """
 
@@ -135,7 +135,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         elif len(pos) != 3:
             raise ValueError("I expect 3D coordinates. Got: {}".format(pos))
 
-        hLightCoords = self.lasagna.returnIngredientByName(self.hPoint_name)._data
+        hilight_coords = self.lasagna.returnIngredientByName(self.hPoint_name)._data
 
         # Update the add_line_plugin GUI
         if self.addPoint_radioButton.isChecked():
@@ -147,33 +147,33 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
                 # We will append the new point to the end, unless a highlight point exists,
                 # in which case we append before that
-                if len(hLightCoords) == 0:
+                if len(hilight_coords) == 0:
                     # No highlight point
-                    rowToInsert = self.num_points
+                    row_to_insert = self.num_points
                 else:
                     self.nearest_point_index, _ = self.find_nearest_point_in_array(
-                        self.get_points_coord(), hLightCoords
+                        self.get_points_coord(), hilight_coords
                     )
                     self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
-                    rowToInsert = self.nearest_point_index + 1
+                    row_to_insert = self.nearest_point_index + 1
 
                 self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
                 # self.tableWidget.setRowCount(self.num_points) #WIth add row this was problematic
 
                 # Add clicked position to the table
-                self.tableWidget.insertRow(rowToInsert - 1)
-                for colIndex, textToAdd in enumerate(pos):
+                self.tableWidget.insertRow(row_to_insert - 1)
+                for col_index, text_to_add in enumerate(pos):
                     # Insert number as a string into the table at column
                     self.tableWidget.setItem(
-                        rowToInsert - 1,
-                        colIndex,
-                        QtGui.QTableWidgetItem(str(textToAdd)),
+                        row_to_insert - 1,
+                        col_index,
+                        QtWidgets.QTableWidgetItem(str(text_to_add)),
                     )
 
             elif self.lasagna.last_button_click_in_axis == 2:
-                # Mark nearest point if right-click. If the nearest point is already marked 
+                # Mark nearest point if right-click. If the nearest point is already marked
                 # then we un-mark it.
-                if len(hLightCoords)>0 and np.array_equal(hLightCoords,self.coords_of_nearest_point_to_cursor):
+                if len(hilight_coords)>0 and np.array_equal(hilight_coords, self.coords_of_nearest_point_to_cursor):
                     self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
                 else:
                     self.lasagna.returnIngredientByName(
@@ -197,13 +197,13 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
               e.g. we can run highlight point here
         """
 
-        currentMousePos = np.array(self.lasagna.mousePositionInStack)
-        existingPoints = self.get_points_coord()
-        if type(existingPoints) == list or existingPoints.size == 0:
+        current_mouse_pos = np.array(self.lasagna.mousePositionInStack)
+        existing_points = self.get_points_coord()
+        if type(existing_points) == list or existing_points.size == 0:
             return
 
         self.nearest_point_index, self.coords_of_nearest_point_to_cursor = self.find_nearest_point_in_array(
-            existingPoints, currentMousePos
+            existing_points, current_mouse_pos
         )
 
         if self.removePoint_radioButton.isChecked():
@@ -218,11 +218,11 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
             Purpose
             Calculate the Euclidian distance between each row of array_to_search
-            and the vector vector_to_find. Return the index of the closest match 
+            and the vector vector_to_find. Return the index of the closest match
             and its value
 
             :return:
-            nearest_point_index - an int defining the row in array_to_search that 
+            nearest_point_index - an int defining the row in array_to_search that
                             is the closest match.
             closest_match - the vector (row) in array_to_search that most closely
                             matches vector_to_find.
@@ -230,7 +230,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         """
 
-        if len(array_to_search)==0 or len(vector_to_find)==0:
+        if len(array_to_search) == 0 or len(vector_to_find) == 0:
             return([], [])
 
         delta = np.sum((array_to_search - vector_to_find) ** 2, axis=1) ** 0.5
@@ -248,7 +248,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         """Add the current line and points to Lasagna and start a new line
 
            i.e. This is not the method that updates. It commits the existing
-           data to Lasagna and allows for more to be created. 
+           data to Lasagna and allows for more to be created.
 
         :return:
         """
@@ -289,12 +289,11 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         self.tableWidget.setRowCount(0)
         self.numPoints_textLabel.setText("n pts: %d" % 0)
         self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
-        self.lasagna.returnIngredientByName(self.line_name)._data = [] 
+        self.lasagna.returnIngredientByName(self.line_name)._data = []
         self.lasagna.update_2D_plot_ingredients_in_axes()
         self.fit_and_display_line()
         self.update_current_line()
 
-        
     def update_current_line(self):
         """Change current line ingredient and display points
 
@@ -415,7 +414,7 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
         linepts = vv[0] * np.mgrid[datMin:datMax:2][:, np.newaxis]
         linepts += muCoords
 
-        linepts = np.unique(np.round(linepts),axis=0)
+        linepts = np.unique(np.round(linepts), axis=0)
         self.fit["fit_coords"] = linepts
 
     def link_points_with_line(self, coords):
@@ -424,18 +423,18 @@ class plugin(LasagnaPlugin, QtGui.QWidget, add_line_UI.Ui_addLine):
 
         # Linearly interpolate between the points
         for ii in range(coords.shape[0]-1):
-            delta = sum((coords[ii,:] - coords[ii+1,:])**2)**0.5
-            nSteps = int(round(delta)+2)
+            delta = sum((coords[ii, :] - coords[ii+1, :])**2)**0.5
+            nSteps = int(round(delta) + 2)
 
-            tmp = np.linspace(coords[ii,:], coords[ii+1,:], num=nSteps)
+            tmp = np.linspace(coords[ii, :], coords[ii+1, :], num=nSteps)
             if ii == 0:
-                cInt = tmp;
+                c_int = tmp
             else:
-                cInt = np.concatenate((cInt,tmp))
+                c_int = np.concatenate((c_int, tmp))
 
-        cInt = np.around(cInt,decimals=3)
+        c_int = np.around(c_int, decimals=3)
 
-        self.fit["fit_coords"] = cInt
+        self.fit["fit_coords"] = c_int
 
     def get_points_coord(self):
         """Return the coordinates of points in the table

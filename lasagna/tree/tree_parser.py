@@ -41,7 +41,7 @@ def parse_file(fname, display_tree=False, col_sep=',', header_line=None, verbose
         if not os.path.exists(fname):
             print("Can not find file " + fname)
             return
-        with (fname, 'r') as fid:  # Read in data
+        with open(fname, 'r') as fid:  # Read in data
             contents = fid.read().split('\n')
     elif isinstance(fname, list):
         contents = fname  # assume that fname is data rather than a file name

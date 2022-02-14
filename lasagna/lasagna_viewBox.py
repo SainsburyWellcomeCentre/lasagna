@@ -8,7 +8,7 @@ import pyqtgraph as pg
 from PyQt5.QtWidgets import *
 import numpy as np
 import pyqtgraph.functions as fn
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 import platform
 
 
@@ -61,7 +61,7 @@ class lasagna_viewBox(pg.ViewBox):
 
         # Do not drag and link displays if we are pressing the control key.
         # Instead, set the self.controlDrag boolean to True and bail out
-        modifiers = QtGui.QApplication.keyboardModifiers()
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
             self.controlDrag = True
             return
@@ -96,7 +96,7 @@ class lasagna_viewBox(pg.ViewBox):
 
     def centreOn(self, thisViewBox, x=None, y=None):
         """
-        Centre thisViewBox on coordinates defined by x and y. 
+        Centre thisViewBox on coordinates defined by x and y.
         """
         vr = thisViewBox.targetRect()
 
@@ -122,7 +122,7 @@ class lasagna_viewBox(pg.ViewBox):
         Allows mouse wheel zoom on ctrl-click [currently]
         """
         self.controlDrag = False  # TODO: hack that should not be needed
-        modifiers = QtGui.QApplication.keyboardModifiers()
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier or (
             modifiers == (QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier)
         ):

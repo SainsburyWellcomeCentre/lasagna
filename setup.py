@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'pyqt5',
+        'pyqt5==5.15.6',
         'numpy',
         'tifffile',
         'pynrrd',
@@ -15,10 +15,11 @@ setup(
         'sip',
         'scikit-image',
         'scipy',
-        'matplotlib'
+        'matplotlib',
     ],
-    entry_points='''
-        [console_scripts]
-            lasagna = lasagna.main:run
-    ''',
+    entry_points={
+        "console_scripts": [
+            'lasagna = lasagna.main:run',
+        ]
+    },
 )

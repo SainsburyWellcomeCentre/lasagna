@@ -12,4 +12,4 @@ class LasagnaPlotWidget(PlotWidget):
             kwargs['viewBox'] = lasagna_viewBox()
 
         # Build the plot widget but disable the right-click pop-up menu
-        super(LasagnaPlotWidget, self).__init__(enableMenu=False,*args, **kwargs)
+        super(LasagnaPlotWidget, self).__init__(*args, **kwargs)
