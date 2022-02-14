@@ -13,7 +13,7 @@
 
 import numpy as np
 from PyQt5 import QtGui, QtWidgets
-import scipy.linalg  # For the 3D line fit
+
 
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.annotation_plugins import add_line_UI
@@ -135,7 +135,7 @@ class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
         elif len(pos) != 3:
             raise ValueError("I expect 3D coordinates. Got: {}".format(pos))
 
-        hLightCoords = self.lasagna.returnIngredientByName(self.hPoint_name)._data
+        hilight_coords = self.lasagna.returnIngredientByName(self.hPoint_name)._data
 
         # Update the add_line_plugin GUI
         if self.addPoint_radioButton.isChecked():
@@ -147,33 +147,33 @@ class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
 
                 # We will append the new point to the end, unless a highlight point exists,
                 # in which case we append before that
-                if len(hLightCoords) == 0:
+                if len(hilight_coords) == 0:
                     # No highlight point
-                    rowToInsert = self.num_points
+                    row_to_insert = self.num_points
                 else:
                     self.nearest_point_index, _ = self.find_nearest_point_in_array(
-                        self.get_points_coord(), hLightCoords
+                        self.get_points_coord(), hilight_coords
                     )
                     self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
-                    rowToInsert = self.nearest_point_index + 1
+                    row_to_insert = self.nearest_point_index + 1
 
                 self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
                 # self.tableWidget.setRowCount(self.num_points) #WIth add row this was problematic
 
                 # Add clicked position to the table
-                self.tableWidget.insertRow(rowToInsert - 1)
-                for colIndex, textToAdd in enumerate(pos):
+                self.tableWidget.insertRow(row_to_insert - 1)
+                for col_index, text_to_add in enumerate(pos):
                     # Insert number as a string into the table at column
                     self.tableWidget.setItem(
-                        rowToInsert - 1,
-                        colIndex,
-                        QtWidgets.QTableWidgetItem(str(textToAdd)),
+                        row_to_insert - 1,
+                        col_index,
+                        QtWidgets.QTableWidgetItem(str(text_to_add)),
                     )
 
             elif self.lasagna.last_button_click_in_axis == 2:
                 # Mark nearest point if right-click. If the nearest point is already marked
                 # then we un-mark it.
-                if len(hLightCoords)>0 and np.array_equal(hLightCoords,self.coords_of_nearest_point_to_cursor):
+                if len(hilight_coords)>0 and np.array_equal(hilight_coords, self.coords_of_nearest_point_to_cursor):
                     self.lasagna.returnIngredientByName(self.hPoint_name)._data = []
                 else:
                     self.lasagna.returnIngredientByName(
@@ -197,13 +197,13 @@ class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
               e.g. we can run highlight point here
         """
 
-        currentMousePos = np.array(self.lasagna.mousePositionInStack)
-        existingPoints = self.get_points_coord()
-        if type(existingPoints) == list or existingPoints.size == 0:
+        current_mouse_pos = np.array(self.lasagna.mousePositionInStack)
+        existing_points = self.get_points_coord()
+        if type(existing_points) == list or existing_points.size == 0:
             return
 
         self.nearest_point_index, self.coords_of_nearest_point_to_cursor = self.find_nearest_point_in_array(
-            existingPoints, currentMousePos
+            existing_points, current_mouse_pos
         )
 
         if self.removePoint_radioButton.isChecked():
@@ -423,18 +423,18 @@ class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
 
         # Linearly interpolate between the points
         for ii in range(coords.shape[0]-1):
-            delta = sum((coords[ii, :] - coords[ii+1,:])**2)**0.5
+            delta = sum((coords[ii, :] - coords[ii+1, :])**2)**0.5
             nSteps = int(round(delta) + 2)
 
-            tmp = np.linspace(coords[ii, :], coords[ii+1,:], num=nSteps)
+            tmp = np.linspace(coords[ii, :], coords[ii+1, :], num=nSteps)
             if ii == 0:
-                cInt = tmp
+                c_int = tmp
             else:
-                cInt = np.concatenate((cInt, tmp))
+                c_int = np.concatenate((c_int, tmp))
 
-        cInt = np.around(cInt, decimals=3)
+        c_int = np.around(c_int, decimals=3)
 
-        self.fit["fit_coords"] = cInt
+        self.fit["fit_coords"] = c_int
 
     def get_points_coord(self):
         """Return the coordinates of points in the table
