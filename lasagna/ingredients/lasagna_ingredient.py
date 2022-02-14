@@ -129,7 +129,7 @@ class lasagna_ingredient(object):
         # Set the text color
         basil = QtGui.QBrush()
         basil.setStyle(QtCore.Qt.BrushStyle(1))
-        QC=QtGui.QColor(self.color[0], self.color[1], self.color[2])
+        QC = QtGui.QColor(int(self.color[0]), int(self.color[1]), int(self.color[2]))
         basil.setColor(QC)
 
         # If the text is too light, we set the background to this color instead of the foreground
