@@ -1,4 +1,4 @@
-""" 
+"""
 This class overrides the behavior of the parent ViewBox to handle operations for
 for scaling and translating of one or more linked axes
 """
@@ -34,7 +34,8 @@ class lasagna_viewBox(pg.ViewBox):
         # Flip stack in X/Y or the image flipped incorrectly
         self.invertY()
 
-        # Define a custom signal to indicate when the user has created an event that will increment the displayed layer
+        # Define a custom signal to indicate when the user has created an event that will increments
+        # the displayed layer
         self.progressBy = 0
 
     def wheelEvent(self, ev, axis=None):
@@ -42,7 +43,8 @@ class lasagna_viewBox(pg.ViewBox):
         Intercept pg.ViewBox.wheelEvent
         """
         self.onMouseWheeled(ev, axis)
-        # The sigRangeChangedManually signal is defined in pg.ViewBox:  sigRangeChangedManually = QtCore.Signal(object)
+        # The sigRangeChangedManually signal is defined in pg.ViewBox:
+        #  sigRangeChangedManually = QtCore.Signal(object)
         self.sigRangeChangedManually.emit(self.state["mouseEnabled"])
         self.mouseWheeled.emit(ev, axis)  # Then it emits a mouseWheeled signal
 
@@ -169,8 +171,9 @@ class lasagna_viewBox(pg.ViewBox):
                 for thisViewBox in self.linkedAxis:
 
                     if self.linkedAxis[thisViewBox]["linkZoom"]:
-                        # Centre with the appropriate axes to avoid the views translating in horrible ways during zooming
-                        # I don't know why I also need to call my centerOn() method, but at least this works
+                        # Centre with the appropriate axes to avoid the views translating in
+                        # horrible ways during zooming. I don't know why I also need to call my
+                        # centerOn() method, but at least this works.
                         if (
                             self.linkedAxis[thisViewBox]["linkX"] == "x"
                             and self.linkedAxis[thisViewBox]["linkY"] is None
@@ -199,8 +202,8 @@ class lasagna_viewBox(pg.ViewBox):
                             thisViewBox.scaleBy(s, x=center.y())
                             self.centreOn(thisViewBox, x=center.y())
 
-                        # The following two cases aren't used currently by Lasagna, but may be required in the future.
-                        # They haven't been tested yet. [28/07/15]
+                        # The following two cases aren't used currently by Lasagna, but may be
+                        # required in the future. They haven't been tested yet. [28/07/15]
                         if (
                             self.linkedAxis[thisViewBox]["linkY"] == "x"
                             and self.linkedAxis[thisViewBox]["linkX"] == "y"

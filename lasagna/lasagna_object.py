@@ -310,7 +310,7 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.pushButton_FlipView3.released.connect(lambda: self.flipAxis_Slot(2))
 
         # Plugins menu and initialisation
-        # 1. Get a list of all plugins in the plugins path and add their directories to the Python path
+        # 1. Get list of all plugins in plugins path and add their directories to the Python path.
         plugin_paths = preferences.readPreference("pluginPaths")
 
         plugins, plugin_paths = plugin_handler.find_plugins(plugin_paths)
@@ -329,14 +329,15 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.pluginSubMenus[dir_name].setTitle(dir_name)
             self.menuPlugins.addAction(self.pluginSubMenus[dir_name].menuAction())
 
-        # 2. Add each plugin to a dictionary where the keys are plugin name and values are instances of the plugin.
+        # 2. Add each plugin to a dictionary where the keys are plugin name and values are
+        #    instances of the plugin.
         print("")
         self.plugins = (
             {}
-        )  # A dictionary where keys are plugin names and values are plugin classes or plugin instances
+        )  # A dictionary where keys are plugin names and values are plugin classes or instances.
         self.pluginActions = (
             {}
-        )  # A dictionary where keys are plugin names and values are QActions associated with a plugin
+        )  # A dictionary where keys are plugin names and values are QActions associated with plugin
         for plugin in plugins:
             # Get the module name and class
             plugin_class, plugin_name = plugin_handler.get_plugin_instance_from_file_name(
@@ -345,14 +346,14 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             if plugin_class is None:
                 continue
 
-            # Get the name of the directory in which the plugin resides so we can add it to the right sub-menu
+            # Get the name of the plugin's directory so we can add it to the right sub-menu
             dir_name = os.path.dirname(plugin_class.__file__).split(os.path.sep)[-1]
 
             # create instance of the plugin object and add to the self.plugins dictionary
             print(("Creating reference to class " + plugin_name + ".plugin"))
             self.plugins[plugin_name] = plugin_class.plugin
 
-            # create an action associated with the plugin and add to the self.pluginActions dictionary
+            # create an action associated with the plugin and add to self.pluginActions dictionary
             print(("Creating menu QAction for " + plugin_name))
             self.pluginActions[plugin_name] = QtWidgets.QAction(plugin_name, self)
             self.pluginActions[plugin_name].setObjectName(plugin_name)
@@ -407,9 +408,10 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
                 )
             )
 
-        # delete the plugin instance and replace it in the dictionary with a reference (that what it is?) to the class
-        # NOTE: plugins with a window do not run the following code when the window is closed. They should, however,
-        # detach hooks (unless the plugin author forgot to do this)
+        # delete the plugin instance and replace it in the dictionary with a reference (that what
+        # it is?) to the class. NOTE: plugins with a window do not run the following code when the
+        # window is closed. They should, however, detach hooks (unless the plugin author forgot to
+        # do this)
         del self.plugins[pluginName]
         plugin_class, pluginName = plugin_handler.get_plugin_instance_from_file_name(
             pluginName + ".py", None
@@ -1204,8 +1206,8 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         )  # Blocks panning beyond the data values
 
         # The object that represents the plotted intensity range is only set up the first time the
-        # plot is made or following a new base image being loaded (any existing plottedIntensityRegionObj
-        # is deleted at base image load time.)
+        # plot is made or following a new base image being loaded (any existing
+        # plottedIntensityRegionObj is deleted at base image load time.)
         if not hasattr(self, "plottedIntensityRegionObj"):
             self.plottedIntensityRegionObj = pg.LinearRegionItem()
             self.plottedIntensityRegionObj.setZValue(10)
@@ -1403,7 +1405,7 @@ class Lasagna(QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.mouseX, self.mouseY = self.axes2D[
                 axis_id
             ].getMousePositionInCurrentView(pos)
-            # Record the current axis in which the mouse is in and the position of the mouse in the stack
+            # Record the axis in which the mouse is in and the position of the mouse in the stack
             self.inAxis = axis_id
             voxel_position = [
                 self.axes2D[axis_id].currentSlice,
