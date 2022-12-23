@@ -145,7 +145,7 @@ class lasagna_viewBox(pg.ViewBox):
             self.progressLayer.emit()
         else:
             # Handle zoom (mousewheel with no keyboard modifier)
-            mask = np.array(self.state["mouseEnabled"], dtype=np.float)
+            mask = np.array(self.state["mouseEnabled"], dtype=float)
 
             if axis is not None and 0 <= axis < len(mask):
                 mv = mask[axis]
