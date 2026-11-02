@@ -11,12 +11,16 @@
     Antonin Blot, Basel
 """
 
+import os
+
 import numpy as np
 from PyQt5 import QtGui, QtWidgets
 
 
+from lasagna.io_libs.sparse_point_io import read_lasagna_pts
 from lasagna.plugins.lasagna_plugin import LasagnaPlugin
 from lasagna.plugins.annotation_plugins import add_line_UI
+from lasagna.utils import preferences
 
 
 class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
@@ -30,6 +34,14 @@ class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
 
         # Create widgets defined in the designer file
         self.setupUi(self)
+
+        # Button to load a saved points file into the table, so a saved track can be edited or extended.
+        # Added here rather than in add_line.ui so the generated add_line_UI.py stays untouched.
+        self.load_pushButton = QtWidgets.QPushButton("&Load points", self.layoutWidget)
+        self.load_pushButton.setToolTip("Load a saved _pts.csv into the table to edit or extend it")
+        self.verticalLayout.insertWidget(
+            self.verticalLayout.indexOf(self.add_pushButton), self.load_pushButton
+        )
         self.show()
         self.name_lineEdit.setText("ManualLine")
 
@@ -86,6 +98,7 @@ class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
         self.deg_spinBox.valueChanged.connect(self.fit_and_display_line)
         self.clear_pushButton.clicked.connect(self.clear_line)
         self.add_pushButton.clicked.connect(self.add_line)
+        self.load_pushButton.clicked.connect(self.load_points_dialog)
         self.addPoint_radioButton.toggled.connect(self.addRemoveToggle)
         self.fitType_comboBox.activated.connect(self.fit_and_display_line)
         # TODO: trigger off an edit signal not item changed
@@ -267,6 +280,75 @@ class plugin(LasagnaPlugin, QtWidgets.QWidget, add_line_UI.Ui_addLine):
             self.lasagna.returnIngredientByName(line_name).addToPlots()
 
         self.clear_line()
+
+    def load_points_dialog(self):
+        """Ask for a saved points file and load it into the table
+
+        If the table already holds points, ask before replacing them.
+        """
+        start_dir = preferences.readPreference('lastLoadDir') or ''
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Load points", start_dir, "Points (*.csv *.pts *.txt);; All Files (*.*)"
+        )
+        if not path:
+            return
+
+        n_rows = self.tableWidget.rowCount()
+        if n_rows > 0:
+            reply = QtWidgets.QMessageBox.question(
+                self, "Load points",
+                "Replace the %d points in the table with %s?" % (n_rows, os.path.basename(path)),
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No
+            )
+            if reply != QtWidgets.QMessageBox.Yes:
+                return
+
+        if self.load_points(path):
+            # The next Load starts in this folder
+            preferences.preferenceWriter('lastLoadDir', os.path.dirname(path) + os.sep)
+
+    def load_points(self, path):
+        """Replace the table with the points in a saved file (one "Z,X,Y" row per point, as written by
+        sparsepoints.save), keeping the file's order, and name the line after the file.
+
+        The name drops a trailing "_pts", so "Add it!" makes a "<name>_pts" layer whose Save dialog
+        offers the original file name.
+
+        :return: True if points were loaded
+        """
+        try:
+            coords = np.asarray(read_lasagna_pts(path), dtype=float)
+        except (OSError, ValueError) as err:
+            print("Could not read points from %s: %s" % (path, err))
+            return False
+        if coords.size == 0:
+            print("No points in %s" % path)
+            return False
+        if coords.ndim != 2 or coords.shape[1] != 3:
+            print("Expected three values (Z,X,Y) per line in %s" % path)
+            return False
+
+        # The table holds whole voxels, as clicked points do
+        rounded = np.round(coords).astype(int)
+        if not np.array_equal(rounded, coords):
+            print("Rounded non-integer coordinates in %s to whole voxels" % path)
+
+        self.clear_line()
+        for row, point in enumerate(rounded):
+            self.tableWidget.insertRow(row)
+            for col_index, value in enumerate(point):
+                self.tableWidget.setItem(row, col_index, QtWidgets.QTableWidgetItem(str(value)))
+        self.num_points = len(rounded)
+        self.numPoints_textLabel.setText("n pts: %d" % self.num_points)
+
+        name = os.path.splitext(os.path.basename(path))[0]
+        if name.endswith("_pts"):
+            name = name[:-len("_pts")]
+        self.name_lineEdit.setText(name)
+
+        self.update_current_line()
+        print("Loaded %d points from %s" % (self.num_points, path))
+        return True
 
     def addRemoveToggle(self):
         """
